@@ -961,5 +961,103 @@
         // Iniciar la aplicación
         init();
     </script>
+
+
+    <script>
+// Registro del Service Worker MEJORADO
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      // Registrar SW
+      const registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/'
+      });
+      
+      console.log('SW registrado exitosamente:', registration);
+      
+      // Esperar a que el SW esté activo
+      if (registration.installing) {
+        console.log('SW instalando...');
+        registration.installing.addEventListener('statechange', (e) => {
+          if (e.target.state === 'installed') {
+            console.log('SW instalado correctamente');
+            // Recargar para que tome control
+            if (!navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          }
+        });
+      }
+      
+      // Verificar si hay actualizaciones
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        console.log('Nueva versión del SW encontrada');
+        
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Notificar al usuario que hay actualización
+            if (confirm('Nueva versión disponible. ¿Recargar para actualizar?')) {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              window.location.reload();
+            }
+          }
+        });
+      });
+      
+      // Escuchar mensajes del SW
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        console.log('Mensaje del SW:', event.data);
+        if (event.data.type === 'ONLINE_SYNC') {
+          showToast(event.data.message);
+        }
+      });
+      
+      // Verificar si el SW está controlando la página
+      if (navigator.serviceWorker.controller) {
+        console.log('SW controlando la página');
+      } else {
+        console.log('SW aún no controla la página');
+      }
+      
+    } catch (error) {
+      console.error('Error registrando SW:', error);
+    }
+  });
+}
+
+// Función para mostrar notificaciones
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 9999;
+    font-size: 14px;
+    animation: fadeInOut 3s ease;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// Agregar estilo para el toast
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  }
+`;
+document.head.appendChild(style);
+</script>
 </body>
 </html>
