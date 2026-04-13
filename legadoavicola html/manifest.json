@@ -1,0 +1,92 @@
+{
+    "name": "Legado Avícola",
+    "short_name": "LegadoAV",
+    "description": "Portal avícola profesional - Guías, sanidad, manejo de aves. Funciona offline y con notificaciones push.",
+    "start_url": "/",
+    "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+    "theme_color": "#2E7D32",
+    "background_color": "#ffffff",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "es-MX",
+    "dir": "ltr",
+    "categories": ["lifestyle", "education", "books", "reference", "productivity", "utilities"],
+    "iarc_rating_id": "",
+    "prefer_related_applications": false,
+    "prefer_related_applications_wildcard": false,
+    "related_applications": [],
+    "id": "/",
+    "version": "2.0.0",
+    
+    "icons": [
+        {"src": "https://placehold.co/48x48/2E7D32/white?text=LA", "sizes": "48x48", "type": "image/png", "purpose": "any"},
+        {"src": "https://placehold.co/72x72/2E7D32/white?text=LA", "sizes": "72x72", "type": "image/png", "purpose": "any"},
+        {"src": "https://placehold.co/96x96/2E7D32/white?text=LA", "sizes": "96x96", "type": "image/png", "purpose": "any"},
+        {"src": "https://placehold.co/128x128/2E7D32/white?text=LA", "sizes": "128x128", "type": "image/png", "purpose": "any"},
+        {"src": "https://placehold.co/144x144/2E7D32/white?text=LA", "sizes": "144x144", "type": "image/png", "purpose": "any"},
+        {"src": "https://placehold.co/152x152/2E7D32/white?text=LA", "sizes": "152x152", "type": "image/png", "purpose": "any"},
+        {"src": "https://placehold.co/192x192/2E7D32/white?text=LA", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+        {"src": "https://placehold.co/256x256/2E7D32/white?text=LA", "sizes": "256x256", "type": "image/png", "purpose": "any maskable"},
+        {"src": "https://placehold.co/384x384/2E7D32/white?text=LA", "sizes": "384x384", "type": "image/png", "purpose": "any maskable"},
+        {"src": "https://placehold.co/512x512/2E7D32/white?text=LA", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    ],
+
+    "shortcuts": [
+        {"name": "📖 Guías Avícolas", "short_name": "Guías", "description": "Manuales y guías de manejo de aves", "url": "/?section=guias", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=📘", "sizes": "96x96", "type": "image/png", "purpose": "any"}]},
+        {"name": "💊 Sanidad", "short_name": "Sanidad", "description": "Enfermedades y tratamientos avícolas", "url": "/?section=sanidad", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=💊", "sizes": "96x96", "type": "image/png", "purpose": "any"}]},
+        {"name": "🍽️ Alimentación", "short_name": "Nutrición", "description": "Tablas nutricionales y dietas", "url": "/?section=alimentacion", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=🍽️", "sizes": "96x96", "type": "image/png", "purpose": "any"}]},
+        {"name": "🚨 Emergencias", "short_name": "Emergencia", "description": "Contactos y primeros auxilios", "url": "/?section=emergencia", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=🚨", "sizes": "96x96", "type": "image/png", "purpose": "any"}]},
+        {"name": "📊 Estadísticas", "short_name": "Estadísticas", "description": "Datos de la industria avícola", "url": "/?section=estadisticas", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=📊", "sizes": "96x96", "type": "image/png", "purpose": "any"}]},
+        {"name": "📞 Contacto Veterinario", "short_name": "Veterinario", "description": "Contactos de emergencia veterinaria", "url": "/?section=contacto", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=📞", "sizes": "96x96", "type": "image/png", "purpose": "any"}]},
+        {"name": "📅 Calendario Avícola", "short_name": "Calendario", "description": "Calendario de vacunación y manejo", "url": "/?section=calendario", "icons": [{"src": "https://placehold.co/96x96/FFC107/1b5e20?text=📅", "sizes": "96x96", "type": "image/png", "purpose": "any"}]}
+    ],
+
+    "screenshots": [
+        {"src": "https://placehold.co/1280x720/2E7D32/white?text=Inicio+Legado+Avicola", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Pantalla de inicio del portal avícola"},
+        {"src": "https://placehold.co/1280x720/2E7D32/white?text=Guías+Avícolas", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Sección de guías y manuales"},
+        {"src": "https://placehold.co/1280x720/2E7D32/white?text=Sanidad+Aviar", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Información de sanidad y enfermedades"},
+        {"src": "https://placehold.co/720x1280/2E7D32/white?text=Modo+Offline", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow", "label": "Contenido disponible sin internet"},
+        {"src": "https://placehold.co/1280x720/2E7D32/white?text=Calendario+Vacunacion", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Calendario de vacunación avícola"},
+        {"src": "https://placehold.co/720x1280/2E7D32/white?text=Emergencias+Veterinarias", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow", "label": "Contactos de emergencia"}
+    ],
+
+    "launch_handler": {"client_mode": ["focus-existing", "navigate-existing", "auto"]},
+    "edge_side_panel": {"preferred_width": 400},
+    "handle_links": "preferred",
+    "note_taking": {"new_note_url": "/?action=nota"},
+    "share_target": {"action": "/", "method": "GET", "enctype": "application/x-www-form-urlencoded", "params": {"title": "title", "text": "text", "url": "url"}},
+    "file_handlers": [{"action": "/", "accept": {"text/plain": [".txt"], "text/markdown": [".md"]}, "launch_type": "single-client"}],
+    "protocol_handlers": [{"protocol": "web+legado", "url": "/?protocol=%s"}],
+    "url_handlers": [{"origin": "https://legadoavicola.pages.dev", "has_origin_wildcard": false}],
+    
+    "display_override_windows": ["window-controls-overlay", "standalone"],
+    "theme_color_override": "#2E7D32",
+    "categories_extra": ["productivity", "utilities"],
+    
+    "serviceworker": {"src": "/sw.js", "scope": "/", "type": "classic", "update_via_cache": "all"},
+    "offline_enabled": true,
+    "cache": {"strategy": "cache-first", "max_age": 2592000, "max_entries": 100},
+    "prefetch": {"urls": ["/", "/?section=guias", "/?section=sanidad", "/?section=alimentacion", "/?section=emergencia"], "strategy": "eager"},
+    "background_sync": {"enabled": true, "tag": "legado-sync", "period": 86400},
+    "periodic_sync": {"enabled": true, "min_interval": 86400, "tag": "legado-periodic"},
+    
+    "push": {"enabled": true, "vapid_key": "BFA5YzZvXbGkf5xQ3pLfWv8RkKjD2sTnMpLxYzVbNcXwQ6oU1iE2rT9yUaFgHjKlZxCsDfGhJkL", "auto_subscribe": true},
+    "notification": {"badge": "https://placehold.co/72x72/2E7D32/white?text=🐔", "vibrate": [200, 100, 200], "sound": "/notification.mp3", "dir": "auto", "lang": "es-MX", "renotify": true, "require_interaction": false, "silent": false},
+    "lock_screen": {"show_notifications": true, "show_badge": true},
+    
+    "splash_screen": {"background_color": "#2E7D32", "image": "https://placehold.co/512x512/2E7D32/white?text=🐔", "image_purpose": "any"},
+    "tab_strip": {"home_tab": {"icon": "/tab-icon.png", "title": "Inicio", "url": "/"}},
+    "widgets": [{"tag": "widget-avicola", "url": "/widget.html", "description": "Widget rápido de Legado Avícola", "screenshots": [{"src": "https://placehold.co/400x400/2E7D32/white?text=Widget", "sizes": "400x400", "type": "image/png"}]}],
+    
+    "analytics": {"enabled": true, "transport": "beacon"},
+    "features": {"cross_window": true, "fullscreen": true, "picture_in_picture": true, "wake_lock": true, "keyboard_lock": false, "screen_orientation": true},
+    "deeplink": {"enabled": true, "domains": ["https://legadoavicola.pages.dev", "https://prueba-ca5.pages.dev"]},
+    "capture_links": "existing-client-event",
+    "intent_filters": [{"action": "android.intent.action.VIEW", "category": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"], "data": {"scheme": "https", "host": "legadoavicola.pages.dev", "pathPrefix": "/"}}],
+    
+    "related_applications_extra": [
+        {"platform": "play", "url": "https://play.google.com/store/apps/details?id=com.legadoavicola.app", "id": "com.legadoavicola.app"},
+        {"platform": "itunes", "url": "https://apps.apple.com/app/legadoavicola/id1234567890", "id": "1234567890"}
+    ]
+}

@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Legado Avícola - Portal Avícola Profesional</title>
+    
+    <!-- ========== DETECCIÓN DE URLS PARA PWA INSTALADA ========== -->
+<link rel="chrome_url_handler" href="https://prueba-ca5.pages.dev/">
+<meta name="google" content="notranslate">
+
+    <!-- PWA Meta Tags COMPLETAS -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Legado Avícola">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232E7D32'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E🐔%3C/text%3E%3C/svg%3E">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- SEO y redes -->
+    <meta name="description" content="Portal avícola profesional - Guías, manejo y sanidad aviar. Funciona offline.">
+    <meta name="keywords" content="avicultura, gallinas, pollos, veterinaria, granja">
+    
+        <!-- ========== OPEN GRAPH PARA WHATSAPP Y REDES SOCIALES ========== -->
+    <meta property="og:title" content="Legado Avícola - Portal Avícola Profesional">
+    <meta property="og:description" content="Portal avícola profesional - Guías, manejo y sanidad aviar. Funciona offline y con notificaciones push.">
+    <meta property="og:image" content="https://placehold.co/512x512/2E7D32/white?text=🐔">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:url" content="https://prueba-ca5.pages.dev/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Legado Avícola">
+    <meta property="og:locale" content="es_MX">
+    
+    <!-- ========== TWITTER CARDS ========== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Legado Avícola - Portal Avícola Profesional">
+    <meta name="twitter:description" content="Portal avícola profesional - Guías, manejo, sanidad aviar.">
+    <meta name="twitter:image" content="https://placehold.co/512x512/2E7D32/white?text=🐔">
+    
+    <!-- ========== WHATSAPP SPECIFIC ========== -->
+    <meta property="og:image:secure_url" content="https://placehold.co/512x512/2E7D32/white?text=🐔">
+    <meta property="og:image:alt" content="Logo Legado Avícola">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #ffffff; /* Fondo blanco limpio */
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Contenido principal - ocupa toda la pantalla sin bordes */
+        .main-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        /* Modo Online - Iframe a pantalla completa */
+        .online-mode {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.3s;
+            background: #ffffff;
+        }
+
+        .online-mode.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Modo Offline - UI Estática */
+        .offline-mode {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            overflow-y: auto;
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .offline-mode.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Navegación offline */
+        .offline-nav {
+            background: #2E7D32;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .offline-nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .offline-nav-btn.active {
+            background: #ffc107;
+            color: #1b5e20;
+        }
+
+        /* Contenido offline */
+        .offline-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .article-card h3 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .article-card p {
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2E7D32;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            margin-top: 10px;
+        }
+
+        .emergency-box {
+            background: #ffeb3b;
+            border-left: 5px solid #f44336;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .connection-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            z-index: 100;
+        }
+
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #2E7D32;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ========== OVERLAY ESTILO GOOGLE MATERIAL DESIGN ========== */
+        .install-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: fadeIn 0.3s ease-out;
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .install-card {
+            background: white;
+            border-radius: 28px;
+            padding: 0;
+            text-align: center;
+            max-width: 320px;
+            width: 85%;
+            margin: 20px;
+            box-shadow: 0 24px 38px rgba(0, 0, 0, 0.2), 0 9px 12px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.3s ease-out;
+            overflow: hidden;
+        }
+        
+        .install-header {
+            background: linear-gradient(135deg, #1e8e3e 0%, #2E7D32 100%);
+            padding: 32px 24px 24px 24px;
+        }
+        
+        .install-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .install-header h2 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.3px;
+        }
+        
+        .install-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .install-body {
+            padding: 24px 20px 20px 20px;
+            background: white;
+        }
+        
+        .feature-list {
+            text-align: left;
+            margin-bottom: 24px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            color: #202124;
+            font-size: 0.85rem;
+        }
+        
+        .feature-icon {
+            font-size: 20px;
+            min-width: 28px;
+        }
+        
+        .feature-text {
+            flex: 1;
+        }
+        
+        .install-button {
+            background: #1e8e3e;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .install-button:hover {
+            background: #2E7D32;
+            transform: scale(1.02);
+        }
+        
+        .install-button:active {
+            transform: scale(0.98);
+        }
+        
+        .later-link {
+            background: none;
+            border: none;
+            color: #5f6368;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 8px;
+            width: 100%;
+            font-family: inherit;
+        }
+        
+        .later-link:hover {
+            color: #202124;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 16px 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; backdrop-filter: blur(0px); }
+            to { opacity: 1; backdrop-filter: blur(4px); }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .offline-nav-btn { padding: 6px 12px; font-size: 0.7rem; }
+            .article-card { padding: 15px; }
+            .install-card { width: 90%; }
+            .install-header { padding: 24px 20px 20px 20px; }
+            .install-body { padding: 20px 16px 16px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Modo Online -->
+        <div id="onlineMode" class="online-mode">
+            <div id="iframeLoader" class="loader"></div>
+            <iframe id="blogFrame" src="https://calcutasysubastasjaviruiz.blogspot.com" title="Legado Avícola Blog"></iframe>
+        </div>
+
+        <!-- Modo Offline - UI Estática Completa -->
+        <div id="offlineMode" class="offline-mode">
+            <div class="offline-nav">
+                <button class="offline-nav-btn active" data-section="inicio">🏠 Inicio</button>
+                <button class="offline-nav-btn" data-section="guias">📖 Guías</button>
+                <button class="offline-nav-btn" data-section="sanidad">💊 Sanidad</button>
+                <button class="offline-nav-btn" data-section="alimentacion">🍽️ Alimentación</button>
+                <button class="offline-nav-btn" data-section="emergencia">🚨 Emergencia</button>
+            </div>
+            <div id="offlineContent" class="offline-content">
+                <!-- Contenido dinámico offline -->
+            </div>
+        </div>
+    </div>
+
+    <div class="connection-status" id="connStatusText">🟢 Online</div>
+
+    <script>
+        // ========== INSTALACIÓN PWA CON OVERLAY GOOGLE DESIGN ==========
+        
+        let deferredPrompt = null;
+        let overlayShown = false;
+        
+        function isPWAInstalled() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                                 window.navigator.standalone === true;
+            return isStandalone;
+        }
+        
+        // Escuchar el evento beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Si el PWA NO está instalado y NO se ha mostrado el overlay
+            if (!isPWAInstalled() && !overlayShown) {
+                overlayShown = true;
+                showInstallOverlay();
+            }
+        });
+        
+        function showInstallOverlay() {
+            // Detectar sistema operativo
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            
+            let installText = "Instalar App";
+            let features = [
+                { icon: "⚡", text: "Acceso instantáneo desde tu pantalla de inicio" },
+                { icon: "📡", text: "Funciona sin conexión a internet" },
+                { icon: "🔔", text: "Recibe notificaciones importantes" },
+                { icon: "🚀", text: "Experiencia más rápida y fluida" }
+            ];
+            
+            if (isIOS) {
+                installText = "Agregar a pantalla de inicio";
+            } else if (isAndroid) {
+                installText = "Instalar App";
+            }
+            
+            // Crear overlay con diseño Google Material
+            const overlay = document.createElement('div');
+            overlay.className = 'install-overlay';
+            overlay.innerHTML = `
+                <div class="install-card">
+                    <div class="install-header">
+                        <div class="install-icon">🐔📱</div>
+                        <h2>Legado Avícola</h2>
+                        <p>Instala nuestra app para una mejor experiencia</p>
+                    </div>
+                    <div class="install-body">
+                        <div class="feature-list">
+                            ${features.map(f => `
+                                <div class="feature-item">
+                                    <span class="feature-icon">${f.icon}</span>
+                                    <span class="feature-text">${f.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="install-button" id="installNowBtn">${installText}</button>
+                        <button class="later-link" id="laterBtn">Ahora no</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Evento para instalar
+            const installNowBtn = document.getElementById('installNowBtn');
+            const laterBtn = document.getElementById('laterBtn');
+            
+            if (installNowBtn) {
+                installNowBtn.addEventListener('click', () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('Usuario instaló la app');
+                            }
+                            deferredPrompt = null;
+                        });
+                    } else {
+                        // Para iOS o navegadores que no soportan beforeinstallprompt
+                        alert('Para instalar, toca el botón compartir y selecciona "Agregar a pantalla de inicio"');
+                    }
+                    overlay.remove();
+                });
+            }
+            
+            if (laterBtn) {
+                laterBtn.addEventListener('click', () => {
+                    overlay.remove();
+                });
+            }
+            
+            // También cerrar al hacer click fuera (opcional)
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+        
+        // Si ya está instalado, no hacer nada
+        if (isPWAInstalled()) {
+            console.log('✅ PWA ya instalada, no mostrar overlay');
+        }
+        
+        // ========== SISTEMA DE URL PERSONALIZADA (SENIOR) ==========
+        // Detecta cualquier parámetro en la URL y lo transfiere al blog
+        
+        const BLOG_BASE_URL = 'https://calcutasysubastasjaviruiz.blogspot.com';
+        
+        // Función para obtener todos los parámetros de la URL actual
+        function getCurrentUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const paramObj = {};
+            for (const [key, value] of params.entries()) {
+                paramObj[key] = value;
+            }
+            return paramObj;
+        }
+        
+        // Función para construir la URL del blog con los mismos parámetros
+        function buildBlogUrlWithParams() {
+            const params = getCurrentUrlParams();
+            const paramKeys = Object.keys(params);
+            
+            // Si no hay parámetros, retornar la URL base
+            if (paramKeys.length === 0) {
+                return BLOG_BASE_URL;
+            }
+            
+            // Construir URL con parámetros
+            const urlParams = new URLSearchParams();
+            for (const [key, value] of Object.entries(params)) {
+                urlParams.append(key, value);
+            }
+            
+            return `${BLOG_BASE_URL}?${urlParams.toString()}`;
+        }
+        
+        // Función principal para redirigir el iframe según los parámetros de URL
+        function redirectIframeToUrlParams() {
+            const targetUrl = buildBlogUrlWithParams();
+            const iframe = document.getElementById('blogFrame');
+            const currentSrc = iframe.src.split('?')[0]; // Ignorar parámetros actuales
+            
+            // Solo redirigir si es necesario
+            if (currentSrc !== BLOG_BASE_URL || targetUrl !== BLOG_BASE_URL) {
+                console.log(`🔄 Redirigiendo iframe a: ${targetUrl}`);
+                iframe.src = targetUrl;
+                return true;
+            }
+            return false;
+        }
+        
+        // ========== DATOS OFFLINE COMPLETOS ==========
+        const offlineData = {
+            inicio: {
+                title: "Bienvenido a Legado Avícola",
+                content: `
+                    <div class="article-card">
+                        <h3>🐔 Portal Avícola Profesional</h3>
+                        <p>Estás viendo la versión offline de Legado Avícola. Cuando recuperes conexión a internet, se cargará automáticamente el blog completo con todas las actualizaciones.</p>
+                        <p style="margin-top: 10px;">Mientras tanto, aquí encontrarás información esencial para el manejo de aves.</p>
+                        <span class="tag">📱 Modo offline</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>📊 Datos de la industria avícola 2024</h3>
+                        <p>La producción avícola en Latinoamérica creció un 8% este año. La demanda de huevo y pollo se mantiene como la proteína animal más accesible.</p>
+                        <span class="tag">📈 Estadísticas</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>✅ Tips rápidos</h3>
+                        <p>✓ Mantén la cama seca y ventilada<br>✓ Agua fresca siempre disponible<br>✓ Revisa el consumo diario de alimento<br>✓ Aisla aves enfermas inmediatamente</p>
+                        <span class="tag">💡 Recomendaciones</span>
+                    </div>
+                `
+            },
+            guias: {
+                title: "Guías Avícolas",
+                content: `
+                    <div class="article-card">
+                        <h3>📘 Manejo de pollos de engorde</h3>
+                        <p><strong>Fase 1 (0-14 días):</strong> Temperatura 32-35°C, alimento iniciador 22% proteína.<br>
+                        <strong>Fase 2 (15-28 días):</strong> Temperatura 26-30°C, alimento crecimiento 20% proteína.<br>
+                        <strong>Fase 3 (29-42 días):</strong> Temperatura 22-24°C, alimento finalizador 18% proteína.</p>
+                        <span class="tag">🐔 Engorde</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>🥚 Producción de huevo comercial</h3>
+                        <p>Gallinas ponedoras requieren 16 horas de luz diaria, calcio suplementario (3.5-4%) y agua ad libitum. Producción óptima: 280-300 huevos/año.</p>
+                        <span class="tag">🥚 Postura</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>🐣 Incubación artificial</h3>
+                        <p>Temperatura: 37.5°C, Humedad: 55-60% (días 1-18), 65-70% (días 19-21). Volteo cada 2 horas hasta día 18.</p>
+                        <span class="tag">🥚 Incubación</span>
+                    </div>
+                `
+            },
+            sanidad: {
+                title: "Sanidad y Enfermedades",
+                content: `
+                    <div class="article-card">
+                        <h3>💊 Calendario de vacunación básico</h3>
+                        <p>• Día 1: Marek (in ovo o subcutáneo)<br>
+                        • Día 7-10: Newcastle + Bronquitis (ocular o agua)<br>
+                        • Día 14-18: Gumboro (agua)<br>
+                        • Día 21-24: Newcastle + Bronquitis (refuerzo)</p>
+                        <span class="tag">💉 Vacunas</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>⚠️ Signos de alarma</h3>
+                        <p>• Depresión, plumas erizadas<br>
+                        • Diarrea verdosa o sanguinolenta<br>
+                        • Estornudos, secreción nasal<br>
+                        • Baja producción de huevo<br>
+                        • Muerte súbita</p>
+                        <span class="tag">🚨 Síntomas</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>🧴 Bioseguridad básica</h3>
+                        <p>Pediluvios a la entrada, cambio de ropa, limpieza diaria de comederos y bebederos, cuarentena de aves nuevas por 21 días.</p>
+                        <span class="tag">🧼 Prevención</span>
+                    </div>
+                `
+            },
+            alimentacion: {
+                title: "Nutrición y Alimentación",
+                content: `
+                    <div class="article-card">
+                        <h3>🍽️ Tabla de requerimientos nutricionales</h3>
+                        <p><strong>Inicio (0-6 sem):</strong> 22-24% PC, 2950-3050 kcal/kg<br>
+                        <strong>Crecimiento (6-12 sem):</strong> 18-20% PC, 2900-3000 kcal/kg<br>
+                        <strong>Postura:</strong> 16-18% PC, 2700-2800 kcal/kg, 3.5% Calcio</p>
+                        <span class="tag">📊 Nutrientes</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>🌿 Alimentos alternativos</h3>
+                        <p>Harina de pescado, torta de soya, sorgo, harina de plumas, maíz, salvado de trigo. Suplementar con aminoácidos esenciales (metionina, lisina).</p>
+                        <span class="tag">🌽 Ingredientes</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>💧 Agua: el nutriente olvidado</h3>
+                        <p>Las aves consumen 2x más agua que alimento. Mantener bebederos limpios, pH 6.5-7.5, cloración a 3-5 ppm.</p>
+                        <span class="tag">💧 Calidad de agua</span>
+                    </div>
+                `
+            },
+            emergencia: {
+                title: "Emergencias Avícolas",
+                content: `
+                    <div class="emergency-box">
+                        <h3>🚨 ¡CONTACTO DE EMERGENCIA!</h3>
+                        <p>📞 Veterinario de guardia: <strong>+52 55 1234 5678</strong><br>
+                        📞 SENASICA (México): <strong>800 751 2100</strong><br>
+                        📞 USDA (EE.UU.): <strong>1-866-536-7593</strong></p>
+                    </div>
+                    <div class="article-card">
+                        <h3>🔥 Golpe de calor</h3>
+                        <p>Síntomas: jadeo, alas separadas, convulsiones. Acción: nebulizar con agua fría, aumentar ventilación, electrolitos en agua.</p>
+                        <span class="tag">🌡️ Urgencia</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>🩸 Hemorragias o trauma</h3>
+                        <p>Aplicar presión directa con gasa estéril, aislar al ave en lugar tranquilo, administrar vitamina K si está disponible. Trasladar al veterinario.</p>
+                        <span class="tag">🩹 Primeros auxilios</span>
+                    </div>
+                    <div class="article-card">
+                        <h3>📋 Kit de emergencia recomendado</h3>
+                        <p>• Antisépticos (yodo, clorhexidina)<br>
+                        • Vendas y gasas<br>
+                        • Vitaminas/electrolitos<br>
+                        • Termómetro<br>
+                        • Antibiótico de amplio espectro (bajo prescripción)</p>
+                        <span class="tag">🎒 Equipo</span>
+                    </div>
+                `
+            }
+        };
+
+        // Elementos DOM
+        const onlineMode = document.getElementById('onlineMode');
+        const offlineMode = document.getElementById('offlineMode');
+        const iframe = document.getElementById('blogFrame');
+        const iframeLoader = document.getElementById('iframeLoader');
+        const connStatusSpan = document.getElementById('connStatusText');
+        
+        let isOnline = navigator.onLine;
+        let swRegistration = null;
+
+        // Cambiar entre modo online/offline
+        function setMode(online) {
+            isOnline = online;
+            
+            if (online) {
+                onlineMode.classList.remove('hidden');
+                offlineMode.classList.remove('active');
+                connStatusSpan.innerHTML = '🟢 Online';
+                // Aplicar redirección por URL personalizada al volver online
+                redirectIframeToUrlParams();
+            } else {
+                onlineMode.classList.add('hidden');
+                offlineMode.classList.add('active');
+                connStatusSpan.innerHTML = '🔴 Offline';
+                
+                // Cargar sección offline según los parámetros de URL
+                const params = getCurrentUrlParams();
+                let sectionToLoad = 'inicio';
+                
+                if (params.section) {
+                    const sectionMap = {
+                        'guias': 'guias',
+                        'sanidad': 'sanidad',
+                        'alimentacion': 'alimentacion',
+                        'emergencia': 'emergencia'
+                    };
+                    sectionToLoad = sectionMap[params.section] || 'inicio';
+                }
+                
+                loadOfflineSection(sectionToLoad);
+            }
+        }
+
+        // Cargar sección offline
+        function loadOfflineSection(sectionId) {
+            const data = offlineData[sectionId];
+            if (data) {
+                document.getElementById('offlineContent').innerHTML = data.content;
+                // Actualizar active en navegación
+                document.querySelectorAll('.offline-nav-btn').forEach(btn => {
+                    if (btn.dataset.section === sectionId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Detectar cambios de conexión
+        window.addEventListener('online', () => {
+            setMode(true);
+            showToast("🌐 Conexión restaurada - Cargando blog...", 3000);
+        });
+        
+        window.addEventListener('offline', () => {
+            setMode(false);
+            showToast("📡 Sin internet - Usando contenido offline", 3000);
+        });
+
+        // Iframe load event
+        iframe.addEventListener('load', () => {
+            iframeLoader.style.display = 'none';
+        });
+
+        iframe.addEventListener('error', () => {
+            iframeLoader.style.display = 'none';
+            if (!navigator.onLine) {
+                setMode(false);
+            }
+        });
+
+        // Service Worker Registration
+        async function registerSW() {
+            if (!('serviceWorker' in navigator)) return;
+            
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+                console.log('SW registrado:', registration);
+                swRegistration = registration;
+                return registration;
+            } catch (error) {
+                console.error('SW registration failed:', error);
+            }
+        }
+
+        // Toast
+        function showToast(msg, duration) {
+            const toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '70px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.background = '#333';
+            toast.style.color = 'white';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '30px';
+            toast.style.zIndex = '2000';
+            toast.style.fontSize = '0.85rem';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), duration);
+        }
+
+        // Event listeners para navegación offline
+        document.querySelectorAll('.offline-nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                loadOfflineSection(btn.dataset.section);
+            });
+        });
+        
+        // Manejar cambios en el historial (botones atrás/adelante)
+        window.addEventListener('popstate', () => {
+            if (navigator.onLine) {
+                redirectIframeToUrlParams();
+            } else {
+                const params = getCurrentUrlParams();
+                let sectionToLoad = 'inicio';
+                if (params.section) {
+                    const sectionMap = {
+                        'guias': 'guias',
+                        'sanidad': 'sanidad',
+                        'alimentacion': 'alimentacion',
+                        'emergencia': 'emergencia'
+                    };
+                    sectionToLoad = sectionMap[params.section] || 'inicio';
+                }
+                loadOfflineSection(sectionToLoad);
+            }
+        });
+        
+        
+        // Inicialización
+        async function init() {
+            await registerSW();
+            
+            // APLICAR REDIRECCIÓN POR URL PERSONALIZADA AL INICIO
+            const targetUrl = buildBlogUrlWithParams();
+            iframe.src = targetUrl;
+            console.log(`🚀 Inicializado con URL destino: ${targetUrl}`);
+            
+            setMode(navigator.onLine);
+            
+            // Mostrar loader del iframe por unos segundos
+            setTimeout(() => {
+                iframeLoader.style.display = 'none';
+            }, 5000);
+        }
+        
+        init();
+    </script>
+</body>
+</html>

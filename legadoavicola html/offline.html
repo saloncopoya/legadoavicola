@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legado Avícola - Offline</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a2e12, #1b5e20);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 32px;
+            text-align: center;
+            max-width: 400px;
+        }
+        .icon { font-size: 64px; margin-bottom: 20px; }
+        h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        p { opacity: 0.9; margin-bottom: 20px; line-height: 1.5; }
+        .btn {
+            background: #ffc107;
+            color: #1b5e20;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">🐔🌾</div>
+        <h1>Modo Offline</h1>
+        <p>Legado Avícola está funcionando sin conexión a internet. Cuando recuperes señal, el contenido se actualizará automáticamente.</p>
+        <button class="btn" onclick="location.reload()">Reintentar</button>
+    </div>
+</body>
+</html>
