@@ -1,0 +1,45 @@
+<div class="home-container">
+    <h2>🏠 Bienvenido a Legado Avícola</h2>
+    <p>Plataforma profesional offline-first</p>
+    
+    <div class="pages-grid">
+        <div class="card" data-page="about">
+            <div class="card-icon">ℹ️</div>
+            <h3>Información</h3>
+            <p>Conoce más sobre nuestra plataforma</p>
+        </div>
+        
+        <div class="card" data-page="contact">
+            <div class="card-icon">📞</div>
+            <h3>Contacto</h3>
+            <p>Comunícate con nosotros</p>
+        </div>
+        
+        <div class="card" data-page="gallery">
+            <div class="card-icon">🖼️</div>
+            <h3>Galería</h3>
+            <p>Explora nuestro contenido</p>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; padding: 1rem; background: #F3F4F6; border-radius: 0.5rem;">
+        <h3>✨ Características Offline</h3>
+        <ul style="margin-top: 0.5rem; list-style: none;">
+            <li>✓ Funciona sin internet</li>
+            <li>✓ Sincronización automática</li>
+            <li>✓ Datos guardados localmente</li>
+            <li>✓ Actualizaciones en segundo plano</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+            const page = card.getAttribute('data-page');
+            if (page && window.navigateTo) {
+                window.navigateTo(page);
+            }
+        });
+    });
+</script>
