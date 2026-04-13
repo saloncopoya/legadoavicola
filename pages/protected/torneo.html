@@ -1,0 +1,31 @@
+<div class="torneo-container">
+    <h2>🏆 Gestión de Torneos</h2>
+    
+    <div class="torneo-controls">
+        <button id="btnNewTorneo" class="btn-primary">+ Nuevo Torneo</button>
+    </div>
+    
+    <div id="torneosList" class="torneos-list">
+        <div class="loading-spinner">Cargando torneos...</div>
+    </div>
+</div>
+
+<script>
+    // Aquí puedes agregar la lógica específica de torneos
+    // Usando Firebase Realtime Database
+    
+    async function loadTorneos() {
+        const torneosList = document.getElementById('torneosList');
+        // Cargar torneos desde Firebase
+        // const torneosRef = ref(database, 'torneos');
+        // const snapshot = await get(torneosRef);
+        // Mostrar torneos
+    }
+    
+    loadTorneos();
+    
+    document.getElementById('btnNewTorneo')?.addEventListener('click', () => {
+        alert('Formulario para crear nuevo torneo');
+        // Aquí implementas la lógica para crear torneos
+    });
+</script>
