@@ -3,49 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Legado Avícola - Portal Avícola Profesional</title>
-    
-    <!-- ========== DETECCIÓN DE URLS PARA PWA INSTALADA ========== -->
-<link rel="chrome_url_handler" href="https://prueba-ca5.pages.dev/">
-<meta name="google" content="notranslate">
-
-    <!-- PWA Meta Tags COMPLETAS -->
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="Legado Avícola - Aplicación profesional offline-first">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2E7D32">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Legado Avícola">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232E7D32'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E🐔%3C/text%3E%3C/svg%3E">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-touch-fullscreen" content="yes">
-    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <title>Legado Avícola</title>
     
-    <!-- SEO y redes -->
-    <meta name="description" content="Portal avícola profesional - Guías, manejo y sanidad aviar. Funciona offline.">
-    <meta name="keywords" content="avicultura, gallinas, pollos, veterinaria, granja">
-    
-        <!-- ========== OPEN GRAPH PARA WHATSAPP Y REDES SOCIALES ========== -->
-    <meta property="og:title" content="Legado Avícola - Portal Avícola Profesional">
-    <meta property="og:description" content="Portal avícola profesional - Guías, manejo y sanidad aviar. Funciona offline y con notificaciones push.">
-    <meta property="og:image" content="https://placehold.co/512x512/2E7D32/white?text=🐔">
-    <meta property="og:image:width" content="512">
-    <meta property="og:image:height" content="512">
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:url" content="https://prueba-ca5.pages.dev/">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Legado Avícola">
-    <meta property="og:locale" content="es_MX">
-    
-    <!-- ========== TWITTER CARDS ========== -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Legado Avícola - Portal Avícola Profesional">
-    <meta name="twitter:description" content="Portal avícola profesional - Guías, manejo, sanidad aviar.">
-    <meta name="twitter:image" content="https://placehold.co/512x512/2E7D32/white?text=🐔">
-    
-    <!-- ========== WHATSAPP SPECIFIC ========== -->
-    <meta property="og:image:secure_url" content="https://placehold.co/512x512/2E7D32/white?text=🐔">
-    <meta property="og:image:alt" content="Logo Legado Avícola">
-
     <style>
         * {
             margin: 0;
@@ -53,786 +16,949 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+            --white: #FFFFFF;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #ffffff; /* Fondo blanco limpio */
-            height: 100vh;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--light);
+            color: var(--dark);
         }
 
-        /* Contenido principal - ocupa toda la pantalla sin bordes */
-        .main-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            background: #ffffff;
+        #app {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            box-shadow: var(--shadow);
         }
 
-        /* Modo Online - Iframe a pantalla completa */
-        .online-mode {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transition: opacity 0.3s;
-            background: #ffffff;
-        }
-
-        .online-mode.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-
-        /* Modo Offline - UI Estática */
-        .offline-mode {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #f5f5f5;
-            overflow-y: auto;
-            transition: opacity 0.3s;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .offline-mode.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* Navegación offline */
-        .offline-nav {
-            background: #2E7D32;
-            padding: 10px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 1rem;
+            box-shadow: var(--shadow);
             position: sticky;
             top: 0;
-            z-index: 10;
-        }
-
-        .offline-nav-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .offline-nav-btn.active {
-            background: #ffc107;
-            color: #1b5e20;
-        }
-
-        /* Contenido offline */
-        .offline-content {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .article-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .article-card h3 {
-            color: #2E7D32;
-            margin-bottom: 10px;
-        }
-
-        .article-card p {
-            color: #333;
-            line-height: 1.5;
-        }
-
-        .tag {
-            display: inline-block;
-            background: #e8f5e9;
-            color: #2E7D32;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            margin-top: 10px;
-        }
-
-        .emergency-box {
-            background: #ffeb3b;
-            border-left: 5px solid #f44336;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .connection-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
             z-index: 100;
         }
 
-        .loader {
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+            animation: pulse 2s infinite;
+        }
+
+        .offline-dot {
+            background: #EF4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .btn-logout, .btn-login {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover, .btn-login:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Navigation */
+        .app-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            background: var(--white);
+            border-bottom: 2px solid var(--light);
+            padding: 0.75rem 0.5rem;
+            gap: 0.5rem;
+            position: sticky;
+            top: 70px;
+            z-index: 99;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.75rem;
+            background: none;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-btn:hover {
+            background: var(--light);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 1.5rem;
+            min-height: 500px;
+        }
+
+        /* Cards */
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--light);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 15% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 1rem;
+            position: relative;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            right: 1rem;
+            top: 0.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--dark);
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--danger);
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 2px solid var(--light);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 1rem 0;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        /* Loading */
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #e0e0e0;
-            border-top: 4px solid #2E7D32;
+            border: 4px solid var(--light);
+            border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* ========== OVERLAY ESTILO GOOGLE MATERIAL DESIGN ========== */
-        .install-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 20000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            animation: fadeIn 0.3s ease-out;
-            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        
-        .install-card {
-            background: white;
-            border-radius: 28px;
-            padding: 0;
+        .error-message {
             text-align: center;
-            max-width: 320px;
-            width: 85%;
-            margin: 20px;
-            box-shadow: 0 24px 38px rgba(0, 0, 0, 0.2), 0 9px 12px rgba(0, 0, 0, 0.1);
-            animation: slideUp 0.3s ease-out;
-            overflow: hidden;
-        }
-        
-        .install-header {
-            background: linear-gradient(135deg, #1e8e3e 0%, #2E7D32 100%);
-            padding: 32px 24px 24px 24px;
-        }
-        
-        .install-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-        }
-        
-        .install-header h2 {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 500;
-            margin: 0 0 8px 0;
-            letter-spacing: -0.3px;
-        }
-        
-        .install-header p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.85rem;
-            margin: 0;
-            line-height: 1.4;
-        }
-        
-        .install-body {
-            padding: 24px 20px 20px 20px;
-            background: white;
-        }
-        
-        .feature-list {
-            text-align: left;
-            margin-bottom: 24px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-            color: #202124;
-            font-size: 0.85rem;
-        }
-        
-        .feature-icon {
-            font-size: 20px;
-            min-width: 28px;
-        }
-        
-        .feature-text {
-            flex: 1;
-        }
-        
-        .install-button {
-            background: #1e8e3e;
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 12px;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        
-        .install-button:hover {
-            background: #2E7D32;
-            transform: scale(1.02);
-        }
-        
-        .install-button:active {
-            transform: scale(0.98);
-        }
-        
-        .later-link {
-            background: none;
-            border: none;
-            color: #5f6368;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 8px;
-            width: 100%;
-            font-family: inherit;
-        }
-        
-        .later-link:hover {
-            color: #202124;
-        }
-        
-        .divider {
-            height: 1px;
-            background: #e0e0e0;
-            margin: 16px 0;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; backdrop-filter: blur(0px); }
-            to { opacity: 1; backdrop-filter: blur(4px); }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            padding: 2rem;
+            color: var(--danger);
+            background: #FEE2E2;
+            border-radius: 0.5rem;
         }
 
-        @media (max-width: 600px) {
-            .offline-nav-btn { padding: 6px 12px; font-size: 0.7rem; }
-            .article-card { padding: 15px; }
-            .install-card { width: 90%; }
-            .install-header { padding: 24px 20px 20px 20px; }
-            .install-body { padding: 20px 16px 16px 16px; }
+        .sync-banner {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            position: sticky;
+            top: 120px;
+            z-index: 98;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-nav {
+                grid-template-columns: repeat(4, 1fr);
+                top: 80px;
+            }
+            
+            .nav-btn span:not(.nav-icon) {
+                font-size: 0.7rem;
+            }
+            
+            .modal-content {
+                margin: 30% auto;
+                padding: 1.5rem;
+            }
+
+            .sync-banner {
+                top: 130px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .app-nav {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .nav-icon {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Modo Online -->
-        <div id="onlineMode" class="online-mode">
-            <div id="iframeLoader" class="loader"></div>
-            <iframe id="blogFrame" src="https://calcutasysubastasjaviruiz.blogspot.com" title="Legado Avícola Blog"></iframe>
+    <div id="app">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>
+                    <span>🏆</span>
+                    <span>Legado Avícola</span>
+                </h1>
+                <div id="userStatus" class="user-status"></div>
+            </div>
+        </header>
+
+        <div id="syncStatus" class="sync-banner" style="display: none;">
+            🔄 Sincronizando cambios pendientes...
         </div>
 
-        <!-- Modo Offline - UI Estática Completa -->
-        <div id="offlineMode" class="offline-mode">
-            <div class="offline-nav">
-                <button class="offline-nav-btn active" data-section="inicio">🏠 Inicio</button>
-                <button class="offline-nav-btn" data-section="guias">📖 Guías</button>
-                <button class="offline-nav-btn" data-section="sanidad">💊 Sanidad</button>
-                <button class="offline-nav-btn" data-section="alimentacion">🍽️ Alimentación</button>
-                <button class="offline-nav-btn" data-section="emergencia">🚨 Emergencia</button>
+        <nav class="app-nav">
+            <button data-page="home" class="nav-btn active">
+                <span class="nav-icon">🏠</span>
+                <span>Inicio</span>
+            </button>
+            <button data-page="about" class="nav-btn">
+                <span class="nav-icon">ℹ️</span>
+                <span>Info</span>
+            </button>
+            <button data-page="contact" class="nav-btn">
+                <span class="nav-icon">📞</span>
+                <span>Contacto</span>
+            </button>
+            <button data-page="gallery" class="nav-btn">
+                <span class="nav-icon">🖼️</span>
+                <span>Galería</span>
+            </button>
+            <button data-page="torneo" class="nav-btn protected-btn" style="display:none;">
+                <span class="nav-icon">🏆</span>
+                <span>Torneo</span>
+            </button>
+            <button data-page="cotejo" class="nav-btn protected-btn" style="display:none;">
+                <span class="nav-icon">⚽</span>
+                <span>Cotejo</span>
+            </button>
+            <button data-page="juez" class="nav-btn protected-btn" style="display:none;">
+                <span class="nav-icon">⚖️</span>
+                <span>Juez</span>
+            </button>
+            <button data-page="perfil" class="nav-btn protected-btn" style="display:none;">
+                <span class="nav-icon">👤</span>
+                <span>Perfil</span>
+            </button>
+        </nav>
+
+        <main id="mainContent" class="main-content">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                Cargando...
             </div>
-            <div id="offlineContent" class="offline-content">
-                <!-- Contenido dinámico offline -->
+        </main>
+
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="loginForm">
+                    <h2>Iniciar Sesión</h2>
+                    <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+                    <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                    <button id="btnLogin" class="btn-primary">Ingresar</button>
+                    <p style="text-align: center; margin-top: 1rem;">
+                        ¿No tienes cuenta? <a href="#" id="showRegister">Regístrate</a>
+                    </p>
+                </div>
+                <div id="registerForm" style="display:none;">
+                    <h2>Registro</h2>
+                    <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+                    <input type="password" id="registerPassword" placeholder="Contraseña" required>
+                    <button id="btnRegister" class="btn-primary">Registrarse</button>
+                    <p style="text-align: center; margin-top: 1rem;">
+                        ¿Ya tienes cuenta? <a href="#" id="showLogin">Inicia Sesión</a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="connection-status" id="connStatusText">🟢 Online</div>
-
     <script>
-        // ========== INSTALACIÓN PWA CON OVERLAY GOOGLE DESIGN ==========
+        // ==================== CONFIGURACIÓN INICIAL ====================
+        // Sistema de almacenamiento offline (IndexedDB)
+        const DB_NAME = 'LegadoAvicolaDB';
+        const DB_VERSION = 1;
+        let db = null;
         
-        let deferredPrompt = null;
-        let overlayShown = false;
+        // Cola de operaciones pendientes para sincronizar
+        let pendingOperations = [];
         
-        function isPWAInstalled() {
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                                 window.navigator.standalone === true;
-            return isStandalone;
+        // Estado de conexión
+        let isOnline = navigator.onLine;
+        
+        // Usuario actual
+        let currentUser = null;
+        let userPermissions = {};
+        let currentPage = 'home';
+        
+        // Firebase config (REEMPLAZA CON TUS DATOS)
+        const firebaseConfig = {
+          apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+  authDomain: "galloslivebadge.firebaseapp.com",
+  databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+  projectId: "galloslivebadge",
+  storageBucket: "galloslivebadge.firebasestorage.app",
+  messagingSenderId: "979482928760",
+  appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d",
+        };
+        
+        // ==================== INICIALIZAR INDEXEDDB ====================
+        async function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    // Store para páginas cacheadas
+                    if (!db.objectStoreNames.contains('pages')) {
+                        const pagesStore = db.createObjectStore('pages', { keyPath: 'url' });
+                        pagesStore.createIndex('url', 'url', { unique: true });
+                    }
+                    
+                    // Store para datos de Firebase (offline cache)
+                    if (!db.objectStoreNames.contains('firebaseData')) {
+                        const firebaseStore = db.createObjectStore('firebaseData', { keyPath: 'path' });
+                        firebaseStore.createIndex('path', 'path', { unique: true });
+                    }
+                    
+                    // Store para operaciones pendientes
+                    if (!db.objectStoreNames.contains('pendingOps')) {
+                        const opsStore = db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
+                        opsStore.createIndex('timestamp', 'timestamp');
+                    }
+                };
+            });
         }
         
-        // Escuchar el evento beforeinstallprompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Si el PWA NO está instalado y NO se ha mostrado el overlay
-            if (!isPWAInstalled() && !overlayShown) {
-                overlayShown = true;
-                showInstallOverlay();
-            }
-        });
+        // ==================== OPERACIONES DE INDEXEDDB ====================
+        async function savePageToCache(url, html) {
+            if (!db) return;
+            const transaction = db.transaction(['pages'], 'readwrite');
+            const store = transaction.objectStore('pages');
+            store.put({ url, html, timestamp: Date.now() });
+        }
         
-        function showInstallOverlay() {
-            // Detectar sistema operativo
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isAndroid = /Android/i.test(navigator.userAgent);
+        async function getPageFromCache(url) {
+            if (!db) return null;
+            const transaction = db.transaction(['pages'], 'readonly');
+            const store = transaction.objectStore('pages');
+            return new Promise((resolve) => {
+                const request = store.get(url);
+                request.onsuccess = () => resolve(request.result?.html || null);
+                request.onerror = () => resolve(null);
+            });
+        }
+        
+        async function saveFirebaseData(path, data) {
+            if (!db) return;
+            const transaction = db.transaction(['firebaseData'], 'readwrite');
+            const store = transaction.objectStore('firebaseData');
+            store.put({ path, data, timestamp: Date.now() });
+        }
+        
+        async function getFirebaseData(path) {
+            if (!db) return null;
+            const transaction = db.transaction(['firebaseData'], 'readonly');
+            const store = transaction.objectStore('firebaseData');
+            return new Promise((resolve) => {
+                const request = store.get(path);
+                request.onsuccess = () => resolve(request.result?.data || null);
+                request.onerror = () => resolve(null);
+            });
+        }
+        
+        async function addPendingOperation(operation) {
+            if (!db) return;
+            const transaction = db.transaction(['pendingOps'], 'readwrite');
+            const store = transaction.objectStore('pendingOps');
+            await store.add({
+                ...operation,
+                timestamp: Date.now(),
+                userId: currentUser?.uid
+            });
             
-            let installText = "Instalar App";
-            let features = [
-                { icon: "⚡", text: "Acceso instantáneo desde tu pantalla de inicio" },
-                { icon: "📡", text: "Funciona sin conexión a internet" },
-                { icon: "🔔", text: "Recibe notificaciones importantes" },
-                { icon: "🚀", text: "Experiencia más rápida y fluida" }
-            ];
-            
-            if (isIOS) {
-                installText = "Agregar a pantalla de inicio";
-            } else if (isAndroid) {
-                installText = "Instalar App";
+            // Intentar sincronizar inmediatamente si hay conexión
+            if (isOnline && currentUser) {
+                syncPendingOperations();
             }
+        }
+        
+        async function getPendingOperations() {
+            if (!db) return [];
+            const transaction = db.transaction(['pendingOps'], 'readonly');
+            const store = transaction.objectStore('pendingOps');
+            return new Promise((resolve) => {
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => resolve([]);
+            });
+        }
+        
+        async function clearPendingOperation(id) {
+            if (!db) return;
+            const transaction = db.transaction(['pendingOps'], 'readwrite');
+            const store = transaction.objectStore('pendingOps');
+            store.delete(id);
+        }
+        
+        // ==================== SINCRONIZACIÓN CON FIREBASE ====================
+        async function syncPendingOperations() {
+            if (!isOnline || !currentUser) return;
             
-            // Crear overlay con diseño Google Material
-            const overlay = document.createElement('div');
-            overlay.className = 'install-overlay';
-            overlay.innerHTML = `
-                <div class="install-card">
-                    <div class="install-header">
-                        <div class="install-icon">🐔📱</div>
-                        <h2>Legado Avícola</h2>
-                        <p>Instala nuestra app para una mejor experiencia</p>
-                    </div>
-                    <div class="install-body">
-                        <div class="feature-list">
-                            ${features.map(f => `
-                                <div class="feature-item">
-                                    <span class="feature-icon">${f.icon}</span>
-                                    <span class="feature-text">${f.text}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button class="install-button" id="installNowBtn">${installText}</button>
-                        <button class="later-link" id="laterBtn">Ahora no</button>
-                    </div>
-                </div>
-            `;
+            const operations = await getPendingOperations();
+            if (operations.length === 0) return;
             
-            document.body.appendChild(overlay);
+            document.getElementById('syncStatus').style.display = 'block';
             
-            // Evento para instalar
-            const installNowBtn = document.getElementById('installNowBtn');
-            const laterBtn = document.getElementById('laterBtn');
-            
-            if (installNowBtn) {
-                installNowBtn.addEventListener('click', () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('Usuario instaló la app');
-                            }
-                            deferredPrompt = null;
-                        });
-                    } else {
-                        // Para iOS o navegadores que no soportan beforeinstallprompt
-                        alert('Para instalar, toca el botón compartir y selecciona "Agregar a pantalla de inicio"');
+            for (const op of operations) {
+                try {
+                    // Aquí implementas la sincronización según el tipo de operación
+                    // Ejemplo: si es una escritura en Firebase
+                    if (op.type === 'write' && window.firebaseDatabase) {
+                        const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
+                        const dbRef = ref(window.firebaseDatabase, op.path);
+                        await set(dbRef, op.data);
+                        await clearPendingOperation(op.id);
+                        showToast('✅ Sincronizado: ' + op.path);
                     }
-                    overlay.remove();
-                });
+                } catch (error) {
+                    console.error('Error syncing operation:', error);
+                }
             }
             
-            if (laterBtn) {
-                laterBtn.addEventListener('click', () => {
-                    overlay.remove();
-                });
-            }
+            document.getElementById('syncStatus').style.display = 'none';
+        }
+        
+        // ==================== CARGA DE PÁGINAS (OFFLINE-FIRST) ====================
+        async function loadPage(pageName, isProtected = false) {
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div>Cargando...</div>';
             
-            // También cerrar al hacer click fuera (opcional)
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    overlay.remove();
+            const url = `pages/${isProtected ? 'protected' : 'public'}/${pageName}.html`;
+            
+            try {
+                // Intentar obtener de la red (solo si hay internet)
+                let response = null;
+                let html = null;
+                
+                if (isOnline) {
+                    try {
+                        response = await fetch(url);
+                        if (response.ok) {
+                            html = await response.text();
+                            // Guardar en IndexedDB para offline
+                            await savePageToCache(url, html);
+                        }
+                    } catch (e) {
+                        console.log('Network error, using cache');
+                    }
+                }
+                
+                // Si no hay internet o falló la red, obtener de cache
+                if (!html) {
+                    html = await getPageFromCache(url);
+                    if (!html) {
+                        throw new Error('Página no disponible offline');
+                    }
+                    showToast('📱 Modo offline - contenido cacheado');
+                }
+                
+                mainContent.innerHTML = html;
+                
+                // Ejecutar scripts de la página
+                const scripts = mainContent.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => {
+                        newScript.setAttribute(attr.name, attr.value);
+                    });
+                    newScript.textContent = oldScript.textContent;
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+                
+            } catch (error) {
+                console.error('Error loading page:', error);
+                mainContent.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Error al cargar la página</h3>
+                        <p>Esta página no está disponible offline. Conéctate a internet para descargarla.</p>
+                        <button onclick="location.reload()" class="btn-primary" style="margin-top: 1rem;">Reintentar</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // ==================== AUTH Y PERMISOS ====================
+        async function checkUserPermissions(userId) {
+            try {
+                // Intentar obtener de Firebase si hay conexión
+                if (isOnline && window.firebaseDatabase) {
+                    const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
+                    const database = getDatabase(window.firebaseApp);
+                    const permissionsRef = ref(database, `users/${userId}/permissions`);
+                    const snapshot = await get(permissionsRef);
+                    
+                    if (snapshot.exists()) {
+                        userPermissions = snapshot.val();
+                        await saveFirebaseData(`users/${userId}/permissions`, userPermissions);
+                    } else {
+                        userPermissions = { torneo: false, cotejo: false, juez: false, perfil: true };
+                        // Guardar en Firebase
+                        const { set } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
+                        await set(permissionsRef, userPermissions);
+                        await saveFirebaseData(`users/${userId}/permissions`, userPermissions);
+                    }
+                } else {
+                    // Offline: obtener de cache local
+                    const cached = await getFirebaseData(`users/${userId}/permissions`);
+                    if (cached) {
+                        userPermissions = cached;
+                    } else {
+                        userPermissions = { torneo: false, cotejo: false, juez: false, perfil: true };
+                    }
+                    showToast('📱 Modo offline - permisos desde cache');
+                }
+                
+                updateNavigationByPermissions();
+                
+            } catch (error) {
+                console.error('Error checking permissions:', error);
+                // Usar permisos por defecto en caso de error
+                userPermissions = { torneo: false, cotejo: false, juez: false, perfil: true };
+                updateNavigationByPermissions();
+            }
+        }
+        
+        function updateNavigationByPermissions() {
+            const protectedBtns = document.querySelectorAll('.protected-btn');
+            protectedBtns.forEach(btn => {
+                const page = btn.getAttribute('data-page');
+                if (userPermissions[page]) {
+                    btn.style.display = 'flex';
+                } else {
+                    btn.style.display = 'none';
                 }
             });
         }
         
-        // Si ya está instalado, no hacer nada
-        if (isPWAInstalled()) {
-            console.log('✅ PWA ya instalada, no mostrar overlay');
-        }
-        
-        // ========== SISTEMA DE URL PERSONALIZADA (SENIOR) ==========
-        // Detecta cualquier parámetro en la URL y lo transfiere al blog
-        
-        const BLOG_BASE_URL = 'https://calcutasysubastasjaviruiz.blogspot.com';
-        
-        // Función para obtener todos los parámetros de la URL actual
-        function getCurrentUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const paramObj = {};
-            for (const [key, value] of params.entries()) {
-                paramObj[key] = value;
-            }
-            return paramObj;
-        }
-        
-        // Función para construir la URL del blog con los mismos parámetros
-        function buildBlogUrlWithParams() {
-            const params = getCurrentUrlParams();
-            const paramKeys = Object.keys(params);
+        function updateAuthUI(user) {
+            const userStatus = document.getElementById('userStatus');
+            const loginModal = document.getElementById('loginModal');
             
-            // Si no hay parámetros, retornar la URL base
-            if (paramKeys.length === 0) {
-                return BLOG_BASE_URL;
-            }
-            
-            // Construir URL con parámetros
-            const urlParams = new URLSearchParams();
-            for (const [key, value] of Object.entries(params)) {
-                urlParams.append(key, value);
-            }
-            
-            return `${BLOG_BASE_URL}?${urlParams.toString()}`;
-        }
-        
-        // Función principal para redirigir el iframe según los parámetros de URL
-        function redirectIframeToUrlParams() {
-            const targetUrl = buildBlogUrlWithParams();
-            const iframe = document.getElementById('blogFrame');
-            const currentSrc = iframe.src.split('?')[0]; // Ignorar parámetros actuales
-            
-            // Solo redirigir si es necesario
-            if (currentSrc !== BLOG_BASE_URL || targetUrl !== BLOG_BASE_URL) {
-                console.log(`🔄 Redirigiendo iframe a: ${targetUrl}`);
-                iframe.src = targetUrl;
-                return true;
-            }
-            return false;
-        }
-        
-        // ========== DATOS OFFLINE COMPLETOS ==========
-        const offlineData = {
-            inicio: {
-                title: "Bienvenido a Legado Avícola",
-                content: `
-                    <div class="article-card">
-                        <h3>🐔 Portal Avícola Profesional</h3>
-                        <p>Estás viendo la versión offline de Legado Avícola. Cuando recuperes conexión a internet, se cargará automáticamente el blog completo con todas las actualizaciones.</p>
-                        <p style="margin-top: 10px;">Mientras tanto, aquí encontrarás información esencial para el manejo de aves.</p>
-                        <span class="tag">📱 Modo offline</span>
+            if (user) {
+                userStatus.innerHTML = `
+                    <div class="user-info">
+                        <div class="online-status">
+                            <div class="online-dot ${!isOnline ? 'offline-dot' : ''}"></div>
+                            <span>${isOnline ? 'En línea' : 'Offline'}</span>
+                        </div>
+                        <span>👤 ${user.email}</span>
+                        <button id="btnLogout" class="btn-logout">Cerrar Sesión</button>
                     </div>
-                    <div class="article-card">
-                        <h3>📊 Datos de la industria avícola 2024</h3>
-                        <p>La producción avícola en Latinoamérica creció un 8% este año. La demanda de huevo y pollo se mantiene como la proteína animal más accesible.</p>
-                        <span class="tag">📈 Estadísticas</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>✅ Tips rápidos</h3>
-                        <p>✓ Mantén la cama seca y ventilada<br>✓ Agua fresca siempre disponible<br>✓ Revisa el consumo diario de alimento<br>✓ Aisla aves enfermas inmediatamente</p>
-                        <span class="tag">💡 Recomendaciones</span>
-                    </div>
-                `
-            },
-            guias: {
-                title: "Guías Avícolas",
-                content: `
-                    <div class="article-card">
-                        <h3>📘 Manejo de pollos de engorde</h3>
-                        <p><strong>Fase 1 (0-14 días):</strong> Temperatura 32-35°C, alimento iniciador 22% proteína.<br>
-                        <strong>Fase 2 (15-28 días):</strong> Temperatura 26-30°C, alimento crecimiento 20% proteína.<br>
-                        <strong>Fase 3 (29-42 días):</strong> Temperatura 22-24°C, alimento finalizador 18% proteína.</p>
-                        <span class="tag">🐔 Engorde</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>🥚 Producción de huevo comercial</h3>
-                        <p>Gallinas ponedoras requieren 16 horas de luz diaria, calcio suplementario (3.5-4%) y agua ad libitum. Producción óptima: 280-300 huevos/año.</p>
-                        <span class="tag">🥚 Postura</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>🐣 Incubación artificial</h3>
-                        <p>Temperatura: 37.5°C, Humedad: 55-60% (días 1-18), 65-70% (días 19-21). Volteo cada 2 horas hasta día 18.</p>
-                        <span class="tag">🥚 Incubación</span>
-                    </div>
-                `
-            },
-            sanidad: {
-                title: "Sanidad y Enfermedades",
-                content: `
-                    <div class="article-card">
-                        <h3>💊 Calendario de vacunación básico</h3>
-                        <p>• Día 1: Marek (in ovo o subcutáneo)<br>
-                        • Día 7-10: Newcastle + Bronquitis (ocular o agua)<br>
-                        • Día 14-18: Gumboro (agua)<br>
-                        • Día 21-24: Newcastle + Bronquitis (refuerzo)</p>
-                        <span class="tag">💉 Vacunas</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>⚠️ Signos de alarma</h3>
-                        <p>• Depresión, plumas erizadas<br>
-                        • Diarrea verdosa o sanguinolenta<br>
-                        • Estornudos, secreción nasal<br>
-                        • Baja producción de huevo<br>
-                        • Muerte súbita</p>
-                        <span class="tag">🚨 Síntomas</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>🧴 Bioseguridad básica</h3>
-                        <p>Pediluvios a la entrada, cambio de ropa, limpieza diaria de comederos y bebederos, cuarentena de aves nuevas por 21 días.</p>
-                        <span class="tag">🧼 Prevención</span>
-                    </div>
-                `
-            },
-            alimentacion: {
-                title: "Nutrición y Alimentación",
-                content: `
-                    <div class="article-card">
-                        <h3>🍽️ Tabla de requerimientos nutricionales</h3>
-                        <p><strong>Inicio (0-6 sem):</strong> 22-24% PC, 2950-3050 kcal/kg<br>
-                        <strong>Crecimiento (6-12 sem):</strong> 18-20% PC, 2900-3000 kcal/kg<br>
-                        <strong>Postura:</strong> 16-18% PC, 2700-2800 kcal/kg, 3.5% Calcio</p>
-                        <span class="tag">📊 Nutrientes</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>🌿 Alimentos alternativos</h3>
-                        <p>Harina de pescado, torta de soya, sorgo, harina de plumas, maíz, salvado de trigo. Suplementar con aminoácidos esenciales (metionina, lisina).</p>
-                        <span class="tag">🌽 Ingredientes</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>💧 Agua: el nutriente olvidado</h3>
-                        <p>Las aves consumen 2x más agua que alimento. Mantener bebederos limpios, pH 6.5-7.5, cloración a 3-5 ppm.</p>
-                        <span class="tag">💧 Calidad de agua</span>
-                    </div>
-                `
-            },
-            emergencia: {
-                title: "Emergencias Avícolas",
-                content: `
-                    <div class="emergency-box">
-                        <h3>🚨 ¡CONTACTO DE EMERGENCIA!</h3>
-                        <p>📞 Veterinario de guardia: <strong>+52 55 1234 5678</strong><br>
-                        📞 SENASICA (México): <strong>800 751 2100</strong><br>
-                        📞 USDA (EE.UU.): <strong>1-866-536-7593</strong></p>
-                    </div>
-                    <div class="article-card">
-                        <h3>🔥 Golpe de calor</h3>
-                        <p>Síntomas: jadeo, alas separadas, convulsiones. Acción: nebulizar con agua fría, aumentar ventilación, electrolitos en agua.</p>
-                        <span class="tag">🌡️ Urgencia</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>🩸 Hemorragias o trauma</h3>
-                        <p>Aplicar presión directa con gasa estéril, aislar al ave en lugar tranquilo, administrar vitamina K si está disponible. Trasladar al veterinario.</p>
-                        <span class="tag">🩹 Primeros auxilios</span>
-                    </div>
-                    <div class="article-card">
-                        <h3>📋 Kit de emergencia recomendado</h3>
-                        <p>• Antisépticos (yodo, clorhexidina)<br>
-                        • Vendas y gasas<br>
-                        • Vitaminas/electrolitos<br>
-                        • Termómetro<br>
-                        • Antibiótico de amplio espectro (bajo prescripción)</p>
-                        <span class="tag">🎒 Equipo</span>
-                    </div>
-                `
-            }
-        };
-
-        // Elementos DOM
-        const onlineMode = document.getElementById('onlineMode');
-        const offlineMode = document.getElementById('offlineMode');
-        const iframe = document.getElementById('blogFrame');
-        const iframeLoader = document.getElementById('iframeLoader');
-        const connStatusSpan = document.getElementById('connStatusText');
-        
-        let isOnline = navigator.onLine;
-        let swRegistration = null;
-
-        // Cambiar entre modo online/offline
-        function setMode(online) {
-            isOnline = online;
-            
-            if (online) {
-                onlineMode.classList.remove('hidden');
-                offlineMode.classList.remove('active');
-                connStatusSpan.innerHTML = '🟢 Online';
-                // Aplicar redirección por URL personalizada al volver online
-                redirectIframeToUrlParams();
-            } else {
-                onlineMode.classList.add('hidden');
-                offlineMode.classList.add('active');
-                connStatusSpan.innerHTML = '🔴 Offline';
-                
-                // Cargar sección offline según los parámetros de URL
-                const params = getCurrentUrlParams();
-                let sectionToLoad = 'inicio';
-                
-                if (params.section) {
-                    const sectionMap = {
-                        'guias': 'guias',
-                        'sanidad': 'sanidad',
-                        'alimentacion': 'alimentacion',
-                        'emergencia': 'emergencia'
-                    };
-                    sectionToLoad = sectionMap[params.section] || 'inicio';
-                }
-                
-                loadOfflineSection(sectionToLoad);
-            }
-        }
-
-        // Cargar sección offline
-        function loadOfflineSection(sectionId) {
-            const data = offlineData[sectionId];
-            if (data) {
-                document.getElementById('offlineContent').innerHTML = data.content;
-                // Actualizar active en navegación
-                document.querySelectorAll('.offline-nav-btn').forEach(btn => {
-                    if (btn.dataset.section === sectionId) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
+                `;
+                document.getElementById('btnLogout')?.addEventListener('click', () => {
+                    if (window.firebaseAuth) {
+                        const { signOut } = import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+                        signOut(window.firebaseAuth);
                     }
                 });
+                loginModal.style.display = 'none';
+                currentUser = user;
+                checkUserPermissions(user.uid);
+                
+                if (currentPage === 'torneo' || currentPage === 'cotejo' || currentPage === 'juez' || currentPage === 'perfil') {
+                    loadPage(currentPage, true);
+                }
+            } else {
+                userStatus.innerHTML = `
+                    <div class="online-status">
+                        <div class="online-dot ${!isOnline ? 'offline-dot' : ''}"></div>
+                        <span>${isOnline ? 'En línea' : 'Offline'}</span>
+                    </div>
+                    <button id="btnShowLogin" class="btn-login">Iniciar Sesión</button>
+                `;
+                document.getElementById('btnShowLogin')?.addEventListener('click', () => {
+                    if (isOnline) {
+                        loginModal.style.display = 'block';
+                    } else {
+                        showToast('❌ Necesitas internet para iniciar sesión');
+                    }
+                });
+                currentUser = null;
+                userPermissions = {};
+                updateNavigationByPermissions();
+                
+                if (currentPage === 'torneo' || currentPage === 'cotejo' || currentPage === 'juez' || currentPage === 'perfil') {
+                    navigateTo('home');
+                }
             }
         }
-
-        // Detectar cambios de conexión
-        window.addEventListener('online', () => {
-            setMode(true);
-            showToast("🌐 Conexión restaurada - Cargando blog...", 3000);
-        });
         
-        window.addEventListener('offline', () => {
-            setMode(false);
-            showToast("📡 Sin internet - Usando contenido offline", 3000);
-        });
-
-        // Iframe load event
-        iframe.addEventListener('load', () => {
-            iframeLoader.style.display = 'none';
-        });
-
-        iframe.addEventListener('error', () => {
-            iframeLoader.style.display = 'none';
-            if (!navigator.onLine) {
-                setMode(false);
-            }
-        });
-
-        // Service Worker Registration
-        async function registerSW() {
-            if (!('serviceWorker' in navigator)) return;
+        function navigateTo(pageName) {
+            currentPage = pageName;
             
-            try {
-                const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-                console.log('SW registrado:', registration);
-                swRegistration = registration;
-                return registration;
-            } catch (error) {
-                console.error('SW registration failed:', error);
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-page') === pageName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            const protectedPages = ['torneo', 'cotejo', 'juez', 'perfil'];
+            const isProtected = protectedPages.includes(pageName);
+            
+            if (isProtected && !currentUser) {
+                if (isOnline) {
+                    document.getElementById('loginModal').style.display = 'block';
+                } else {
+                    showToast('❌ Necesitas internet para iniciar sesión');
+                }
+                return;
             }
+            
+            if (isProtected && !userPermissions[pageName]) {
+                loadPage('home', false);
+                showToast('🔒 No tienes permiso para acceder a esta página');
+                return;
+            }
+            
+            loadPage(pageName, isProtected);
         }
-
-        // Toast
-        function showToast(msg, duration) {
+        
+        function showToast(message, duration = 3000) {
             const toast = document.createElement('div');
-            toast.textContent = msg;
-            toast.style.position = 'fixed';
-            toast.style.bottom = '70px';
-            toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
-            toast.style.background = '#333';
-            toast.style.color = 'white';
-            toast.style.padding = '10px 20px';
-            toast.style.borderRadius = '30px';
-            toast.style.zIndex = '2000';
-            toast.style.fontSize = '0.85rem';
+            toast.className = 'toast';
+            toast.textContent = message;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), duration);
         }
-
-        // Event listeners para navegación offline
-        document.querySelectorAll('.offline-nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                loadOfflineSection(btn.dataset.section);
-            });
-        });
         
-        // Manejar cambios en el historial (botones atrás/adelante)
-        window.addEventListener('popstate', () => {
-            if (navigator.onLine) {
-                redirectIframeToUrlParams();
-            } else {
-                const params = getCurrentUrlParams();
-                let sectionToLoad = 'inicio';
-                if (params.section) {
-                    const sectionMap = {
-                        'guias': 'guias',
-                        'sanidad': 'sanidad',
-                        'alimentacion': 'alimentacion',
-                        'emergencia': 'emergencia'
-                    };
-                    sectionToLoad = sectionMap[params.section] || 'inicio';
+        // ==================== MONITOREO DE CONEXIÓN ====================
+        function updateConnectionStatus() {
+            isOnline = navigator.onLine;
+            const onlineDot = document.querySelector('.online-dot');
+            if (onlineDot) {
+                if (isOnline) {
+                    onlineDot.classList.remove('offline-dot');
+                    showToast('🟢 Conexión restablecida');
+                    syncPendingOperations();
+                } else {
+                    onlineDot.classList.add('offline-dot');
+                    showToast('🔴 Sin conexión - trabajando offline');
                 }
-                loadOfflineSection(sectionToLoad);
             }
-        });
-        
-        
-        // Inicialización
-        async function init() {
-            await registerSW();
             
-            // APLICAR REDIRECCIÓN POR URL PERSONALIZADA AL INICIO
-            const targetUrl = buildBlogUrlWithParams();
-            iframe.src = targetUrl;
-            console.log(`🚀 Inicializado con URL destino: ${targetUrl}`);
-            
-            setMode(navigator.onLine);
-            
-            // Mostrar loader del iframe por unos segundos
-            setTimeout(() => {
-                iframeLoader.style.display = 'none';
-            }, 5000);
+            // Actualizar UI de auth
+            if (currentUser) {
+                updateAuthUI(currentUser);
+            } else {
+                updateAuthUI(null);
+            }
         }
         
+        // ==================== INICIALIZAR TODO ====================
+        async function init() {
+            await initDB();
+            
+            // Cargar Firebase dinámicamente
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
+            const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } = 
+                await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+            const { getDatabase, ref, get, set } = 
+                await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
+            
+            window.firebaseApp = initializeApp(firebaseConfig);
+            window.firebaseAuth = getAuth(window.firebaseApp);
+            window.firebaseDatabase = getDatabase(window.firebaseApp);
+            
+            // Eventos de navegación
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const page = btn.getAttribute('data-page');
+                    navigateTo(page);
+                });
+            });
+            
+            // Modal logic
+            const modal = document.getElementById('loginModal');
+            const closeBtn = document.querySelector('.close');
+            closeBtn.onclick = () => modal.style.display = 'none';
+            window.onclick = (event) => {
+                if (event.target === modal) modal.style.display = 'none';
+            };
+            
+            // Login/Register
+            document.getElementById('showRegister')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+            });
+            
+            document.getElementById('showLogin')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+            });
+            
+            document.getElementById('btnLogin')?.addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                try {
+                    await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                    modal.style.display = 'none';
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            });
+            
+            document.getElementById('btnRegister')?.addEventListener('click', async () => {
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                    const database = getDatabase(window.firebaseApp);
+                    await set(ref(database, `users/${userCredential.user.uid}/permissions`), {
+                        torneo: false,
+                        cotejo: false,
+                        juez: false,
+                        perfil: true
+                    });
+                    modal.style.display = 'none';
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            });
+            
+            onAuthStateChanged(window.firebaseAuth, (user) => {
+                updateAuthUI(user);
+            });
+            
+            // Monitorear conexión
+            window.addEventListener('online', updateConnectionStatus);
+            window.addEventListener('offline', updateConnectionStatus);
+            updateConnectionStatus();
+            
+            // Cargar página inicial
+            navigateTo('home');
+        }
+        
+        // Iniciar la aplicación
         init();
     </script>
 </body>
