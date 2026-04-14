@@ -1,165 +1,73 @@
-const CACHE_NAME = 'legado-avicola-v6';
-const BLOG_URL = 'https://calcutasysubastasjaviruiz.blogspot.com';
+const CACHE_NAME = 'legadoavicola-v2';
+const STATIC_CACHE = 'legadoavicola-static-v2';
+const DYNAMIC_CACHE = 'legadoavicola-dynamic-v2';
 
-// Recursos esenciales para offline - TU INDEX ES LO PRINCIPAL
-const STATIC_CACHE_URLS = [
-    '/',
-    '/index.html',      // ← Este archivo contiene TODO (incluye offlineData)
-    '/manifest.json',
-    'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700',
-    'https://fonts.gstatic.com/'
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/_redirects',
+  '/pages/public/home.html',
+  '/pages/public/about.html',
+  '/pages/public/contact.html',
+  '/pages/public/gallery.html',
+  '/pages/protected/torneo.html',
+  '/pages/protected/cotejo.html',
+  '/pages/protected/juez.html',
+  '/pages/protected/perfil.html'
 ];
 
-// Instalación
 self.addEventListener('install', event => {
-    console.log('[SW] Instalando...');
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(STATIC_CACHE_URLS).catch(err => {
-                console.warn('Error cacheando recursos estáticos:', err);
-            });
-        }).then(() => self.skipWaiting())
-    );
+  event.waitUntil(
+    caches.open(STATIC_CACHE)
+      .then(cache => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-// Activación
-self.addEventListener('activate', event => {
-    console.log('[SW] Activando...');
-    event.waitUntil(
-        caches.keys().then(keys => {
-            return Promise.all(
-                keys.filter(key => key !== CACHE_NAME)
-                    .map(key => caches.delete(key))
-            );
-        }).then(() => self.clients.claim())
-    );
-});
-
-// Fetch - Estrategia: SIEMPRE devolver index.html para navegación
 self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
-    
-    // Para navegación (cuando el usuario abre la app)
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            // Intentar obtener de red primero (para actualizar)
-            fetch(event.request).then(response => {
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, clone);
-                });
-                return response;
-            }).catch(async () => {
-                // Si no hay red, devolver index.html desde caché
-                const cachedIndex = await caches.match('/index.html');
-                if (cachedIndex) {
-                    console.log('[SW] Sirviendo index.html desde caché (offline)');
-                    return cachedIndex;
-                }
-                // Fallback extremo (casi nunca ocurre)
-                return new Response('Contenido offline no disponible', {
-                    status: 200,
-                    headers: { 'Content-Type': 'text/html' }
-                });
-            })
-        );
-    }
-    // Para el iframe del blog - Network First
-    else if (url.hostname === 'calcutasysubastasjaviruiz.blogspot.com') {
-        event.respondWith(
-            fetch(event.request).catch(() => {
-                // Si el blog falla, devolver un mensaje (no afecta tu app)
-                return new Response('Blog no disponible offline', {
-                    status: 200,
-                    headers: { 'Content-Type': 'text/html' }
-                });
-            })
-        );
-    }
-    // Para recursos estáticos (CSS, JS, imágenes) - Cache First
-    else if (event.request.destination === 'style' ||
-             event.request.destination === 'script' ||
-             event.request.destination === 'image') {
-        event.respondWith(
-            caches.match(event.request).then(cached => {
-                return cached || fetch(event.request).then(response => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, clone);
-                    });
-                    return response;
-                });
-            })
-        );
-    }
-    // Para el resto - Network First con fallback a caché
-    else {
-        event.respondWith(
-            fetch(event.request).catch(async () => {
-                const cached = await caches.match(event.request);
-                return cached || new Response('Recurso no disponible', { status: 404 });
-            })
-        );
-    }
-});
-
-// Push Notifications (mantener igual)
-self.addEventListener('push', event => {
-    let data = {
-        title: '🐔 Legado Avícola',
-        body: '¡Nuevo contenido disponible en el portal!',
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-192.png'
-    };
-    
-    if (event.data) {
-        try {
-            const parsed = event.data.json();
-            data = { ...data, ...parsed };
-        } catch(e) {
-            data.body = event.data.text();
+  // Estrategia: Cache First, luego Network
+  event.respondWith(
+    caches.match(event.request)
+      .then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
-    }
-    
-    event.waitUntil(
-        self.registration.showNotification(data.title, {
-            body: data.body,
-            icon: data.icon,
-            badge: data.badge,
-            vibrate: [200, 100, 200],
-            data: { url: '/' },
-            actions: [
-                { action: 'open', title: 'Abrir portal' }
-            ]
-        })
-    );
+        
+        return fetch(event.request)
+          .then(networkResponse => {
+            if (!networkResponse || networkResponse.status !== 200) {
+              return networkResponse;
+            }
+            
+            const responseToCache = networkResponse.clone();
+            caches.open(DYNAMIC_CACHE)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            
+            return networkResponse;
+          })
+          .catch(() => {
+            // Si es una página HTML, mostrar offline.html
+            if (event.request.headers.get('accept').includes('text/html')) {
+              return caches.match('/index.html');
+            }
+          });
+      })
+  );
 });
 
-self.addEventListener('notificationclick', event => {
-    event.notification.close();
-    const url = event.notification.data?.url || '/';
-    
-    event.waitUntil(
-        clients.matchAll({ type: 'window' }).then(clientsArr => {
-            for (const client of clientsArr) {
-                if (client.url === url && 'focus' in client) {
-                    return client.focus();
-                }
-            }
-            return clients.openWindow(url);
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+            return caches.delete(cacheName);
+          }
         })
-    );
-});
-
-// Mensajes desde la página
-self.addEventListener('message', event => {
-    if (event.data?.type === 'SHOW_NOTIFICATION') {
-        self.registration.showNotification(
-            event.data.title || 'Legado Avícola',
-            {
-                body: event.data.body || 'Mensaje del portal',
-                icon: event.data.icon || '/icons/icon-192.png'
-            }
-        );
-    }
+      );
+    }).then(() => self.clients.claim())
+  );
 });
