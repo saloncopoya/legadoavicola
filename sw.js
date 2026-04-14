@@ -1,10 +1,10 @@
-const CACHE_NAME = 'legado-avicola-v5';
-const BLOG_URL = 'https://legadoavicola.blogspot.com';
+const CACHE_NAME = 'legado-avicola-v6';
+const BLOG_URL = 'https://calcutasysubastasjaviruiz.blogspot.com';
 
-// Recursos esenciales para offline
+// Recursos esenciales para offline - TU INDEX ES LO PRINCIPAL
 const STATIC_CACHE_URLS = [
     '/',
-    '/index.html',
+    '/index.html',      // ← Este archivo contiene TODO (incluye offlineData)
     '/manifest.json',
     'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700',
     'https://fonts.gstatic.com/'
@@ -35,15 +35,14 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Fetch - Estrategia híbrida
+// Fetch - Estrategia: SIEMPRE devolver index.html para navegación
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     
-    // Para el blog principal - Network First con fallback a cache
-    if (event.request.mode === 'navigate' || 
-        url.hostname === 'legadoavicola.blogspot.com') {
-        
+    // Para navegación (cuando el usuario abre la app)
+    if (event.request.mode === 'navigate') {
         event.respondWith(
+            // Intentar obtener de red primero (para actualizar)
             fetch(event.request).then(response => {
                 const clone = response.clone();
                 caches.open(CACHE_NAME).then(cache => {
@@ -51,15 +50,33 @@ self.addEventListener('fetch', event => {
                 });
                 return response;
             }).catch(async () => {
-                const cached = await caches.match(event.request);
-                if (cached) return cached;
-                
-                // Si no hay cache del blog, devolver index.html
-                return caches.match('/index.html');
+                // Si no hay red, devolver index.html desde caché
+                const cachedIndex = await caches.match('/index.html');
+                if (cachedIndex) {
+                    console.log('[SW] Sirviendo index.html desde caché (offline)');
+                    return cachedIndex;
+                }
+                // Fallback extremo (casi nunca ocurre)
+                return new Response('Contenido offline no disponible', {
+                    status: 200,
+                    headers: { 'Content-Type': 'text/html' }
+                });
             })
         );
-    } 
-    // Para recursos estáticos - Cache First
+    }
+    // Para el iframe del blog - Network First
+    else if (url.hostname === 'calcutasysubastasjaviruiz.blogspot.com') {
+        event.respondWith(
+            fetch(event.request).catch(() => {
+                // Si el blog falla, devolver un mensaje (no afecta tu app)
+                return new Response('Blog no disponible offline', {
+                    status: 200,
+                    headers: { 'Content-Type': 'text/html' }
+                });
+            })
+        );
+    }
+    // Para recursos estáticos (CSS, JS, imágenes) - Cache First
     else if (event.request.destination === 'style' ||
              event.request.destination === 'script' ||
              event.request.destination === 'image') {
@@ -75,13 +92,18 @@ self.addEventListener('fetch', event => {
             })
         );
     }
-    // Para el resto - Network only
+    // Para el resto - Network First con fallback a caché
     else {
-        event.respondWith(fetch(event.request));
+        event.respondWith(
+            fetch(event.request).catch(async () => {
+                const cached = await caches.match(event.request);
+                return cached || new Response('Recurso no disponible', { status: 404 });
+            })
+        );
     }
 });
 
-// Push Notifications
+// Push Notifications (mantener igual)
 self.addEventListener('push', event => {
     let data = {
         title: '🐔 Legado Avícola',
@@ -105,7 +127,7 @@ self.addEventListener('push', event => {
             icon: data.icon,
             badge: data.badge,
             vibrate: [200, 100, 200],
-            data: { url: BLOG_URL },
+            data: { url: '/' },
             actions: [
                 { action: 'open', title: 'Abrir portal' }
             ]
@@ -115,7 +137,7 @@ self.addEventListener('push', event => {
 
 self.addEventListener('notificationclick', event => {
     event.notification.close();
-    const url = event.notification.data?.url || BLOG_URL;
+    const url = event.notification.data?.url || '/';
     
     event.waitUntil(
         clients.matchAll({ type: 'window' }).then(clientsArr => {
@@ -139,59 +161,5 @@ self.addEventListener('message', event => {
                 icon: event.data.icon || '/icons/icon-192.png'
             }
         );
-    }
-});
-
-// ==============================================
-// 🟢 NUEVO CÓDIGO PARA EL WIDGET - PÉGALO AQUÍ ABAJO
-// ==============================================
-
-// MANEJO DE CLICKS EN NOTIFICACIONES (WIDGET)
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-    
-    const action = event.action;
-    const baseUrl = 'https://legadoavicola.pages.dev';
-    
-    let url = baseUrl + '/';
-    if (action === 'guias') url = baseUrl + '/?section=guias';
-    if (action === 'sanidad') url = baseUrl + '/?section=sanidad';
-    if (action === 'emergencia') url = baseUrl + '/?section=emergencia';
-    
-    // Notificar a la página
-    event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true })
-            .then(windowClients => {
-                // Enviar mensaje a la página
-                windowClients.forEach(client => {
-                    client.postMessage({
-                        type: 'NOTIFICATION_ACTION',
-                        action: action
-                    });
-                });
-                
-                // Abrir ventana si es necesario
-                return clients.openWindow(url);
-            })
-    );
-});
-
-// Crear notificación persistente por mensaje
-self.addEventListener('message', (event) => {
-    if (event.data?.type === 'CREATE_PERSISTENT_WIDGET') {
-        self.registration.showNotification('🐔 Legado Avícola', {
-            body: 'Acceso rápido al portal - Toca para abrir',
-            icon: 'https://placehold.co/192x192/2E7D32/white?text=🐔',
-            tag: 'legado-permanente',
-            requireInteraction: true,
-            renotify: false,
-            silent: true,
-            actions: [
-                { action: 'guias', title: '📖 Guías' },
-                { action: 'sanidad', title: '💊 Sanidad' },
-                { action: 'alimentacion', title: '🍽️ Alimentación' },
-                { action: 'emergencia', title: '🚨 Emergencia' }
-            ]
-        });
     }
 });
