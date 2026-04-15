@@ -1434,69 +1434,65 @@
 </script>
 
 
-<script>
+
+    <script>
 (function() {
-    // Solo Android
     if (!/android/i.test(navigator.userAgent)) return;
-    
-    // Detectar si ya está instalada
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) return;
     
     let deferredPrompt = null;
-    let overlayShown = false;
     
-    // Verificar si el usuario ya rechazó antes (Chrome lo recuerda)
+    // Limpiar cualquier referencia de rechazo en sessionStorage
+    sessionStorage.removeItem('pwa_rejected');
+    
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        console.log('✅ beforeinstallprompt capturado - Todo listo para instalar');
         
-        if (!overlayShown) {
-            showOverlay();
-            overlayShown = true;
-        }
-    });
-    
-    function showOverlay() {
+        // Overlay transparente
         const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999;cursor:pointer';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999';
         document.body.appendChild(overlay);
         
-        overlay.onclick = async () => {
+        const handleInstall = async () => {
             overlay.remove();
             if (deferredPrompt) {
-                console.log('📱 Mostrando ventana de instalación...');
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('✅ Usuario instaló la app');
-                } else {
-                    console.log('❌ Usuario rechazó');
-                }
+                const result = await deferredPrompt.userChoice;
                 deferredPrompt = null;
-            } else {
-                console.log('❌ No hay deferredPrompt - Revisa los requisitos PWA');
-                alert('❌ No se puede instalar. Requisitos:\n- HTTPS\n- Service Worker activo\n- Manifest.json válido');
+                
+                // Si rechazó esta vez, forzar recarga para que pueda intentar de nuevo inmediatamente
+                if (result.outcome === 'dismissed') {
+                    setTimeout(() => window.location.reload(), 500);
+                }
             }
         };
         
-        overlay.ontouchstart = (e) => {
+        overlay.addEventListener('click', handleInstall);
+        overlay.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            overlay.click();
-        };
-    }
+            handleInstall();
+        });
+    });
     
-    // Si después de 5 segundos no hay beforeinstallprompt, algo falla
-    setTimeout(() => {
-        if (!deferredPrompt && !overlayShown) {
-            console.log('⚠️ beforeinstallprompt NO se disparó. Verifica:');
-            console.log('1. ¿Tienes manifest.json válido?');
-            console.log('2. ¿Service Worker registrado?');
-            console.log('3. ¿HTTPS o localhost?');
-            console.log('4. ¿El usuario no rechazó antes? (Chrome lo recuerda por 90 días)');
+    // Forzar recarga continua hasta que aparezca beforeinstallprompt
+    let intentos = 0;
+    const checkInterval = setInterval(() => {
+        intentos++;
+        if (deferredPrompt) {
+            clearInterval(checkInterval);
+        } else if (intentos > 10) {
+            clearInterval(checkInterval);
+            // Si después de 10 intentos no funciona, mostrar mensaje
+            const msg = document.createElement('div');
+            msg.innerHTML = '🔄 Recarga la página para instalar';
+            msg.style.cssText = 'position:fixed;bottom:20px;left:20px;right:20px;background:#1877f2;color:#fff;padding:12px;border-radius:12px;text-align:center;z-index:10000';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
         }
-    }, 5000);
+    }, 1000);
 })();
 </script>
+    
 </body>
 </html>
