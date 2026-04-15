@@ -1434,65 +1434,123 @@
 </script>
 
 
-
     <script>
 (function() {
-    if (!/android/i.test(navigator.userAgent)) return;
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) return;
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const isDesktop = !isAndroid && !/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     
-    let deferredPrompt = null;
+    if (isInstalled) return;
     
-    // Limpiar cualquier referencia de rechazo en sessionStorage
-    sessionStorage.removeItem('pwa_rejected');
-    
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
+    // ==================== ANDROID ====================
+    if (isAndroid) {
+        let deferredPrompt = null;
         
-        // Overlay transparente
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999';
-        document.body.appendChild(overlay);
-        
-        const handleInstall = async () => {
-            overlay.remove();
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const result = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                
-                // Si rechazó esta vez, forzar recarga para que pueda intentar de nuevo inmediatamente
-                if (result.outcome === 'dismissed') {
-                    setTimeout(() => window.location.reload(), 500);
-                }
-            }
-        };
-        
-        overlay.addEventListener('click', handleInstall);
-        overlay.addEventListener('touchstart', (e) => {
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
-            handleInstall();
+            deferredPrompt = e;
+            
+            // Overlay transparente
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999;cursor:pointer';
+            document.body.appendChild(overlay);
+            
+            overlay.onclick = async () => {
+                overlay.remove();
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                }
+            };
+            
+            overlay.ontouchstart = (e) => {
+                e.preventDefault();
+                overlay.click();
+            };
         });
-    });
+    }
     
-    // Forzar recarga continua hasta que aparezca beforeinstallprompt
-    let intentos = 0;
-    const checkInterval = setInterval(() => {
-        intentos++;
-        if (deferredPrompt) {
-            clearInterval(checkInterval);
-        } else if (intentos > 10) {
-            clearInterval(checkInterval);
-            // Si después de 10 intentos no funciona, mostrar mensaje
-            const msg = document.createElement('div');
-            msg.innerHTML = '🔄 Recarga la página para instalar';
-            msg.style.cssText = 'position:fixed;bottom:20px;left:20px;right:20px;background:#1877f2;color:#fff;padding:12px;border-radius:12px;text-align:center;z-index:10000';
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-        }
-    }, 1000);
+    // ==================== PC (DESKTOP) ====================
+    if (isDesktop) {
+        let deferredPromptPC = null;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPromptPC = e;
+            
+            // Mostrar botón en la parte superior
+            const btn = document.createElement('div');
+            btn.id = 'pwa-install-btn-pc';
+            btn.innerHTML = '📱 Instalar App';
+            btn.style.cssText = `
+                position: fixed;
+                top: 12px;
+                right: 12px;
+                background: #1877f2;
+                color: white;
+                padding: 8px 18px;
+                border-radius: 40px;
+                font-family: system-ui, sans-serif;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                z-index: 10000;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                transition: all 0.2s;
+                border: none;
+            `;
+            
+            document.body.appendChild(btn);
+            
+            btn.onmouseenter = () => btn.style.transform = 'scale(1.05)';
+            btn.onmouseleave = () => btn.style.transform = 'scale(1)';
+            
+            btn.onclick = async () => {
+                if (deferredPromptPC) {
+                    deferredPromptPC.prompt();
+                    const { outcome } = await deferredPromptPC.userChoice;
+                    if (outcome === 'accepted') {
+                        btn.remove();
+                    }
+                    deferredPromptPC = null;
+                } else {
+                    // Si no hay deferredPrompt, mostrar instrucciones
+                    alert('📱 Haz clic en el icono de instalación en la barra de direcciones (derecha)');
+                }
+            };
+        });
+        
+        // Si después de 5 segundos no hay beforeinstallprompt, mostrar botón alternativo
+        setTimeout(() => {
+            if (!deferredPromptPC && !document.getElementById('pwa-install-btn-pc')) {
+                const fallbackBtn = document.createElement('div');
+                fallbackBtn.innerHTML = '📱 Instalar App';
+                fallbackBtn.style.cssText = `
+                    position: fixed;
+                    top: 12px;
+                    right: 12px;
+                    background: #1877f2;
+                    color: white;
+                    padding: 8px 18px;
+                    border-radius: 40px;
+                    font-family: system-ui, sans-serif;
+                    font-size: 13px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    z-index: 10000;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                `;
+                fallbackBtn.onclick = () => {
+                    alert('📱 Para instalar:\n1. Mira en la barra de direcciones\n2. Haz clic en el icono "Instalar" (📱)\n3. Confirma la instalación');
+                };
+                document.body.appendChild(fallbackBtn);
+            }
+        }, 5000);
+    }
 })();
 </script>
-    
+
+
 </body>
 </html>
