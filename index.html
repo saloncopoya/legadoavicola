@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#4F46E5">
-    <meta name="description" content="Legado Avícola - Aplicación profesional offline-first">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <title>Legado Avícola</title>
+    <title>GallosLive - Sistema Offline con Firebase</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     
     <style>
         * {
@@ -16,224 +17,145 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #4F46E5;
-            --primary-dark: #4338CA;
-            --secondary: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --dark: #1F2937;
-            --light: #F3F4F6;
-            --white: #FFFFFF;
-            --shadow: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: var(--light);
-            color: var(--dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        #app {
+        .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: var(--white);
-            min-height: 100vh;
-            box-shadow: var(--shadow);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
 
-        /* Header */
-        .app-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white);
-            padding: 1rem;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
         }
 
-        .header-content {
+        .status-bar {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .status-bar.online {
+            background: #27ae60;
+        }
+
+        .nav {
+            background: #34495e;
+            padding: 15px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
             flex-wrap: wrap;
-            gap: 1rem;
         }
 
-        .app-header h1 {
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .user-status {
-            display: flex;
-            align-items: center;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .online-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 2rem;
-            background: rgba(255,255,255,0.2);
-        }
-
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #10B981;
-            animation: pulse 2s infinite;
-        }
-
-        .offline-dot {
-            background: #EF4444;
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .btn-logout, .btn-login {
-            background: rgba(255,255,255,0.2);
+        .nav button {
+            background: #3498db;
+            color: white;
             border: none;
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+            padding: 10px 20px;
             cursor: pointer;
-            font-weight: 600;
+            border-radius: 5px;
             transition: all 0.3s;
+            font-size: 14px;
         }
 
-        .btn-logout:hover, .btn-login:hover {
-            background: rgba(255,255,255,0.3);
+        .nav button:hover {
+            background: #2980b9;
             transform: translateY(-2px);
         }
 
-        /* Navigation */
-        .app-nav {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            background: var(--white);
-            border-bottom: 2px solid var(--light);
-            padding: 0.75rem 0.5rem;
-            gap: 0.5rem;
-            position: sticky;
-            top: 70px;
-            z-index: 99;
+        .nav button.active {
+            background: #e74c3c;
         }
 
-        .nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.75rem;
-            background: none;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.875rem;
-            color: var(--dark);
-            font-weight: 500;
-        }
-
-        .nav-icon {
-            font-size: 1.5rem;
-        }
-
-        .nav-btn:hover {
-            background: var(--light);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn.active {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 1.5rem;
+        .content {
+            padding: 30px;
             min-height: 500px;
         }
 
-        /* Cards */
-        .pages-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .card {
-            background: var(--white);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 1px solid var(--light);
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: bold;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .card h3 {
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
+        input, textarea, select {
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
         }
 
-        .modal-content {
-            background: var(--white);
-            margin: 15% auto;
-            padding: 2rem;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 1rem;
-            position: relative;
-            animation: modalSlide 0.3s ease;
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
         }
 
-        @keyframes modalSlide {
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
             from {
-                transform: translateY(-50px);
+                transform: translateY(-20px);
                 opacity: 0;
             }
             to {
@@ -242,724 +164,678 @@
             }
         }
 
-        .close {
-            position: absolute;
-            right: 1rem;
-            top: 0.5rem;
-            font-size: 2rem;
-            cursor: pointer;
-            color: var(--dark);
-            transition: color 0.3s;
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        .close:hover {
-            color: var(--danger);
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
-        .modal-content input {
-            width: 100%;
-            padding: 0.75rem;
-            margin: 0.5rem 0;
-            border: 2px solid var(--light);
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
 
-        .modal-content input:focus {
-            outline: none;
-            border-color: var(--primary);
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        .btn-primary {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 1rem 0;
-            transition: all 0.3s;
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
         }
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
+        .badge-pending {
+            background: #f39c12;
+            color: white;
         }
 
-        .btn-secondary {
-            background: var(--secondary);
+        .badge-synced {
+            background: #27ae60;
+            color: white;
         }
 
-        /* Loading */
-        .loading-spinner {
+        .loading {
             text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            color: var(--primary);
+            padding: 20px;
         }
 
         .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
             width: 40px;
             height: 40px;
-            border: 4px solid var(--light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            margin: 0 auto;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 2rem;
-            color: var(--danger);
-            background: #FEE2E2;
-            border-radius: 0.5rem;
-        }
-
-        .sync-banner {
-            background: var(--warning);
-            color: var(--dark);
-            padding: 0.5rem;
-            text-align: center;
-            font-size: 0.875rem;
-            font-weight: 500;
-            position: sticky;
-            top: 120px;
-            z-index: 98;
-        }
-
-        /* Toast notifications */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--dark);
-            color: var(--white);
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-lg);
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .app-nav {
-                grid-template-columns: repeat(4, 1fr);
-                top: 80px;
-            }
-            
-            .nav-btn span:not(.nav-icon) {
-                font-size: 0.7rem;
-            }
-            
-            .modal-content {
-                margin: 30% auto;
-                padding: 1.5rem;
-            }
-
-            .sync-banner {
-                top: 130px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .app-nav {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .nav-icon {
-                font-size: 1.25rem;
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <header class="app-header">
-            <div class="header-content">
-                <h1>
-                    <span>🏆</span>
-                    <span>Legado Avícola</span>
-                </h1>
-                <div id="userStatus" class="user-status"></div>
-            </div>
-        </header>
-
-        <div id="syncStatus" class="sync-banner" style="display: none;">
-            🔄 Sincronizando cambios pendientes...
+    <div class="container">
+        <div class="header">
+            <h1>🐓 GallosLive Badge</h1>
+            <p>Sistema Offline - Sincronización Automática con Firebase</p>
         </div>
-
-        <nav class="app-nav">
-            <button data-page="home" class="nav-btn active">
-                <span class="nav-icon">🏠</span>
-                <span>Inicio</span>
-            </button>
-            <button data-page="about" class="nav-btn">
-                <span class="nav-icon">ℹ️</span>
-                <span>Info</span>
-            </button>
-            <button data-page="contact" class="nav-btn">
-                <span class="nav-icon">📞</span>
-                <span>Contacto</span>
-            </button>
-            <button data-page="gallery" class="nav-btn">
-                <span class="nav-icon">🖼️</span>
-                <span>Galería</span>
-            </button>
-            <button data-page="torneo" class="nav-btn protected-btn" style="display:none;">
-                <span class="nav-icon">🏆</span>
-                <span>Torneo</span>
-            </button>
-            <button data-page="cotejo" class="nav-btn protected-btn" style="display:none;">
-                <span class="nav-icon">⚽</span>
-                <span>Cotejo</span>
-            </button>
-            <button data-page="juez" class="nav-btn protected-btn" style="display:none;">
-                <span class="nav-icon">⚖️</span>
-                <span>Juez</span>
-            </button>
-            <button data-page="perfil" class="nav-btn protected-btn" style="display:none;">
-                <span class="nav-icon">👤</span>
-                <span>Perfil</span>
-            </button>
-        </nav>
-
-        <main id="mainContent" class="main-content">
-            <div class="loading-spinner">
+        <div class="status-bar" id="statusBar">
+            🔄 Verificando conexión...
+        </div>
+        <div class="nav" id="navMenu">
+            <button onclick="showPage('login')" id="btnLogin">🔐 Iniciar Sesión</button>
+            <button onclick="showPage('register')" id="btnRegister">📝 Registrarse</button>
+            <button onclick="showPage('dashboard')" id="btnDashboard" style="display:none;">📊 Dashboard</button>
+            <button onclick="showPage('torneos')" id="btnTorneos" style="display:none;">🏆 Torneos</button>
+            <button onclick="logout()" id="btnLogout" style="display:none;">🚪 Cerrar Sesión</button>
+        </div>
+        <div class="content" id="content">
+            <div class="loading">
                 <div class="spinner"></div>
-                Cargando...
-            </div>
-        </main>
-
-        <div id="loginModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <div id="loginForm">
-                    <h2>Iniciar Sesión</h2>
-                    <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
-                    <input type="password" id="loginPassword" placeholder="Contraseña" required>
-                    <button id="btnLogin" class="btn-primary">Ingresar</button>
-                    <p style="text-align: center; margin-top: 1rem;">
-                        ¿No tienes cuenta? <a href="#" id="showRegister">Regístrate</a>
-                    </p>
-                </div>
-                <div id="registerForm" style="display:none;">
-                    <h2>Registro</h2>
-                    <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
-                    <input type="password" id="registerPassword" placeholder="Contraseña" required>
-                    <button id="btnRegister" class="btn-primary">Registrarse</button>
-                    <p style="text-align: center; margin-top: 1rem;">
-                        ¿Ya tienes cuenta? <a href="#" id="showLogin">Inicia Sesión</a>
-                    </p>
-                </div>
+                <p>Cargando aplicación...</p>
             </div>
         </div>
     </div>
+    <div class="sync-status" id="syncStatus">
+        📡 Inicializando...
+    </div>
 
     <script>
-        // ==================== CONFIGURACIÓN INICIAL ====================
-        // Sistema de almacenamiento offline (IndexedDB)
-        const DB_NAME = 'LegadoAvicolaDB';
-        const DB_VERSION = 1;
-        let db = null;
-        
-        // Cola de operaciones pendientes para sincronizar
-        let pendingOperations = [];
-        
-        // Estado de conexión
-        let isOnline = navigator.onLine;
-        
-        // Usuario actual
-        let currentUser = null;
-        let userPermissions = {};
-        let currentPage = 'home';
-        
-        // Firebase config (REEMPLAZA CON TUS DATOS)
+        // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            databaseURL: "TU_DATABASE_URL",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+            authDomain: "galloslivebadge.firebaseapp.com",
+            databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+            projectId: "galloslivebadge",
+            storageBucket: "galloslivebadge.firebasestorage.app",
+            messagingSenderId: "979482928760",
+            appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d",
+            measurementId: "G-8L3Z484S3D"
         };
-        
-        // ==================== INICIALIZAR INDEXEDDB ====================
-        async function initDB() {
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Estado global
+        let currentUser = null;
+        let isOnline = navigator.onLine;
+
+        // IndexedDB Setup
+        const DB_NAME = 'GallosLiveOfflineDB';
+        const DB_VERSION = 2;
+        let db = null;
+
+        // Inicializar IndexedDB
+        function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => {
                     db = request.result;
+                    console.log('IndexedDB inicializada');
                     resolve(db);
                 };
                 
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     
-                    // Store para páginas cacheadas
-                    if (!db.objectStoreNames.contains('pages')) {
-                        const pagesStore = db.createObjectStore('pages', { keyPath: 'url' });
-                        pagesStore.createIndex('url', 'url', { unique: true });
-                    }
-                    
-                    // Store para datos de Firebase (offline cache)
-                    if (!db.objectStoreNames.contains('firebaseData')) {
-                        const firebaseStore = db.createObjectStore('firebaseData', { keyPath: 'path' });
-                        firebaseStore.createIndex('path', 'path', { unique: true });
+                    // Store para datos offline de torneos
+                    if (!db.objectStoreNames.contains('offlineTorneos')) {
+                        const torneoStore = db.createObjectStore('offlineTorneos', { keyPath: 'id', autoIncrement: true });
+                        torneoStore.createIndex('userId', 'userId', { unique: false });
+                        torneoStore.createIndex('syncStatus', 'syncStatus', { unique: false });
+                        torneoStore.createIndex('timestamp', 'timestamp', { unique: false });
                     }
                     
                     // Store para operaciones pendientes
-                    if (!db.objectStoreNames.contains('pendingOps')) {
-                        const opsStore = db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
-                        opsStore.createIndex('timestamp', 'timestamp');
+                    if (!db.objectStoreNames.contains('pendingOperations')) {
+                        const pendingStore = db.createObjectStore('pendingOperations', { keyPath: 'id', autoIncrement: true });
+                        pendingStore.createIndex('userId', 'userId', { unique: false });
+                        pendingStore.createIndex('type', 'type', { unique: false });
+                        pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
+                    }
+                    
+                    // Store para usuarios offline
+                    if (!db.objectStoreNames.contains('offlineUsers')) {
+                        const userStore = db.createObjectStore('offlineUsers', { keyPath: 'uid' });
+                        userStore.createIndex('email', 'email', { unique: true });
                     }
                 };
             });
         }
-        
-        // ==================== OPERACIONES DE INDEXEDDB ====================
-        async function savePageToCache(url, html) {
-            if (!db) return;
-            const transaction = db.transaction(['pages'], 'readwrite');
-            const store = transaction.objectStore('pages');
-            store.put({ url, html, timestamp: Date.now() });
-        }
-        
-        async function getPageFromCache(url) {
-            if (!db) return null;
-            const transaction = db.transaction(['pages'], 'readonly');
-            const store = transaction.objectStore('pages');
-            return new Promise((resolve) => {
-                const request = store.get(url);
-                request.onsuccess = () => resolve(request.result?.html || null);
-                request.onerror = () => resolve(null);
+
+        // Guardar en IndexedDB
+        async function saveToDB(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.put(data);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
             });
         }
-        
-        async function saveFirebaseData(path, data) {
-            if (!db) return;
-            const transaction = db.transaction(['firebaseData'], 'readwrite');
-            const store = transaction.objectStore('firebaseData');
-            store.put({ path, data, timestamp: Date.now() });
-        }
-        
-        async function getFirebaseData(path) {
-            if (!db) return null;
-            const transaction = db.transaction(['firebaseData'], 'readonly');
-            const store = transaction.objectStore('firebaseData');
-            return new Promise((resolve) => {
-                const request = store.get(path);
-                request.onsuccess = () => resolve(request.result?.data || null);
-                request.onerror = () => resolve(null);
-            });
-        }
-        
-        async function addPendingOperation(operation) {
-            if (!db) return;
-            const transaction = db.transaction(['pendingOps'], 'readwrite');
-            const store = transaction.objectStore('pendingOps');
-            await store.add({
-                ...operation,
-                timestamp: Date.now(),
-                userId: currentUser?.uid
-            });
-            
-            // Intentar sincronizar inmediatamente si hay conexión
-            if (isOnline && currentUser) {
-                syncPendingOperations();
-            }
-        }
-        
-        async function getPendingOperations() {
-            if (!db) return [];
-            const transaction = db.transaction(['pendingOps'], 'readonly');
-            const store = transaction.objectStore('pendingOps');
-            return new Promise((resolve) => {
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result || []);
-                request.onerror = () => resolve([]);
-            });
-        }
-        
-        async function clearPendingOperation(id) {
-            if (!db) return;
-            const transaction = db.transaction(['pendingOps'], 'readwrite');
-            const store = transaction.objectStore('pendingOps');
-            store.delete(id);
-        }
-        
-        // ==================== SINCRONIZACIÓN CON FIREBASE ====================
-        async function syncPendingOperations() {
-            if (!isOnline || !currentUser) return;
-            
-            const operations = await getPendingOperations();
-            if (operations.length === 0) return;
-            
-            document.getElementById('syncStatus').style.display = 'block';
-            
-            for (const op of operations) {
-                try {
-                    // Aquí implementas la sincronización según el tipo de operación
-                    // Ejemplo: si es una escritura en Firebase
-                    if (op.type === 'write' && window.firebaseDatabase) {
-                        const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
-                        const dbRef = ref(window.firebaseDatabase, op.path);
-                        await set(dbRef, op.data);
-                        await clearPendingOperation(op.id);
-                        showToast('✅ Sincronizado: ' + op.path);
-                    }
-                } catch (error) {
-                    console.error('Error syncing operation:', error);
-                }
-            }
-            
-            document.getElementById('syncStatus').style.display = 'none';
-        }
-        
-        // ==================== CARGA DE PÁGINAS (OFFLINE-FIRST) ====================
-        async function loadPage(pageName, isProtected = false) {
-            const mainContent = document.getElementById('mainContent');
-            mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div>Cargando...</div>';
-            
-            const url = `pages/${isProtected ? 'protected' : 'public'}/${pageName}.html`;
-            
-            try {
-                // Intentar obtener de la red (solo si hay internet)
-                let response = null;
-                let html = null;
+
+        // Obtener de IndexedDB
+        async function getFromDB(storeName, key = null) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                let request;
                 
-                if (isOnline) {
-                    try {
-                        response = await fetch(url);
-                        if (response.ok) {
-                            html = await response.text();
-                            // Guardar en IndexedDB para offline
-                            await savePageToCache(url, html);
-                        }
-                    } catch (e) {
-                        console.log('Network error, using cache');
-                    }
-                }
-                
-                // Si no hay internet o falló la red, obtener de cache
-                if (!html) {
-                    html = await getPageFromCache(url);
-                    if (!html) {
-                        throw new Error('Página no disponible offline');
-                    }
-                    showToast('📱 Modo offline - contenido cacheado');
-                }
-                
-                mainContent.innerHTML = html;
-                
-                // Ejecutar scripts de la página
-                const scripts = mainContent.querySelectorAll('script');
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => {
-                        newScript.setAttribute(attr.name, attr.value);
-                    });
-                    newScript.textContent = oldScript.textContent;
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
-                
-            } catch (error) {
-                console.error('Error loading page:', error);
-                mainContent.innerHTML = `
-                    <div class="error-message">
-                        <h3>⚠️ Error al cargar la página</h3>
-                        <p>Esta página no está disponible offline. Conéctate a internet para descargarla.</p>
-                        <button onclick="location.reload()" class="btn-primary" style="margin-top: 1rem;">Reintentar</button>
-                    </div>
-                `;
-            }
-        }
-        
-        // ==================== AUTH Y PERMISOS ====================
-        async function checkUserPermissions(userId) {
-            try {
-                // Intentar obtener de Firebase si hay conexión
-                if (isOnline && window.firebaseDatabase) {
-                    const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
-                    const database = getDatabase(window.firebaseApp);
-                    const permissionsRef = ref(database, `users/${userId}/permissions`);
-                    const snapshot = await get(permissionsRef);
-                    
-                    if (snapshot.exists()) {
-                        userPermissions = snapshot.val();
-                        await saveFirebaseData(`users/${userId}/permissions`, userPermissions);
-                    } else {
-                        userPermissions = { torneo: false, cotejo: false, juez: false, perfil: true };
-                        // Guardar en Firebase
-                        const { set } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
-                        await set(permissionsRef, userPermissions);
-                        await saveFirebaseData(`users/${userId}/permissions`, userPermissions);
-                    }
+                if (key) {
+                    request = store.get(key);
                 } else {
-                    // Offline: obtener de cache local
-                    const cached = await getFirebaseData(`users/${userId}/permissions`);
-                    if (cached) {
-                        userPermissions = cached;
-                    } else {
-                        userPermissions = { torneo: false, cotejo: false, juez: false, perfil: true };
-                    }
-                    showToast('📱 Modo offline - permisos desde cache');
+                    request = store.getAll();
                 }
                 
-                updateNavigationByPermissions();
-                
-            } catch (error) {
-                console.error('Error checking permissions:', error);
-                // Usar permisos por defecto en caso de error
-                userPermissions = { torneo: false, cotejo: false, juez: false, perfil: true };
-                updateNavigationByPermissions();
-            }
-        }
-        
-        function updateNavigationByPermissions() {
-            const protectedBtns = document.querySelectorAll('.protected-btn');
-            protectedBtns.forEach(btn => {
-                const page = btn.getAttribute('data-page');
-                if (userPermissions[page]) {
-                    btn.style.display = 'flex';
-                } else {
-                    btn.style.display = 'none';
-                }
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
             });
         }
-        
-        function updateAuthUI(user) {
-            const userStatus = document.getElementById('userStatus');
-            const loginModal = document.getElementById('loginModal');
-            
-            if (user) {
-                userStatus.innerHTML = `
-                    <div class="user-info">
-                        <div class="online-status">
-                            <div class="online-dot ${!isOnline ? 'offline-dot' : ''}"></div>
-                            <span>${isOnline ? 'En línea' : 'Offline'}</span>
-                        </div>
-                        <span>👤 ${user.email}</span>
-                        <button id="btnLogout" class="btn-logout">Cerrar Sesión</button>
-                    </div>
-                `;
-                document.getElementById('btnLogout')?.addEventListener('click', () => {
-                    if (window.firebaseAuth) {
-                        const { signOut } = import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
-                        signOut(window.firebaseAuth);
-                    }
-                });
-                loginModal.style.display = 'none';
-                currentUser = user;
-                checkUserPermissions(user.uid);
-                
-                if (currentPage === 'torneo' || currentPage === 'cotejo' || currentPage === 'juez' || currentPage === 'perfil') {
-                    loadPage(currentPage, true);
-                }
-            } else {
-                userStatus.innerHTML = `
-                    <div class="online-status">
-                        <div class="online-dot ${!isOnline ? 'offline-dot' : ''}"></div>
-                        <span>${isOnline ? 'En línea' : 'Offline'}</span>
-                    </div>
-                    <button id="btnShowLogin" class="btn-login">Iniciar Sesión</button>
-                `;
-                document.getElementById('btnShowLogin')?.addEventListener('click', () => {
-                    if (isOnline) {
-                        loginModal.style.display = 'block';
-                    } else {
-                        showToast('❌ Necesitas internet para iniciar sesión');
-                    }
-                });
-                currentUser = null;
-                userPermissions = {};
-                updateNavigationByPermissions();
-                
-                if (currentPage === 'torneo' || currentPage === 'cotejo' || currentPage === 'juez' || currentPage === 'perfil') {
-                    navigateTo('home');
-                }
-            }
-        }
-        
-        function navigateTo(pageName) {
-            currentPage = pageName;
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if (btn.getAttribute('data-page') === pageName) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+
+        // Obtener por índice
+        async function getFromDBByIndex(storeName, indexName, value) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const index = store.index(indexName);
+                const request = index.getAll(value);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
             });
-            
-            const protectedPages = ['torneo', 'cotejo', 'juez', 'perfil'];
-            const isProtected = protectedPages.includes(pageName);
-            
-            if (isProtected && !currentUser) {
-                if (isOnline) {
-                    document.getElementById('loginModal').style.display = 'block';
-                } else {
-                    showToast('❌ Necesitas internet para iniciar sesión');
-                }
-                return;
-            }
-            
-            if (isProtected && !userPermissions[pageName]) {
-                loadPage('home', false);
-                showToast('🔒 No tienes permiso para acceder a esta página');
-                return;
-            }
-            
-            loadPage(pageName, isProtected);
         }
-        
-        function showToast(message, duration = 3000) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), duration);
-        }
-        
-        // ==================== MONITOREO DE CONEXIÓN ====================
-        function updateConnectionStatus() {
-            isOnline = navigator.onLine;
-            const onlineDot = document.querySelector('.online-dot');
-            if (onlineDot) {
-                if (isOnline) {
-                    onlineDot.classList.remove('offline-dot');
-                    showToast('🟢 Conexión restablecida');
-                    syncPendingOperations();
-                } else {
-                    onlineDot.classList.add('offline-dot');
-                    showToast('🔴 Sin conexión - trabajando offline');
-                }
-            }
-            
-            // Actualizar UI de auth
-            if (currentUser) {
-                updateAuthUI(currentUser);
-            } else {
-                updateAuthUI(null);
-            }
-        }
-        
-        // ==================== INICIALIZAR TODO ====================
-        async function init() {
-            await initDB();
-            
-            // Cargar Firebase dinámicamente
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
-            const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } = 
-                await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
-            const { getDatabase, ref, get, set } = 
-                await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js');
-            
-            window.firebaseApp = initializeApp(firebaseConfig);
-            window.firebaseAuth = getAuth(window.firebaseApp);
-            window.firebaseDatabase = getDatabase(window.firebaseApp);
-            
-            // Eventos de navegación
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const page = btn.getAttribute('data-page');
-                    navigateTo(page);
-                });
+
+        // Eliminar de IndexedDB
+        async function deleteFromDB(storeName, key) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.delete(key);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
             });
-            
-            // Modal logic
-            const modal = document.getElementById('loginModal');
-            const closeBtn = document.querySelector('.close');
-            closeBtn.onclick = () => modal.style.display = 'none';
-            window.onclick = (event) => {
-                if (event.target === modal) modal.style.display = 'none';
+        }
+
+        // Guardar torneo offline
+        async function saveTorneoOffline(torneoData) {
+            const torneo = {
+                ...torneoData,
+                userId: currentUser.uid,
+                syncStatus: isOnline ? 'synced' : 'pending',
+                timestamp: new Date().toISOString(),
+                offlineId: Date.now()
             };
             
-            // Login/Register
-            document.getElementById('showRegister')?.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
-            });
+            const id = await saveToDB('offlineTorneos', torneo);
             
-            document.getElementById('showLogin')?.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('loginForm').style.display = 'block';
-            });
+            if (!isOnline) {
+                // Guardar operación pendiente
+                await saveToDB('pendingOperations', {
+                    userId: currentUser.uid,
+                    type: 'CREATE_TORNEO',
+                    data: torneo,
+                    timestamp: new Date().toISOString()
+                });
+                updateSyncStatus();
+                showAlert('📡 Datos guardados localmente (Offline)', 'info');
+            } else {
+                // Enviar a Firebase inmediatamente
+                await syncTorneoToFirebase(torneo);
+            }
             
-            document.getElementById('btnLogin')?.addEventListener('click', async () => {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                try {
-                    await signInWithEmailAndPassword(window.firebaseAuth, email, password);
-                    modal.style.display = 'none';
-                } catch (error) {
-                    alert('Error: ' + error.message);
+            return id;
+        }
+
+        // Sincronizar torneo a Firebase
+        async function syncTorneoToFirebase(torneo) {
+            try {
+                const torneoRef = database.ref(`torneos/${currentUser.uid}/${torneo.offlineId || torneo.id}`);
+                await torneoRef.set({
+                    nombre: torneo.nombre,
+                    fecha: torneo.fecha,
+                    ubicacion: torneo.ubicacion,
+                    participantes: torneo.participantes || 0,
+                    ganador: torneo.ganador || '',
+                    timestamp: torneo.timestamp
+                });
+                
+                // Actualizar estado en IndexedDB
+                const allTorneos = await getFromDB('offlineTorneos');
+                const torneoToUpdate = allTorneos.find(t => t.offlineId === torneo.offlineId);
+                if (torneoToUpdate) {
+                    torneoToUpdate.syncStatus = 'synced';
+                    await saveToDB('offlineTorneos', torneoToUpdate);
                 }
-            });
+                
+                console.log('Torneo sincronizado a Firebase');
+                return true;
+            } catch (error) {
+                console.error('Error sincronizando a Firebase:', error);
+                return false;
+            }
+        }
+
+        // Sincronizar datos pendientes
+        async function syncPendingData() {
+            if (!isOnline || !currentUser) return;
             
-            document.getElementById('btnRegister')?.addEventListener('click', async () => {
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
+            const pendingOps = await getFromDB('pendingOperations');
+            const userOps = pendingOps.filter(op => op.userId === currentUser.uid);
+            
+            if (userOps.length === 0) return;
+            
+            showAlert(`🔄 Sincronizando ${userOps.length} datos pendientes...`, 'info');
+            
+            for (const op of userOps) {
                 try {
-                    const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-                    const database = getDatabase(window.firebaseApp);
-                    await set(ref(database, `users/${userCredential.user.uid}/permissions`), {
-                        torneo: false,
-                        cotejo: false,
-                        juez: false,
-                        perfil: true
-                    });
-                    modal.style.display = 'none';
+                    if (op.type === 'CREATE_TORNEO') {
+                        await syncTorneoToFirebase(op.data);
+                    }
+                    // Eliminar operación pendiente
+                    await deleteFromDB('pendingOperations', op.id);
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    console.error('Error sincronizando operación:', error);
                 }
-            });
+            }
             
-            onAuthStateChanged(window.firebaseAuth, (user) => {
-                updateAuthUI(user);
-            });
+            await loadTorneos();
+            updateSyncStatus();
+            showAlert('✅ Todos los datos sincronizados con Firebase', 'success');
+        }
+
+        // Cargar torneos (desde Firebase si está online, desde IndexedDB si offline)
+        async function loadTorneos() {
+            if (!currentUser) return;
             
-            // Monitorear conexión
-            window.addEventListener('online', updateConnectionStatus);
-            window.addEventListener('offline', updateConnectionStatus);
+            const tbody = document.getElementById('torneosTable');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '<tr><td colspan="6" class="loading"><div class="spinner"></div> Cargando...</td></tr>';
+            
+            let torneos = [];
+            
+            if (isOnline) {
+                // Cargar desde Firebase
+                try {
+                    const torneosRef = database.ref(`torneos/${currentUser.uid}`);
+                    const snapshot = await torneosRef.once('value');
+                    const firebaseTorneos = snapshot.val() || {};
+                    
+                    torneos = Object.keys(firebaseTorneos).map(key => ({
+                        id: key,
+                        ...firebaseTorneos[key],
+                        syncStatus: 'synced'
+                    }));
+                    
+                    // Guardar copia local
+                    for (const torneo of torneos) {
+                        await saveToDB('offlineTorneos', { ...torneo, userId: currentUser.uid });
+                    }
+                } catch (error) {
+                    console.error('Error cargando desde Firebase:', error);
+                    // Fallback a IndexedDB
+                    torneos = await getFromDBByIndex('offlineTorneos', 'userId', currentUser.uid);
+                }
+            } else {
+                // Cargar desde IndexedDB
+                torneos = await getFromDBByIndex('offlineTorneos', 'userId', currentUser.uid);
+            }
+            
+            if (torneos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No hay torneos registrados</td></tr>';
+            } else {
+                tbody.innerHTML = torneos.map(t => `
+                    <tr>
+                        <td>${t.nombre || ''}</td>
+                        <td>${t.fecha || ''}</td>
+                        <td>${t.ubicacion || ''}</td>
+                        <td>${t.participantes || 0}</td>
+                        <td>${t.ganador || 'Pendiente'}</td>
+                        <td><span class="badge ${t.syncStatus === 'synced' ? 'badge-synced' : 'badge-pending'}">
+                            ${t.syncStatus === 'synced' ? '✅ Sincronizado' : '⏳ Pendiente'}
+                        </span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Guardar torneo desde el formulario
+        async function handleSaveTorneo(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('torneoNombre').value;
+            const fecha = document.getElementById('torneoFecha').value;
+            const ubicacion = document.getElementById('torneoUbicacion').value;
+            const participantes = parseInt(document.getElementById('torneoParticipantes').value) || 0;
+            const ganador = document.getElementById('torneoGanador').value;
+            
+            const torneo = { nombre, fecha, ubicacion, participantes, ganador };
+            
+            await saveTorneoOffline(torneo);
+            showAlert('✅ Torneo guardado exitosamente', 'success');
+            document.getElementById('torneoForm').reset();
+            await loadTorneos();
+        }
+
+        // Mostrar páginas
+        async function showPage(page) {
+            const content = document.getElementById('content');
+            
+            if (page === 'login') {
+                content.innerHTML = getLoginHTML();
+                document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            } else if (page === 'register') {
+                content.innerHTML = getRegisterHTML();
+                document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            } else if (page === 'dashboard') {
+                content.innerHTML = getDashboardHTML();
+                await loadTorneos();
+            } else if (page === 'torneos') {
+                content.innerHTML = getTorneosHTML();
+                document.getElementById('torneoForm').addEventListener('submit', handleSaveTorneo);
+                await loadTorneos();
+            }
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn${page.charAt(0).toUpperCase() + page.slice(1)}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        // Manejar login
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                // Guardar usuario en IndexedDB
+                await saveToDB('offlineUsers', {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    displayName: currentUser.displayName
+                });
+                
+                showAlert('✅ Inicio de sesión exitoso', 'success');
+                updateUIForLoggedInUser();
+                showPage('dashboard');
+                await syncPendingData();
+            } catch (error) {
+                showAlert('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Manejar registro
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const nombre = document.getElementById('nombre').value;
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                // Actualizar perfil
+                await currentUser.updateProfile({ displayName: nombre });
+                
+                // Guardar en IndexedDB
+                await saveToDB('offlineUsers', {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    displayName: nombre
+                });
+                
+                showAlert('✅ Registro exitoso', 'success');
+                updateUIForLoggedInUser();
+                showPage('dashboard');
+            } catch (error) {
+                showAlert('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Cerrar sesión
+        async function logout() {
+            await auth.signOut();
+            currentUser = null;
+            updateUIForLoggedOutUser();
+            showAlert('Sesión cerrada correctamente', 'success');
+            showPage('login');
+        }
+
+        // Actualizar UI según estado de login
+        function updateUIForLoggedInUser() {
+            document.getElementById('btnLogin').style.display = 'none';
+            document.getElementById('btnRegister').style.display = 'none';
+            document.getElementById('btnDashboard').style.display = 'inline-block';
+            document.getElementById('btnTorneos').style.display = 'inline-block';
+            document.getElementById('btnLogout').style.display = 'inline-block';
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('btnLogin').style.display = 'inline-block';
+            document.getElementById('btnRegister').style.display = 'inline-block';
+            document.getElementById('btnDashboard').style.display = 'none';
+            document.getElementById('btnTorneos').style.display = 'none';
+            document.getElementById('btnLogout').style.display = 'none';
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            const content = document.getElementById('content');
+            content.insertBefore(alertDiv, content.firstChild);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        // Actualizar estado de conexión
+        function updateConnectionStatus() {
+            isOnline = navigator.onLine;
+            const statusBar = document.getElementById('statusBar');
+            if (isOnline) {
+                statusBar.className = 'status-bar online';
+                statusBar.innerHTML = '✅ Conectado a Internet - Sincronización automática activa con Firebase';
+                if (currentUser) {
+                    syncPendingData();
+                }
+            } else {
+                statusBar.className = 'status-bar';
+                statusBar.innerHTML = '📡 Modo OFFLINE - Los datos se guardan localmente y se sincronizarán al recuperar conexión';
+            }
+            updateSyncStatus();
+        }
+
+        // Actualizar estado de sincronización
+        async function updateSyncStatus() {
+            if (!db) return;
+            
+            const pendingOps = await getFromDB('pendingOperations');
+            const userOps = currentUser ? pendingOps.filter(op => op.userId === currentUser.uid) : [];
+            const syncDiv = document.getElementById('syncStatus');
+            
+            if (!isOnline) {
+                syncDiv.innerHTML = '📡 Modo OFFLINE - Los datos se guardan localmente';
+                syncDiv.style.background = '#e74c3c';
+            } else if (userOps.length > 0) {
+                syncDiv.innerHTML = `⏳ Sincronizando: ${userOps.length} datos pendientes...`;
+                syncDiv.style.background = '#f39c12';
+            } else {
+                syncDiv.innerHTML = '✅ Conectado a Firebase - Todos los datos sincronizados';
+                syncDiv.style.background = '#27ae60';
+            }
+        }
+
+        // Templates HTML
+        function getLoginHTML() {
+            return `
+                <h2>🔐 Iniciar Sesión</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="email" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input type="password" id="password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit">Iniciar Sesión</button>
+                </form>
+            `;
+        }
+
+        function getRegisterHTML() {
+            return `
+                <h2>📝 Registrarse</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Nombre Completo:</label>
+                        <input type="text" id="nombre" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="email" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input type="password" id="password" required autocomplete="new-password">
+                    </div>
+                    <button type="submit">Registrarse</button>
+                </form>
+            `;
+        }
+
+        function getDashboardHTML() {
+            return `
+                <h2>📊 Dashboard</h2>
+                ${currentUser ? `<p>Bienvenido, <strong>${currentUser.displayName || currentUser.email}</strong></p>` : ''}
+                <div style="background: #ecf0f1; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h3>Estadísticas</h3>
+                    <p>📋 Total de Torneos: <span id="totalTorneos">0</span></p>
+                    <p>🌐 Estado: <span id="estadoConexion">${isOnline ? 'Online' : 'Offline'}</span></p>
+                </div>
+                <h3>📋 Últimos Torneos</h3>
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Participantes</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody id="torneosTable"></tbody>
+                </table>
+            `;
+        }
+
+        function getTorneosHTML() {
+            return `
+                <h2>🏆 Registrar Torneo</h2>
+                <form id="torneoForm">
+                    <div class="form-group">
+                        <label>Nombre del Torneo:</label>
+                        <input type="text" id="torneoNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha:</label>
+                        <input type="date" id="torneoFecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ubicación:</label>
+                        <input type="text" id="torneoUbicacion" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Participantes:</label>
+                        <input type="number" id="torneoParticipantes" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Ganador (opcional):</label>
+                        <input type="text" id="torneoGanador">
+                    </div>
+                    <button type="submit">💾 Guardar Torneo</button>
+                </form>
+                <h3>📋 Torneos Registrados</h3>
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Participantes</th><th>Ganador</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody id="torneosTable"></tbody>
+                </table>
+            `;
+        }
+
+        // Escuchar cambios en autenticación
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                updateUIForLoggedInUser();
+                await syncPendingData();
+                if (document.getElementById('content').innerHTML.includes('Cargando')) {
+                    showPage('dashboard');
+                }
+            } else {
+                currentUser = null;
+                updateUIForLoggedOutUser();
+                showPage('login');
+            }
+        });
+
+        // Inicializar aplicación
+        window.addEventListener('load', async () => {
+            await initDB();
             updateConnectionStatus();
             
-            // Cargar página inicial
-            navigateTo('home');
+            window.addEventListener('online', () => {
+                updateConnectionStatus();
+                showAlert('🎉 Conexión restablecida. Sincronizando con Firebase...', 'success');
+                if (currentUser) {
+                    syncPendingData();
+                }
+            });
+            
+            window.addEventListener('offline', () => {
+                updateConnectionStatus();
+                showAlert('📡 Sin conexión. Los datos se guardarán localmente.', 'info');
+            });
+        });
+    </script>
+
+    <!-- Registro de Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Error al registrar Service Worker:', error);
+                    });
+            });
         }
-        
-        // Iniciar la aplicación
-        init();
     </script>
 </body>
 </html>
