@@ -1433,10 +1433,9 @@
     }
 </script>
 
-
 <!-- ============================================ -->
-<!-- INSTALACIÓN PWA - SOLO OVERLAY TRANSPARENTE  -->
-<!-- 0 BOTONES - 0 MENSAJES - 0 TEXTO VISIBLE    -->
+<!-- INSTALACIÓN PWA - OVERLAY TRANSPARENTE       -->
+<!-- FUNCIONA EN PC Y ANDROID                     -->
 <!-- ============================================ -->
 <script>
     (function() {
@@ -1447,24 +1446,21 @@
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
         const isInstalled = isStandalone || window.navigator.standalone === true;
         
-        if (isInstalled) return;
-        if (sessionStorage.getItem('pwa_overlay_shown')) return;
+        if (isInstalled) {
+            console.log('App ya instalada');
+            return;
+        }
         
-        // Escuchar evento de instalación
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            if (!overlayShown && !sessionStorage.getItem('pwa_overlay_shown')) {
-                showInstallOverlay();
-                overlayShown = true;
-                sessionStorage.setItem('pwa_overlay_shown', 'true');
-            }
-        });
+        // Verificar si ya se mostró el overlay en esta sesión
+        if (sessionStorage.getItem('pwa_overlay_shown')) {
+            console.log('Overlay ya mostrado');
+            return;
+        }
         
-        // Mostrar overlay transparente
+        // Función para mostrar el overlay transparente
         function showInstallOverlay() {
             const overlay = document.createElement('div');
+            overlay.id = 'pwa-install-overlay';
             overlay.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -1473,43 +1469,86 @@
                 height: 100%;
                 background: transparent;
                 z-index: 9999;
+                cursor: pointer;
             `;
             
             document.body.appendChild(overlay);
             
-            // Clic en PC
-            overlay.addEventListener('click', async () => {
+            // Evento para PC (click)
+            overlay.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Overlay clickeado');
                 overlay.remove();
+                
                 if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        sessionStorage.removeItem('pwa_overlay_shown');
+                    try {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            console.log('Instalación aceptada');
+                            sessionStorage.removeItem('pwa_overlay_shown');
+                        } else {
+                            console.log('Instalación cancelada');
+                        }
+                        deferredPrompt = null;
+                    } catch (err) {
+                        console.error('Error:', err);
                     }
-                    deferredPrompt = null;
+                } else {
+                    // Si no hay deferredPrompt, recargar la página para intentar de nuevo
+                    console.log('No hay deferredPrompt, recargando...');
+                    window.location.reload();
                 }
             });
             
-            // Toque en móvil
+            // Evento para móvil (touch)
             overlay.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 overlay.click();
             });
         }
         
-        // Para iOS
+        // Escuchar evento de instalación (funciona en PC y Android)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('beforeinstallprompt capturado');
+            
+            if (!overlayShown && !sessionStorage.getItem('pwa_overlay_shown')) {
+                showInstallOverlay();
+                overlayShown = true;
+                sessionStorage.setItem('pwa_overlay_shown', 'true');
+            }
+        });
+        
+        // Para navegadores que ya cargaron y no dispararon el evento
+        if (window.location.search.indexOf('force') === -1) {
+            setTimeout(() => {
+                if (!deferredPrompt && !sessionStorage.getItem('pwa_overlay_shown')) {
+                    console.log('Forzando recarga para activar beforeinstallprompt');
+                    window.location.href = window.location.href + '?force=1';
+                }
+            }, 1000);
+        }
+        
+        // Para iOS (no tiene beforeinstallprompt, pero funciona diferente)
         if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
             setTimeout(() => {
                 if (!sessionStorage.getItem('pwa_overlay_shown')) {
                     showInstallOverlay();
                     overlayShown = true;
                     sessionStorage.setItem('pwa_overlay_shown', 'true');
+                    // En iOS mostrar instrucciones porque no hay ventana nativa
+                    overlay.addEventListener('click', () => {
+                        alert('Para instalar: toca Compartir → Agregar a pantalla de inicio');
+                    });
                 }
             }, 2000);
         }
     })();
 </script>
-
 
 </body>
 </html>
