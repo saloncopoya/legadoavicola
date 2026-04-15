@@ -113,4 +113,31 @@
         <p>No se pudo cargar la página solicitada.</p>
         
         <div class="info-box">
-            <h3>✨ Modo Off
+            <h3>✨ Modo Offline Activo</h3>
+            <ul>
+                <li>✅ La aplicación principal sigue funcionando</li>
+                <li>✅ Los datos se guardan localmente</li>
+                <li>✅ La sincronización es automática al reconectar</li>
+                <li>✅ Puedes seguir usando la aplicación normalmente</li>
+            </ul>
+        </div>
+        
+        <p>Haz clic en el botón de abajo para volver a la aplicación principal:</p>
+        
+        <button class="retry-btn" onclick="window.location.href='/'">
+            🔄 Volver a la Aplicación
+        </button>
+        
+        <button onclick="window.location.reload()">
+            🔌 Reintentar Conexión
+        </button>
+    </div>
+    
+    <script>
+        // Intentar recargar cuando haya conexión
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>
