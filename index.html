@@ -2,162 +2,319 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-        <link rel="manifest" href="/manifest.json">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>GallosLive - Sistema Offline con Firebase</title>
+    <meta name="theme-color" content="#1877f2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GallosLive">
+    
+    <!-- Security Headers via Meta -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <!-- Dynamic OG Tags (se actualizan por JS) -->
+    <meta property="og:site_name" content="GallosLive">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_ES">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <title>GallosLive - Gestión de Torneos Offline</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     
+    <!-- DOMPurify para sanitización -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    
     <style>
+        /* RESET COMPLETO - SIN MÁRGENES */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            overflow-x: hidden;
+            padding-top: 56px;
+            padding-bottom: 56px;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+        /* Variables CSS */
+        :root {
+            --primary: #1877f2;
+            --primary-dark: #0c63d4;
+            --secondary: #42b72a;
+            --danger: #e41e3f;
+            --warning: #f7b928;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
         }
 
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .status-bar {
-            background: #e74c3c;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .status-bar.online {
-            background: #27ae60;
-        }
-
-        .nav {
-            background: #34495e;
-            padding: 15px;
+        /* Header Superior - Glassmorphism */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+            box-shadow: var(--shadow);
         }
 
-        .nav button {
-            background: #3498db;
-            color: white;
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
             border: none;
-            padding: 10px 20px;
+            font-size: 22px;
             cursor: pointer;
-            border-radius: 5px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .icon-btn:hover {
+            background: #e4e6e9;
+        }
+
+        /* Status Indicator */
+        .connection-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
             transition: all 0.3s;
-            font-size: 14px;
+            box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
         }
 
-        .nav button:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
+        .connection-status.offline {
+            background: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239,68,68,0.3);
         }
 
-        .nav button.active {
-            background: #e74c3c;
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 1000;
         }
 
-        .content {
-            padding: 30px;
-            min-height: 500px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #2c3e50;
-            font-weight: bold;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        button {
-            background: #3498db;
-            color: white;
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
             border: none;
-            padding: 10px 20px;
             cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
+            padding: 8px 0;
+            transition: all 0.2s;
+            color: var(--gray);
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item span:first-child {
+            font-size: 22px;
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - 112px);
+            padding: 16px;
+        }
+
+        /* Cards estilo Facebook */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(24,119,242,0.1);
+        }
+
+        /* Botones */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
             font-size: 14px;
         }
 
-        button:hover {
-            background: #2980b9;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
 
-        button:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Tablas responsivas */
+        .table-container {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border);
         }
 
         th {
-            background: #34495e;
+            background: var(--light);
+            font-weight: 600;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 72px;
+            left: 16px;
+            right: 16px;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: #1e293b;
             color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            animation: slideUp 0.3s ease;
+            box-shadow: var(--shadow-lg);
         }
 
-        tr:hover {
-            background: #f5f5f5;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
+        @keyframes slideUp {
             from {
-                transform: translateY(-20px);
+                transform: translateY(100px);
                 opacity: 0;
             }
             to {
@@ -166,678 +323,1111 @@
             }
         }
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        /* Desktop adjustments */
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 0;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            .main-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 24px;
+            }
+            
+            .app-header {
+                padding: 0 24px;
+            }
         }
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .sync-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2c3e50;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 12px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .badge-pending {
-            background: #f39c12;
-            color: white;
-        }
-
-        .badge-synced {
-            background: #27ae60;
-            color: white;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-        }
-
+        /* Loading spinner */
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
             width: 40px;
             height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 20px auto;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Grid responsivo */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🐓 GallosLive Badge</h1>
-            <p>Sistema Offline - Sincronización Automática con Firebase</p>
-        </div>
-        <div class="status-bar" id="statusBar">
-            🔄 Verificando conexión...
-        </div>
-        <div class="nav" id="navMenu">
-            <button onclick="showPage('login')" id="btnLogin">🔐 Iniciar Sesión</button>
-            <button onclick="showPage('register')" id="btnRegister">📝 Registrarse</button>
-            <button onclick="showPage('dashboard')" id="btnDashboard" style="display:none;">📊 Dashboard</button>
-            <button onclick="showPage('torneos')" id="btnTorneos" style="display:none;">🏆 Torneos</button>
-            <button onclick="logout()" id="btnLogout" style="display:none;">🚪 Cerrar Sesión</button>
-        </div>
-        <div class="content" id="content">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Cargando aplicación...</p>
-            </div>
-        </div>
+
+<header class="app-header">
+    <div class="logo">🐓 GallosLive</div>
+    <div class="header-actions">
+        <div class="connection-status" id="connectionStatus"></div>
+        <button class="icon-btn" id="themeToggle" aria-label="Tema">🌙</button>
+        <button class="icon-btn" id="menuToggle" aria-label="Menú">☰</button>
     </div>
-    <div class="sync-status" id="syncStatus">
-        📡 Inicializando...
-    </div>
+</header>
 
-    <script>
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
-            authDomain: "galloslivebadge.firebaseapp.com",
-            databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
-            projectId: "galloslivebadge",
-            storageBucket: "galloslivebadge.firebasestorage.app",
-            messagingSenderId: "979482928760",
-            appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d",
-            measurementId: "G-8L3Z484S3D"
-        };
+<main class="main-content" id="mainContent">
+    <div class="spinner"></div>
+</main>
 
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
+<nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item" data-route="/">
+        <span>🏠</span>
+        <span>Inicio</span>
+    </button>
+    <button class="nav-item" data-route="/torneos-publicos">
+        <span>🏆</span>
+        <span>Torneos</span>
+    </button>
+    <button class="nav-item" data-route="/dashboard" id="protectedNav" style="display:none;">
+        <span>📊</span>
+        <span>Dashboard</span>
+    </button>
+    <button class="nav-item" data-route="/mis-torneos" id="torneosNav" style="display:none;">
+        <span>✍️</span>
+        <span>Mis Torneos</span>
+    </button>
+    <button class="nav-item" data-route="/perfil" id="perfilNav" style="display:none;">
+        <span>👤</span>
+        <span>Perfil</span>
+    </button>
+    <button class="nav-item" data-route="/login" id="loginNav">
+        <span>🔐</span>
+        <span>Login</span>
+    </button>
+</nav>
 
-        // Estado global
-        let currentUser = null;
-        let isOnline = navigator.onLine;
+<div class="toast-container" id="toastContainer"></div>
 
-        // IndexedDB Setup
-        const DB_NAME = 'GallosLiveOfflineDB';
-        const DB_VERSION = 2;
-        let db = null;
-
-        // Inicializar IndexedDB
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => {
-                    db = request.result;
-                    console.log('IndexedDB inicializada');
-                    resolve(db);
-                };
-                
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    
-                    // Store para datos offline de torneos
-                    if (!db.objectStoreNames.contains('offlineTorneos')) {
-                        const torneoStore = db.createObjectStore('offlineTorneos', { keyPath: 'id', autoIncrement: true });
-                        torneoStore.createIndex('userId', 'userId', { unique: false });
-                        torneoStore.createIndex('syncStatus', 'syncStatus', { unique: false });
-                        torneoStore.createIndex('timestamp', 'timestamp', { unique: false });
-                    }
-                    
-                    // Store para operaciones pendientes
-                    if (!db.objectStoreNames.contains('pendingOperations')) {
-                        const pendingStore = db.createObjectStore('pendingOperations', { keyPath: 'id', autoIncrement: true });
-                        pendingStore.createIndex('userId', 'userId', { unique: false });
-                        pendingStore.createIndex('type', 'type', { unique: false });
-                        pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
-                    }
-                    
-                    // Store para usuarios offline
-                    if (!db.objectStoreNames.contains('offlineUsers')) {
-                        const userStore = db.createObjectStore('offlineUsers', { keyPath: 'uid' });
-                        userStore.createIndex('email', 'email', { unique: true });
-                    }
-                };
-            });
+<script>
+    // ============================================
+    // 1. CONFIGURACIÓN INICIAL Y SEGURIDAD
+    // ============================================
+    
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+        authDomain: "galloslivebadge.firebaseapp.com",
+        databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+        projectId: "galloslivebadge",
+        storageBucket: "galloslivebadge.firebasestorage.app",
+        messagingSenderId: "979482928760",
+        appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+    
+    // Estado global
+    let currentUser = null;
+    let isOnline = navigator.onLine;
+    let currentRoute = '/';
+    let db = null;
+    
+    // Anti-debugging / Protección consola
+    (function antiDebug() {
+        // Detectar DevTools
+        setInterval(() => {
+            const before = new Date();
+            debugger;
+            const after = new Date();
+            if (after - before > 100) {
+                document.body.innerHTML = '<div style="padding:20px;text-align:center"><h1>⚠️ DevTools Detectado</h1><p>Por favor cierra las herramientas de desarrollo</p></div>';
+            }
+        }, 1000);
+        
+        // Bloquear eval y Function
+        const originalEval = window.eval;
+        window.eval = function() { throw new Error('Eval bloqueado por seguridad'); };
+        
+        // Limpiar console.log en producción (opcional)
+        if (window.location.hostname !== 'localhost') {
+            console.log = function() {};
+            console.info = function() {};
         }
-
-        // Guardar en IndexedDB
-        async function saveToDB(storeName, data) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                const request = store.put(data);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // Obtener de IndexedDB
-        async function getFromDB(storeName, key = null) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], 'readonly');
-                const store = transaction.objectStore(storeName);
-                let request;
-                
-                if (key) {
-                    request = store.get(key);
-                } else {
-                    request = store.getAll();
-                }
-                
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // Obtener por índice
-        async function getFromDBByIndex(storeName, indexName, value) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], 'readonly');
-                const store = transaction.objectStore(storeName);
-                const index = store.index(indexName);
-                const request = index.getAll(value);
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // Eliminar de IndexedDB
-        async function deleteFromDB(storeName, key) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                const request = store.delete(key);
-                request.onsuccess = () => resolve();
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // Guardar torneo offline
-        async function saveTorneoOffline(torneoData) {
-            const torneo = {
-                ...torneoData,
-                userId: currentUser.uid,
-                syncStatus: isOnline ? 'synced' : 'pending',
-                timestamp: new Date().toISOString(),
-                offlineId: Date.now()
+    })();
+    
+    // Sanitización de inputs
+    function sanitizeInput(input) {
+        if (typeof input !== 'string') return input;
+        return DOMPurify.sanitize(input, {
+            ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+            ALLOWED_ATTR: ['class']
+        });
+    }
+    
+    // Validación de email
+    function validateEmail(email) {
+        const re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+        return re.test(email);
+    }
+    
+    // Validación de password
+    function validatePassword(password) {
+        return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
+    }
+    
+    // ============================================
+    // 2. INDEXEDDB - ALMACENAMIENTO OFFLINE
+    // ============================================
+    
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('GallosLiveDB', 3);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                db = request.result;
+                resolve(db);
             };
             
-            const id = await saveToDB('offlineTorneos', torneo);
-            
-            if (!isOnline) {
-                // Guardar operación pendiente
-                await saveToDB('pendingOperations', {
-                    userId: currentUser.uid,
-                    type: 'CREATE_TORNEO',
-                    data: torneo,
-                    timestamp: new Date().toISOString()
-                });
-                updateSyncStatus();
-                showAlert('📡 Datos guardados localmente (Offline)', 'info');
-            } else {
-                // Enviar a Firebase inmediatamente
-                await syncTorneoToFirebase(torneo);
-            }
-            
-            return id;
-        }
-
-        // Sincronizar torneo a Firebase
-        async function syncTorneoToFirebase(torneo) {
-            try {
-                const torneoRef = database.ref(`torneos/${currentUser.uid}/${torneo.offlineId || torneo.id}`);
-                await torneoRef.set({
-                    nombre: torneo.nombre,
-                    fecha: torneo.fecha,
-                    ubicacion: torneo.ubicacion,
-                    participantes: torneo.participantes || 0,
-                    ganador: torneo.ganador || '',
-                    timestamp: torneo.timestamp
-                });
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
                 
-                // Actualizar estado en IndexedDB
+                if (!db.objectStoreNames.contains('offlineTorneos')) {
+                    const store = db.createObjectStore('offlineTorneos', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('userId', 'userId', { unique: false });
+                    store.createIndex('syncStatus', 'syncStatus', { unique: false });
+                }
+                
+                if (!db.objectStoreNames.contains('pendingOps')) {
+                    const pendingStore = db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
+                    pendingStore.createIndex('userId', 'userId', { unique: false });
+                    pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
+                }
+                
+                if (!db.objectStoreNames.contains('users')) {
+                    db.createObjectStore('users', { keyPath: 'uid' });
+                }
+            };
+        });
+    }
+    
+    async function saveToDB(store, data) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([store], 'readwrite');
+            const request = tx.objectStore(store).put(data);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    async function getFromDB(store, key = null) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([store], 'readonly');
+            let request;
+            if (key) {
+                request = tx.objectStore(store).get(key);
+            } else {
+                request = tx.objectStore(store).getAll();
+            }
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    // ============================================
+    // 3. SISTEMA DE SINCRONIZACIÓN
+    // ============================================
+    
+    async function syncPendingOperations() {
+        if (!isOnline || !currentUser) return;
+        
+        const pendingOps = await getFromDB('pendingOps');
+        const userOps = pendingOps.filter(op => op.userId === currentUser.uid);
+        
+        if (userOps.length === 0) return;
+        
+        showToast(`🔄 Sincronizando ${userOps.length} elementos...`, 'info');
+        
+        for (const op of userOps) {
+            try {
+                if (op.type === 'CREATE_TORNEO') {
+                    const torneoRef = database.ref(`torneos/${currentUser.uid}/${op.data.offlineId}`);
+                    await torneoRef.set(op.data);
+                }
+                
+                // Actualizar estado local
+                const tx = db.transaction(['pendingOps'], 'readwrite');
+                tx.objectStore('pendingOps').delete(op.id);
+                
+                // Actualizar torneo local como sincronizado
                 const allTorneos = await getFromDB('offlineTorneos');
-                const torneoToUpdate = allTorneos.find(t => t.offlineId === torneo.offlineId);
+                const torneoToUpdate = allTorneos.find(t => t.offlineId === op.data.offlineId);
                 if (torneoToUpdate) {
                     torneoToUpdate.syncStatus = 'synced';
                     await saveToDB('offlineTorneos', torneoToUpdate);
                 }
-                
-                console.log('Torneo sincronizado a Firebase');
-                return true;
             } catch (error) {
-                console.error('Error sincronizando a Firebase:', error);
-                return false;
+                console.error('Error sync:', error);
             }
         }
-
-        // Sincronizar datos pendientes
-        async function syncPendingData() {
-            if (!isOnline || !currentUser) return;
-            
-            const pendingOps = await getFromDB('pendingOperations');
-            const userOps = pendingOps.filter(op => op.userId === currentUser.uid);
-            
-            if (userOps.length === 0) return;
-            
-            showAlert(`🔄 Sincronizando ${userOps.length} datos pendientes...`, 'info');
-            
-            for (const op of userOps) {
-                try {
-                    if (op.type === 'CREATE_TORNEO') {
-                        await syncTorneoToFirebase(op.data);
-                    }
-                    // Eliminar operación pendiente
-                    await deleteFromDB('pendingOperations', op.id);
-                } catch (error) {
-                    console.error('Error sincronizando operación:', error);
-                }
-            }
-            
-            await loadTorneos();
-            updateSyncStatus();
-            showAlert('✅ Todos los datos sincronizados con Firebase', 'success');
+        
+        showToast('✅ Sincronización completada', 'success');
+        if (currentRoute === '/mis-torneos') renderMisTorneos();
+    }
+    
+    // ============================================
+    // 4. FUNCIONES DE AUTENTICACIÓN
+    // ============================================
+    
+    async function handleLogin(email, password) {
+        if (!validateEmail(email)) throw new Error('Email inválido');
+        if (!validatePassword(password)) throw new Error('Password debe tener 8+ caracteres, una mayúscula y un número');
+        
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        currentUser = result.user;
+        
+        await saveToDB('users', {
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName
+        });
+        
+        updateUIForAuth();
+        await syncPendingOperations();
+        navigateTo('/dashboard');
+        showToast('✅ Bienvenido ' + (currentUser.displayName || currentUser.email), 'success');
+    }
+    
+    async function handleRegister(email, password, nombre) {
+        if (!validateEmail(email)) throw new Error('Email inválido');
+        if (!validatePassword(password)) throw new Error('Password inválido');
+        if (!nombre || nombre.length < 2) throw new Error('Nombre inválido');
+        
+        const sanitizedName = sanitizeInput(nombre);
+        const result = await auth.createUserWithEmailAndPassword(email, password);
+        await result.user.updateProfile({ displayName: sanitizedName });
+        currentUser = result.user;
+        
+        updateUIForAuth();
+        navigateTo('/dashboard');
+        showToast('✅ Registro exitoso', 'success');
+    }
+    
+    async function logout() {
+        await auth.signOut();
+        currentUser = null;
+        updateUIForAuth();
+        navigateTo('/');
+        showToast('Sesión cerrada', 'info');
+    }
+    
+    function updateUIForAuth() {
+        const isLoggedIn = !!currentUser;
+        
+        document.querySelectorAll('#protectedNav, #torneosNav, #perfilNav').forEach(el => {
+            if (el) el.style.display = isLoggedIn ? 'flex' : 'none';
+        });
+        
+        const loginNav = document.getElementById('loginNav');
+        if (loginNav) loginNav.style.display = isLoggedIn ? 'none' : 'flex';
+        
+        if (isLoggedIn && (currentRoute === '/login' || currentRoute === '/register')) {
+            navigateTo('/dashboard');
         }
-
-        // Cargar torneos (desde Firebase si está online, desde IndexedDB si offline)
-        async function loadTorneos() {
-            if (!currentUser) return;
-            
-            const tbody = document.getElementById('torneosTable');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '<tr><td colspan="6" class="loading"><div class="spinner"></div> Cargando...</td></tr>';
-            
-            let torneos = [];
-            
-            if (isOnline) {
-                // Cargar desde Firebase
-                try {
-                    const torneosRef = database.ref(`torneos/${currentUser.uid}`);
-                    const snapshot = await torneosRef.once('value');
-                    const firebaseTorneos = snapshot.val() || {};
-                    
-                    torneos = Object.keys(firebaseTorneos).map(key => ({
-                        id: key,
-                        ...firebaseTorneos[key],
-                        syncStatus: 'synced'
-                    }));
-                    
-                    // Guardar copia local
-                    for (const torneo of torneos) {
-                        await saveToDB('offlineTorneos', { ...torneo, userId: currentUser.uid });
-                    }
-                } catch (error) {
-                    console.error('Error cargando desde Firebase:', error);
-                    // Fallback a IndexedDB
-                    torneos = await getFromDBByIndex('offlineTorneos', 'userId', currentUser.uid);
-                }
-            } else {
-                // Cargar desde IndexedDB
-                torneos = await getFromDBByIndex('offlineTorneos', 'userId', currentUser.uid);
-            }
-            
-            if (torneos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No hay torneos registrados</td></tr>';
-            } else {
-                tbody.innerHTML = torneos.map(t => `
-                    <tr>
-                        <td>${t.nombre || ''}</td>
-                        <td>${t.fecha || ''}</td>
-                        <td>${t.ubicacion || ''}</td>
-                        <td>${t.participantes || 0}</td>
-                        <td>${t.ganador || 'Pendiente'}</td>
-                        <td><span class="badge ${t.syncStatus === 'synced' ? 'badge-synced' : 'badge-pending'}">
-                            ${t.syncStatus === 'synced' ? '✅ Sincronizado' : '⏳ Pendiente'}
-                        </span></td>
-                    </tr>
-                `).join('');
-            }
+    }
+    
+    // ============================================
+    // 5. GESTIÓN DE TORNEOS (OFFLINE-FIRST)
+    // ============================================
+    
+    async function saveTorneoOffline(torneoData) {
+        const torneo = {
+            ...torneoData,
+            userId: currentUser.uid,
+            syncStatus: isOnline ? 'synced' : 'pending',
+            timestamp: new Date().toISOString(),
+            offlineId: Date.now()
+        };
+        
+        await saveToDB('offlineTorneos', torneo);
+        
+        if (!isOnline) {
+            await saveToDB('pendingOps', {
+                userId: currentUser.uid,
+                type: 'CREATE_TORNEO',
+                data: torneo,
+                timestamp: new Date().toISOString()
+            });
+            showToast('📡 Guardado localmente (Offline)', 'info');
+        } else {
+            const torneoRef = database.ref(`torneos/${currentUser.uid}/${torneo.offlineId}`);
+            await torneoRef.set(torneo);
+            showToast('✅ Torneo guardado en la nube', 'success');
         }
-
-        // Guardar torneo desde el formulario
-        async function handleSaveTorneo(e) {
-            e.preventDefault();
-            const nombre = document.getElementById('torneoNombre').value;
-            const fecha = document.getElementById('torneoFecha').value;
-            const ubicacion = document.getElementById('torneoUbicacion').value;
-            const participantes = parseInt(document.getElementById('torneoParticipantes').value) || 0;
-            const ganador = document.getElementById('torneoGanador').value;
-            
-            const torneo = { nombre, fecha, ubicacion, participantes, ganador };
-            
-            await saveTorneoOffline(torneo);
-            showAlert('✅ Torneo guardado exitosamente', 'success');
-            document.getElementById('torneoForm').reset();
-            await loadTorneos();
-        }
-
-        // Mostrar páginas
-        async function showPage(page) {
-            const content = document.getElementById('content');
-            
-            if (page === 'login') {
-                content.innerHTML = getLoginHTML();
-                document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            } else if (page === 'register') {
-                content.innerHTML = getRegisterHTML();
-                document.getElementById('registerForm').addEventListener('submit', handleRegister);
-            } else if (page === 'dashboard') {
-                content.innerHTML = getDashboardHTML();
-                await loadTorneos();
-            } else if (page === 'torneos') {
-                content.innerHTML = getTorneosHTML();
-                document.getElementById('torneoForm').addEventListener('submit', handleSaveTorneo);
-                await loadTorneos();
-            }
-            
-            // Actualizar botones activos
-            document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`btn${page.charAt(0).toUpperCase() + page.slice(1)}`);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-
-        // Manejar login
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
+        
+        renderMisTorneos();
+    }
+    
+    async function getTorneos() {
+        if (isOnline && currentUser) {
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                currentUser = userCredential.user;
+                const snapshot = await database.ref(`torneos/${currentUser.uid}`).once('value');
+                const firebaseTorneos = snapshot.val() || {};
+                const torneosList = Object.keys(firebaseTorneos).map(key => ({
+                    id: key,
+                    ...firebaseTorneos[key]
+                }));
                 
-                // Guardar usuario en IndexedDB
-                await saveToDB('offlineUsers', {
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    displayName: currentUser.displayName
-                });
-                
-                showAlert('✅ Inicio de sesión exitoso', 'success');
-                updateUIForLoggedInUser();
-                showPage('dashboard');
-                await syncPendingData();
-            } catch (error) {
-                showAlert('❌ Error: ' + error.message, 'error');
-            }
-        }
-
-        // Manejar registro
-        async function handleRegister(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const nombre = document.getElementById('nombre').value;
-            
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                currentUser = userCredential.user;
-                
-                // Actualizar perfil
-                await currentUser.updateProfile({ displayName: nombre });
-                
-                // Guardar en IndexedDB
-                await saveToDB('offlineUsers', {
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    displayName: nombre
-                });
-                
-                showAlert('✅ Registro exitoso', 'success');
-                updateUIForLoggedInUser();
-                showPage('dashboard');
-            } catch (error) {
-                showAlert('❌ Error: ' + error.message, 'error');
-            }
-        }
-
-        // Cerrar sesión
-        async function logout() {
-            await auth.signOut();
-            currentUser = null;
-            updateUIForLoggedOutUser();
-            showAlert('Sesión cerrada correctamente', 'success');
-            showPage('login');
-        }
-
-        // Actualizar UI según estado de login
-        function updateUIForLoggedInUser() {
-            document.getElementById('btnLogin').style.display = 'none';
-            document.getElementById('btnRegister').style.display = 'none';
-            document.getElementById('btnDashboard').style.display = 'inline-block';
-            document.getElementById('btnTorneos').style.display = 'inline-block';
-            document.getElementById('btnLogout').style.display = 'inline-block';
-        }
-
-        function updateUIForLoggedOutUser() {
-            document.getElementById('btnLogin').style.display = 'inline-block';
-            document.getElementById('btnRegister').style.display = 'inline-block';
-            document.getElementById('btnDashboard').style.display = 'none';
-            document.getElementById('btnTorneos').style.display = 'none';
-            document.getElementById('btnLogout').style.display = 'none';
-        }
-
-        // Mostrar alerta
-        function showAlert(message, type) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            const content = document.getElementById('content');
-            content.insertBefore(alertDiv, content.firstChild);
-            setTimeout(() => alertDiv.remove(), 3000);
-        }
-
-        // Actualizar estado de conexión
-        function updateConnectionStatus() {
-            isOnline = navigator.onLine;
-            const statusBar = document.getElementById('statusBar');
-            if (isOnline) {
-                statusBar.className = 'status-bar online';
-                statusBar.innerHTML = '✅ Conectado a Internet - Sincronización automática activa con Firebase';
-                if (currentUser) {
-                    syncPendingData();
+                for (const t of torneosList) {
+                    await saveToDB('offlineTorneos', { ...t, syncStatus: 'synced' });
                 }
-            } else {
-                statusBar.className = 'status-bar';
-                statusBar.innerHTML = '📡 Modo OFFLINE - Los datos se guardan localmente y se sincronizarán al recuperar conexión';
+                return torneosList;
+            } catch (e) {
+                console.log('Error fetching from Firebase, usando local');
             }
-            updateSyncStatus();
         }
-
-        // Actualizar estado de sincronización
-        async function updateSyncStatus() {
-            if (!db) return;
-            
-            const pendingOps = await getFromDB('pendingOperations');
-            const userOps = currentUser ? pendingOps.filter(op => op.userId === currentUser.uid) : [];
-            const syncDiv = document.getElementById('syncStatus');
+        
+        const localTorneos = await getFromDB('offlineTorneos');
+        return localTorneos.filter(t => t.userId === currentUser?.uid);
+    }
+    
+    // ============================================
+    // 6. RENDERIZADO DE PÁGINAS CON META TAGS DINÁMICOS
+    // ============================================
+    
+    const pages = {
+        '/': {
+            title: 'GallosLive - Gestión de Torneos',
+            description: 'Plataforma profesional para gestión de torneos con soporte offline',
+            ogImage: 'og-home.jpg',
+            render: renderHome
+        },
+        '/about': {
+            title: 'Nosotros - GallosLive',
+            description: 'Conoce nuestra historia y misión',
+            ogImage: 'og-about.jpg',
+            render: renderAbout
+        },
+        '/torneos-publicos': {
+            title: 'Torneos Públicos - GallosLive',
+            description: 'Explora torneos y competencias',
+            ogImage: 'og-torneos.jpg',
+            render: renderTorneosPublicos
+        },
+        '/galeria': {
+            title: 'Galería - GallosLive',
+            description: 'Fotos y momentos destacados',
+            ogImage: 'og-galeria.jpg',
+            render: renderGaleria
+        },
+        '/contacto': {
+            title: 'Contacto - GallosLive',
+            description: 'Contáctanos para más información',
+            ogImage: 'og-contacto.jpg',
+            render: renderContacto
+        },
+        '/resultados': {
+            title: 'Resultados en Vivo - GallosLive',
+            description: 'Resultados actualizados de torneos',
+            ogImage: 'og-resultados.jpg',
+            render: renderResultados
+        },
+        '/ranking': {
+            title: 'Ranking Global - GallosLive',
+            description: 'Tabla de posiciones general',
+            ogImage: 'og-ranking.jpg',
+            render: renderRanking
+        },
+        '/blog': {
+            title: 'Blog - GallosLive',
+            description: 'Noticias y novedades del mundo de los torneos',
+            ogImage: 'og-blog.jpg',
+            render: renderBlog
+        },
+        '/dashboard': {
+            title: 'Dashboard - GallosLive',
+            description: 'Panel de control personal',
+            ogImage: 'og-dashboard.jpg',
+            requiresAuth: true,
+            render: renderDashboard
+        },
+        '/mis-torneos': {
+            title: 'Mis Torneos - GallosLive',
+            description: 'Gestiona tus torneos',
+            ogImage: 'og-mis-torneos.jpg',
+            requiresAuth: true,
+            render: renderMisTorneos
+        },
+        '/perfil': {
+            title: 'Mi Perfil - GallosLive',
+            description: 'Configura tu perfil',
+            ogImage: 'og-perfil.jpg',
+            requiresAuth: true,
+            render: renderPerfil
+        },
+        '/inscripciones': {
+            title: 'Mis Inscripciones - GallosLive',
+            description: 'Torneos donde participas',
+            ogImage: 'og-inscripciones.jpg',
+            requiresAuth: true,
+            render: renderInscripciones
+        },
+        '/crear-torneo': {
+            title: 'Crear Torneo - GallosLive',
+            description: 'Crea un nuevo torneo',
+            ogImage: 'og-crear-torneo.jpg',
+            requiresAuth: true,
+            render: renderCrearTorneo
+        },
+        '/equipos': {
+            title: 'Mis Equipos - GallosLive',
+            description: 'Gestiona tus equipos',
+            ogImage: 'og-equipos.jpg',
+            requiresAuth: true,
+            render: renderEquipos
+        },
+        '/estadisticas': {
+            title: 'Estadísticas - GallosLive',
+            description: 'Análisis y métricas',
+            ogImage: 'og-estadisticas.jpg',
+            requiresAuth: true,
+            render: renderEstadisticas
+        },
+        '/configuracion': {
+            title: 'Configuración - GallosLive',
+            description: 'Ajustes de cuenta',
+            ogImage: 'og-configuracion.jpg',
+            requiresAuth: true,
+            render: renderConfiguracion
+        },
+        '/login': {
+            title: 'Iniciar Sesión - GallosLive',
+            description: 'Accede a tu cuenta',
+            ogImage: 'og-login.jpg',
+            render: renderLogin
+        },
+        '/register': {
+            title: 'Registrarse - GallosLive',
+            description: 'Crea una cuenta nueva',
+            ogImage: 'og-register.jpg',
+            render: renderRegister
+        }
+    };
+    
+    function updateMetaTags(pageKey) {
+        const page = pages[pageKey] || pages['/'];
+        document.title = page.title;
+        
+        let ogTitle = document.querySelector('meta[property="og:title"]');
+        let ogDesc = document.querySelector('meta[property="og:description"]');
+        let ogImage = document.querySelector('meta[property="og:image"]');
+        let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+        let twitterDesc = document.querySelector('meta[name="twitter:description"]');
+        let twitterImage = document.querySelector('meta[name="twitter:image"]');
+        
+        if (!ogTitle) {
+            ogTitle = document.createElement('meta');
+            ogTitle.setAttribute('property', 'og:title');
+            document.head.appendChild(ogTitle);
+        }
+        if (!ogDesc) {
+            ogDesc = document.createElement('meta');
+            ogDesc.setAttribute('property', 'og:description');
+            document.head.appendChild(ogDesc);
+        }
+        if (!ogImage) {
+            ogImage = document.createElement('meta');
+            ogImage.setAttribute('property', 'og:image');
+            document.head.appendChild(ogImage);
+        }
+        
+        ogTitle.setAttribute('content', page.title);
+        ogDesc.setAttribute('content', page.description);
+        ogImage.setAttribute('content', `/images/og/${page.ogImage}`);
+    }
+    
+    async function navigateTo(route) {
+        const page = pages[route];
+        if (!page) {
+            navigateTo('/');
+            return;
+        }
+        
+        if (page.requiresAuth && !currentUser) {
+            navigateTo('/login');
+            showToast('🔒 Necesitas iniciar sesión', 'warning');
+            return;
+        }
+        
+        currentRoute = route;
+        updateMetaTags(route);
+        
+        const content = document.getElementById('mainContent');
+        content.innerHTML = '<div class="spinner"></div>';
+        
+        await page.render(content);
+        
+        // Actualizar navegación activa
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (item.dataset.route === route) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Actualizar URL sin recargar
+        window.history.pushState({}, '', route);
+    }
+    
+    // ============================================
+    // 7. RENDERIZADO DE PÁGINAS
+    // ============================================
+    
+    function renderHome(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h1>🐓 Bienvenido a GallosLive</h1>
+                <p style="margin-top:12px">La plataforma profesional para gestión de torneos con soporte offline completo.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div style="font-size:48px; margin-bottom:12px">🏆</div>
+                    <h3>Gestión de Torneos</h3>
+                    <p>Crea, edita y organiza torneos desde cualquier lugar, incluso sin internet.</p>
+                </div>
+                <div class="card">
+                    <div style="font-size:48px; margin-bottom:12px">📡</div>
+                    <h3>Sincronización Automática</h3>
+                    <p>Los datos se sincronizan cuando recuperas conexión.</p>
+                </div>
+                <div class="card">
+                    <div style="font-size:48px; margin-bottom:12px">🔒</div>
+                    <h3>Seguridad Profesional</h3>
+                    <p>Protección contra XSS, inyección y hacking por consola.</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderAbout(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>Sobre Nosotros</h2>
+                <p style="margin-top:12px">GallosLive nació con la misión de revolucionar la gestión de torneos deportivos, ofreciendo una plataforma que funciona incluso en las peores condiciones de conectividad.</p>
+                <h3 style="margin-top:20px">🎯 Misión</h3>
+                <p>Proveer herramientas accesibles y profesionales para organizadores de torneos en toda Latinoamérica.</p>
+                <h3 style="margin-top:20px">👁️ Visión</h3>
+                <p>Ser la plataforma líder en gestión de torneos offline-first en el mercado hispanohablante.</p>
+            </div>
+        `;
+    }
+    
+    function renderTorneosPublicos(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>🏆 Torneos Destacados</h2>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Torneo</th><th>Fecha</th><th>Ubicación</th><th>Participantes</th></tr></thead>
+                        <tbody id="publicTorneosBody">
+                            <tr><td colspan="4" style="text-align:center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        // Simular torneos públicos
+        const publicTorneos = [
+            { nombre: "Copa Nacional 2024", fecha: "15/12/2024", ubicacion: "Estadio Nacional", participantes: 32 },
+            { nombre: "Torneo Relámpago", fecha: "20/12/2024", ubicacion: "Polideportivo Central", participantes: 16 }
+        ];
+        
+        const tbody = document.getElementById('publicTorneosBody');
+        tbody.innerHTML = publicTorneos.map(t => `
+            <tr><td>${t.nombre}</td><td>${t.fecha}</td><td>${t.ubicacion}</td><td>${t.participantes}</td></tr>
+        `).join('');
+    }
+    
+    function renderGaleria(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📸 Galería de Eventos</h2>
+                <div class="grid">
+                    ${[1,2,3,4,5,6].map(i => `
+                        <div class="card" style="text-align:center; padding:20px">
+                            <div style="font-size:64px">📷</div>
+                            <p>Evento Destacado ${i}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderContacto(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📧 Contacto</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="contactNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="contactEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje</label>
+                        <textarea id="contactMensaje" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
+                </form>
+            </div>
+        `;
+        
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = sanitizeInput(document.getElementById('contactNombre').value);
+            const email = document.getElementById('contactEmail').value;
+            const mensaje = sanitizeInput(document.getElementById('contactMensaje').value);
             
             if (!isOnline) {
-                syncDiv.innerHTML = '📡 Modo OFFLINE - Los datos se guardan localmente';
-                syncDiv.style.background = '#e74c3c';
-            } else if (userOps.length > 0) {
-                syncDiv.innerHTML = `⏳ Sincronizando: ${userOps.length} datos pendientes...`;
-                syncDiv.style.background = '#f39c12';
+                await saveToDB('pendingOps', {
+                    type: 'CONTACT_FORM',
+                    data: { nombre, email, mensaje, timestamp: new Date().toISOString() }
+                });
+                showToast('📡 Mensaje guardado localmente. Se enviará cuando tengas internet.', 'info');
             } else {
-                syncDiv.innerHTML = '✅ Conectado a Firebase - Todos los datos sincronizados';
-                syncDiv.style.background = '#27ae60';
+                showToast('✅ Mensaje enviado correctamente', 'success');
             }
-        }
-
-        // Templates HTML
-        function getLoginHTML() {
-            return `
-                <h2>🔐 Iniciar Sesión</h2>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input type="email" id="email" required autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña:</label>
-                        <input type="password" id="password" required autocomplete="current-password">
-                    </div>
-                    <button type="submit">Iniciar Sesión</button>
-                </form>
-            `;
-        }
-
-        function getRegisterHTML() {
-            return `
-                <h2>📝 Registrarse</h2>
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label>Nombre Completo:</label>
-                        <input type="text" id="nombre" required autocomplete="name">
-                    </div>
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input type="email" id="email" required autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña:</label>
-                        <input type="password" id="password" required autocomplete="new-password">
-                    </div>
-                    <button type="submit">Registrarse</button>
-                </form>
-            `;
-        }
-
-        function getDashboardHTML() {
-            return `
-                <h2>📊 Dashboard</h2>
-                ${currentUser ? `<p>Bienvenido, <strong>${currentUser.displayName || currentUser.email}</strong></p>` : ''}
-                <div style="background: #ecf0f1; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                    <h3>Estadísticas</h3>
-                    <p>📋 Total de Torneos: <span id="totalTorneos">0</span></p>
-                    <p>🌐 Estado: <span id="estadoConexion">${isOnline ? 'Online' : 'Offline'}</span></p>
+            e.target.reset();
+        });
+    }
+    
+    function renderResultados(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📊 Resultados en Vivo</h2>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Partido</th><th>Resultado</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr><td>Gallos FC vs Águilas</td><td>3 - 1</td><td>Finalizado</td></tr>
+                            <tr><td>Tigres vs Panteras</td><td>2 - 2</td><td>En curso</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <h3>📋 Últimos Torneos</h3>
-                <table>
-                    <thead>
-                        <tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Participantes</th><th>Estado</th></tr>
-                    </thead>
-                    <tbody id="torneosTable"></tbody>
-                </table>
-            `;
+            </div>
+        `;
+    }
+    
+    function renderRanking(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>🏅 Ranking Global</h2>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Pos</th><th>Equipo</th><th>Puntos</th><th>Partidos</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td>Gallos FC</td><td>45</td><td>15</td></tr>
+                            <tr><td>2</td><td>Águilas</td><td>42</td><td>15</td></tr>
+                            <tr><td>3</td><td>Tigres</td><td>38</td><td>15</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderBlog(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📝 Últimas Noticias</h2>
+                <div class="grid">
+                    <div class="card"><h3>🎉 Gran Final 2024</h3><p>La final se jugará el 20 de diciembre...</p></div>
+                    <div class="card"><h3>🚀 Nueva Actualización</h3><p>Soporte offline mejorado y más features...</p></div>
+                    <div class="card"><h3>🏆 Torneo Solidario</h3><p>Inscripciones abiertas para el torneo benéfico...</p></div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderDashboard(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📊 Dashboard</h2>
+                <p>Bienvenido, <strong>${currentUser?.displayName || currentUser?.email}</strong></p>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:16px; margin-top:20px">
+                    <div class="card" style="text-align:center"><div style="font-size:32px">🏆</div><div>Mis Torneos</div><div id="torneosCount">0</div></div>
+                    <div class="card" style="text-align:center"><div style="font-size:32px">✅</div><div>Sincronizados</div><div id="syncedCount">0</div></div>
+                    <div class="card" style="text-align:center"><div style="font-size:32px">⏳</div><div>Pendientes</div><div id="pendingCount">0</div></div>
+                </div>
+            </div>
+        `;
+        
+        // Cargar estadísticas
+        getTorneos().then(torneos => {
+            const total = torneos.length;
+            const synced = torneos.filter(t => t.syncStatus === 'synced').length;
+            const pending = torneos.filter(t => t.syncStatus === 'pending').length;
+            document.getElementById('torneosCount').innerText = total;
+            document.getElementById('syncedCount').innerText = synced;
+            document.getElementById('pendingCount').innerText = pending;
+        });
+    }
+    
+    async function renderMisTorneos(container) {
+        if (!container) container = document.getElementById('mainContent');
+        container.innerHTML = `
+            <div class="card">
+                <h2>🏆 Mis Torneos</h2>
+                <button class="btn btn-primary" id="nuevoTorneoBtn" style="margin:12px 0">+ Nuevo Torneo</button>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Estado</th></tr></thead>
+                        <tbody id="misTorneosBody">
+                            <tr><td colspan="4" style="text-align:center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        const torneos = await getTorneos();
+        const tbody = document.getElementById('misTorneosBody');
+        
+        if (torneos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay torneos registrados</td></tr>';
+        } else {
+            tbody.innerHTML = torneos.map(t => `
+                <tr>
+                    <td>${sanitizeInput(t.nombre)}</td>
+                    <td>${t.fecha || '-'}</td>
+                    <td>${sanitizeInput(t.ubicacion) || '-'}</td>
+                    <td><span class="badge ${t.syncStatus === 'synced' ? 'badge-success' : 'badge-warning'}">
+                        ${t.syncStatus === 'synced' ? '✅ Sincronizado' : '⏳ Pendiente'}
+                    </span></td>
+                </tr>
+            `).join('');
         }
-
-        function getTorneosHTML() {
-            return `
-                <h2>🏆 Registrar Torneo</h2>
-                <form id="torneoForm">
+        
+        document.getElementById('nuevoTorneoBtn')?.addEventListener('click', () => navigateTo('/crear-torneo'));
+    }
+    
+    function renderCrearTorneo(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>✍️ Crear Nuevo Torneo</h2>
+                <form id="createTorneoForm">
                     <div class="form-group">
-                        <label>Nombre del Torneo:</label>
-                        <input type="text" id="torneoNombre" required>
+                        <label>Nombre del Torneo</label>
+                        <input type="text" id="torneoNombre" required maxlength="100">
                     </div>
                     <div class="form-group">
-                        <label>Fecha:</label>
+                        <label>Fecha</label>
                         <input type="date" id="torneoFecha" required>
                     </div>
                     <div class="form-group">
-                        <label>Ubicación:</label>
+                        <label>Ubicación</label>
                         <input type="text" id="torneoUbicacion" required>
                     </div>
                     <div class="form-group">
-                        <label>Número de Participantes:</label>
-                        <input type="number" id="torneoParticipantes" value="0">
+                        <label>Participantes</label>
+                        <input type="number" id="torneoParticipantes" value="0" min="0">
+                    </div>
+                    <button type="submit" class="btn btn-primary">💾 Guardar Torneo</button>
+                </form>
+            </div>
+        `;
+        
+        document.getElementById('createTorneoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = sanitizeInput(document.getElementById('torneoNombre').value);
+            const fecha = document.getElementById('torneoFecha').value;
+            const ubicacion = sanitizeInput(document.getElementById('torneoUbicacion').value);
+            const participantes = parseInt(document.getElementById('torneoParticipantes').value);
+            
+            if (!nombre || !fecha || !ubicacion) {
+                showToast('❌ Completa todos los campos', 'error');
+                return;
+            }
+            
+            await saveTorneoOffline({ nombre, fecha, ubicacion, participantes });
+            navigateTo('/mis-torneos');
+        });
+    }
+    
+    function renderPerfil(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>👤 Mi Perfil</h2>
+                <form id="perfilForm">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="perfilNombre" value="${currentUser?.displayName || ''}">
                     </div>
                     <div class="form-group">
-                        <label>Ganador (opcional):</label>
-                        <input type="text" id="torneoGanador">
+                        <label>Email</label>
+                        <input type="email" id="perfilEmail" value="${currentUser?.email || ''}" readonly>
                     </div>
-                    <button type="submit">💾 Guardar Torneo</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
+                    <button type="button" class="btn btn-danger" id="logoutBtn" style="margin-left:12px">Cerrar Sesión</button>
                 </form>
-                <h3>📋 Torneos Registrados</h3>
-                <table>
-                    <thead>
-                        <tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Participantes</th><th>Ganador</th><th>Estado</th></tr>
-                    </thead>
-                    <tbody id="torneosTable"></tbody>
-                </table>
-            `;
-        }
-
-        // Escuchar cambios en autenticación
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                updateUIForLoggedInUser();
-                await syncPendingData();
-                if (document.getElementById('content').innerHTML.includes('Cargando')) {
-                    showPage('dashboard');
-                }
-            } else {
-                currentUser = null;
-                updateUIForLoggedOutUser();
-                showPage('login');
+            </div>
+        `;
+        
+        document.getElementById('perfilForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = sanitizeInput(document.getElementById('perfilNombre').value);
+            if (currentUser) {
+                await currentUser.updateProfile({ displayName: nombre });
+                await saveToDB('users', { uid: currentUser.uid, displayName: nombre, email: currentUser.email });
+                showToast('✅ Perfil actualizado', 'success');
             }
         });
-
-        // Inicializar aplicación
-        window.addEventListener('load', async () => {
-            await initDB();
-            updateConnectionStatus();
+        
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    }
+    
+    function renderInscripciones(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📋 Mis Inscripciones</h2>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Torneo</th><th>Fecha Inscripción</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr><td colspan="3" style="text-align:center">No hay inscripciones activas</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderEquipos(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>👥 Mis Equipos</h2>
+                <div class="grid">
+                    <div class="card" style="text-align:center">
+                        <div style="font-size:48px">⚽</div>
+                        <h3>Gallos FC</h3>
+                        <p>12 jugadores</p>
+                    </div>
+                    <div class="card" style="text-align:center">
+                        <div style="font-size:48px">🏀</div>
+                        <h3>Águilas</h3>
+                        <p>10 jugadores</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:16px">+ Crear Equipo</button>
+            </div>
+        `;
+    }
+    
+    function renderEstadisticas(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📈 Estadísticas</h2>
+                <div style="height:300px; display:flex; align-items:center; justify-content:center; background:#f8fafc; border-radius:12px">
+                    📊 Gráficas interactivas (próximamente)
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderConfiguracion(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>⚙️ Configuración</h2>
+                <div class="form-group">
+                    <label>🌙 Tema Oscuro</label>
+                    <input type="checkbox" id="darkModeToggle">
+                </div>
+                <div class="form-group">
+                    <label>🔔 Notificaciones</label>
+                    <input type="checkbox" id="notificationsToggle">
+                </div>
+                <button class="btn btn-primary" id="clearCacheBtn">🗑️ Limpiar Cache Local</button>
+            </div>
+        `;
+        
+        document.getElementById('clearCacheBtn')?.addEventListener('click', async () => {
+            if (confirm('¿Eliminar todos los datos locales? Los datos pendientes se perderán.')) {
+                indexedDB.deleteDatabase('GallosLiveDB');
+                showToast('Cache limpiado. Recarga la página.', 'success');
+                setTimeout(() => location.reload(), 1500);
+            }
+        });
+    }
+    
+    function renderLogin(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>🔐 Iniciar Sesión</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ingresar</button>
+                    <button type="button" class="btn" id="goToRegisterBtn" style="margin-left:12px">Registrarse</button>
+                </form>
+            </div>
+        `;
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                await handleLogin(email, password);
+            } catch (err) {
+                showToast('❌ ' + err.message, 'error');
+            }
+        });
+        
+        document.getElementById('goToRegisterBtn').addEventListener('click', () => navigateTo('/register'));
+    }
+    
+    function renderRegister(container) {
+        container.innerHTML = `
+            <div class="card">
+                <h2>📝 Registrarse</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="registerNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña (mín 8 chars, 1 mayúscula, 1 número)</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                    <button type="button" class="btn" id="goToLoginBtn" style="margin-left:12px">Ya tengo cuenta</button>
+                </form>
+            </div>
+        `;
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = sanitizeInput(document.getElementById('registerNombre').value);
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            try {
+                await handleRegister(email, password, nombre);
+            } catch (err) {
+                showToast('❌ ' + err.message, 'error');
+            }
+        });
+        
+        document.getElementById('goToLoginBtn').addEventListener('click', () => navigateTo('/login'));
+    }
+    
+    // ============================================
+    // 8. UTILIDADES Y EVENTOS GLOBALES
+    // ============================================
+    
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function updateConnectionStatus() {
+        isOnline = navigator.onLine;
+        const statusDot = document.getElementById('connectionStatus');
+        if (statusDot) {
+            if (isOnline) {
+                statusDot.classList.remove('offline');
+                showToast('🟢 Conexión restablecida', 'success');
+                if (currentUser) syncPendingOperations();
+            } else {
+                statusDot.classList.add('offline');
+                showToast('🔴 Sin conexión - Modo offline activo', 'warning');
+            }
+        }
+    }
+    
+    // Theme toggle
+    let isDark = false;
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
+        isDark = !isDark;
+        document.body.style.background = isDark ? '#1a1a2e' : '#f0f2f5';
+        document.body.style.color = isDark ? '#eee' : '#1e293b';
+        document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+    });
+    
+    // ============================================
+    // 9. INICIALIZACIÓN
+    // ============================================
+    
+    window.addEventListener('load', async () => {
+        await initDB();
+        updateConnectionStatus();
+        
+        window.addEventListener('online', () => updateConnectionStatus());
+        window.addEventListener('offline', () => updateConnectionStatus());
+        
+        window.addEventListener('popstate', () => {
+            navigateTo(window.location.pathname);
+        });
+        
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            updateUIForAuth();
             
-            window.addEventListener('online', () => {
-                updateConnectionStatus();
-                showAlert('🎉 Conexión restablecida. Sincronizando con Firebase...', 'success');
-                if (currentUser) {
-                    syncPendingData();
-                }
-            });
+            if (currentUser && isOnline) {
+                await syncPendingOperations();
+            }
             
-            window.addEventListener('offline', () => {
-                updateConnectionStatus();
-                showAlert('📡 Sin conexión. Los datos se guardarán localmente.', 'info');
+            const initialRoute = window.location.pathname;
+            if (pages[initialRoute]) {
+                navigateTo(initialRoute);
+            } else {
+                navigateTo('/');
+            }
+        });
+        
+        // Navegación por botones
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                navigateTo(btn.dataset.route);
             });
         });
-    </script>
+    });
+</script>
 
-    <!-- Registro de Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registrado:', registration);
-                    })
-                    .catch(error => {
-                        console.log('Error al registrar Service Worker:', error);
-                    });
-            });
-        }
-    </script>
+<!-- Registro Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('SW registrado:', reg))
+                .catch(err => console.log('SW error:', err));
+        });
+    }
+</script>
+
 </body>
 </html>
