@@ -1521,10 +1521,9 @@
     })();
 </script>
 
-
 <!-- ============================================ -->
-<!-- INSTALACIÓN PWA - OVERLAY TRANSPARENTE       -->
-<!-- SIN MENSAJE - SOLO CLIC PARA INSTALAR        -->
+<!-- INSTALACIÓN PWA - OVERLAY 100% TRANSPARENTE  -->
+<!-- SIN MENSAJES - SIN BOTONES - SIN TEXTO       -->
 <!-- ============================================ -->
 <script>
     (function() {
@@ -1536,13 +1535,12 @@
         const isInstalled = isStandalone || window.navigator.standalone === true;
         
         if (isInstalled) {
-            console.log('✅ App ya instalada - Modo standalone');
+            console.log('App ya instalada');
             return;
         }
         
         // Verificar si ya se mostró el overlay en esta sesión
         if (sessionStorage.getItem('pwa_overlay_shown')) {
-            console.log('Overlay ya mostrado en esta sesión');
             return;
         }
         
@@ -1551,7 +1549,6 @@
             e.preventDefault();
             deferredPrompt = e;
             
-            // Mostrar overlay si no se ha mostrado antes en esta sesión
             if (!overlayShown && !sessionStorage.getItem('pwa_overlay_shown')) {
                 showInstallOverlay();
                 overlayShown = true;
@@ -1559,7 +1556,7 @@
             }
         });
         
-        // Función para mostrar el overlay transparente (sin mensaje)
+        // Función para mostrar el overlay transparente (SIN NADA VISIBLE)
         function showInstallOverlay() {
             // Crear overlay que cubre toda la pantalla - COMPLETAMENTE INVISIBLE
             const overlay = document.createElement('div');
@@ -1572,18 +1569,15 @@
                 height: 100%;
                 background: transparent;
                 z-index: 9999;
-                cursor: pointer;
             `;
             
             // Agregar overlay al body
             document.body.appendChild(overlay);
             
-            // Evento: clic en cualquier lugar del overlay (PC y móvil)
+            // Evento: clic en cualquier lugar (PC)
             overlay.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
-                console.log('Overlay clickeado - Mostrando instalación nativa');
                 
                 // Ocultar overlay inmediatamente
                 if (overlay && overlay.parentNode) {
@@ -1593,269 +1587,24 @@
                 // Mostrar prompt de instalación nativo
                 if (deferredPrompt) {
                     try {
-                        // Mostrar diálogo nativo de instalación del navegador
                         deferredPrompt.prompt();
                         const { outcome } = await deferredPrompt.userChoice;
-                        
                         if (outcome === 'accepted') {
-                            console.log('✅ Usuario aceptó instalar la app');
                             sessionStorage.removeItem('pwa_overlay_shown');
-                        } else {
-                            console.log('❌ Usuario canceló instalación');
                         }
                         deferredPrompt = null;
                     } catch (err) {
-                        console.error('Error al mostrar prompt:', err);
+                        console.error(err);
                     }
-                } else {
-                    // Si no hay deferredPrompt, intentar con métodos alternativos
-                    tryAlternativeInstall();
                 }
             });
             
-            // También detectar eventos táctiles para móviles
+            // Evento: tocar en cualquier lugar (Móvil)
             overlay.addEventListener('touchstart', (e) => {
-                // Solo prevenir si es para evitar scroll, pero permitir el click
                 e.preventDefault();
                 overlay.click();
             });
         }
-        
-        // Métodos alternativos de instalación
-        async function tryAlternativeInstall() {
-            // Para iOS (Safari) - mostrar instrucciones nativas
-            if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-                showIOSInstallInstructions();
-                return;
-            }
-            
-            // Para Android - intentar forzar instalación
-            if (/android/i.test(navigator.userAgent)) {
-                // Intentar con el prompt de Chrome
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                } else {
-                    // Si no hay deferredPrompt, mostrar instrucciones
-                    showAndroidInstallInstructions();
-                }
-                return;
-            }
-            
-            // Para PC - si no hay deferredPrompt, mostrar instrucciones
-            if (!deferredPrompt) {
-                showPCInstallInstructions();
-            }
-        }
-        
-        function showIOSInstallInstructions() {
-            const instructionOverlay = document.createElement('div');
-            instructionOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.95);
-                z-index: 20000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                backdrop-filter: blur(10px);
-                cursor: pointer;
-            `;
-            
-            instructionOverlay.innerHTML = `
-                <div style="
-                    background: white;
-                    border-radius: 28px;
-                    padding: 32px;
-                    max-width: 280px;
-                    text-align: center;
-                    margin: 20px;
-                    animation: fadeInScale 0.3s ease;
-                ">
-                    <div style="font-size: 56px; margin-bottom: 16px;">📱</div>
-                    <h3 style="margin-bottom: 12px; color: #1e293b; font-size: 20px;">Instalar App en iOS</h3>
-                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.6; font-size: 14px;">
-                        1. Toca el botón <strong>Compartir</strong> 📤<br>
-                        2. Desplázate y toca <strong>Agregar a pantalla de inicio</strong> ➕<br>
-                        3. Toca <strong>Agregar</strong>
-                    </p>
-                    <button id="close-ios-instructions" style="
-                        background: #1877f2;
-                        color: white;
-                        border: none;
-                        padding: 12px 28px;
-                        border-radius: 40px;
-                        font-size: 16px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        width: 100%;
-                    ">Entendido</button>
-                </div>
-            `;
-            
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes fadeInScale {
-                    from {
-                        opacity: 0;
-                        transform: scale(0.9);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            document.body.appendChild(instructionOverlay);
-            instructionOverlay.addEventListener('click', (e) => {
-                if (e.target === instructionOverlay || e.target.id === 'close-ios-instructions') {
-                    instructionOverlay.remove();
-                }
-            });
-        }
-        
-        function showAndroidInstallInstructions() {
-            const instructionOverlay = document.createElement('div');
-            instructionOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.95);
-                z-index: 20000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                backdrop-filter: blur(10px);
-                cursor: pointer;
-            `;
-            
-            instructionOverlay.innerHTML = `
-                <div style="
-                    background: white;
-                    border-radius: 28px;
-                    padding: 32px;
-                    max-width: 280px;
-                    text-align: center;
-                    margin: 20px;
-                    animation: fadeInScale 0.3s ease;
-                ">
-                    <div style="font-size: 56px; margin-bottom: 16px;">🤖</div>
-                    <h3 style="margin-bottom: 12px; color: #1e293b; font-size: 20px;">Instalar App en Android</h3>
-                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.6; font-size: 14px;">
-                        1. Toca los <strong>3 puntos</strong> ⋮ arriba a la derecha<br>
-                        2. Selecciona <strong>Instalar aplicación</strong> 📲<br>
-                        3. Confirma la instalación
-                    </p>
-                    <button id="close-android-instructions" style="
-                        background: #1877f2;
-                        color: white;
-                        border: none;
-                        padding: 12px 28px;
-                        border-radius: 40px;
-                        font-size: 16px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        width: 100%;
-                    ">Entendido</button>
-                </div>
-            `;
-            
-            document.body.appendChild(instructionOverlay);
-            instructionOverlay.addEventListener('click', (e) => {
-                if (e.target === instructionOverlay || e.target.id === 'close-android-instructions') {
-                    instructionOverlay.remove();
-                }
-            });
-        }
-        
-        function showPCInstallInstructions() {
-            const instructionOverlay = document.createElement('div');
-            instructionOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.95);
-                z-index: 20000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                backdrop-filter: blur(10px);
-                cursor: pointer;
-            `;
-            
-            instructionOverlay.innerHTML = `
-                <div style="
-                    background: white;
-                    border-radius: 28px;
-                    padding: 32px;
-                    max-width: 320px;
-                    text-align: center;
-                    margin: 20px;
-                    animation: fadeInScale 0.3s ease;
-                ">
-                    <div style="font-size: 56px; margin-bottom: 16px;">💻</div>
-                    <h3 style="margin-bottom: 12px; color: #1e293b; font-size: 20px;">Instalar App en PC</h3>
-                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.6; font-size: 14px;">
-                        1. Mira en la <strong>barra de direcciones</strong> del navegador<br>
-                        2. Haz clic en el icono <strong>📱 Instalar</strong><br>
-                        3. Confirma la instalación
-                    </p>
-                    <button id="close-pc-instructions" style="
-                        background: #1877f2;
-                        color: white;
-                        border: none;
-                        padding: 12px 28px;
-                        border-radius: 40px;
-                        font-size: 16px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        width: 100%;
-                    ">Entendido</button>
-                </div>
-            `;
-            
-            document.body.appendChild(instructionOverlay);
-            instructionOverlay.addEventListener('click', (e) => {
-                if (e.target === instructionOverlay || e.target.id === 'close-pc-instructions') {
-                    instructionOverlay.remove();
-                }
-            });
-        }
-        
-        // Detectar cuando se instala la app
-        window.addEventListener('appinstalled', () => {
-            console.log('🎉 App instalada exitosamente');
-            sessionStorage.removeItem('pwa_overlay_shown');
-            
-            // Mostrar mensaje de éxito (opcional, se puede eliminar si no quieres)
-            const successMsg = document.createElement('div');
-            successMsg.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #22c55e;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 40px;
-                font-family: system-ui, sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-                z-index: 20000;
-                animation: slideDown 0.3s ease;
-            `;
-            successMsg.innerHTML = '✅ App instalada correctamente';
-            document.body.appendChild(successMsg);
-            setTimeout(() => successMsg.remove(), 3000);
-        });
         
         // Para iOS que no soporta beforeinstallprompt
         if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
@@ -1867,14 +1616,7 @@
                 }
             }, 2000);
         }
-        
-        // Para navegadores que ya tienen el evento disponible inmediatamente
-        if (window.deferredPrompt !== undefined) {
-            // El evento ya se disparó antes
-            console.log('DeferredPrompt ya disponible');
-        }
     })();
 </script>
-    
 </body>
 </html>
