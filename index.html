@@ -1434,55 +1434,80 @@
 </script>
 
 
-
+<!-- ============================================ -->
+<!-- INSTALACIÓN PWA - SOLO OVERLAY TRANSPARENTE  -->
+<!-- 0 BOTONES - 0 MENSAJES - 0 TEXTO VISIBLE    -->
+<!-- ============================================ -->
 <script>
-(function() {
-    // Detectar si es teléfono (móvil o tablet)
-    const isMobile = /android|iphone|ipad|ipod|blackberry|windows phone/i.test(navigator.userAgent);
-    if (!isMobile) return;
-    
-    // Detectar si ya está instalada como app
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone || window.navigator.standalone === true) return;
-    
-    let deferredPrompt = null;
-    
-    function showOverlay() {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999;cursor:pointer';
-        document.body.appendChild(overlay);
+    (function() {
+        let deferredPrompt = null;
+        let overlayShown = false;
         
-        overlay.onclick = async () => {
-            overlay.remove();
-            if (deferredPrompt) {
-                // Android
-                deferredPrompt.prompt();
-                await deferredPrompt.userChoice;
-                deferredPrompt = null;
-            } else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-                // iOS - mostrar instrucciones
-                alert('📱 Para instalar: toca Compartir → Agregar a pantalla de inicio');
-            }
-        };
+        // Detectar si ya está instalada
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        const isInstalled = isStandalone || window.navigator.standalone === true;
         
-        overlay.ontouchstart = (e) => {
+        if (isInstalled) return;
+        if (sessionStorage.getItem('pwa_overlay_shown')) return;
+        
+        // Escuchar evento de instalación
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
-            overlay.click();
-        };
-    }
-    
-    // Para Android
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        showOverlay();
-    });
-    
-    // Para iOS (no tiene beforeinstallprompt)
-    if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-        setTimeout(showOverlay, 2000);
-    }
-})();
+            deferredPrompt = e;
+            
+            if (!overlayShown && !sessionStorage.getItem('pwa_overlay_shown')) {
+                showInstallOverlay();
+                overlayShown = true;
+                sessionStorage.setItem('pwa_overlay_shown', 'true');
+            }
+        });
+        
+        // Mostrar overlay transparente
+        function showInstallOverlay() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: transparent;
+                z-index: 9999;
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Clic en PC
+            overlay.addEventListener('click', async () => {
+                overlay.remove();
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        sessionStorage.removeItem('pwa_overlay_shown');
+                    }
+                    deferredPrompt = null;
+                }
+            });
+            
+            // Toque en móvil
+            overlay.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                overlay.click();
+            });
+        }
+        
+        // Para iOS
+        if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+            setTimeout(() => {
+                if (!sessionStorage.getItem('pwa_overlay_shown')) {
+                    showInstallOverlay();
+                    overlayShown = true;
+                    sessionStorage.setItem('pwa_overlay_shown', 'true');
+                }
+            }, 2000);
+        }
+    })();
 </script>
 
 
