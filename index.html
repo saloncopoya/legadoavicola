@@ -1523,8 +1523,8 @@
 
 
 <!-- ============================================ -->
-<!-- INSTALACIÓN PWA - OVERLAY TRANSPARENTE        -->
-<!-- SIEMPRE MUESTRA EL OVERLAY                   -->
+<!-- INSTALACIÓN PWA - OVERLAY TRANSPARENTE       -->
+<!-- SIN MENSAJE - SOLO CLIC PARA INSTALAR        -->
 <!-- ============================================ -->
 <script>
     (function() {
@@ -1559,9 +1559,9 @@
             }
         });
         
-        // Función para mostrar el overlay transparente
+        // Función para mostrar el overlay transparente (sin mensaje)
         function showInstallOverlay() {
-            // Crear overlay que cubre toda la pantalla
+            // Crear overlay que cubre toda la pantalla - COMPLETAMENTE INVISIBLE
             const overlay = document.createElement('div');
             overlay.id = 'pwa-install-overlay';
             overlay.style.cssText = `
@@ -1573,114 +1573,32 @@
                 background: transparent;
                 z-index: 9999;
                 cursor: pointer;
-                backdrop-filter: blur(0px);
             `;
             
-            // Crear mensaje flotante (sutil, no molesto)
-            const message = document.createElement('div');
-            message.style.cssText = `
-                position: fixed;
-                bottom: 30px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.85);
-                backdrop-filter: blur(20px);
-                color: white;
-                padding: 14px 24px;
-                border-radius: 60px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-                text-align: center;
-                z-index: 10000;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                border: 1px solid rgba(255,255,255,0.2);
-                animation: slideUpBanner 0.5s ease;
-                pointer-events: none;
-                white-space: nowrap;
-            `;
-            message.innerHTML = `
-                <span style="font-size: 18px; margin-right: 8px;">📱</span>
-                Toca en cualquier lugar para instalar la App
-                <span style="font-size: 18px; margin-left: 8px;">⬇️</span>
-            `;
-            
-            // Animación para el banner
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideUpBanner {
-                    from {
-                        transform: translateX(-50%) translateY(100px);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateX(-50%) translateY(0);
-                        opacity: 1;
-                    }
-                }
-                @keyframes fadeOut {
-                    from { opacity: 1; }
-                    to { opacity: 0; }
-                }
-                @keyframes pulse {
-                    0%, 100% { transform: translateX(-50%) scale(1); }
-                    50% { transform: translateX(-50%) scale(1.05); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Agregar elementos al body
+            // Agregar overlay al body
             document.body.appendChild(overlay);
-            document.body.appendChild(message);
             
-            // Animación sutil de pulso después de 2 segundos
-            setTimeout(() => {
-                if (message) {
-                    message.style.animation = 'pulse 1s ease';
-                    setTimeout(() => {
-                        if (message) message.style.animation = '';
-                    }, 1000);
-                }
-            }, 2000);
-            
-            // Auto-ocultar después de 8 segundos si no toca
-            let autoHideTimeout = setTimeout(() => {
-                hideOverlay(overlay, message);
-            }, 8000);
-            
-            // Función para ocultar overlay
-            function hideOverlay(overlayEl, messageEl) {
-                if (overlayEl && overlayEl.parentNode) {
-                    overlayEl.style.animation = 'fadeOut 0.3s ease';
-                    messageEl.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => {
-                        if (overlayEl.parentNode) overlayEl.remove();
-                        if (messageEl.parentNode) messageEl.remove();
-                    }, 300);
-                }
-            }
-            
-            // Evento: tocar en cualquier lugar del overlay
+            // Evento: clic en cualquier lugar del overlay (PC y móvil)
             overlay.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Limpiar timeout de auto-ocultar
-                clearTimeout(autoHideTimeout);
+                console.log('Overlay clickeado - Mostrando instalación nativa');
                 
                 // Ocultar overlay inmediatamente
-                hideOverlay(overlay, message);
+                if (overlay && overlay.parentNode) {
+                    overlay.remove();
+                }
                 
-                // Mostrar prompt de instalación
+                // Mostrar prompt de instalación nativo
                 if (deferredPrompt) {
                     try {
-                        // Mostrar diálogo nativo de instalación
+                        // Mostrar diálogo nativo de instalación del navegador
                         deferredPrompt.prompt();
                         const { outcome } = await deferredPrompt.userChoice;
                         
                         if (outcome === 'accepted') {
                             console.log('✅ Usuario aceptó instalar la app');
-                            // Limpiar sessionStorage
                             sessionStorage.removeItem('pwa_overlay_shown');
                         } else {
                             console.log('❌ Usuario canceló instalación');
@@ -1695,30 +1613,38 @@
                 }
             });
             
-            // También permitir tocar el mensaje
-            message.addEventListener('click', async (e) => {
+            // También detectar eventos táctiles para móviles
+            overlay.addEventListener('touchstart', (e) => {
+                // Solo prevenir si es para evitar scroll, pero permitir el click
                 e.preventDefault();
-                e.stopPropagation();
                 overlay.click();
             });
         }
         
         // Métodos alternativos de instalación
         async function tryAlternativeInstall() {
-            // Para iOS (Safari)
+            // Para iOS (Safari) - mostrar instrucciones nativas
             if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
                 showIOSInstallInstructions();
                 return;
             }
             
-            // Para Android con Chrome
-            if (/android/i.test(navigator.userAgent) && deferredPrompt === null) {
-                showAndroidInstallInstructions();
+            // Para Android - intentar forzar instalación
+            if (/android/i.test(navigator.userAgent)) {
+                // Intentar con el prompt de Chrome
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                } else {
+                    // Si no hay deferredPrompt, mostrar instrucciones
+                    showAndroidInstallInstructions();
+                }
                 return;
             }
             
-            // Si nada funciona, redirigir a documentación
-            window.open('https://support.google.com/chrome/answer/9658361', '_blank');
+            // Para PC - si no hay deferredPrompt, mostrar instrucciones
+            if (!deferredPrompt) {
+                showPCInstallInstructions();
+            }
         }
         
         function showIOSInstallInstructions() {
@@ -1729,27 +1655,28 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.9);
+                background: rgba(0,0,0,0.95);
                 z-index: 20000;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 backdrop-filter: blur(10px);
+                cursor: pointer;
             `;
             
             instructionOverlay.innerHTML = `
                 <div style="
                     background: white;
-                    border-radius: 24px;
+                    border-radius: 28px;
                     padding: 32px;
                     max-width: 280px;
                     text-align: center;
                     margin: 20px;
-                    animation: slideUpBanner 0.3s ease;
+                    animation: fadeInScale 0.3s ease;
                 ">
-                    <div style="font-size: 48px; margin-bottom: 16px;">📱</div>
-                    <h3 style="margin-bottom: 12px; color: #1e293b;">Instalar en iOS</h3>
-                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.5;">
+                    <div style="font-size: 56px; margin-bottom: 16px;">📱</div>
+                    <h3 style="margin-bottom: 12px; color: #1e293b; font-size: 20px;">Instalar App en iOS</h3>
+                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.6; font-size: 14px;">
                         1. Toca el botón <strong>Compartir</strong> 📤<br>
                         2. Desplázate y toca <strong>Agregar a pantalla de inicio</strong> ➕<br>
                         3. Toca <strong>Agregar</strong>
@@ -1758,18 +1685,36 @@
                         background: #1877f2;
                         color: white;
                         border: none;
-                        padding: 12px 24px;
+                        padding: 12px 28px;
                         border-radius: 40px;
                         font-size: 16px;
                         font-weight: 600;
                         cursor: pointer;
+                        width: 100%;
                     ">Entendido</button>
                 </div>
             `;
             
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInScale {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.9);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
             document.body.appendChild(instructionOverlay);
-            document.getElementById('close-ios-instructions')?.addEventListener('click', () => {
-                instructionOverlay.remove();
+            instructionOverlay.addEventListener('click', (e) => {
+                if (e.target === instructionOverlay || e.target.id === 'close-ios-instructions') {
+                    instructionOverlay.remove();
+                }
             });
         }
         
@@ -1781,28 +1726,29 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.9);
+                background: rgba(0,0,0,0.95);
                 z-index: 20000;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 backdrop-filter: blur(10px);
+                cursor: pointer;
             `;
             
             instructionOverlay.innerHTML = `
                 <div style="
                     background: white;
-                    border-radius: 24px;
+                    border-radius: 28px;
                     padding: 32px;
                     max-width: 280px;
                     text-align: center;
                     margin: 20px;
-                    animation: slideUpBanner 0.3s ease;
+                    animation: fadeInScale 0.3s ease;
                 ">
-                    <div style="font-size: 48px; margin-bottom: 16px;">🔧</div>
-                    <h3 style="margin-bottom: 12px; color: #1e293b;">Instalar en Android</h3>
-                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.5;">
-                        1. Toca los <strong>3 puntos</strong> ⋮ en la esquina<br>
+                    <div style="font-size: 56px; margin-bottom: 16px;">🤖</div>
+                    <h3 style="margin-bottom: 12px; color: #1e293b; font-size: 20px;">Instalar App en Android</h3>
+                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.6; font-size: 14px;">
+                        1. Toca los <strong>3 puntos</strong> ⋮ arriba a la derecha<br>
                         2. Selecciona <strong>Instalar aplicación</strong> 📲<br>
                         3. Confirma la instalación
                     </p>
@@ -1810,28 +1756,86 @@
                         background: #1877f2;
                         color: white;
                         border: none;
-                        padding: 12px 24px;
+                        padding: 12px 28px;
                         border-radius: 40px;
                         font-size: 16px;
                         font-weight: 600;
                         cursor: pointer;
+                        width: 100%;
                     ">Entendido</button>
                 </div>
             `;
             
             document.body.appendChild(instructionOverlay);
-            document.getElementById('close-android-instructions')?.addEventListener('click', () => {
-                instructionOverlay.remove();
+            instructionOverlay.addEventListener('click', (e) => {
+                if (e.target === instructionOverlay || e.target.id === 'close-android-instructions') {
+                    instructionOverlay.remove();
+                }
+            });
+        }
+        
+        function showPCInstallInstructions() {
+            const instructionOverlay = document.createElement('div');
+            instructionOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.95);
+                z-index: 20000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(10px);
+                cursor: pointer;
+            `;
+            
+            instructionOverlay.innerHTML = `
+                <div style="
+                    background: white;
+                    border-radius: 28px;
+                    padding: 32px;
+                    max-width: 320px;
+                    text-align: center;
+                    margin: 20px;
+                    animation: fadeInScale 0.3s ease;
+                ">
+                    <div style="font-size: 56px; margin-bottom: 16px;">💻</div>
+                    <h3 style="margin-bottom: 12px; color: #1e293b; font-size: 20px;">Instalar App en PC</h3>
+                    <p style="margin-bottom: 20px; color: #64748b; line-height: 1.6; font-size: 14px;">
+                        1. Mira en la <strong>barra de direcciones</strong> del navegador<br>
+                        2. Haz clic en el icono <strong>📱 Instalar</strong><br>
+                        3. Confirma la instalación
+                    </p>
+                    <button id="close-pc-instructions" style="
+                        background: #1877f2;
+                        color: white;
+                        border: none;
+                        padding: 12px 28px;
+                        border-radius: 40px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        width: 100%;
+                    ">Entendido</button>
+                </div>
+            `;
+            
+            document.body.appendChild(instructionOverlay);
+            instructionOverlay.addEventListener('click', (e) => {
+                if (e.target === instructionOverlay || e.target.id === 'close-pc-instructions') {
+                    instructionOverlay.remove();
+                }
             });
         }
         
         // Detectar cuando se instala la app
         window.addEventListener('appinstalled', () => {
             console.log('🎉 App instalada exitosamente');
-            // Limpiar sessionStorage
             sessionStorage.removeItem('pwa_overlay_shown');
             
-            // Mostrar mensaje de éxito
+            // Mostrar mensaje de éxito (opcional, se puede eliminar si no quieres)
             const successMsg = document.createElement('div');
             successMsg.style.cssText = `
                 position: fixed;
@@ -1846,7 +1850,7 @@
                 font-size: 14px;
                 font-weight: 500;
                 z-index: 20000;
-                animation: slideUpBanner 0.3s ease;
+                animation: slideDown 0.3s ease;
             `;
             successMsg.innerHTML = '✅ App instalada correctamente';
             document.body.appendChild(successMsg);
@@ -1862,6 +1866,12 @@
                     sessionStorage.setItem('pwa_overlay_shown', 'true');
                 }
             }, 2000);
+        }
+        
+        // Para navegadores que ya tienen el evento disponible inmediatamente
+        if (window.deferredPrompt !== undefined) {
+            // El evento ya se disparó antes
+            console.log('DeferredPrompt ya disponible');
         }
     })();
 </script>
