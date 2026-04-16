@@ -2,48 +2,1290 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sin Conexión - Gallos Live</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="Plataforma profesional de torneos deportivos - Offline First PWA">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192">
+    <title>Gallos Live - Torneos Deportivos</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e55a2b;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --success: #00d26a;
+            --warning: #ffc107;
+            --danger: #ff4757;
+            --dark: #1a1a2e;
+            --light: #f5f5f5;
+            --gray: #6c757d;
+            --glass-bg: rgba(26, 26, 46, 0.95);
+            --glass-blur: blur(20px);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            color: var(--light);
+            overflow-x: hidden;
             min-height: 100vh;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar Desktop */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 260px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 72px;
+        }
+
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            padding-left: 24px;
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(90deg, var(--primary), transparent);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            transition: var(--transition);
+            padding: 20px;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        /* Header Móvil */
+        .mobile-header {
+            display: none;
+            position: sticky;
+            top: 0;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            padding: 12px 16px;
+            z-index: 999;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .connection-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .connection-dot.offline {
+            background: var(--danger);
+        }
+
+        .pending-badge {
+            background: var(--primary);
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+
+        /* Bottom Navigation Móvil */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            padding: 8px 16px;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 999;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bottom-nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--light);
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Grid Responsive */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            border-radius: var(--radius);
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 8px;
+            animation: slideIn 0.3s ease;
+            border-left: 3px solid var(--primary);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1999;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
+        }
+
+        .modal {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 2000;
+        }
+
+        /* Torneo Card */
+        .tournament-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
             padding: 20px;
+            transition: var(--transition);
         }
-        .offline-container {
-            max-width: 400px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
+
+        .tournament-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
         }
-        .offline-icon { font-size: 80px; margin-bottom: 20px; }
-        h1 { margin-bottom: 16px; }
-        p { margin-bottom: 24px; opacity: 0.9; }
-        .btn {
-            padding: 12px 24px;
-            background: #ff6b35;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 16px;
+            }
+            
+            .mobile-header {
+                display: block;
+            }
+            
+            .bottom-nav {
+                display: block;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="offline-container">
-        <div class="offline-icon">📡</div>
-        <h1>Sin Conexión a Internet</h1>
-        <p>Actualmente estás offline. Los datos se sincronizarán automáticamente cuando recuperes la conexión.</p>
-        <button class="btn" onclick="location.reload()">Reintentar</button>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>🏆 Gallos Live</h2>
+            </div>
+            <nav class="sidebar-nav" id="sidebar-nav"></nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="mobile-header">
+                <div class="header-content">
+                    <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+                    <h2>Gallos Live</h2>
+                    <div class="connection-indicator" id="connectionIndicator">
+                        <div class="connection-dot" id="connectionDot"></div>
+                        <span id="connectionStatus">Online</span>
+                        <span class="pending-badge" id="pendingBadge" style="display:none;">0</span>
+                    </div>
+                </div>
+            </div>
+            <div id="pages-container"></div>
+        </main>
+
+        <nav class="bottom-nav" id="bottomNav"></nav>
     </div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ==================== CONFIGURACIÓN FIREBASE ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+            authDomain: "galloslivebadge.firebaseapp.com",
+            databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+            projectId: "galloslivebadge",
+            storageBucket: "galloslivebadge.firebasestorage.app",
+            messagingSenderId: "979482928760",
+            appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d",
+            measurementId: "G-8L3Z484S3D"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ==================== ESTADO GLOBAL ====================
+        let currentUser = null;
+        let currentRoute = '/';
+        let isOnline = navigator.onLine;
+        let pendingOperations = [];
+        let tournaments = [];
+        let registrations = [];
+
+        // Rutas
+        const routes = {
+            public: ['/', '/about', '/torneos', '/galeria', '/contacto', '/resultados', '/ranking', '/blog'],
+            private: ['/dashboard', '/mis-torneos', '/perfil', '/inscripciones', '/crear-torneo', '/equipos', '/estadisticas', '/configuracion']
+        };
+
+        // Meta tags por página
+        const pageMeta = {
+            '/': { title: 'Inicio - Gallos Live', description: 'Plataforma de torneos deportivos', ogImage: 'og-home.jpg' },
+            '/about': { title: 'Nosotros - Gallos Live', description: 'Conoce nuestra historia', ogImage: 'og-about.jpg' },
+            '/torneos': { title: 'Torneos - Gallos Live', description: 'Descubre los torneos disponibles', ogImage: 'og-torneos.jpg' },
+            '/galeria': { title: 'Galería - Gallos Live', description: 'Eventos y momentos destacados', ogImage: 'og-galeria.jpg' },
+            '/contacto': { title: 'Contacto - Gallos Live', description: 'Contáctanos', ogImage: 'og-contacto.jpg' },
+            '/resultados': { title: 'Resultados en Vivo', description: 'Resultados actualizados', ogImage: 'og-resultados.jpg' },
+            '/ranking': { title: 'Ranking Global', description: 'Tabla de posiciones', ogImage: 'og-ranking.jpg' },
+            '/blog': { title: 'Blog - Gallos Live', description: 'Noticias y novedades', ogImage: 'og-blog.jpg' },
+            '/dashboard': { title: 'Dashboard - Gallos Live', description: 'Tu panel personal', ogImage: 'og-dashboard.jpg' }
+        };
+
+        // ==================== FUNCIONES DE SEGURIDAD ====================
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return input;
+            return DOMPurify.sanitize(input, {
+                ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+                ALLOWED_ATTR: ['class']
+            });
+        }
+
+        function validateEmail(email) {
+            return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[!@#$%^&*]/.test(password);
+        }
+
+        function validateName(name) {
+            return /^[a-zA-ZáéíóúñÑ\s]{2,50}$/.test(name);
+        }
+
+        // ==================== INDEXEDDB ====================
+        const DB_NAME = 'GallosLiveDB';
+        const DB_VERSION = 2;
+        let db = null;
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    if (!db.objectStoreNames.contains('pendingOperations')) {
+                        const store = db.createObjectStore('pendingOperations', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('timestamp', 'timestamp');
+                    }
+                    if (!db.objectStoreNames.contains('tournaments')) {
+                        db.createObjectStore('tournaments', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        async function addPendingOperation(operation) {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['pendingOperations'], 'readwrite');
+                const store = transaction.objectStore('pendingOperations');
+                const request = store.add({ ...operation, timestamp: Date.now() });
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getPendingOperations() {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['pendingOperations'], 'readonly');
+                const store = transaction.objectStore('pendingOperations');
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveTournamentOffline(tournament) {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['tournaments'], 'readwrite');
+                const store = transaction.objectStore('tournaments');
+                const request = store.put(tournament);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getOfflineTournaments() {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['tournaments'], 'readonly');
+                const store = transaction.objectStore('tournaments');
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // ==================== AUTENTICACIÓN ====================
+        async function register(email, password, name) {
+            if (!validateEmail(email)) throw new Error('Email inválido');
+            if (!validatePassword(password)) throw new Error('La contraseña debe tener 8+ caracteres, mayúscula, número y especial');
+            if (!validateName(name)) throw new Error('Nombre inválido (solo letras, 2-50 caracteres)');
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: sanitizeInput(name) });
+                await database.ref('users/' + userCredential.user.uid).set({
+                    name: sanitizeInput(name),
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+                showToast('Registro exitoso', 'success');
+                return userCredential.user;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        }
+
+        async function login(email, password) {
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                showToast(`Bienvenido ${currentUser.displayName || email}`, 'success');
+                updateUIForAuth();
+                navigateTo('/dashboard');
+                return currentUser;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        }
+
+        async function logout() {
+            await auth.signOut();
+            currentUser = null;
+            updateUIForAuth();
+            navigateTo('/');
+            showToast('Sesión cerrada', 'info');
+        }
+
+        // ==================== ROUTING ====================
+        function navigateTo(path) {
+            if (!routes.public.includes(path) && !routes.private.includes(path)) {
+                path = '/';
+            }
+            
+            if (routes.private.includes(path) && !currentUser) {
+                showToast('Debes iniciar sesión', 'warning');
+                path = '/';
+            }
+            
+            currentRoute = path;
+            window.history.pushState({}, '', path);
+            renderCurrentPage();
+            updateMetaTags();
+            updateActiveNav();
+        }
+
+        function renderCurrentPage() {
+            const container = document.getElementById('pages-container');
+            if (!container) return;
+            
+            let content = '';
+            switch(currentRoute) {
+                case '/': content = renderHome(); break;
+                case '/about': content = renderAbout(); break;
+                case '/torneos': content = renderTorneos(); break;
+                case '/galeria': content = renderGaleria(); break;
+                case '/contacto': content = renderContacto(); break;
+                case '/resultados': content = renderResultados(); break;
+                case '/ranking': content = renderRanking(); break;
+                case '/blog': content = renderBlog(); break;
+                case '/dashboard': content = renderDashboard(); break;
+                case '/mis-torneos': content = renderMisTorneos(); break;
+                case '/perfil': content = renderPerfil(); break;
+                case '/inscripciones': content = renderInscripciones(); break;
+                case '/crear-torneo': content = renderCrearTorneo(); break;
+                default: content = renderHome();
+            }
+            
+            container.innerHTML = content;
+            attachEventListeners();
+        }
+
+        // ==================== RENDERIZADO DE PÁGINAS ====================
+        function renderHome() {
+            return `
+                <div class="page active">
+                    <div class="hero">
+                        <h1>🏆 Gallos Live</h1>
+                        <p style="font-size: 20px; margin-bottom: 30px;">La plataforma definitiva para torneos deportivos</p>
+                        <p style="margin-bottom: 30px;">Organiza, participa y gana en los mejores torneos</p>
+                        ${!currentUser ? `
+                            <div style="display: flex; gap: 16px; justify-content: center;">
+                                <button class="btn" onclick="showLoginModal()">Iniciar Sesión</button>
+                                <button class="btn btn-secondary" onclick="showRegisterModal()">Registrarse</button>
+                            </div>
+                        ` : `
+                            <button class="btn" onclick="navigateTo('/dashboard')">Ir a mi Dashboard</button>
+                        `}
+                    </div>
+                    
+                    <h2 style="margin-bottom: 20px;">Torneos Destacados</h2>
+                    <div class="grid" id="featuredTournaments">
+                        <div class="tournament-card">
+                            <h3>🏅 Copa de Campeones</h3>
+                            <p>Fecha: 15-20 Dic 2024</p>
+                            <p>Premio: $10,000 USD</p>
+                        </div>
+                        <div class="tournament-card">
+                            <h3>⚽ Liga Profesional</h3>
+                            <p>Fecha: Enero - Marzo 2025</p>
+                            <p>8 equipos participantes</p>
+                        </div>
+                        <div class="tournament-card">
+                            <h3>🎾 Masters de Tenis</h3>
+                            <p>Fecha: 5-10 Ene 2025</p>
+                            <p>Categorías: Individual/Dobles</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDashboard() {
+            if (!currentUser) return '<div class="page active"><p>Cargando...</p></div>';
+            return `
+                <div class="page active">
+                    <h1>Dashboard</h1>
+                    <div class="card">
+                        <h2>Bienvenido, ${escapeHtml(currentUser.displayName || currentUser.email)}</h2>
+                        <p>Email: ${escapeHtml(currentUser.email)}</p>
+                        <p>UID: ${currentUser.uid}</p>
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="btn" onclick="syncNow()">🔄 Sincronizar Ahora</button>
+                            <button class="btn btn-danger" onclick="logout()">🚪 Cerrar Sesión</button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid">
+                        <div class="card" onclick="navigateTo('/mis-torneos')" style="cursor: pointer;">
+                            <h3>🎯 Mis Torneos</h3>
+                            <p>Gestiona tus torneos creados</p>
+                        </div>
+                        <div class="card" onclick="navigateTo('/inscripciones')" style="cursor: pointer;">
+                            <h3>📝 Mis Inscripciones</h3>
+                            <p>Torneos donde participas</p>
+                        </div>
+                        <div class="card" onclick="navigateTo('/estadisticas')" style="cursor: pointer;">
+                            <h3>📊 Estadísticas</h3>
+                            <p>Tu rendimiento en detalle</p>
+                        </div>
+                        <div class="card" onclick="navigateTo('/perfil')" style="cursor: pointer;">
+                            <h3>👤 Mi Perfil</h3>
+                            <p>Editar información personal</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Estadísticas Rápidas</h3>
+                        <p>Torneos creados: ${tournaments.filter(t => t.ownerId === currentUser.uid).length}</p>
+                        <p>Inscripciones: ${registrations.filter(r => r.userId === currentUser.uid).length}</p>
+                        <p>Operaciones pendientes: <span id="pendingCount">0</span></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMisTorneos() {
+            const userTournaments = tournaments.filter(t => t.ownerId === currentUser?.uid);
+            return `
+                <div class="page active">
+                    <h1>Mis Torneos</h1>
+                    <div class="card">
+                        <button class="btn" onclick="navigateTo('/crear-torneo')">+ Crear Nuevo Torneo</button>
+                    </div>
+                    <div class="grid" id="myTournamentsList">
+                        ${userTournaments.length === 0 ? '<p>No tienes torneos creados. ¡Crea uno!</p>' : 
+                            userTournaments.map(t => `
+                                <div class="tournament-card">
+                                    <h3>${escapeHtml(t.name)}</h3>
+                                    <p>📅 ${t.startDate} - ${t.endDate}</p>
+                                    <p>🏷️ ${t.category}</p>
+                                    <p>📝 ${t.description?.substring(0, 100)}</p>
+                                    <button class="btn btn-secondary" style="margin-top: 10px;" onclick="editTournament('${t.id}')">Editar</button>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCrearTorneo() {
+            return `
+                <div class="page active">
+                    <h1>Crear Torneo</h1>
+                    <div class="card" style="max-width: 600px; margin: 0 auto;">
+                        <form id="createTournamentForm" onsubmit="createTournament(event)">
+                            <div class="input-group">
+                                <label>Nombre del Torneo *</label>
+                                <input type="text" id="tournamentName" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Fecha de Inicio *</label>
+                                <input type="date" id="tournamentStartDate" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Fecha de Fin *</label>
+                                <input type="date" id="tournamentEndDate" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Descripción</label>
+                                <textarea id="tournamentDescription" rows="4" placeholder="Describe tu torneo..."></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>Categoría</label>
+                                <select id="tournamentCategory">
+                                    <option value="futbol">⚽ Fútbol</option>
+                                    <option value="basquet">🏀 Básquet</option>
+                                    <option value="tenis">🎾 Tenis</option>
+                                    <option value="voley">🏐 Vóley</option>
+                                    <option value="otros">🎯 Otros</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Premio (opcional)</label>
+                                <input type="text" id="tournamentPrize" placeholder="Ej: $1000 USD + Trofeo">
+                            </div>
+                            <button type="submit" class="btn">✅ Crear Torneo</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTorneos() {
+            return `
+                <div class="page active">
+                    <h1>Torneos Disponibles</h1>
+                    <div class="grid" id="allTournamentsList">
+                        ${tournaments.map(t => `
+                            <div class="tournament-card">
+                                <h3>${escapeHtml(t.name)}</h3>
+                                <p>📅 ${t.startDate} - ${t.endDate}</p>
+                                <p>🏷️ ${t.category}</p>
+                                <p>Creado por: ${t.ownerName || 'Anónimo'}</p>
+                                ${currentUser ? `<button class="btn btn-secondary" style="margin-top: 10px;" onclick="inscribirseTorneo('${t.id}')">📝 Inscribirse</button>` : ''}
+                            </div>
+                        `).join('')}
+                        ${tournaments.length === 0 ? '<p>No hay torneos disponibles aún.</p>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInscripciones() {
+            const myRegistrations = registrations.filter(r => r.userId === currentUser?.uid);
+            const registeredTournaments = tournaments.filter(t => myRegistrations.some(r => r.tournamentId === t.id));
+            return `
+                <div class="page active">
+                    <h1>Mis Inscripciones</h1>
+                    <div class="grid">
+                        ${registeredTournaments.map(t => `
+                            <div class="tournament-card">
+                                <h3>${escapeHtml(t.name)}</h3>
+                                <p>📅 ${t.startDate} - ${t.endDate}</p>
+                                <p>🏷️ ${t.category}</p>
+                                <button class="btn btn-danger" style="margin-top: 10px;" onclick="cancelarInscripcion('${t.id}')">❌ Cancelar inscripción</button>
+                            </div>
+                        `).join('')}
+                        ${registeredTournaments.length === 0 ? '<p>No estás inscrito en ningún torneo.</p>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAbout() {
+            return `<div class="page active"><h1>Sobre Nosotros</h1><div class="card"><p>Gallos Live es la plataforma líder en gestión de torneos deportivos, fundada en 2024 con la misión de conectar atletas y organizadores.</p><br><p>📍 Misión: Facilitar la organización y participación en torneos deportivos a nivel mundial.</p><p>🌟 Visión: Ser la plataforma #1 en deportes electrónicos y tradicionales.</p></div></div>`;
+        }
+
+        function renderGaleria() {
+            return `<div class="page active"><h1>Galería</h1><div class="grid"><div class="card">📸 Evento Copa de Campeones 2024</div><div class="card">🏆 Ceremonia de premiación</div><div class="card">⚽ Final Liga Profesional</div><div class="card">🎾 Masters de Tenis - Final</div></div></div>`;
+        }
+
+        function renderContacto() {
+            return `<div class="page active"><h1>Contacto</h1><div class="card"><form id="contactForm" onsubmit="sendContactMessage(event)"><div class="input-group"><label>Nombre</label><input type="text" id="contactName" required></div><div class="input-group"><label>Email</label><input type="email" id="contactEmail" required></div><div class="input-group"><label>Mensaje</label><textarea id="contactMessage" rows="4" required></textarea></div><button type="submit" class="btn">📨 Enviar Mensaje</button></form></div></div>`;
+        }
+
+        function renderResultados() {
+            return `<div class="page active"><h1>Resultados en Vivo</h1><div class="card"><div class="tournament-card"><h3>Copa de Campeones - Final</h3><p>Equipo A 3 - 2 Equipo B</p><p>✅ Finalizado</p></div><div class="tournament-card"><h3>Liga Profesional - Semifinal</h3><p>En curso...</p></div></div></div>`;
+        }
+
+        function renderRanking() {
+            return `<div class="page active"><h1>Ranking Global</h1><div class="card"><table style="width:100%"><tr><th>#</th><th>Jugador</th><th>Puntos</th></tr><tr><td>1</td><td>Carlos Martínez</td><td>2500</td></tr><tr><td>2</td><td>Ana García</td><td>2350</td></tr><tr><td>3</td><td>Luis Rodríguez</td><td>2200</td></tr></table></div></div>`;
+        }
+
+        function renderBlog() {
+            return `<div class="page active"><h1>Blog / Noticias</h1><div class="card"><h3>🎉 Gran final de la Copa de Campeones</h3><p>El evento más esperado del año se acerca...</p></div><div class="card"><h3>📢 Nuevas reglas para torneos 2025</h3><p>Conoce las actualizaciones...</p></div></div>`;
+        }
+
+        function renderPerfil() {
+            return `<div class="page active"><h1>Mi Perfil</h1><div class="card"><form id="profileForm" onsubmit="updateProfile(event)"><div class="input-group"><label>Nombre</label><input type="text" id="profileName" value="${escapeHtml(currentUser?.displayName || '')}" required></div><div class="input-group"><label>Email</label><input type="email" id="profileEmail" value="${escapeHtml(currentUser?.email || '')}" disabled></div><button type="submit" class="btn">💾 Actualizar Perfil</button></form><hr style="margin: 20px 0;"><button class="btn btn-danger" onclick="changePassword()">🔑 Cambiar Contraseña</button></div></div>`;
+        }
+
+        function renderEstadisticas() {
+            const myTournaments = tournaments.filter(t => t.ownerId === currentUser?.uid).length;
+            const myRegs = registrations.filter(r => r.userId === currentUser?.uid).length;
+            return `<div class="page active"><h1>Estadísticas</h1><div class="grid"><div class="card"><h3>Torneos Creados</h3><p style="font-size: 48px;">${myTournaments}</p></div><div class="card"><h3>Inscripciones</h3><p style="font-size: 48px;">${myRegs}</p></div><div class="card"><h3>Porcentaje de Victorias</h3><p style="font-size: 48px;">75%</p></div></div></div>`;
+        }
+
+        function renderConfiguracion() {
+            return `<div class="page active"><h1>Configuración</h1><div class="card"><label><input type="checkbox" id="darkModeToggle"> Modo Oscuro</label></div><div class="card"><button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button></div></div>`;
+        }
+
+        function renderEquipos() {
+            return `<div class="page active"><h1>Mis Equipos</h1><div class="card"><button class="btn">+ Crear Equipo</button></div></div>`;
+        }
+
+        // ==================== FUNCIONES CRUD ====================
+        async function createTournament(event) {
+            event.preventDefault();
+            if (!currentUser) {
+                showToast('Debes iniciar sesión', 'warning');
+                return;
+            }
+            
+            const name = document.getElementById('tournamentName')?.value;
+            const startDate = document.getElementById('tournamentStartDate')?.value;
+            const endDate = document.getElementById('tournamentEndDate')?.value;
+            const description = document.getElementById('tournamentDescription')?.value;
+            const category = document.getElementById('tournamentCategory')?.value;
+            const prize = document.getElementById('tournamentPrize')?.value;
+            
+            const tournament = {
+                id: 'local_' + Date.now(),
+                name: sanitizeInput(name),
+                startDate,
+                endDate,
+                description: sanitizeInput(description),
+                category,
+                prize: sanitizeInput(prize),
+                ownerId: currentUser.uid,
+                ownerName: currentUser.displayName || currentUser.email,
+                createdAt: new Date().toISOString(),
+                syncStatus: 'pending'
+            };
+            
+            // Guardar offline
+            await saveTournamentOffline(tournament);
+            tournaments.push(tournament);
+            
+            // Agregar a cola de sincronización
+            await addPendingOperation({
+                type: 'CREATE_TOURNAMENT',
+                data: tournament,
+                userId: currentUser.uid
+            });
+            
+            showToast('Torneo creado offline. Se sincronizará automáticamente', 'success');
+            navigateTo('/mis-torneos');
+            
+            // Si hay conexión, sincronizar inmediatamente
+            if (isOnline) await syncNow();
+        }
+
+        async function inscribirseTorneo(tournamentId) {
+            if (!currentUser) {
+                showToast('Debes iniciar sesión', 'warning');
+                return;
+            }
+            
+            const registration = {
+                id: 'reg_' + Date.now(),
+                tournamentId,
+                userId: currentUser.uid,
+                userName: currentUser.displayName || currentUser.email,
+                date: new Date().toISOString(),
+                syncStatus: 'pending'
+            };
+            
+            registrations.push(registration);
+            await addPendingOperation({
+                type: 'REGISTER_TOURNAMENT',
+                data: registration
+            });
+            
+            showToast('Inscripción registrada offline', 'success');
+            if (isOnline) await syncNow();
+        }
+
+        async function cancelarInscripcion(tournamentId) {
+            const regIndex = registrations.findIndex(r => r.tournamentId === tournamentId && r.userId === currentUser?.uid);
+            if (regIndex !== -1) {
+                registrations.splice(regIndex, 1);
+                await addPendingOperation({
+                    type: 'UNREGISTER_TOURNAMENT',
+                    data: { tournamentId, userId: currentUser.uid }
+                });
+                showToast('Inscripción cancelada', 'success');
+                renderCurrentPage();
+            }
+        }
+
+        async function syncNow() {
+            if (!isOnline) {
+                showToast('Sin conexión. Se sincronizará cuando recuperes internet', 'warning');
+                return;
+            }
+            
+            showToast('Sincronizando...', 'info');
+            const pendingOps = await getPendingOperations();
+            
+            for (const op of pendingOps) {
+                try {
+                    if (op.type === 'CREATE_TOURNAMENT') {
+                        const newTournamentRef = database.ref('tournaments/' + op.data.id).push();
+                        await newTournamentRef.set(op.data);
+                        op.synced = true;
+                    } else if (op.type === 'REGISTER_TOURNAMENT') {
+                        await database.ref('registrations/' + op.data.id).set(op.data);
+                        op.synced = true;
+                    }
+                } catch (error) {
+                    console.error('Error syncing:', error);
+                }
+            }
+            
+            // Cargar datos desde Firebase
+            await loadDataFromFirebase();
+            showToast('Sincronización completada', 'success');
+            renderCurrentPage();
+        }
+
+        async function loadDataFromFirebase() {
+            try {
+                const tournamentsSnapshot = await database.ref('tournaments').once('value');
+                const firebaseTournaments = tournamentsSnapshot.val();
+                if (firebaseTournaments) {
+                    tournaments = Object.values(firebaseTournaments);
+                }
+                
+                const registrationsSnapshot = await database.ref('registrations').once('value');
+                const firebaseRegistrations = registrationsSnapshot.val();
+                if (firebaseRegistrations) {
+                    registrations = Object.values(firebaseRegistrations);
+                }
+            } catch (error) {
+                console.log('Offline mode - usando datos locales');
+                const offlineTournaments = await getOfflineTournaments();
+                tournaments.push(...offlineTournaments);
+            }
+        }
+
+        // ==================== MODALES ====================
+        function showLoginModal() {
+            const modalHtml = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" onclick="event.stopPropagation()">
+                        <h2>Iniciar Sesión</h2>
+                        <form onsubmit="handleLogin(event)">
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Contraseña</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn">Ingresar</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function showRegisterModal() {
+            const modalHtml = `
+                <div class="modal-overlay" onclick="closeModal(event)">
+                    <div class="modal" onclick="event.stopPropagation()">
+                        <h2>Registro</h2>
+                        <form onsubmit="handleRegister(event)">
+                            <div class="input-group">
+                                <label>Nombre Completo</label>
+                                <input type="text" id="regName" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" id="regEmail" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Contraseña</label>
+                                <input type="password" id="regPassword" required>
+                                <small>Mínimo 8 caracteres, 1 mayúscula, 1 número, 1 especial</small>
+                            </div>
+                            <button type="submit" class="btn">Registrarse</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail')?.value;
+            const password = document.getElementById('loginPassword')?.value;
+            try {
+                await login(email, password);
+                closeModal();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('regName')?.value;
+            const email = document.getElementById('regEmail')?.value;
+            const password = document.getElementById('regPassword')?.value;
+            try {
+                await register(email, password, name);
+                closeModal();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        function closeModal(event) {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+        }
+
+        async function updateProfile(event) {
+            event.preventDefault();
+            const newName = document.getElementById('profileName')?.value;
+            if (currentUser) {
+                await currentUser.updateProfile({ displayName: sanitizeInput(newName) });
+                showToast('Perfil actualizado', 'success');
+                renderCurrentPage();
+            }
+        }
+
+        async function changePassword() {
+            const newPassword = prompt('Nueva contraseña (8+ chars, mayúscula, número, especial):');
+            if (newPassword && validatePassword(newPassword)) {
+                await currentUser.updatePassword(newPassword);
+                showToast('Contraseña actualizada', 'success');
+            } else {
+                showToast('Contraseña no cumple requisitos', 'error');
+            }
+        }
+
+        async function sendContactMessage(event) {
+            event.preventDefault();
+            const name = document.getElementById('contactName')?.value;
+            const email = document.getElementById('contactEmail')?.value;
+            const message = document.getElementById('contactMessage')?.value;
+            
+            await addPendingOperation({
+                type: 'CONTACT_MESSAGE',
+                data: { name: sanitizeInput(name), email, message: sanitizeInput(message), date: new Date().toISOString() }
+            });
+            
+            showToast('Mensaje guardado. Se enviará al reconectar', 'success');
+            event.target.reset();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ==================== UI HELPER ====================
+        function toggleMobileMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function updateUIForAuth() {
+            renderCurrentPage();
+            renderNavigation();
+        }
+
+        function renderNavigation() {
+            const sidebarNav = document.getElementById('sidebar-nav');
+            const bottomNav = document.getElementById('bottomNav');
+            
+            const publicItems = [
+                { path: '/', icon: '🏠', label: 'Inicio' },
+                { path: '/torneos', icon: '🏆', label: 'Torneos' },
+                { path: '/galeria', icon: '📸', label: 'Galería' },
+                { path: '/contacto', icon: '📧', label: 'Contacto' },
+                { path: '/resultados', icon: '📊', label: 'Resultados' },
+                { path: '/ranking', icon: '🏅', label: 'Ranking' },
+                { path: '/blog', icon: '📰', label: 'Blog' },
+                { path: '/about', icon: 'ℹ️', label: 'Nosotros' }
+            ];
+            
+            const privateItems = currentUser ? [
+                { path: '/dashboard', icon: '📊', label: 'Dashboard' },
+                { path: '/mis-torneos', icon: '🎯', label: 'Mis Torneos' },
+                { path: '/inscripciones', icon: '📝', label: 'Inscripciones' },
+                { path: '/crear-torneo', icon: '➕', label: 'Crear' },
+                { path: '/perfil', icon: '👤', label: 'Perfil' },
+                { path: '/estadisticas', icon: '📈', label: 'Stats' },
+                { path: '/equipos', icon: '👥', label: 'Equipos' },
+                { path: '/configuracion', icon: '⚙️', label: 'Config' }
+            ] : [];
+            
+            const allItems = [...publicItems, ...privateItems];
+            
+            sidebarNav.innerHTML = allItems.map(item => `
+                <a class="sidebar-item ${currentRoute === item.path ? 'active' : ''}" onclick="navigateTo('${item.path}')">
+                    <span class="sidebar-icon">${item.icon}</span>
+                    <span class="sidebar-text">${item.label}</span>
+                </a>
+            `).join('');
+            
+            bottomNav.innerHTML = `
+                <div class="bottom-nav-items">
+                    ${allItems.slice(0, 5).map(item => `
+                        <div class="bottom-nav-item" onclick="navigateTo('${item.path}')">
+                            <div>${item.icon}</div>
+                            <div>${item.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function updateMetaTags() {
+            const meta = pageMeta[currentRoute] || pageMeta['/'];
+            document.title = meta.title;
+        }
+
+        function updateActiveNav() {
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                el.classList.remove('active');
+                if (el.getAttribute('onclick')?.includes(currentRoute)) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        function updateConnectionStatus() {
+            isOnline = navigator.onLine;
+            const dot = document.getElementById('connectionDot');
+            const status = document.getElementById('connectionStatus');
+            if (dot) dot.className = `connection-dot ${isOnline ? '' : 'offline'}`;
+            if (status) status.textContent = isOnline ? 'Online' : 'Offline';
+            if (isOnline) {
+                showToast('Conexión restablecida', 'success');
+                syncNow();
+            } else {
+                showToast('Modo offline activado', 'warning');
+            }
+        }
+
+        function attachEventListeners() {
+            // No additional listeners needed
+        }
+
+        function editTournament(id) {
+            showToast('Función en desarrollo', 'info');
+        }
+
+        // ==================== INICIALIZACIÓN ====================
+        window.addEventListener('load', async () => {
+            await initDB();
+            await loadDataFromFirebase();
+            
+            // Escuchar cambios en autenticación
+            auth.onAuthStateChanged(async (user) => {
+                currentUser = user;
+                updateUIForAuth();
+                if (user) await loadDataFromFirebase();
+            });
+            
+            window.addEventListener('online', updateConnectionStatus);
+            window.addEventListener('offline', updateConnectionStatus);
+            window.addEventListener('popstate', () => {
+                currentRoute = window.location.pathname;
+                renderCurrentPage();
+                updateMetaTags();
+                updateActiveNav();
+            });
+            
+            updateConnectionStatus();
+            
+            const savedRoute = window.location.pathname;
+            currentRoute = savedRoute !== '/' && (routes.public.includes(savedRoute) || routes.private.includes(savedRoute)) ? savedRoute : '/';
+            renderCurrentPage();
+            renderNavigation();
+            updateMetaTags();
+            
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(err => console.error('SW Error:', err));
+            }
+            
+            // Sincronización periódica
+            setInterval(() => { if (isOnline) syncNow(); }, 30000);
+        });
+    </script>
 </body>
 </html>
