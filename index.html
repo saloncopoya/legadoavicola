@@ -4,1437 +4,1459 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1877f2">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="GallosLive">
+    <meta name="description" content="GallosLive - Plataforma líder en gestión de torneos y competencias">
+    <meta name="keywords" content="torneos, competencias, deportes, gaming, gestión">
+    <link rel="canonical" href="https://galloslive.com/">
     
-    <!-- Security Headers via Meta -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    
-    <!-- Dynamic OG Tags (se actualizan por JS) -->
+    <!-- Open Graph Tags (Dinámicos por página) -->
     <meta property="og:site_name" content="GallosLive">
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_ES">
+    <meta property="og:url" content="https://galloslive.com/">
+    
+    <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@galloslive">
     
-    <title>GallosLive - Gestión de Torneos Offline</title>
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
     
-    <!-- DOMPurify para sanitización -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-
-
-        <link rel="manifest" href="/manifest.json">
-
+    <!-- CSP Meta Tag -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' wss: https:; font-src 'self' data:;">
+    
+    <title>GallosLive - Torneos y Competencias</title>
     
     <style>
-        /* RESET COMPLETO - SIN MÁRGENES */
+        /* ==================== CSS RESET & VARIABLES ==================== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f0f2f5;
-            overflow-x: hidden;
-            padding-top: 56px;
-            padding-bottom: 56px;
-        }
-
-        /* Variables CSS */
+        
         :root {
+            /* Light Theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f0f2f5;
+            --text-primary: #1e1e2f;
+            --text-secondary: #65676b;
+            --border-color: #e4e6eb;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
             --primary: #1877f2;
             --primary-dark: #0c63d4;
-            --secondary: #42b72a;
+            --success: #42b72a;
             --danger: #e41e3f;
             --warning: #f7b928;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --light: #f8fafc;
-            --border: #e2e8f0;
-            --shadow: 0 2px 8px rgba(0,0,0,0.08);
-            --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
         }
-
-        /* Header Superior - Glassmorphism */
-        .app-header {
+        
+        [data-theme="dark"] {
+            --bg-primary: #18191a;
+            --bg-secondary: #242526;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --border-color: #3e4042;
+            --card-bg: #242526;
+            --header-bg: rgba(24, 25, 26, 0.95);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        
+        /* Full-bleed layout */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 80px 16px 80px 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        @media (min-width: 1024px) {
+            .main-content {
+                padding: 80px 24px 40px 280px;
+            }
+        }
+        
+        /* ==================== HEADER ==================== */
+        .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: 56px;
-            background: rgba(255,255,255,0.96);
+            background: var(--header-bg);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
-            z-index: 1000;
-            box-shadow: var(--shadow);
         }
-
+        
+        @media (min-width: 1024px) {
+            .header {
+                left: 260px;
+                padding: 0 24px;
+            }
+            .header.sidebar-collapsed {
+                left: 72px;
+            }
+        }
+        
         .logo {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), #00c6ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
-
+        
         .header-actions {
             display: flex;
             gap: 12px;
             align-items: center;
         }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-        }
-
-        .icon-btn:hover {
-            background: #e4e6e9;
-        }
-
-        /* Status Indicator */
-        .connection-status {
+        
+        .connection-indicator {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: #22c55e;
-            transition: all 0.3s;
-            box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
+            background: var(--success);
+            transition: var(--transition);
         }
-
-        .connection-status.offline {
-            background: #ef4444;
-            box-shadow: 0 0 0 2px rgba(239,68,68,0.3);
+        
+        .connection-indicator.offline {
+            background: var(--danger);
         }
-
-        /* Bottom Navigation */
+        
+        .pending-badge {
+            background: var(--danger);
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        /* ==================== SIDEBAR DESKTOP ==================== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            transform: translateX(-100%);
+            transition: var(--transition);
+            z-index: 999;
+            overflow-y: auto;
+        }
+        
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                width: 72px;
+            }
+            .sidebar.collapsed .sidebar-link span {
+                display: none;
+            }
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .sidebar-header {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .sidebar-nav {
+            padding: 16px 0;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            border-radius: 8px;
+            margin: 4px 8px;
+        }
+        
+        .sidebar-link:hover, .sidebar-link.active {
+            background: var(--bg-secondary);
+        }
+        
+        .sidebar-link svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+        
+        /* ==================== BOTTOM NAVIGATION (Móvil) ==================== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             height: 56px;
-            background: rgba(255,255,255,0.96);
+            background: var(--header-bg);
             backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding-bottom: env(safe-area-inset-bottom);
             z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
         }
-
+        
+        @media (min-width: 1024px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+        
         .nav-item {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px 0;
-            transition: all 0.2s;
-            color: var(--gray);
-            font-size: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.7rem;
         }
-
+        
         .nav-item.active {
             color: var(--primary);
         }
-
-        .nav-item span:first-child {
-            font-size: 22px;
+        
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
         }
-
-        /* Main Content */
-        .main-content {
-            min-height: calc(100vh - 112px);
-            padding: 16px;
-        }
-
-        /* Cards estilo Facebook */
+        
+        /* ==================== CARDS Y COMPONENTES ==================== */
         .card {
-            background: white;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
             padding: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
             margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s;
         }
-
+        
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-md);
         }
-
-        /* Formularios */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(24,119,242,0.1);
-        }
-
-        /* Botones */
+        
         .btn {
-            padding: 12px 24px;
-            border: none;
+            padding: 8px 16px;
             border-radius: 8px;
-            font-weight: 600;
+            border: none;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
         }
-
+        
         .btn-primary {
             background: var(--primary);
             color: white;
         }
-
+        
         .btn-primary:hover {
             background: var(--primary-dark);
         }
-
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
+        
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
+        
+        .form-group {
+            margin-bottom: 16px;
         }
-
-        /* Tablas responsivas */
-        .table-container {
-            overflow-x: auto;
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
-
-        table {
+        
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            border-collapse: collapse;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
         }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
+        
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
         }
-
-        th {
-            background: var(--light);
-            font-weight: 600;
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-warning {
-            background: #fef9c3;
-            color: #854d0e;
-        }
-
-        /* Toast notifications */
-        .toast-container {
-            position: fixed;
-            bottom: 72px;
-            left: 16px;
-            right: 16px;
-            z-index: 1100;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        
+        /* Toast Notifications */
         .toast {
-            background: #1e293b;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            animation: slideUp 0.3s ease;
-            box-shadow: var(--shadow-lg);
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 12px 20px;
+            border-radius: 40px;
+            z-index: 1100;
+            transition: transform 0.3s ease;
+            white-space: nowrap;
         }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
+        
+        @media (min-width: 1024px) {
+            .toast {
+                bottom: 24px;
             }
         }
-
-        /* Desktop adjustments */
-        @media (min-width: 768px) {
-            body {
-                padding-bottom: 0;
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Grid System */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
             }
-            
-            .bottom-nav {
-                display: none;
-            }
-            
             .main-content {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 24px;
-            }
-            
-            .app-header {
-                padding: 0 24px;
+                padding: 72px 12px 72px 12px;
             }
         }
-
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, #00c6ff 100%);
+            border-radius: var(--border-radius);
+            color: white;
+            margin-bottom: 40px;
+        }
+        
         /* Loading spinner */
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid var(--border);
+            border: 4px solid var(--border-color);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
-
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        /* Grid responsivo */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
-
-<header class="app-header">
-    <div class="logo">🐓 GallosLive</div>
-    <div class="header-actions">
-        <div class="connection-status" id="connectionStatus"></div>
-        <button class="icon-btn" id="themeToggle" aria-label="Tema">🌙</button>
-        <button class="icon-btn" id="menuToggle" aria-label="Menú">☰</button>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">GallosLive</div>
+            <div class="header-actions">
+                <div class="connection-indicator" id="connectionIndicator"></div>
+                <span class="pending-badge" id="pendingBadge" style="display: none;">0</span>
+                <button class="btn" id="themeToggle">🌓</button>
+                <button class="btn" id="menuToggle" style="display: none;">☰</button>
+            </div>
+        </header>
+        
+        <!-- Sidebar Desktop -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button class="btn" id="collapseSidebar">◀</button>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+        </aside>
+        
+        <!-- Bottom Navigation Móvil -->
+        <nav class="bottom-nav" id="bottomNav"></nav>
+        
+        <!-- Main Content (Router View) -->
+        <main class="main-content" id="app"></main>
     </div>
-</header>
-
-<main class="main-content" id="mainContent">
-    <div class="spinner"></div>
-</main>
-
-<nav class="bottom-nav" id="bottomNav">
-    <button class="nav-item" data-route="/">
-        <span>🏠</span>
-        <span>Inicio</span>
-    </button>
-    <button class="nav-item" data-route="/torneos-publicos">
-        <span>🏆</span>
-        <span>Torneos</span>
-    </button>
-    <button class="nav-item" data-route="/dashboard" id="protectedNav" style="display:none;">
-        <span>📊</span>
-        <span>Dashboard</span>
-    </button>
-    <button class="nav-item" data-route="/mis-torneos" id="torneosNav" style="display:none;">
-        <span>✍️</span>
-        <span>Mis Torneos</span>
-    </button>
-    <button class="nav-item" data-route="/perfil" id="perfilNav" style="display:none;">
-        <span>👤</span>
-        <span>Perfil</span>
-    </button>
-    <button class="nav-item" data-route="/login" id="loginNav">
-        <span>🔐</span>
-        <span>Login</span>
-    </button>
-</nav>
-
-<div class="toast-container" id="toastContainer"></div>
-
-<script>
-    // ============================================
-    // 1. CONFIGURACIÓN INICIAL Y SEGURIDAD
-    // ============================================
     
-    // Firebase Config
-    const firebaseConfig = {
-        apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
-        authDomain: "galloslivebadge.firebaseapp.com",
-        databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
-        projectId: "galloslivebadge",
-        storageBucket: "galloslivebadge.firebasestorage.app",
-        messagingSenderId: "979482928760",
-        appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
-    };
+    <!-- Toast Container -->
+    <div id="toast" class="toast"></div>
     
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const database = firebase.database();
+    <!-- Modal Container -->
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
     
-    // Estado global
-    let currentUser = null;
-    let isOnline = navigator.onLine;
-    let currentRoute = '/';
-    let db = null;
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/zod@3.22.4/lib/index.umd.js"></script>
     
-    // Anti-debugging / Protección consola
-    (function antiDebug() {
-        // Detectar DevTools
-        setInterval(() => {
-            const before = new Date();
-            debugger;
-            const after = new Date();
-            if (after - before > 100) {
-                document.body.innerHTML = '<div style="padding:20px;text-align:center"><h1>⚠️ DevTools Detectado</h1><p>Por favor cierra las herramientas de desarrollo</p></div>';
-            }
-        }, 1000);
-        
-        // Bloquear eval y Function
-        const originalEval = window.eval;
-        window.eval = function() { throw new Error('Eval bloqueado por seguridad'); };
-        
-        // Limpiar console.log en producción (opcional)
-        if (window.location.hostname !== 'localhost') {
-            console.log = function() {};
-            console.info = function() {};
-        }
-    })();
-    
-    // Sanitización de inputs
-    function sanitizeInput(input) {
-        if (typeof input !== 'string') return input;
-        return DOMPurify.sanitize(input, {
-            ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
-            ALLOWED_ATTR: ['class']
-        });
-    }
-    
-    // Validación de email
-    function validateEmail(email) {
-        const re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
-        return re.test(email);
-    }
-    
-    // Validación de password
-  function validatePassword(password) {
-    return true;  // Siempre válida, sin restricciones
-}
-    
-    // ============================================
-    // 2. INDEXEDDB - ALMACENAMIENTO OFFLINE
-    // ============================================
-    
-    function initDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open('GallosLiveDB', 3);
+    <script>
+        // ==================== SECURITY & SANITIZATION ====================
+        (function() {
+            // Anti-debugging
+            setInterval(() => {
+                debugger;
+                const start = performance.now();
+                const end = performance.now();
+                if (end - start > 100) {
+                    document.body.innerHTML = '<h1>Debugging detected</h1>';
+                    throw new Error('Debugger detected');
+                }
+            }, 1000);
             
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => {
-                db = request.result;
-                resolve(db);
-            };
+            // Bloquear eval y Function
+            const originalEval = window.eval;
+            window.eval = function() { throw new Error('Eval blocked'); };
             
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                
-                if (!db.objectStoreNames.contains('offlineTorneos')) {
-                    const store = db.createObjectStore('offlineTorneos', { keyPath: 'id', autoIncrement: true });
-                    store.createIndex('userId', 'userId', { unique: false });
-                    store.createIndex('syncStatus', 'syncStatus', { unique: false });
-                }
-                
-                if (!db.objectStoreNames.contains('pendingOps')) {
-                    const pendingStore = db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
-                    pendingStore.createIndex('userId', 'userId', { unique: false });
-                    pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
-                }
-                
-                if (!db.objectStoreNames.contains('users')) {
-                    db.createObjectStore('users', { keyPath: 'uid' });
-                }
+            // Detectar DevTools
+            let devtools = /./;
+            devtools.toString = () => {
+                document.body.innerHTML = '<h1>DevTools detected</h1>';
+                throw new Error('DevTools');
             };
-        });
-    }
-    
-    async function saveToDB(store, data) {
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction([store], 'readwrite');
-            const request = tx.objectStore(store).put(data);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-    
-    async function getFromDB(store, key = null) {
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction([store], 'readonly');
-            let request;
-            if (key) {
-                request = tx.objectStore(store).get(key);
-            } else {
-                request = tx.objectStore(store).getAll();
-            }
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-    
-    // ============================================
-    // 3. SISTEMA DE SINCRONIZACIÓN
-    // ============================================
-    
-    async function syncPendingOperations() {
-        if (!isOnline || !currentUser) return;
+            console.log('%c', devtools);
+        })();
         
-        const pendingOps = await getFromDB('pendingOps');
-        const userOps = pendingOps.filter(op => op.userId === currentUser.uid);
-        
-        if (userOps.length === 0) return;
-        
-        showToast(`🔄 Sincronizando ${userOps.length} elementos...`, 'info');
-        
-        for (const op of userOps) {
-            try {
-                if (op.type === 'CREATE_TORNEO') {
-                    const torneoRef = database.ref(`torneos/${currentUser.uid}/${op.data.offlineId}`);
-                    await torneoRef.set(op.data);
-                }
-                
-                // Actualizar estado local
-                const tx = db.transaction(['pendingOps'], 'readwrite');
-                tx.objectStore('pendingOps').delete(op.id);
-                
-                // Actualizar torneo local como sincronizado
-                const allTorneos = await getFromDB('offlineTorneos');
-                const torneoToUpdate = allTorneos.find(t => t.offlineId === op.data.offlineId);
-                if (torneoToUpdate) {
-                    torneoToUpdate.syncStatus = 'synced';
-                    await saveToDB('offlineTorneos', torneoToUpdate);
-                }
-            } catch (error) {
-                console.error('Error sync:', error);
-            }
+        // Sanitización de inputs
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return input;
+            return DOMPurify.sanitize(input, {
+                ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+                ALLOWED_ATTR: []
+            });
         }
         
-        showToast('✅ Sincronización completada', 'success');
-        if (currentRoute === '/mis-torneos') renderMisTorneos();
-    }
-    
-    // ============================================
-    // 4. FUNCIONES DE AUTENTICACIÓN
-    // ============================================
-    
-    async function handleLogin(email, password) {
-        if (!validateEmail(email)) throw new Error('Email inválido');
-        if (!validatePassword(password)) throw new Error('Password debe tener 8+ caracteres, una mayúscula y un número');
-        
-        const result = await auth.signInWithEmailAndPassword(email, password);
-        currentUser = result.user;
-        
-        await saveToDB('users', {
-            uid: currentUser.uid,
-            email: currentUser.email,
-            displayName: currentUser.displayName
-        });
-        
-        updateUIForAuth();
-        await syncPendingOperations();
-        navigateTo('/dashboard');
-        showToast('✅ Bienvenido ' + (currentUser.displayName || currentUser.email), 'success');
-    }
-    
-    async function handleRegister(email, password, nombre) {
-        if (!validateEmail(email)) throw new Error('Email inválido');
-        if (!validatePassword(password)) throw new Error('Password inválido');
-        if (!nombre || nombre.length < 2) throw new Error('Nombre inválido');
-        
-        const sanitizedName = sanitizeInput(nombre);
-        const result = await auth.createUserWithEmailAndPassword(email, password);
-        await result.user.updateProfile({ displayName: sanitizedName });
-        currentUser = result.user;
-        
-        updateUIForAuth();
-        navigateTo('/dashboard');
-        showToast('✅ Registro exitoso', 'success');
-    }
-    
-    async function logout() {
-        await auth.signOut();
-        currentUser = null;
-        updateUIForAuth();
-        navigateTo('/');
-        showToast('Sesión cerrada', 'info');
-    }
-    
-    function updateUIForAuth() {
-        const isLoggedIn = !!currentUser;
-        
-        document.querySelectorAll('#protectedNav, #torneosNav, #perfilNav').forEach(el => {
-            if (el) el.style.display = isLoggedIn ? 'flex' : 'none';
-        });
-        
-        const loginNav = document.getElementById('loginNav');
-        if (loginNav) loginNav.style.display = isLoggedIn ? 'none' : 'flex';
-        
-        if (isLoggedIn && (currentRoute === '/login' || currentRoute === '/register')) {
-            navigateTo('/dashboard');
-        }
-    }
-    
-    // ============================================
-    // 5. GESTIÓN DE TORNEOS (OFFLINE-FIRST)
-    // ============================================
-    
-    async function saveTorneoOffline(torneoData) {
-        const torneo = {
-            ...torneoData,
-            userId: currentUser.uid,
-            syncStatus: isOnline ? 'synced' : 'pending',
-            timestamp: new Date().toISOString(),
-            offlineId: Date.now()
+        // Validación con Zod
+        const validationSchemas = {
+            email: zod.string().email().regex(/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/),
+            password: zod.string().min(8).regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/),
+            name: zod.string().min(2).max(50).regex(/^[a-zA-ZáéíóúñÑ\s]+$/),
+            phone: zod.string().regex(/^\+[1-9]\d{1,14}$/),
+            url: zod.string().url()
         };
         
-        await saveToDB('offlineTorneos', torneo);
-        
-        if (!isOnline) {
-            await saveToDB('pendingOps', {
-                userId: currentUser.uid,
-                type: 'CREATE_TORNEO',
-                data: torneo,
-                timestamp: new Date().toISOString()
-            });
-            showToast('📡 Guardado localmente (Offline)', 'info');
-        } else {
-            const torneoRef = database.ref(`torneos/${currentUser.uid}/${torneo.offlineId}`);
-            await torneoRef.set(torneo);
-            showToast('✅ Torneo guardado en la nube', 'success');
-        }
-        
-        renderMisTorneos();
-    }
-    
-    async function getTorneos() {
-        if (isOnline && currentUser) {
+        function validateData(schema, data) {
             try {
-                const snapshot = await database.ref(`torneos/${currentUser.uid}`).once('value');
-                const firebaseTorneos = snapshot.val() || {};
-                const torneosList = Object.keys(firebaseTorneos).map(key => ({
-                    id: key,
-                    ...firebaseTorneos[key]
-                }));
-                
-                for (const t of torneosList) {
-                    await saveToDB('offlineTorneos', { ...t, syncStatus: 'synced' });
-                }
-                return torneosList;
+                validationSchemas[schema].parse(data);
+                return { valid: true, error: null };
             } catch (e) {
-                console.log('Error fetching from Firebase, usando local');
+                return { valid: false, error: e.errors };
             }
         }
         
-        const localTorneos = await getFromDB('offlineTorneos');
-        return localTorneos.filter(t => t.userId === currentUser?.uid);
-    }
-    
-    // ============================================
-    // 6. RENDERIZADO DE PÁGINAS CON META TAGS DINÁMICOS
-    // ============================================
-    
-    const pages = {
-        '/': {
-            title: 'GallosLive - Gestión de Torneos',
-            description: 'Plataforma profesional para gestión de torneos con soporte offline',
-            ogImage: 'og-home.jpg',
-            render: renderHome
-        },
-        '/about': {
-            title: 'Nosotros - GallosLive',
-            description: 'Conoce nuestra historia y misión',
-            ogImage: 'og-about.jpg',
-            render: renderAbout
-        },
-        '/torneos-publicos': {
-            title: 'Torneos Públicos - GallosLive',
-            description: 'Explora torneos y competencias',
-            ogImage: 'og-torneos.jpg',
-            render: renderTorneosPublicos
-        },
-        '/galeria': {
-            title: 'Galería - GallosLive',
-            description: 'Fotos y momentos destacados',
-            ogImage: 'og-galeria.jpg',
-            render: renderGaleria
-        },
-        '/contacto': {
-            title: 'Contacto - GallosLive',
-            description: 'Contáctanos para más información',
-            ogImage: 'og-contacto.jpg',
-            render: renderContacto
-        },
-        '/resultados': {
-            title: 'Resultados en Vivo - GallosLive',
-            description: 'Resultados actualizados de torneos',
-            ogImage: 'og-resultados.jpg',
-            render: renderResultados
-        },
-        '/ranking': {
-            title: 'Ranking Global - GallosLive',
-            description: 'Tabla de posiciones general',
-            ogImage: 'og-ranking.jpg',
-            render: renderRanking
-        },
-        '/blog': {
-            title: 'Blog - GallosLive',
-            description: 'Noticias y novedades del mundo de los torneos',
-            ogImage: 'og-blog.jpg',
-            render: renderBlog
-        },
-        '/dashboard': {
-            title: 'Dashboard - GallosLive',
-            description: 'Panel de control personal',
-            ogImage: 'og-dashboard.jpg',
-            requiresAuth: true,
-            render: renderDashboard
-        },
-        '/mis-torneos': {
-            title: 'Mis Torneos - GallosLive',
-            description: 'Gestiona tus torneos',
-            ogImage: 'og-mis-torneos.jpg',
-            requiresAuth: true,
-            render: renderMisTorneos
-        },
-        '/perfil': {
-            title: 'Mi Perfil - GallosLive',
-            description: 'Configura tu perfil',
-            ogImage: 'og-perfil.jpg',
-            requiresAuth: true,
-            render: renderPerfil
-        },
-        '/inscripciones': {
-            title: 'Mis Inscripciones - GallosLive',
-            description: 'Torneos donde participas',
-            ogImage: 'og-inscripciones.jpg',
-            requiresAuth: true,
-            render: renderInscripciones
-        },
-        '/crear-torneo': {
-            title: 'Crear Torneo - GallosLive',
-            description: 'Crea un nuevo torneo',
-            ogImage: 'og-crear-torneo.jpg',
-            requiresAuth: true,
-            render: renderCrearTorneo
-        },
-        '/equipos': {
-            title: 'Mis Equipos - GallosLive',
-            description: 'Gestiona tus equipos',
-            ogImage: 'og-equipos.jpg',
-            requiresAuth: true,
-            render: renderEquipos
-        },
-        '/estadisticas': {
-            title: 'Estadísticas - GallosLive',
-            description: 'Análisis y métricas',
-            ogImage: 'og-estadisticas.jpg',
-            requiresAuth: true,
-            render: renderEstadisticas
-        },
-        '/configuracion': {
-            title: 'Configuración - GallosLive',
-            description: 'Ajustes de cuenta',
-            ogImage: 'og-configuracion.jpg',
-            requiresAuth: true,
-            render: renderConfiguracion
-        },
-        '/login': {
-            title: 'Iniciar Sesión - GallosLive',
-            description: 'Accede a tu cuenta',
-            ogImage: 'og-login.jpg',
-            render: renderLogin
-        },
-        '/register': {
-            title: 'Registrarse - GallosLive',
-            description: 'Crea una cuenta nueva',
-            ogImage: 'og-register.jpg',
-            render: renderRegister
-        }
-    };
-    
-    function updateMetaTags(pageKey) {
-        const page = pages[pageKey] || pages['/'];
-        document.title = page.title;
-        
-        let ogTitle = document.querySelector('meta[property="og:title"]');
-        let ogDesc = document.querySelector('meta[property="og:description"]');
-        let ogImage = document.querySelector('meta[property="og:image"]');
-        let twitterTitle = document.querySelector('meta[name="twitter:title"]');
-        let twitterDesc = document.querySelector('meta[name="twitter:description"]');
-        let twitterImage = document.querySelector('meta[name="twitter:image"]');
-        
-        if (!ogTitle) {
-            ogTitle = document.createElement('meta');
-            ogTitle.setAttribute('property', 'og:title');
-            document.head.appendChild(ogTitle);
-        }
-        if (!ogDesc) {
-            ogDesc = document.createElement('meta');
-            ogDesc.setAttribute('property', 'og:description');
-            document.head.appendChild(ogDesc);
-        }
-        if (!ogImage) {
-            ogImage = document.createElement('meta');
-            ogImage.setAttribute('property', 'og:image');
-            document.head.appendChild(ogImage);
+        // Encriptación local con SubtleCrypto
+        async function encryptLocalData(data, password = 'default-key') {
+            const encoder = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(password),
+                'PBKDF2',
+                false,
+                ['deriveKey']
+            );
+            const key = await crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: encoder.encode('salt'), iterations: 100000, hash: 'SHA-256' },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt']
+            );
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                encoder.encode(JSON.stringify(data))
+            );
+            return { encrypted, iv };
         }
         
-        ogTitle.setAttribute('content', page.title);
-        ogDesc.setAttribute('content', page.description);
-        ogImage.setAttribute('content', `/images/og/${page.ogImage}`);
-    }
-    
-    async function navigateTo(route) {
-        const page = pages[route];
-        if (!page) {
-            navigateTo('/');
-            return;
-        }
+        // ==================== INDEXEDDB ====================
+        const DB_NAME = 'GallosLiveDB';
+        const DB_VERSION = 1;
+        let db = null;
         
-        if (page.requiresAuth && !currentUser) {
-            navigateTo('/login');
-            showToast('🔒 Necesitas iniciar sesión', 'warning');
-            return;
-        }
-        
-        currentRoute = route;
-        updateMetaTags(route);
-        
-        const content = document.getElementById('mainContent');
-        content.innerHTML = '<div class="spinner"></div>';
-        
-        await page.render(content);
-        
-        // Actualizar navegación activa
-        document.querySelectorAll('.nav-item').forEach(item => {
-            if (item.dataset.route === route) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-        
-        // Actualizar URL sin recargar
-        window.history.pushState({}, '', route);
-    }
-    
-    // ============================================
-    // 7. RENDERIZADO DE PÁGINAS
-    // ============================================
-    
-    function renderHome(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h1>🐓 Bienvenido a GallosLive</h1>
-                <p style="margin-top:12px">La plataforma profesional para gestión de torneos con soporte offline completo.</p>
-            </div>
-            <div class="grid">
-                <div class="card">
-                    <div style="font-size:48px; margin-bottom:12px">🏆</div>
-                    <h3>Gestión de Torneos</h3>
-                    <p>Crea, edita y organiza torneos desde cualquier lugar, incluso sin internet.</p>
-                </div>
-                <div class="card">
-                    <div style="font-size:48px; margin-bottom:12px">📡</div>
-                    <h3>Sincronización Automática</h3>
-                    <p>Los datos se sincronizan cuando recuperas conexión.</p>
-                </div>
-                <div class="card">
-                    <div style="font-size:48px; margin-bottom:12px">🔒</div>
-                    <h3>Seguridad Profesional</h3>
-                    <p>Protección contra XSS, inyección y hacking por consola.</p>
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderAbout(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>Sobre Nosotros</h2>
-                <p style="margin-top:12px">GallosLive nació con la misión de revolucionar la gestión de torneos deportivos, ofreciendo una plataforma que funciona incluso en las peores condiciones de conectividad.</p>
-                <h3 style="margin-top:20px">🎯 Misión</h3>
-                <p>Proveer herramientas accesibles y profesionales para organizadores de torneos en toda Latinoamérica.</p>
-                <h3 style="margin-top:20px">👁️ Visión</h3>
-                <p>Ser la plataforma líder en gestión de torneos offline-first en el mercado hispanohablante.</p>
-            </div>
-        `;
-    }
-    
-    function renderTorneosPublicos(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>🏆 Torneos Destacados</h2>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Torneo</th><th>Fecha</th><th>Ubicación</th><th>Participantes</th></tr></thead>
-                        <tbody id="publicTorneosBody">
-                            <tr><td colspan="4" style="text-align:center">Cargando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-        
-        // Simular torneos públicos
-        const publicTorneos = [
-            { nombre: "Copa Nacional 2024", fecha: "15/12/2024", ubicacion: "Estadio Nacional", participantes: 32 },
-            { nombre: "Torneo Relámpago", fecha: "20/12/2024", ubicacion: "Polideportivo Central", participantes: 16 }
-        ];
-        
-        const tbody = document.getElementById('publicTorneosBody');
-        tbody.innerHTML = publicTorneos.map(t => `
-            <tr><td>${t.nombre}</td><td>${t.fecha}</td><td>${t.ubicacion}</td><td>${t.participantes}</td></tr>
-        `).join('');
-    }
-    
-    function renderGaleria(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📸 Galería de Eventos</h2>
-                <div class="grid">
-                    ${[1,2,3,4,5,6].map(i => `
-                        <div class="card" style="text-align:center; padding:20px">
-                            <div style="font-size:64px">📷</div>
-                            <p>Evento Destacado ${i}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderContacto(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📧 Contacto</h2>
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="contactNombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="contactEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Mensaje</label>
-                        <textarea id="contactMensaje" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
-                </form>
-            </div>
-        `;
-        
-        document.getElementById('contactForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nombre = sanitizeInput(document.getElementById('contactNombre').value);
-            const email = document.getElementById('contactEmail').value;
-            const mensaje = sanitizeInput(document.getElementById('contactMensaje').value);
-            
-            if (!isOnline) {
-                await saveToDB('pendingOps', {
-                    type: 'CONTACT_FORM',
-                    data: { nombre, email, mensaje, timestamp: new Date().toISOString() }
-                });
-                showToast('📡 Mensaje guardado localmente. Se enviará cuando tengas internet.', 'info');
-            } else {
-                showToast('✅ Mensaje enviado correctamente', 'success');
-            }
-            e.target.reset();
-        });
-    }
-    
-    function renderResultados(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📊 Resultados en Vivo</h2>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Partido</th><th>Resultado</th><th>Estado</th></tr></thead>
-                        <tbody>
-                            <tr><td>Gallos FC vs Águilas</td><td>3 - 1</td><td>Finalizado</td></tr>
-                            <tr><td>Tigres vs Panteras</td><td>2 - 2</td><td>En curso</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderRanking(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>🏅 Ranking Global</h2>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Pos</th><th>Equipo</th><th>Puntos</th><th>Partidos</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Gallos FC</td><td>45</td><td>15</td></tr>
-                            <tr><td>2</td><td>Águilas</td><td>42</td><td>15</td></tr>
-                            <tr><td>3</td><td>Tigres</td><td>38</td><td>15</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderBlog(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📝 Últimas Noticias</h2>
-                <div class="grid">
-                    <div class="card"><h3>🎉 Gran Final 2024</h3><p>La final se jugará el 20 de diciembre...</p></div>
-                    <div class="card"><h3>🚀 Nueva Actualización</h3><p>Soporte offline mejorado y más features...</p></div>
-                    <div class="card"><h3>🏆 Torneo Solidario</h3><p>Inscripciones abiertas para el torneo benéfico...</p></div>
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderDashboard(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📊 Dashboard</h2>
-                <p>Bienvenido, <strong>${currentUser?.displayName || currentUser?.email}</strong></p>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:16px; margin-top:20px">
-                    <div class="card" style="text-align:center"><div style="font-size:32px">🏆</div><div>Mis Torneos</div><div id="torneosCount">0</div></div>
-                    <div class="card" style="text-align:center"><div style="font-size:32px">✅</div><div>Sincronizados</div><div id="syncedCount">0</div></div>
-                    <div class="card" style="text-align:center"><div style="font-size:32px">⏳</div><div>Pendientes</div><div id="pendingCount">0</div></div>
-                </div>
-            </div>
-        `;
-        
-        // Cargar estadísticas
-        getTorneos().then(torneos => {
-            const total = torneos.length;
-            const synced = torneos.filter(t => t.syncStatus === 'synced').length;
-            const pending = torneos.filter(t => t.syncStatus === 'pending').length;
-            document.getElementById('torneosCount').innerText = total;
-            document.getElementById('syncedCount').innerText = synced;
-            document.getElementById('pendingCount').innerText = pending;
-        });
-    }
-    
-    async function renderMisTorneos(container) {
-        if (!container) container = document.getElementById('mainContent');
-        container.innerHTML = `
-            <div class="card">
-                <h2>🏆 Mis Torneos</h2>
-                <button class="btn btn-primary" id="nuevoTorneoBtn" style="margin:12px 0">+ Nuevo Torneo</button>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Nombre</th><th>Fecha</th><th>Ubicación</th><th>Estado</th></tr></thead>
-                        <tbody id="misTorneosBody">
-                            <tr><td colspan="4" style="text-align:center">Cargando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-        
-        const torneos = await getTorneos();
-        const tbody = document.getElementById('misTorneosBody');
-        
-        if (torneos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No hay torneos registrados</td></tr>';
-        } else {
-            tbody.innerHTML = torneos.map(t => `
-                <tr>
-                    <td>${sanitizeInput(t.nombre)}</td>
-                    <td>${t.fecha || '-'}</td>
-                    <td>${sanitizeInput(t.ubicacion) || '-'}</td>
-                    <td><span class="badge ${t.syncStatus === 'synced' ? 'badge-success' : 'badge-warning'}">
-                        ${t.syncStatus === 'synced' ? '✅ Sincronizado' : '⏳ Pendiente'}
-                    </span></td>
-                </tr>
-            `).join('');
-        }
-        
-        document.getElementById('nuevoTorneoBtn')?.addEventListener('click', () => navigateTo('/crear-torneo'));
-    }
-    
-    function renderCrearTorneo(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>✍️ Crear Nuevo Torneo</h2>
-                <form id="createTorneoForm">
-                    <div class="form-group">
-                        <label>Nombre del Torneo</label>
-                        <input type="text" id="torneoNombre" required maxlength="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Fecha</label>
-                        <input type="date" id="torneoFecha" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Ubicación</label>
-                        <input type="text" id="torneoUbicacion" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Participantes</label>
-                        <input type="number" id="torneoParticipantes" value="0" min="0">
-                    </div>
-                    <button type="submit" class="btn btn-primary">💾 Guardar Torneo</button>
-                </form>
-            </div>
-        `;
-        
-        document.getElementById('createTorneoForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nombre = sanitizeInput(document.getElementById('torneoNombre').value);
-            const fecha = document.getElementById('torneoFecha').value;
-            const ubicacion = sanitizeInput(document.getElementById('torneoUbicacion').value);
-            const participantes = parseInt(document.getElementById('torneoParticipantes').value);
-            
-            if (!nombre || !fecha || !ubicacion) {
-                showToast('❌ Completa todos los campos', 'error');
-                return;
-            }
-            
-            await saveTorneoOffline({ nombre, fecha, ubicacion, participantes });
-            navigateTo('/mis-torneos');
-        });
-    }
-    
-    function renderPerfil(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>👤 Mi Perfil</h2>
-                <form id="perfilForm">
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="perfilNombre" value="${currentUser?.displayName || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="perfilEmail" value="${currentUser?.email || ''}" readonly>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
-                    <button type="button" class="btn btn-danger" id="logoutBtn" style="margin-left:12px">Cerrar Sesión</button>
-                </form>
-            </div>
-        `;
-        
-        document.getElementById('perfilForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nombre = sanitizeInput(document.getElementById('perfilNombre').value);
-            if (currentUser) {
-                await currentUser.updateProfile({ displayName: nombre });
-                await saveToDB('users', { uid: currentUser.uid, displayName: nombre, email: currentUser.email });
-                showToast('✅ Perfil actualizado', 'success');
-            }
-        });
-        
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-    }
-    
-    function renderInscripciones(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📋 Mis Inscripciones</h2>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Torneo</th><th>Fecha Inscripción</th><th>Estado</th></tr></thead>
-                        <tbody>
-                            <tr><td colspan="3" style="text-align:center">No hay inscripciones activas</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderEquipos(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>👥 Mis Equipos</h2>
-                <div class="grid">
-                    <div class="card" style="text-align:center">
-                        <div style="font-size:48px">⚽</div>
-                        <h3>Gallos FC</h3>
-                        <p>12 jugadores</p>
-                    </div>
-                    <div class="card" style="text-align:center">
-                        <div style="font-size:48px">🏀</div>
-                        <h3>Águilas</h3>
-                        <p>10 jugadores</p>
-                    </div>
-                </div>
-                <button class="btn btn-primary" style="margin-top:16px">+ Crear Equipo</button>
-            </div>
-        `;
-    }
-    
-    function renderEstadisticas(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📈 Estadísticas</h2>
-                <div style="height:300px; display:flex; align-items:center; justify-content:center; background:#f8fafc; border-radius:12px">
-                    📊 Gráficas interactivas (próximamente)
-                </div>
-            </div>
-        `;
-    }
-    
-    function renderConfiguracion(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>⚙️ Configuración</h2>
-                <div class="form-group">
-                    <label>🌙 Tema Oscuro</label>
-                    <input type="checkbox" id="darkModeToggle">
-                </div>
-                <div class="form-group">
-                    <label>🔔 Notificaciones</label>
-                    <input type="checkbox" id="notificationsToggle">
-                </div>
-                <button class="btn btn-primary" id="clearCacheBtn">🗑️ Limpiar Cache Local</button>
-            </div>
-        `;
-        
-        document.getElementById('clearCacheBtn')?.addEventListener('click', async () => {
-            if (confirm('¿Eliminar todos los datos locales? Los datos pendientes se perderán.')) {
-                indexedDB.deleteDatabase('GallosLiveDB');
-                showToast('Cache limpiado. Recarga la página.', 'success');
-                setTimeout(() => location.reload(), 1500);
-            }
-        });
-    }
-    
-    function renderLogin(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>🔐 Iniciar Sesión</h2>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Ingresar</button>
-                    <button type="button" class="btn" id="goToRegisterBtn" style="margin-left:12px">Registrarse</button>
-                </form>
-            </div>
-        `;
-        
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try {
-                await handleLogin(email, password);
-            } catch (err) {
-                showToast('❌ ' + err.message, 'error');
-            }
-        });
-        
-        document.getElementById('goToRegisterBtn').addEventListener('click', () => navigateTo('/register'));
-    }
-    
-    function renderRegister(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h2>📝 Registrarse</h2>
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label>Nombre Completo</label>
-                        <input type="text" id="registerNombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="registerEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña (mín 8 chars, 1 mayúscula, 1 número)</label>
-                        <input type="password" id="registerPassword" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Registrarse</button>
-                    <button type="button" class="btn" id="goToLoginBtn" style="margin-left:12px">Ya tengo cuenta</button>
-                </form>
-            </div>
-        `;
-        
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nombre = sanitizeInput(document.getElementById('registerNombre').value);
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            try {
-                await handleRegister(email, password, nombre);
-            } catch (err) {
-                showToast('❌ ' + err.message, 'error');
-            }
-        });
-        
-        document.getElementById('goToLoginBtn').addEventListener('click', () => navigateTo('/login'));
-    }
-    
-    // ============================================
-    // 8. UTILIDADES Y EVENTOS GLOBALES
-    // ============================================
-    
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function updateConnectionStatus() {
-        isOnline = navigator.onLine;
-        const statusDot = document.getElementById('connectionStatus');
-        if (statusDot) {
-            if (isOnline) {
-                statusDot.classList.remove('offline');
-                showToast('🟢 Conexión restablecida', 'success');
-                if (currentUser) syncPendingOperations();
-            } else {
-                statusDot.classList.add('offline');
-                showToast('🔴 Sin conexión - Modo offline activo', 'warning');
-            }
-        }
-    }
-    
-    // Theme toggle
-    let isDark = false;
-    document.getElementById('themeToggle')?.addEventListener('click', () => {
-        isDark = !isDark;
-        document.body.style.background = isDark ? '#1a1a2e' : '#f0f2f5';
-        document.body.style.color = isDark ? '#eee' : '#1e293b';
-        document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
-    });
-    
-    // ============================================
-    // 9. INICIALIZACIÓN
-    // ============================================
-    
-    window.addEventListener('load', async () => {
-        await initDB();
-        updateConnectionStatus();
-        
-        window.addEventListener('online', () => updateConnectionStatus());
-        window.addEventListener('offline', () => updateConnectionStatus());
-        
-        window.addEventListener('popstate', () => {
-            navigateTo(window.location.pathname);
-        });
-        
-        auth.onAuthStateChanged(async (user) => {
-            currentUser = user;
-            updateUIForAuth();
-            
-            if (currentUser && isOnline) {
-                await syncPendingOperations();
-            }
-            
-            const initialRoute = window.location.pathname;
-            if (pages[initialRoute]) {
-                navigateTo(initialRoute);
-            } else {
-                navigateTo('/');
-            }
-        });
-        
-        // Navegación por botones
-        document.querySelectorAll('.nav-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                navigateTo(btn.dataset.route);
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('users')) {
+                        db.createObjectStore('users', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('offlineData')) {
+                        const store = db.createObjectStore('offlineData', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('syncStatus', 'syncStatus');
+                    }
+                    if (!db.objectStoreNames.contains('pendingOperations')) {
+                        const store = db.createObjectStore('pendingOperations', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('priority', 'priority');
+                        store.createIndex('timestamp', 'timestamp');
+                    }
+                    if (!db.objectStoreNames.contains('userSessions')) {
+                        db.createObjectStore('userSessions', { keyPath: 'sessionId' });
+                    }
+                    if (!db.objectStoreNames.contains('mediaCache')) {
+                        db.createObjectStore('mediaCache', { keyPath: 'url' });
+                    }
+                    if (!db.objectStoreNames.contains('torneos')) {
+                        db.createObjectStore('torneos', { keyPath: 'id' });
+                    }
+                };
             });
-        });
-    });
-</script>
-
-<!-- Registro Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('SW registrado:', reg))
-                .catch(err => console.log('SW error:', err));
-        });
-    }
-</script>
-
-
-
-
+        }
+        
+        async function addToStore(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.put(data);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function getFromStore(storeName, key) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function getAllFromStore(storeName) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        // ==================== AUTENTICACIÓN OFFLINE ====================
+        let currentUser = null;
+        
+        async function registerUser(userData) {
+            const validation = validateData('email', userData.email);
+            if (!validation.valid) throw new Error('Email inválido');
+            const passValidation = validateData('password', userData.password);
+            if (!passValidation.valid) throw new Error('Contraseña inválida');
+            const nameValidation = validateData('name', userData.name);
+            if (!nameValidation.valid) throw new Error('Nombre inválido');
+            
+            const userId = crypto.randomUUID();
+            const hashedPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(userData.password));
+            const user = {
+                id: userId,
+                email: userData.email,
+                passwordHash: Array.from(new Uint8Array(hashedPassword)),
+                name: sanitizeInput(userData.name),
+                createdAt: Date.now()
+            };
+            await addToStore('users', user);
+            
+            // Queue para sincronizar con backend
+            await addToStore('pendingOperations', {
+                type: 'REGISTER',
+                data: user,
+                priority: 'high',
+                timestamp: Date.now(),
+                syncStatus: 'pending'
+            });
+            
+            return user;
+        }
+        
+        async function loginUser(email, password) {
+            const users = await getAllFromStore('users');
+            const passwordHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+            const passwordHashArray = Array.from(new Uint8Array(passwordHash));
+            const user = users.find(u => u.email === email && JSON.stringify(u.passwordHash) === JSON.stringify(passwordHashArray));
+            
+            if (!user) throw new Error('Credenciales inválidas');
+            
+            const sessionId = crypto.randomUUID();
+            const session = {
+                sessionId,
+                userId: user.id,
+                createdAt: Date.now(),
+                expiresAt: Date.now() + 30 * 60 * 1000 // 30 minutos
+            };
+            await addToStore('userSessions', session);
+            currentUser = user;
+            localStorage.setItem('sessionId', sessionId);
+            return user;
+        }
+        
+        async function logoutUser() {
+            const sessionId = localStorage.getItem('sessionId');
+            if (sessionId && db) {
+                const transaction = db.transaction(['userSessions'], 'readwrite');
+                transaction.objectStore('userSessions').delete(sessionId);
+            }
+            localStorage.removeItem('sessionId');
+            currentUser = null;
+        }
+        
+        async function checkSession() {
+            const sessionId = localStorage.getItem('sessionId');
+            if (!sessionId) return false;
+            const session = await getFromStore('userSessions', sessionId);
+            if (!session || session.expiresAt < Date.now()) {
+                localStorage.removeItem('sessionId');
+                return false;
+            }
+            const user = await getFromStore('users', session.userId);
+            if (user) currentUser = user;
+            return !!user;
+        }
+        
+        // ==================== SINCRONIZACIÓN CON BACKOFF ====================
+        async function syncWithBackoff(operation, retries = 5) {
+            let delay = 3000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const result = await operation();
+                    return result;
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+        
+        async function syncPendingOperations() {
+            if (!navigator.onLine) return;
+            
+            const pendingOps = await getAllFromStore('pendingOperations');
+            for (const op of pendingOps) {
+                if (op.syncStatus === 'synced') continue;
+                try {
+                    await syncWithBackoff(async () => {
+                        // Simular envío a backend
+                        console.log('Sincronizando:', op);
+                        return { success: true };
+                    });
+                    op.syncStatus = 'synced';
+                    await addToStore('pendingOperations', op);
+                    updatePendingBadge();
+                } catch (error) {
+                    op.syncStatus = 'failed';
+                    await addToStore('pendingOperations', op);
+                    showToast(`Error sincronizando: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function updatePendingBadge() {
+            const pending = await getAllFromStore('pendingOperations');
+            const pendingCount = pending.filter(p => p.syncStatus === 'pending').length;
+            const badge = document.getElementById('pendingBadge');
+            if (pendingCount > 0) {
+                badge.style.display = 'inline-block';
+                badge.textContent = pendingCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        // ==================== ROUTER SPA ====================
+        const routes = {
+            '/': { 
+                title: 'Inicio - GallosLive', 
+                public: true,
+                ogImage: 'og-home.jpg',
+                render: renderHome
+            },
+            '/about': { 
+                title: 'Nosotros - GallosLive', 
+                public: true,
+                ogImage: 'og-about.jpg',
+                render: renderAbout
+            },
+            '/torneos-publicos': { 
+                title: 'Torneos Públicos - GallosLive', 
+                public: true,
+                ogImage: 'og-torneos.jpg',
+                render: renderPublicTournaments
+            },
+            '/galeria': { 
+                title: 'Galería - GallosLive', 
+                public: true,
+                ogImage: 'og-galeria.jpg',
+                render: renderGallery
+            },
+            '/contacto': { 
+                title: 'Contacto - GallosLive', 
+                public: true,
+                ogImage: 'og-contacto.jpg',
+                render: renderContact
+            },
+            '/resultados': { 
+                title: 'Resultados - GallosLive', 
+                public: true,
+                ogImage: 'og-resultados.jpg',
+                render: renderResults
+            },
+            '/ranking': { 
+                title: 'Ranking - GallosLive', 
+                public: true,
+                ogImage: 'og-ranking.jpg',
+                render: renderRanking
+            },
+            '/blog': { 
+                title: 'Blog - GallosLive', 
+                public: true,
+                ogImage: 'og-blog.jpg',
+                render: renderBlog
+            },
+            '/dashboard': { 
+                title: 'Dashboard - GallosLive', 
+                public: false,
+                ogImage: 'og-dashboard.jpg',
+                render: renderDashboard
+            },
+            '/mis-torneos': { 
+                title: 'Mis Torneos - GallosLive', 
+                public: false,
+                ogImage: 'og-mis-torneos.jpg',
+                render: renderMyTournaments
+            },
+            '/perfil': { 
+                title: 'Mi Perfil - GallosLive', 
+                public: false,
+                ogImage: 'og-perfil.jpg',
+                render: renderProfile
+            },
+            '/inscripciones': { 
+                title: 'Mis Inscripciones - GallosLive', 
+                public: false,
+                ogImage: 'og-inscripciones.jpg',
+                render: renderRegistrations
+            },
+            '/crear-torneo': { 
+                title: 'Crear Torneo - GallosLive', 
+                public: false,
+                ogImage: 'og-crear-torneo.jpg',
+                render: renderCreateTournament
+            },
+            '/equipos': { 
+                title: 'Mis Equipos - GallosLive', 
+                public: false,
+                ogImage: 'og-equipos.jpg',
+                render: renderTeams
+            },
+            '/estadisticas': { 
+                title: 'Estadísticas - GallosLive', 
+                public: false,
+                ogImage: 'og-estadisticas.jpg',
+                render: renderStats
+            },
+            '/configuracion': { 
+                title: 'Configuración - GallosLive', 
+                public: false,
+                ogImage: 'og-configuracion.jpg',
+                render: renderSettings
+            },
+            '/login': { title: 'Login - GallosLive', public: true, render: renderLogin },
+            '/register': { title: 'Registro - GallosLive', public: true, render: renderRegister }
+        };
+        
+        function updateMetaTags(route) {
+            document.title = route.title;
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            const ogImage = document.querySelector('meta[property="og:image"]');
+            const ogDescription = document.querySelector('meta[property="og:description"]');
+            
+            if (ogTitle) ogTitle.setAttribute('content', route.title);
+            if (ogImage) ogImage.setAttribute('content', `https://galloslive.com/${route.ogImage || 'og-default.jpg'}`);
+            if (ogDescription) ogDescription.setAttribute('content', `GallosLive - ${route.title}`);
+        }
+        
+        async function router() {
+            let path = window.location.pathname;
+            if (path === '') path = '/';
+            
+            let route = routes[path];
+            if (!route) {
+                route = { render: renderNotFound, title: '404 - GallosLive', public: true };
+            }
+            
+            // Verificar autenticación
+            const isLoggedIn = await checkSession();
+            if (!route.public && !isLoggedIn) {
+                window.history.pushState({}, '', '/login');
+                route = routes['/login'];
+            }
+            
+            updateMetaTags(route);
+            
+            const app = document.getElementById('app');
+            if (app) {
+                app.innerHTML = '<div class="spinner"></div>';
+                try {
+                    const content = await route.render(isLoggedIn);
+                    app.innerHTML = content;
+                } catch (error) {
+                    app.innerHTML = `<div class="card"><h3>Error</h3><p>${error.message}</p></div>`;
+                }
+            }
+            
+            updateNavigation(isLoggedIn);
+        }
+        
+        function updateNavigation(isLoggedIn) {
+            const navItems = isLoggedIn ? [
+                { path: '/dashboard', icon: '📊', label: 'Dashboard' },
+                { path: '/mis-torneos', icon: '🏆', label: 'Torneos' },
+                { path: '/crear-torneo', icon: '+', label: 'Crear' },
+                { path: '/inscripciones', icon: '📝', label: 'Mis Torneos' },
+                { path: '/perfil', icon: '👤', label: 'Perfil' }
+            ] : [
+                { path: '/', icon: '🏠', label: 'Inicio' },
+                { path: '/torneos-publicos', icon: '🏆', label: 'Torneos' },
+                { path: '/ranking', icon: '📊', label: 'Ranking' },
+                { path: '/contacto', icon: '📧', label: 'Contacto' },
+                { path: '/login', icon: '🔑', label: 'Login' }
+            ];
+            
+            // Actualizar bottom nav
+            const bottomNav = document.getElementById('bottomNav');
+            if (bottomNav) {
+                bottomNav.innerHTML = navItems.map(item => `
+                    <a href="${item.path}" class="nav-item ${window.location.pathname === item.path ? 'active' : ''}" data-link>
+                        <span style="font-size:1.5rem">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </a>
+                `).join('');
+            }
+            
+            // Actualizar sidebar
+            const sidebarNav = document.getElementById('sidebarNav');
+            if (sidebarNav && window.innerWidth >= 1024) {
+                sidebarNav.innerHTML = navItems.map(item => `
+                    <a href="${item.path}" class="sidebar-link ${window.location.pathname === item.path ? 'active' : ''}" data-link>
+                        <span style="font-size:1.3rem">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </a>
+                `).join('');
+            }
+        }
+        
+        // ==================== RENDER FUNCTIONS ====================
+        function renderHome() {
+            return `
+                <div class="hero">
+                    <h1>GallosLive</h1>
+                    <p>La plataforma líder en gestión de torneos y competencias</p>
+                    <button class="btn btn-primary" onclick="window.location.href='/torneos-publicos'">Explorar Torneos</button>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>🎯 Torneos Destacados</h3>
+                        <p>Participa en los mejores torneos y compite por grandes premios</p>
+                    </div>
+                    <div class="card">
+                        <h3>🏆 Ranking Global</h3>
+                        <p>Compite por los primeros puestos del ranking mundial</p>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Estadísticas en Vivo</h3>
+                        <p>Sigue tus estadísticas y mejora tu rendimiento</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderAbout() {
+            return `
+                <div class="card">
+                    <h1>Sobre Nosotros</h1>
+                    <p>GallosLive nació en 2020 con la misión de revolucionar la gestión de torneos deportivos y de gaming.</p>
+                    <h3>Misión</h3>
+                    <p>Ofrecer una plataforma accesible y profesional para la organización de competencias.</p>
+                    <h3>Visión</h3>
+                    <p>Ser la plataforma líder mundial en gestión de torneos para 2026.</p>
+                    <h3>Equipo</h3>
+                    <p>Un grupo de apasionados por el deporte y la tecnología.</p>
+                </div>
+            `;
+        }
+        
+        function renderPublicTournaments() {
+            return `
+                <h1>Torneos Públicos</h1>
+                <div class="grid" id="tournamentsList">
+                    <div class="skeleton" style="height:200px"></div>
+                    <div class="skeleton" style="height:200px"></div>
+                </div>
+            `;
+        }
+        
+        function renderGallery() {
+            return `
+                <h1>Galería de Eventos</h1>
+                <div class="grid" id="galleryGrid">
+                    ${Array(6).fill().map(() => `<div class="skeleton" style="height:200px; border-radius:12px"></div>`).join('')}
+                </div>
+            `;
+        }
+        
+        function renderContact() {
+            return `
+                <div class="card">
+                    <h1>Contacto</h1>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="contactName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="contactEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mensaje</label>
+                            <textarea id="contactMessage" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar (funciona offline)</button>
+                    </form>
+                </div>
+            `;
+        }
+        
+        function renderResults() {
+            return `
+                <h1>Resultados en Vivo</h1>
+                <div class="card">
+                    <p>Los resultados más recientes se mostrarán aquí</p>
+                    <div id="liveResults"></div>
+                </div>
+            `;
+        }
+        
+        function renderRanking() {
+            return `
+                <h1>Ranking Global</h1>
+                <div class="card">
+                    <table style="width:100%; border-collapse:collapse">
+                        <thead><tr><th>#</th><th>Jugador</th><th>Puntos</th><th>Torneos</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td>Carlos Pérez</td><td>2500</td><td>12</td></tr>
+                            <tr><td>2</td><td>María López</td><td>2350</td><td>10</td></tr>
+                            <tr><td>3</td><td>Juan Rodríguez</td><td>2100</td><td>9</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function renderBlog() {
+            return `
+                <h1>Blog y Noticias</h1>
+                <div class="grid">
+                    <div class="card"><h3>🎉 Nuevo torneo internacional</h3><p>Inscripciones abiertas...</p></div>
+                    <div class="card"><h3>📱 App actualizada</h3><p>Nuevas funcionalidades offline</p></div>
+                </div>
+            `;
+        }
+        
+        function renderDashboard(isLoggedIn) {
+            if (!isLoggedIn) return '<div class="card">Debes iniciar sesión</div>';
+            return `
+                <h1>Dashboard</h1>
+                <div class="grid">
+                    <div class="card"><h3>🏆 Mis Torneos</h3><p>3 torneos activos</p></div>
+                    <div class="card"><h3>📊 Estadísticas</h3><p>75% victorias</p></div>
+                    <div class="card"><h3>👥 Equipos</h3><p>2 equipos registrados</p></div>
+                </div>
+                <div class="card">
+                    <h3>Actividad Reciente</h3>
+                    <p>✓ Torneo "Copa de Verano" creado</p>
+                    <p>✓ Equipo "Los Gallos" actualizado</p>
+                </div>
+                <button class="btn" onclick="logout()">Cerrar Sesión</button>
+            `;
+        }
+        
+        function renderMyTournaments() {
+            return `
+                <h1>Mis Torneos</h1>
+                <div class="grid" id="myTournaments">
+                    <div class="card">
+                        <h3>Copa de Verano 2024</h3>
+                        <p>Estado: Activo</p>
+                        <button class="btn btn-primary" onclick="editTournament('1')">Editar</button>
+                        <button class="btn" onclick="deleteTournament('1')">Eliminar</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderProfile() {
+            const user = currentUser || { name: 'Usuario', email: 'usuario@example.com' };
+            return `
+                <div class="card">
+                    <h1>Mi Perfil</h1>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="profileName" value="${sanitizeInput(user.name || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="profileEmail" value="${sanitizeInput(user.email || '')}">
+                        </div>
+                        <div class="form-group">
+                            <label>Nueva Contraseña</label>
+                            <input type="password" id="profilePassword">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
+                    </form>
+                </div>
+            `;
+        }
+        
+        function renderRegistrations() {
+            return `
+                <h1>Mis Inscripciones</h1>
+                <div class="card">
+                    <p>Torneos donde participas:</p>
+                    <ul><li>Copa de Verano 2024 - Inscripto</li></ul>
+                </div>
+            `;
+        }
+        
+        function renderCreateTournament() {
+            return `
+                <div class="card">
+                    <h1>Crear Nuevo Torneo</h1>
+                    <form id="createTournamentForm">
+                        <div class="form-group">
+                            <label>Nombre del Torneo</label>
+                            <input type="text" id="tournamentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de Inicio</label>
+                            <input type="date" id="tournamentStartDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="tournamentDescription" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Crear Torneo (funciona offline)</button>
+                    </form>
+                </div>
+            `;
+        }
+        
+        function renderTeams() {
+            return `
+                <h1>Mis Equipos</h1>
+                <div class="card">
+                    <h3>Los Gallos Elite</h3>
+                    <p>Miembros: 5</p>
+                    <button class="btn btn-primary">Gestionar Equipo</button>
+                </div>
+            `;
+        }
+        
+        function renderStats() {
+            return `
+                <h1>Estadísticas de Rendimiento</h1>
+                <div class="card">
+                    <canvas id="statsChart" width="400" height="200"></canvas>
+                </div>
+            `;
+        }
+        
+        function renderSettings() {
+            return `
+                <div class="card">
+                    <h1>Configuración</h1>
+                    <div class="form-group">
+                        <label>Modo Oscuro</label>
+                        <input type="checkbox" id="darkModeToggle">
+                    </div>
+                    <div class="form-group">
+                        <label>Notificaciones Push</label>
+                        <input type="checkbox" id="pushNotifications">
+                    </div>
+                    <div class="form-group">
+                        <label>Descargar mis datos</label>
+                        <button class="btn" onclick="exportData()">Exportar CSV</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderLogin() {
+            return `
+                <div class="card" style="max-width:400px; margin:0 auto">
+                    <h1>Iniciar Sesión</h1>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ingresar</button>
+                    </form>
+                    <p style="margin-top:16px">¿No tienes cuenta? <a href="/register" data-link>Regístrate</a></p>
+                </div>
+            `;
+        }
+        
+        function renderRegister() {
+            return `
+                <div class="card" style="max-width:400px; margin:0 auto">
+                    <h1>Registro</h1>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="regName" required pattern="[a-zA-ZáéíóúñÑ\\s]{2,50}">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña (8+ chars, 1 mayúscula, 1 número, 1 especial)</label>
+                            <input type="password" id="regPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrarse</button>
+                    </form>
+                    <p style="margin-top:16px">¿Ya tienes cuenta? <a href="/login" data-link>Inicia Sesión</a></p>
+                </div>
+            `;
+        }
+        
+        function renderNotFound() {
+            return `
+                <div class="card" style="text-align:center">
+                    <h1>404</h1>
+                    <p>Página no encontrada</p>
+                    <a href="/" data-link class="btn btn-primary">Volver al inicio</a>
+                </div>
+            `;
+        }
+        
+        // ==================== UTILITIES & EVENT HANDLERS ====================
+        async function createTournamentOffline(tournamentData) {
+            const tournament = {
+                id: crypto.randomUUID(),
+                ...tournamentData,
+                createdAt: Date.now(),
+                syncStatus: 'pending'
+            };
+            await addToStore('torneos', tournament);
+            await addToStore('pendingOperations', {
+                type: 'CREATE_TOURNAMENT',
+                data: tournament,
+                priority: 'high',
+                timestamp: Date.now(),
+                syncStatus: 'pending'
+            });
+            updatePendingBadge();
+            showToast('Torneo creado offline, se sincronizará automáticamente', 'success');
+            return tournament;
+        }
+        
+        async function exportData() {
+            const users = await getAllFromStore('users');
+            const torneos = await getAllFromStore('torneos');
+            const data = { users, torneos, exportDate: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `galloslive-export-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Datos exportados correctamente', 'success');
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // Event Listeners dinámicos
+        function setupEventListeners() {
+            // Login form
+            document.addEventListener('submit', async (e) => {
+                if (e.target.id === 'loginForm') {
+                    e.preventDefault();
+                    const email = document.getElementById('loginEmail')?.value;
+                    const password = document.getElementById('loginPassword')?.value;
+                    try {
+                        await loginUser(email, password);
+                        showToast('Login exitoso', 'success');
+                        window.location.href = '/dashboard';
+                    } catch (error) {
+                        showToast(error.message, 'error');
+                    }
+                }
+                
+                if (e.target.id === 'registerForm') {
+                    e.preventDefault();
+                    const name = document.getElementById('regName')?.value;
+                    const email = document.getElementById('regEmail')?.value;
+                    const password = document.getElementById('regPassword')?.value;
+                    try {
+                        await registerUser({ name, email, password });
+                        showToast('Registro exitoso, ahora inicia sesión', 'success');
+                        window.location.href = '/login';
+                    } catch (error) {
+                        showToast(error.message, 'error');
+                    }
+                }
+                
+                if (e.target.id === 'createTournamentForm') {
+                    e.preventDefault();
+                    const name = document.getElementById('tournamentName')?.value;
+                    const startDate = document.getElementById('tournamentStartDate')?.value;
+                    const description = document.getElementById('tournamentDescription')?.value;
+                    await createTournamentOffline({ name, startDate, description });
+                    window.location.href = '/mis-torneos';
+                }
+                
+                if (e.target.id === 'contactForm') {
+                    e.preventDefault();
+                    const name = document.getElementById('contactName')?.value;
+                    const email = document.getElementById('contactEmail')?.value;
+                    const message = document.getElementById('contactMessage')?.value;
+                    await addToStore('pendingOperations', {
+                        type: 'CONTACT',
+                        data: { name, email, message, timestamp: Date.now() },
+                        priority: 'medium',
+                        syncStatus: 'pending'
+                    });
+                    updatePendingBadge();
+                    showToast('Mensaje guardado, se enviará cuando tengas conexión', 'success');
+                    e.target.reset();
+                }
+            });
+            
+            // Navegación con links
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('[data-link]');
+                if (link && link.getAttribute('href')) {
+                    e.preventDefault();
+                    const href = link.getAttribute('href');
+                    window.history.pushState({}, '', href);
+                    router();
+                }
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const html = document.documentElement;
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+            
+            // Sidebar collapse
+            const collapseBtn = document.getElementById('collapseSidebar');
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', () => {
+                    const sidebar = document.getElementById('sidebar');
+                    const header = document.querySelector('.header');
+                    sidebar.classList.toggle('collapsed');
+                    header.classList.toggle('sidebar-collapsed');
+                });
+            }
+            
+            // Menu toggle móvil
+            const menuToggle = document.getElementById('menuToggle');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    document.getElementById('sidebar').classList.toggle('open');
+                });
+            }
+        }
+        
+        // Conexión online/offline
+        function initConnectionMonitoring() {
+            const indicator = document.getElementById('connectionIndicator');
+            function updateIndicator() {
+                if (navigator.onLine) {
+                    indicator.classList.remove('offline');
+                    indicator.classList.add('online');
+                    syncPendingOperations();
+                    showToast('Conexión recuperada, sincronizando...', 'success');
+                } else {
+                    indicator.classList.add('offline');
+                    indicator.classList.remove('online');
+                    showToast('Sin conexión, trabajando offline', 'warning');
+                }
+            }
+            window.addEventListener('online', updateIndicator);
+            window.addEventListener('offline', updateIndicator);
+            updateIndicator();
+            
+            // Periodic sync
+            setInterval(() => {
+                if (navigator.onLine) syncPendingOperations();
+            }, 30000);
+        }
+        
+        // Inicialización
+        async function init() {
+            await openDatabase();
+            await checkSession();
+            initConnectionMonitoring();
+            setupEventListeners();
+            await router();
+            
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('SW registrado:', reg);
+                }).catch(err => console.log('SW error:', err));
+            }
+            
+            // Cargar tema
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        
+        // Exponer funciones globales
+        window.logout = logoutUser;
+        window.editTournament = (id) => { showToast('Editar torneo ' + id, 'info'); };
+        window.deleteTournament = async (id) => {
+            await addToStore('pendingOperations', {
+                type: 'DELETE_TOURNAMENT',
+                data: { id },
+                priority: 'high',
+                timestamp: Date.now(),
+                syncStatus: 'pending'
+            });
+            updatePendingBadge();
+            showToast('Torneo eliminado (offline)', 'success');
+            router();
+        };
+        window.exportData = exportData;
+        
+        init();
+    </script>
 </body>
 </html>
