@@ -1,4 +1,4 @@
-const CACHE_NAME = 'galloslive-v2';
+const CACHE_NAME = 'galloslive-v3';
 const urlsToCache = [
     '/',
     '/index.html',
