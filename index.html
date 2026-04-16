@@ -364,12 +364,78 @@
   // Pantalla publica
   window.renderPublicScreen = () => { let html = `<div style="text-align:center;padding:2rem;"><div style="font-size:4rem;">🐓🔥</div><h1>CALCUTAS Y SUBASTAS</h1><h3>JAVI RUIZ</h3><button id="publicLoginBtn" class="btn">🔐 INICIAR SESIÓN</button><div class="screen-card"><h4>📌 ¿Qué es esto?</h4><p>Plataforma de torneos, subastas y pedigrí gallístico.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;"><div>🏆 Torneos</div><div>💰 Subastas</div><div>🧬 Pedigrí</div><div>⚖️ Jueces</div></div></div></div>`; document.getElementById('social-app').innerHTML = html; document.getElementById('publicLoginBtn')?.addEventListener('click', ()=>window.handleLoginClick()); };
   window.renderLoginScreen = () => { let html = `<div class="screen-card"><div style="display:flex; gap:10px;"><button id="tabLoginBtn" class="btn" style="flex:1">🔐 CORREO ELECTRONICO</button><button id="tabRegisterBtn" class="btn" style="flex:1">📝 Registrar</button></div><div id="loginFormContainer"><input type="email" id="loginPhone" placeholder="Correo electrónico" /><input type="password" id="loginPassword" placeholder="Contraseña" /><button id="doLoginBtn">ACCEDER</button><a href="#" id="resetPassLink">¿Olvidaste contraseña?</a></div><div id="registerFormContainer" style="display:none;"></div><button id="googleSuperiorBtn" class="btn" style="margin-top:12px;">🔑 ACCEDER CON GOOGLE</button></div>`; document.getElementById('social-app').innerHTML = html; document.getElementById('tabLoginBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='block'; document.getElementById('registerFormContainer').style.display='none'; }; document.getElementById('tabRegisterBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='none'; document.getElementById('registerFormContainer').style.display='block'; if(!document.getElementById('registerFormContainer').innerHTML) window.renderRegisterForm(); }; document.getElementById('doLoginBtn').onclick = () => window.handleLogin(); document.getElementById('resetPassLink').onclick = (e) => { e.preventDefault(); window.resetPassword(); }; document.getElementById('googleSuperiorBtn').onclick = () => window.mostrarModalGoogleSuperior(); window.renderRegisterForm = function() { let municipios = ['Tuxtla Gutiérrez','Tapachula','Comitán','San Cristóbal','Otro']; let opts = municipios.map(m=>`<option value="${m}">${m}</option>`).join(''); let formHtml = `<input id="registerFullName" placeholder="Nombre completo" /><input id="registerRealEmail" placeholder="Email real" /><input id="registerPartyName" placeholder="Nombre del partido (opcional)" /><input id="registerRepresentative" placeholder="Representante/Criadero" /><select id="registerMunicipio">${opts}</select><input id="registerCustomMunicipio" placeholder="Otro municipio" style="display:none;" /><input id="registerPhone" placeholder="Teléfono 7 dígitos" /><input id="registerPassword" type="password" placeholder="Contraseña" /><input id="registerConfirmPassword" type="password" placeholder="Confirmar" /><label><input type="checkbox" id="registerTerms" /> Acepto términos</label><button id="completeRegisterBtn">REGISTRARSE</button>`; document.getElementById('registerFormContainer').innerHTML = formHtml; document.getElementById('completeRegisterBtn').onclick = () => window.handleCompleteRegister(); let munSelect = document.getElementById('registerMunicipio'); let customMun = document.getElementById('registerCustomMunicipio'); munSelect.onchange = () => { customMun.style.display = munSelect.value === 'Otro' ? 'block' : 'none'; }; }; if(document.getElementById('registerFormContainer')) window.renderRegisterForm(); };
-  window.handleLogin = async () => { let email = document.getElementById('loginPhone')?.value; let pwd = document.getElementById('loginPassword')?.value; if(!email || !pwd) return AppState.addNotification("Complete campos", "warning"); try { await AppState.state.firebase.auth.signInWithEmailAndPassword(email, pwd); AppState.addNotification("Bienvenido", "success"); await loadUserProfile(AppState.state.user.current.uid); navigateTo('public'); } catch(e) { AppState.addNotification(e.message, "error"); } };
-  window.resetPassword = async () => { let email = document.getElementById('loginPhone')?.value; if(!email) return AppState.addNotification("Ingrese email", "warning"); try { await AppState.state.firebase.auth.sendPasswordResetEmail(email); AppState.addNotification("Correo enviado", "info"); } catch(e) { AppState.addNotification(e.message, "error"); } };
-  window.handleCompleteRegister = async () => { let email=document.getElementById('registerRealEmail')?.value, pwd=document.getElementById('registerPassword')?.value, confirm=document.getElementById('registerConfirmPassword')?.value; if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden","error"); try { let cred = await AppState.state.firebase.auth.createUserWithEmailAndPassword(email, pwd); await cred.user.updateProfile({displayName: document.getElementById('registerFullName').value}); let newProfile = { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, displayName: document.getElementById('registerFullName').value, realEmail: email, phone: document.getElementById('registerPhone').value || '' }; await AppState.state.firebase.database.ref(`users/${cred.user.uid}`).set(newProfile); AppState.addNotification("Registro exitoso, espera activación","success"); navigateTo('activation_pending'); } catch(e) { AppState.addNotification(e.message,"error"); } };
+  
+  // CORREGIDO: handleLogin con verificación de firebase
+  window.handleLogin = async () => { 
+    let email = document.getElementById('loginPhone')?.value; 
+    let pwd = document.getElementById('loginPassword')?.value; 
+    if(!email || !pwd) return AppState.addNotification("Complete campos", "warning"); 
+    // VERIFICAR QUE FIREBASE ESTÉ LISTO
+    if(!AppState.state.firebase.auth) {
+      AppState.addNotification("Conectando con servidor, espere...", "warning");
+      await initializeFirebase();
+      if(!AppState.state.firebase.auth) {
+        AppState.addNotification("Error de conexión, recargue la página", "error");
+        return;
+      }
+    }
+    try { 
+      await AppState.state.firebase.auth.signInWithEmailAndPassword(email, pwd); 
+      AppState.addNotification("Bienvenido", "success"); 
+      await loadUserProfile(AppState.state.user.current.uid); 
+      navigateTo('public'); 
+    } catch(e) { 
+      AppState.addNotification(e.message, "error"); 
+    } 
+  };
+  
+  window.resetPassword = async () => { 
+    let email = document.getElementById('loginPhone')?.value; 
+    if(!email) return AppState.addNotification("Ingrese email", "warning"); 
+    if(!AppState.state.firebase.auth) {
+      AppState.addNotification("Esperando conexión...", "warning");
+      return;
+    }
+    try { 
+      await AppState.state.firebase.auth.sendPasswordResetEmail(email); 
+      AppState.addNotification("Correo enviado", "info"); 
+    } catch(e) { 
+      AppState.addNotification(e.message, "error"); 
+    } 
+  };
+  
+  // CORREGIDO: handleCompleteRegister con verificación
+  window.handleCompleteRegister = async () => { 
+    let email=document.getElementById('registerRealEmail')?.value; 
+    let pwd=document.getElementById('registerPassword')?.value; 
+    let confirm=document.getElementById('registerConfirmPassword')?.value; 
+    if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden","error"); 
+    if(!AppState.state.firebase.auth) {
+      AppState.addNotification("Conectando con servidor...", "warning");
+      await initializeFirebase();
+    }
+    try { 
+      let cred = await AppState.state.firebase.auth.createUserWithEmailAndPassword(email, pwd); 
+      await cred.user.updateProfile({displayName: document.getElementById('registerFullName').value}); 
+      let newProfile = { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, displayName: document.getElementById('registerFullName').value, realEmail: email, phone: document.getElementById('registerPhone').value || '' }; 
+      await AppState.state.firebase.database.ref(`users/${cred.user.uid}`).set(newProfile); 
+      AppState.addNotification("Registro exitoso, espera activación","success"); 
+      navigateTo('activation_pending'); 
+    } catch(e) { 
+      AppState.addNotification(e.message,"error"); 
+    } 
+  };
+  
   // Pantalla activation pending
   window.renderActivationPendingScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><div>⏳ Cuenta en revisión</div><p>Espera la activación por un administrador.</p><button id="checkActivationBtn">Verificar estado</button><button id="logoutPendingBtn">Cerrar sesión</button></div>`; document.getElementById('checkActivationBtn').onclick = () => window.checkActivationStatusWithFeedback(); document.getElementById('logoutPendingBtn').onclick = () => window.handleLogout(); };
-  window.checkActivationStatusWithFeedback = async () => { let uid = AppState.state.user.current?.uid; let snap = await AppState.state.firebase.database.ref(`users/${uid}/activated`).once('value'); if(snap.val() === true) { AppState.addNotification("Cuenta activada!", "success"); await loadUserProfile(uid); navigateTo('public'); } else AppState.addNotification("Aún pendiente", "warning"); };
+  window.checkActivationStatusWithFeedback = async () => { 
+    let uid = AppState.state.user.current?.uid; 
+    if(!AppState.state.firebase.database) await initializeFirebase();
+    let snap = await AppState.state.firebase.database.ref(`users/${uid}/activated`).once('value'); 
+    if(snap.val() === true) { AppState.addNotification("Cuenta activada!", "success"); await loadUserProfile(uid); navigateTo('public'); } 
+    else AppState.addNotification("Aún pendiente", "warning"); 
+  };
+  
   // pantallas placeholder
   window.renderShareScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🔗 Publicaciones compartidas (próximamente)<button onclick="navigateTo('public')">Volver</button></div>`; };
   window.renderVentasScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">💰 Subastas en construcción<button onclick="navigateTo('public')">Volver</button></div>`; };
@@ -380,30 +446,189 @@
   window.renderPublicacionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚔️ Enfrentamientos en construcción<button onclick="navigateTo('public')">Volver</button></div>`; };
   window.renderPedigriScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🧬 Pedigrí en construcción<button onclick="navigateTo('public')">Volver</button></div>`; };
   window.renderAdminScreen = () => { let profile = AppState.state.user.profile; if(profile?.gallo !== true) { document.getElementById('social-app').innerHTML = `<div class="screen-card">Acceso denegado</div>`; return; } document.getElementById('social-app').innerHTML = `<div class="screen-card">👑 Panel Administración (próximamente)</div>`; };
-  // ---------- Firebase & Loading ----------
-  async function loadUserProfile(uid) { if(!AppState.state.firebase.database) AppState.state.firebase.database = firebase.database(); let cached = AppState.persistentCache.get('profile', uid); if(cached) { AppState.setUser(AppState.state.user.current, cached); updateSideMenuContent(); return true; } let snap = await AppState.state.firebase.database.ref(`users/${uid}`).once('value'); let data = snap.val() || { activated: false }; AppState.persistentCache.set('profile', data, uid); AppState.setUser(AppState.state.user.current, data); updateSideMenuContent(); return true; }
-  async function initializeFirebase() { if(AppState.state.firebase.isEnabled) return; try { firebase.initializeApp(FIREBASE_MAIN); AppState.state.firebase.auth = firebase.auth(); AppState.state.firebase.isEnabled = true; AppState.state.firebase.database = firebase.database(); firebase.auth().onAuthStateChanged(async (user) => { if(user) { AppState.setUser(user, null); await loadUserProfile(user.uid); if(AppState.state.user.profile?.activated) navigateTo('public'); else navigateTo('activation_pending'); } else { AppState.clearUser(); navigateTo('public'); } hideLoadingScreen(); }); } catch(e) { console.error(e); } }
-  function hideLoadingScreen() { let ls = document.getElementById('loading-screen'); if(ls) { ls.style.opacity='0'; setTimeout(()=>{ ls.style.display='none'; document.getElementById('social-app').style.display='block'; },500); } AppState.setLoading(false); }
-  function updateLoadingProgress(percent, msg) { let bar = document.getElementById('loading-progress-bar'); let status = document.getElementById('loading-status'); if(bar) bar.style.width = `${percent}%`; if(status) status.innerText = msg||''; }
-  window.handleLoginClick = () => { if(!AppState.state.firebase.isEnabled) initializeFirebase(); navigateTo('login'); };
-  window.handleLogout = async () => { window.toggleSideMenu(false); AppState.addNotification("Cerrando sesión...","info"); AppState.persistentCache.clearUserCache(AppState.state.user.current?.uid); localStorage.removeItem('legado_usuario_recurrente'); try { await AppState.state.firebase.auth.signOut(); } catch(e){} AppState.clearUser(); navigateTo('public'); location.reload(); };
-  // google modals
-  window.mostrarModalGoogleInferior = () => { if(document.getElementById('google-one-tap-container')) return; let div = document.createElement('div'); div.id='google-one-tap-container'; div.style.position='fixed'; div.style.bottom='20px'; div.style.left='0'; div.style.width='100%'; div.style.display='flex'; div.style.justifyContent='center'; div.style.zIndex='100000'; document.body.appendChild(div); google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: async (res) => { try { let cred = firebase.auth.GoogleAuthProvider.credential(res.credential); await AppState.state.firebase.auth.signInWithCredential(cred); } catch(e){ AppState.addNotification("Error Google","error"); } } }); google.accounts.id.prompt(); };
-  window.mostrarModalGoogleSuperior = () => { let container = document.createElement('div'); container.id='google-one-tap-container-superior'; container.style.position='fixed'; container.style.top='120px'; container.style.left='50%'; container.style.transform='translateX(-50%)'; container.style.zIndex='100001'; document.body.appendChild(container); google.accounts.id.renderButton(container, { theme:'outline', size:'large' }); setTimeout(()=>{ container.addEventListener('click',()=>{}); window.addEventListener('click', function close(e){ if(!container.contains(e.target)){ container.remove(); window.removeEventListener('click',close); } }); },100); };
-  // inicialización y eventos
-  window.addEventListener('load', async () => { document.getElementById('loading-screen').style.display='flex'; updateLoadingProgress(10,'Conectando...'); await initializeFirebase(); updateLoadingProgress(80,'Verificando sesión'); setTimeout(()=>{ if(!AppState.state.user.current && !AppState.state.ui.currentScreen) navigateTo('public'); },500); window.mostrarModalGoogleInferior(); });
+  
+  // ---------- Firebase & Loading CORREGIDO ----------
+  async function loadUserProfile(uid) { 
+    if(!AppState.state.firebase.database) AppState.state.firebase.database = firebase.database(); 
+    let cached = AppState.persistentCache.get('profile', uid); 
+    if(cached) { 
+      AppState.setUser(AppState.state.user.current, cached); 
+      updateSideMenuContent(); 
+      return true; 
+    } 
+    let snap = await AppState.state.firebase.database.ref(`users/${uid}`).once('value'); 
+    let data = snap.val() || { activated: false }; 
+    AppState.persistentCache.set('profile', data, uid); 
+    AppState.setUser(AppState.state.user.current, data); 
+    updateSideMenuContent(); 
+    return true; 
+  }
+  
+  // CORREGIDA: initializeFirebase con verificación de carga
+  async function initializeFirebase() { 
+    if(AppState.state.firebase.isEnabled) return true;
+    // Esperar a que firebase esté disponible globalmente
+    if(typeof firebase === 'undefined') {
+      console.log("Esperando Firebase...");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if(typeof firebase === 'undefined') {
+        AppState.addNotification("Error cargando Firebase, recargue", "error");
+        return false;
+      }
+    }
+    try { 
+      if(!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_MAIN); 
+      }
+      AppState.state.firebase.auth = firebase.auth(); 
+      AppState.state.firebase.database = firebase.database(); 
+      AppState.state.firebase.isEnabled = true; 
+      AppState.state.firebase.isInitialized = true;
+      
+      firebase.auth().onAuthStateChanged(async (user) => { 
+        if(user) { 
+          AppState.setUser(user, null); 
+          await loadUserProfile(user.uid); 
+          if(AppState.state.user.profile?.activated) navigateTo('public'); 
+          else navigateTo('activation_pending'); 
+        } else { 
+          AppState.clearUser(); 
+          if(AppState.state.ui.currentScreen !== 'login') navigateTo('public'); 
+        } 
+        hideLoadingScreen(); 
+      }); 
+      return true;
+    } catch(e) { 
+      console.error("Firebase error:", e); 
+      AppState.addNotification("Error de conexión: " + e.message, "error");
+      return false;
+    } 
+  }
+  
+  function hideLoadingScreen() { 
+    let ls = document.getElementById('loading-screen'); 
+    if(ls) { 
+      ls.style.opacity='0'; 
+      setTimeout(()=>{ 
+        ls.style.display='none'; 
+        document.getElementById('social-app').style.display='block'; 
+      },500); 
+    } 
+    AppState.setLoading(false); 
+  }
+  
+  function updateLoadingProgress(percent, msg) { 
+    let bar = document.getElementById('loading-progress-bar'); 
+    let status = document.getElementById('loading-status'); 
+    if(bar) bar.style.width = `${percent}%`; 
+    if(status) status.innerText = msg||''; 
+  }
+  
+  window.handleLoginClick = async () => { 
+    if(!AppState.state.firebase.isEnabled) {
+      await initializeFirebase(); 
+    }
+    navigateTo('login'); 
+  };
+  
+  window.handleLogout = async () => { 
+    window.toggleSideMenu(false); 
+    AppState.addNotification("Cerrando sesión...","info"); 
+    AppState.persistentCache.clearUserCache(AppState.state.user.current?.uid); 
+    localStorage.removeItem('legado_usuario_recurrente'); 
+    try { 
+      if(AppState.state.firebase.auth) await AppState.state.firebase.auth.signOut(); 
+    } catch(e){} 
+    AppState.clearUser(); 
+    navigateTo('public'); 
+    location.reload(); 
+  };
+  
+  // google modals CORREGIDOS
+  window.mostrarModalGoogleInferior = () => { 
+    if(document.getElementById('google-one-tap-container')) return; 
+    if(typeof google === 'undefined' || !google.accounts) {
+      setTimeout(() => window.mostrarModalGoogleInferior(), 1000);
+      return;
+    }
+    let div = document.createElement('div'); 
+    div.id='google-one-tap-container'; 
+    div.style.position='fixed'; 
+    div.style.bottom='20px'; 
+    div.style.left='0'; 
+    div.style.width='100%'; 
+    div.style.display='flex'; 
+    div.style.justifyContent='center'; 
+    div.style.zIndex='100000'; 
+    document.body.appendChild(div); 
+    google.accounts.id.initialize({ 
+      client_id: GOOGLE_CLIENT_ID, 
+      callback: async (res) => { 
+        try { 
+          await initializeFirebase();
+          let cred = firebase.auth.GoogleAuthProvider.credential(res.credential); 
+          await AppState.state.firebase.auth.signInWithCredential(cred); 
+        } catch(e){ 
+          AppState.addNotification("Error Google: " + e.message,"error"); 
+        } 
+      } 
+    }); 
+    google.accounts.id.prompt(); 
+  };
+  
+  window.mostrarModalGoogleSuperior = () => { 
+    if(typeof google === 'undefined' || !google.accounts) {
+      AppState.addNotification("Cargando Google, intente de nuevo", "warning");
+      return;
+    }
+    let container = document.createElement('div'); 
+    container.id='google-one-tap-container-superior'; 
+    container.style.position='fixed'; 
+    container.style.top='120px'; 
+    container.style.left='50%'; 
+    container.style.transform='translateX(-50%)'; 
+    container.style.zIndex='100001'; 
+    document.body.appendChild(container); 
+    google.accounts.id.renderButton(container, { theme:'outline', size:'large' }); 
+    setTimeout(()=>{ 
+      window.addEventListener('click', function close(e){ 
+        if(!container.contains(e.target)){ 
+          container.remove(); 
+          window.removeEventListener('click',close); 
+        } 
+      }); 
+    },100); 
+  };
+  
+  // inicialización y eventos CORREGIDOS
+  window.addEventListener('load', async () => { 
+    document.getElementById('loading-screen').style.display='flex'; 
+    updateLoadingProgress(10,'Conectando...'); 
+    await initializeFirebase(); 
+    updateLoadingProgress(80,'Verificando sesión'); 
+    setTimeout(()=>{ 
+      if(!AppState.state.user.current && !AppState.state.ui.currentScreen) navigateTo('public'); 
+    },500); 
+    setTimeout(() => window.mostrarModalGoogleInferior(), 1500);
+  });
+  
   window.renderScreenSkeleton = (name) => { document.getElementById('social-app').innerHTML = `<div class="skeleton-card"></div><div class="skeleton-card"></div>`; };
+  
   // side menu listeners
-  document.getElementById('sidePerfilBtn')?.addEventListener('click',()=>navigateTo('perfil'));
-  document.getElementById('sideShareBtn')?.addEventListener('click',()=>navigateTo('share'));
-  document.getElementById('sideSubastasBtn')?.addEventListener('click',()=>navigateTo('ventas'));
-  document.getElementById('sideJuezBtn')?.addEventListener('click',()=>navigateTo('juez'));
-  document.getElementById('sideConfigBtn')?.addEventListener('click',()=>navigateTo('configuraciones'));
-  document.getElementById('sideLogoutBtn')?.addEventListener('click',()=>window.handleLogout());
-  document.getElementById('side-menu-overlay')?.addEventListener('click',()=>window.toggleSideMenu(false));
+  setTimeout(() => {
+    document.getElementById('sidePerfilBtn')?.addEventListener('click',()=>navigateTo('perfil'));
+    document.getElementById('sideShareBtn')?.addEventListener('click',()=>navigateTo('share'));
+    document.getElementById('sideSubastasBtn')?.addEventListener('click',()=>navigateTo('ventas'));
+    document.getElementById('sideJuezBtn')?.addEventListener('click',()=>navigateTo('juez'));
+    document.getElementById('sideConfigBtn')?.addEventListener('click',()=>navigateTo('configuraciones'));
+    document.getElementById('sideLogoutBtn')?.addEventListener('click',()=>window.handleLogout());
+    document.getElementById('side-menu-overlay')?.addEventListener('click',()=>window.toggleSideMenu(false));
+  }, 100);
+  
   // Connection bar simulator
   window.addEventListener('online',()=>{ let bar=document.getElementById('connection-status-bar'); bar.style.transform='translateY(0)'; document.getElementById('connMsg').innerText='Conexión restablecida'; setTimeout(()=>{ bar.style.transform='translateY(100%)'; },5000); });
   window.addEventListener('offline',()=>{ let bar=document.getElementById('connection-status-bar'); bar.style.transform='translateY(0)'; document.getElementById('connMsg').innerText='Sin internet'; });
+  
   // adicional functions
   window.getDeviceFingerprint = async () => "simulated_fingerprint";
   window.checkActivationStatus = window.checkActivationStatusWithFeedback;
@@ -420,6 +645,7 @@
   window.togglePasswordVisibility = ()=>{};
   window.mostrarNotificacionYModal = ()=>{};
   window.mostrarModalInformativo = ()=>{ AppState.addNotification("Información de la App","info"); };
+  
   // suscripción y protección final
   AppState.subscribe(()=>{ if(AppState.state.ui.currentScreen === 'login' && window.renderLoginScreen) window.renderLoginScreen(); else renderCurrentScreen(); });
   AppState.protectAppState();
