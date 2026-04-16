@@ -6524,44 +6524,41 @@ statusEl.style.fontSize = '20px';
   console.log("🟢 [LOADING] showLoadingScreen COMPLETADO, progreso actualizado a:", progress);
 }
 
+
+
 function hideLoadingScreen() {
   console.log("🟪🟪 [HIDE-LOADING] hideLoadingScreen INICIADO", {
     timestamp: new Date().toISOString(),
     stack: new Error().stack.split('\n')[1]
   });
 
-
- if (window.loadingInterval) {
-    clearInterval(window.loadingInterval);
-    window.loadingInterval = null;
-    console.log("🧹 Intervalo limpiado en hideLoadingScreen");
-  }
-
-  
   // CANCELAR TIMEOUT PENDIENTE
   if (loadingTimeoutId) {
     console.log("🟪 [HIDE-LOADING] Cancelando timeout pendiente:", loadingTimeoutId);
     clearTimeout(loadingTimeoutId);
     loadingTimeoutId = null;
-    console.log("✅ [HIDE-LOADING] Timeout cancelado");
+  }
+  
+  // CANCELAR INTERVALO
+  if (loadingInterval) {
+    clearInterval(loadingInterval);
+    loadingInterval = null;
   }
   
   // OCULTAR BOTÓN SI ESTÁ VISIBLE
   const reloadBtn = document.getElementById('loading-reload-btn');
   if (reloadBtn) {
-    const estabaVisible = reloadBtn.style.display === 'block';
     reloadBtn.style.display = 'none';
-    if (estabaVisible) console.log("🟪 [HIDE-LOADING] Botón de recarga ocultado (estaba visible)");
   }
   
+  // 🔥 SOLUCIÓN PRINCIPAL: Forzar ocultación COMPLETA
   const loadingScreen = document.getElementById('loading-screen');
-
-
-
-if (loadingScreen) {
-    console.log("🟪 [HIDE-LOADING] Ocultando pantalla BRUSCAMENTE");
-    loadingScreen.style.display = 'none';  // ← SOLO ESTA LÍNEA
-} else {
+  if (loadingScreen) {
+    console.log("🟪 [HIDE-LOADING] Ocultando pantalla");
+    loadingScreen.style.display = 'none';
+    loadingScreen.style.opacity = '0';
+    loadingScreen.style.visibility = 'hidden';  // ← NUEVO: Capa extra de seguridad
+  } else {
     console.error("🔴 [HIDE-LOADING] No se encontró #loading-screen");
   }
 
@@ -6570,12 +6567,20 @@ if (loadingScreen) {
   if (socialApp) {
     console.log("🟪 [HIDE-LOADING] Forzando mostrar social-app");
     socialApp.style.display = 'block';
+    socialApp.style.visibility = 'visible';
   }
+  
+  // 🔥 NUEVO: Forzar que cualquier elemento modal o overlay se oculte
+  const overlays = document.querySelectorAll('[id*="overlay"], [id*="modal"]');
+  overlays.forEach(overlay => {
+    if (overlay.style.display === 'flex' || overlay.style.display === 'block') {
+      console.log("🟪 [HIDE-LOADING] Ocultando overlay:", overlay.id);
+      overlay.style.display = 'none';
+    }
+  });
   
   console.log("🟢 [HIDE-LOADING] hideLoadingScreen COMPLETADO");
 }
-
-
 
 
 
