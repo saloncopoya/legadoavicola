@@ -5582,9 +5582,10 @@ async function renderApp(changedProperty) {
 
 
 
+
 if (changedProperty === 'notifications' || changedProperty === 'cotejo') {
-    return; // Solo ignorar notificaciones y cotejo
-}
+    return; // Salir inmediatamente, no renderizar
+  }
 
   const app = document.getElementById('social-app');
   if (!app) return;
@@ -6521,6 +6522,57 @@ statusEl.style.fontSize = '20px';
   
   updateLoadingProgress(progress, message);
   console.log("🟢 [LOADING] showLoadingScreen COMPLETADO, progreso actualizado a:", progress);
+}
+
+function hideLoadingScreen() {
+  console.log("🟪🟪 [HIDE-LOADING] hideLoadingScreen INICIADO", {
+    timestamp: new Date().toISOString(),
+    stack: new Error().stack.split('\n')[1]
+  });
+
+
+ if (window.loadingInterval) {
+    clearInterval(window.loadingInterval);
+    window.loadingInterval = null;
+    console.log("🧹 Intervalo limpiado en hideLoadingScreen");
+  }
+
+  
+  // CANCELAR TIMEOUT PENDIENTE
+  if (loadingTimeoutId) {
+    console.log("🟪 [HIDE-LOADING] Cancelando timeout pendiente:", loadingTimeoutId);
+    clearTimeout(loadingTimeoutId);
+    loadingTimeoutId = null;
+    console.log("✅ [HIDE-LOADING] Timeout cancelado");
+  }
+  
+  // OCULTAR BOTÓN SI ESTÁ VISIBLE
+  const reloadBtn = document.getElementById('loading-reload-btn');
+  if (reloadBtn) {
+    const estabaVisible = reloadBtn.style.display === 'block';
+    reloadBtn.style.display = 'none';
+    if (estabaVisible) console.log("🟪 [HIDE-LOADING] Botón de recarga ocultado (estaba visible)");
+  }
+  
+  const loadingScreen = document.getElementById('loading-screen');
+
+
+
+if (loadingScreen) {
+    console.log("🟪 [HIDE-LOADING] Ocultando pantalla BRUSCAMENTE");
+    loadingScreen.style.display = 'none';  // ← SOLO ESTA LÍNEA
+} else {
+    console.error("🔴 [HIDE-LOADING] No se encontró #loading-screen");
+  }
+
+  // FORZAR QUE EL CONTENIDO PRINCIPAL SEA VISIBLE
+  const socialApp = document.getElementById('social-app');
+  if (socialApp) {
+    console.log("🟪 [HIDE-LOADING] Forzando mostrar social-app");
+    socialApp.style.display = 'block';
+  }
+  
+  console.log("🟢 [HIDE-LOADING] hideLoadingScreen COMPLETADO");
 }
 
 
