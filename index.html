@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Calcutas y Subastas Javi Ruiz</title>
-  <!-- Firebase v9 compat + Google Identity -->
+  <!-- Firebase v9 compat + Google Identity + html2canvas -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: 'Segoe UI', system-ui, 'Roboto', sans-serif; background: #1a120b; color: #f5ede0; overflow-x: hidden; }
@@ -19,7 +20,7 @@
     #loading-progress-bar { width: 0%; height: 100%; background: #d99e4c; transition: width 0.3s ease; }
     #loading-status { font-size: 0.9rem; color: #e2c9a7; }
     #social-app { display: none; min-height: 100vh; padding-bottom: 70px; }
-    #side-menu { position: fixed; top: 0; right: -350px; width: 280px; height: 100%; background: #2c211b; box-shadow: -5px 0 25px rgba(0,0,0,0.5); z-index: 100010; transition: right 0.3s; display: flex; flex-direction: column; padding: 1.5rem 1rem; border-left: 1px solid #b97f44; }
+    #side-menu { position: fixed; top: 0; right: -350px; width: 280px; height: 100%; background: #2c211b; box-shadow: -5px 0 25px rgba(0,0,0,0.5); z-index: 100010; transition: right 0.3s cubic-bezier(0.2,0.9,0.4,1.1); display: flex; flex-direction: column; padding: 1.5rem 1rem; border-left: 1px solid #b97f44; }
     #side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100005; display: none; backdrop-filter: blur(3px); }
     .side-header { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid #5e3e2c; margin-bottom: 20px; }
     .side-avatar { width: 55px; height: 55px; border-radius: 50%; background: #8b5a2b; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.6rem; color: white; object-fit: cover; }
@@ -38,12 +39,17 @@
     @keyframes fadeIn { from { opacity:0; transform: translateY(-10px);} to { opacity:1; transform: translateY(0);} }
     @keyframes fadeOutClean { to { opacity:0; transform: scale(0.95); visibility: hidden; } }
     #connection-status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c2e31; color: white; text-align: center; padding: 8px; font-size: 0.75rem; z-index: 100000; transform: translateY(100%); transition: transform 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .skeleton-card { background: #2b2a28; border-radius: 18px; height: 100px; margin: 12px; animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     .screen-card { background: #2a201a; border-radius: 32px; padding: 20px; margin: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
     button, .btn { background: #b97f44; border: none; padding: 12px 20px; border-radius: 60px; font-weight: bold; color: white; cursor: pointer; transition: 0.2s; }
     button:active { transform: scale(0.97); }
     input, select { background: #3b2c24; border: 1px solid #7a532e; padding: 12px; border-radius: 30px; color: white; width: 100%; margin: 8px 0; }
     footer { text-align: center; padding: 20px; font-size: 0.7rem; color: #b99e7c; border-top: 1px solid #4a3427; margin-top: 20px; }
     @media (max-width: 768px) { .screen-card { margin: 12px; } }
+    .mobile-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1f1611; display: flex; justify-content: space-around; padding: 8px 12px; z-index: 1000; border-top: 1px solid #885e38; }
+    .nav-icon { background: none; font-size: 1.6rem; padding: 6px; }
+    .profile-nav { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #b97f44; background: #5e3a2c; display: flex; align-items: center; justify-content: center; }
   </style>
 </head>
 <body>
@@ -52,6 +58,7 @@
     <div class="loader-logo">🐓⚡</div>
     <div class="progress-bar-bg"><div id="loading-progress-bar"></div></div>
     <div id="loading-status">Iniciando...</div>
+    <div id="loading-sub" style="font-size: 0.7rem; margin-top: 12px;"></div>
   </div>
 </div>
 <div id="social-app"></div>
@@ -63,258 +70,506 @@
   <button class="side-menu-item" id="sideSubastasBtn" style="display:none;">💰 SUBASTAS</button>
   <button class="side-menu-item" id="sideJuezBtn" style="display:none;">⚖️ PANEL JUEZ</button>
   <button class="side-menu-item" id="sideConfigBtn">⚙️ CONFIGURACIONES</button>
-  <button class="side-menu-item" id="sideAdminCotejoBtn" style="display:none;">🤖 CREAR COTEJO</button>
+  <button class="side-menu-item" id="sideAdminCotejoBtn" style="display:none;">🤖 CREAR COTEJO COMPUTARIZADO</button>
   <button class="side-menu-item logout" id="sideLogoutBtn">🚪 CERRAR SESIÓN</button>
 </div>
 <div id="toast-container"></div>
-<div id="connection-status-bar"><span id="connMsg"></span><span>📶</span></div>
-<footer><span>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - v2.0</span><br><a href="#" id="footerTerms">Términos</a> | <a href="#" id="footerPrivacy">Privacidad</a></footer>
+<div id="connection-status-bar"><span id="connMsg"></span><span class="wifi-dots">📶</span></div>
+<footer style="margin-top: 2rem;"><span>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - v2.0</span><br><a href="#" id="footerTerms" style="color:#cb9e6b;">Términos</a> | <a href="#" id="footerPrivacy">Privacidad</a></footer>
 
 <script>
-// 100% FUNCIONAL - SIN ERRORES
-(function() {
-  // CONFIGURACIONES
-  const FIREBASE_MAIN = {
-    apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
-    authDomain: "galloslivebadge.firebaseapp.com",
-    databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
-    projectId: "galloslivebadge",
-  };
-  const GOOGLE_CLIENT_ID = "979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com";
+// ============================================================
+// CONFIGURACIONES FIREBASE
+// ============================================================
+const FIREBASE_MAIN = {
+  apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+  authDomain: "galloslivebadge.firebaseapp.com",
+  databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+  projectId: "galloslivebadge",
+};
 
-  // AppState
-  let AppState = {
-    firebase: { auth: null, database: null, isEnabled: false },
+const FIREBASE_ADMIN = {
+  apiKey: "AIzaSyBMON_hBlUJfE-_L6qrt8MEP6JZrculRcs",
+  authDomain: "premiumcotejosgallistico-59e76.firebaseapp.com",
+  databaseURL: "https://premiumcotejosgallistico-59e76-default-rtdb.firebaseio.com",
+  projectId: "premiumcotejosgallistico-59e76",
+};
+
+const GOOGLE_CLIENT_ID = "979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com";
+
+// ============================================================
+// AppState SINGLETON (COMPLETO)
+// ============================================================
+window.AppState = (function() {
+  let state = {
+    firebase: { app: null, auth: null, database: null, isEnabled: false, isInitialized: false },
     user: { current: null, profile: null },
-    ui: { currentScreen: 'public' },
-    addNotification: function(msg, type='info') {
-      let cont = document.getElementById('toast-container');
-      if(!cont) return;
-      let toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.innerText = msg;
-      cont.appendChild(toast);
-      setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); }, 5000);
-      toast.onclick = () => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); };
-    }
-  };
-  window.AppState = AppState;
-
-  // Helper functions
-  window.getInitials = (name) => name ? name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '??';
-  window.toggleSideMenu = (open) => { 
-    let menu = document.getElementById('side-menu'); 
-    let overlay = document.getElementById('side-menu-overlay'); 
-    if(open === true || (menu.style.right !== '0px' && open !== false)) { 
-      menu.style.right = '0px'; 
-      overlay.style.display = 'block'; 
-      document.body.style.overflow = 'hidden'; 
-    } else { 
-      menu.style.right = '-350px'; 
-      overlay.style.display = 'none'; 
-      document.body.style.overflow = ''; 
-    } 
+    ui: { currentScreen: 'public', pendingScreen: null, isLoading: true, isLoadingScreen: false, loadingScreenName: '', activeTab: 'login', formData: { register: {}, login: {} } },
+    rooster: { cotejoState: false, listener: null, tournamentInfo: null, roosters: [] },
+    persistentCache: { version: '2.0' },
+    subscribers: [],
+    _isNotifying: false
   };
   
-  window.navigateTo = (section) => { 
-    window.toggleSideMenu(false); 
-    AppState.ui.currentScreen = section; 
-    renderScreen(section); 
+  const cache = {
+    set(key, data, uid) { try { if(uid) localStorage.setItem(`app_${key}_${uid}`, JSON.stringify({data, ts: Date.now(), v: '2.0'})); } catch(e){} },
+    get(key, uid, maxAge=30*24*3600*1000) { try { let raw = localStorage.getItem(`app_${key}_${uid}`); if(!raw) return null; let obj = JSON.parse(raw); if(obj.v !== '2.0' || Date.now() - obj.ts > maxAge) { localStorage.removeItem(`app_${key}_${uid}`); return null; } return obj.data; } catch(e){ return null; } },
+    clearUserCache(uid) { Object.keys(localStorage).forEach(k => { if(k.startsWith('app_') && k.endsWith(uid)) localStorage.removeItem(k); }); },
+    setGlobal(key, data) { localStorage.setItem(`app_global_${key}`, JSON.stringify({data, ts: Date.now(), v:'2.0'})); },
+    getGlobal(key, maxAge=30*24*3600*1000) { let raw = localStorage.getItem(`app_global_${key}`); if(!raw) return null; let obj=JSON.parse(raw); if(obj.v !== '2.0' || Date.now()-obj.ts > maxAge) return null; return obj.data; }
   };
   
-  function renderScreen(screen) {
-    let container = document.getElementById('social-app');
-    if(screen === 'public') {
-      container.innerHTML = `<div style="text-align:center;padding:2rem;"><div style="font-size:4rem;">🐓🔥</div><h1>CALCUTAS Y SUBASTAS</h1><h3>JAVI RUIZ</h3><button id="publicLoginBtn" class="btn">🔐 INICIAR SESIÓN</button><div class="screen-card"><h4>📌 ¿Qué es esto?</h4><p>Plataforma de torneos, subastas y pedigrí gallístico.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;"><div>🏆 Torneos</div><div>💰 Subastas</div><div>🧬 Pedigrí</div><div>⚖️ Jueces</div></div></div></div>`;
-      document.getElementById('publicLoginBtn')?.addEventListener('click', () => window.navigateTo('login'));
-    } else if(screen === 'login') {
-      container.innerHTML = `<div class="screen-card"><div style="display:flex; gap:10px;"><button id="tabLoginBtn" class="btn" style="flex:1">🔐 CORREO</button><button id="tabRegisterBtn" class="btn" style="flex:1">📝 REGISTRO</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="Correo" /><input type="password" id="loginPassword" placeholder="Contraseña" /><button id="doLoginBtn">ACCEDER</button><a href="#" id="resetPassLink">¿Olvidaste contraseña?</a></div><div id="registerForm" style="display:none;"><input id="regName" placeholder="Nombre completo" /><input id="regEmail" placeholder="Email" /><input id="regPassword" type="password" placeholder="Contraseña" /><input id="regConfirm" type="password" placeholder="Confirmar" /><button id="doRegisterBtn">REGISTRARSE</button></div><button id="googleBtn" class="btn" style="margin-top:12px;">🔑 GOOGLE</button></div>`;
-      document.getElementById('tabLoginBtn').onclick = () => { document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; };
-      document.getElementById('tabRegisterBtn').onclick = () => { document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; };
-      document.getElementById('doLoginBtn').onclick = () => handleLogin();
-      document.getElementById('doRegisterBtn').onclick = () => handleRegister();
-      document.getElementById('resetPassLink').onclick = (e) => { e.preventDefault(); resetPassword(); };
-      document.getElementById('googleBtn').onclick = () => mostrarGoogleModal();
-    } else if(screen === 'activation_pending') {
-      container.innerHTML = `<div class="screen-card">⏳ Cuenta pendiente de activación<br><button id="logoutBtn">Cerrar sesión</button></div>`;
-      document.getElementById('logoutBtn')?.addEventListener('click', () => handleLogout());
-    } else {
-      container.innerHTML = `<div class="screen-card">${screen} - en construcción<br><button onclick="navigateTo('public')">Volver</button></div>`;
-    }
-  }
+  function notify(prop) { if(state._isNotifying) return; state._isNotifying=true; state.subscribers.forEach(cb=>cb(prop)); state._isNotifying=false; }
   
-  // Firebase functions
-  async function initFirebase() {
-    if(AppState.firebase.isEnabled) return true;
-    if(typeof firebase === 'undefined') {
-      AppState.addNotification("Error: Firebase no cargó", "error");
-      return false;
-    }
-    try {
-      if(!firebase.apps.length) firebase.initializeApp(FIREBASE_MAIN);
-      AppState.firebase.auth = firebase.auth();
-      AppState.firebase.database = firebase.database();
-      AppState.firebase.isEnabled = true;
-      
-      firebase.auth().onAuthStateChanged(async (user) => {
-        if(user) {
-          AppState.user.current = user;
-          // Cargar perfil
-          let snap = await AppState.firebase.database.ref(`users/${user.uid}`).once('value');
-          AppState.user.profile = snap.val() || { activated: false };
-          if(AppState.user.profile?.activated) window.navigateTo('public');
-          else window.navigateTo('activation_pending');
-        } else {
-          AppState.user.current = null;
-          AppState.user.profile = null;
-          if(AppState.ui.currentScreen !== 'login') window.navigateTo('public');
-        }
-        hideLoading();
-      });
-      return true;
-    } catch(e) {
-      AppState.addNotification("Error Firebase: " + e.message, "error");
-      return false;
-    }
-  }
-  
-  async function handleLogin() {
-    let email = document.getElementById('loginEmail')?.value;
-    let pwd = document.getElementById('loginPassword')?.value;
-    if(!email || !pwd) return AppState.addNotification("Complete campos", "warning");
-    try {
-      await AppState.firebase.auth.signInWithEmailAndPassword(email, pwd);
-      AppState.addNotification("Bienvenido", "success");
-    } catch(e) {
-      AppState.addNotification(e.message, "error");
-    }
-  }
-  
-  async function handleRegister() {
-    let email = document.getElementById('regEmail')?.value;
-    let pwd = document.getElementById('regPassword')?.value;
-    let confirm = document.getElementById('regConfirm')?.value;
-    let name = document.getElementById('regName')?.value;
-    if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden", "error");
-    try {
-      let cred = await AppState.firebase.auth.createUserWithEmailAndPassword(email, pwd);
-      await cred.user.updateProfile({ displayName: name });
-      await AppState.firebase.database.ref(`users/${cred.user.uid}`).set({
-        displayName: name,
-        email: email,
-        activated: false,
-        gallo: false,
-        isJudge: false,
-        ventas: false,
-        pedigri: false,
-        publicaciones: false
-      });
-      AppState.addNotification("Registro exitoso, espera activación", "success");
-      window.navigateTo('activation_pending');
-    } catch(e) {
-      AppState.addNotification(e.message, "error");
-    }
-  }
-  
-  async function resetPassword() {
-    let email = document.getElementById('loginEmail')?.value;
-    if(!email) return AppState.addNotification("Ingrese email", "warning");
-    try {
-      await AppState.firebase.auth.sendPasswordResetEmail(email);
-      AppState.addNotification("Correo enviado", "info");
-    } catch(e) {
-      AppState.addNotification(e.message, "error");
-    }
-  }
-  
-  async function handleLogout() {
-    try { await AppState.firebase.auth.signOut(); } catch(e) {}
-    AppState.user.current = null;
-    AppState.user.profile = null;
-    window.navigateTo('public');
-  }
-  
-  function mostrarGoogleModal() {
-    if(typeof google === 'undefined' || !google.accounts) {
-      AppState.addNotification("Cargando Google...", "warning");
-      setTimeout(() => mostrarGoogleModal(), 1000);
-      return;
-    }
-    let container = document.createElement('div');
-    container.id = 'google-modal';
-    container.style.position = 'fixed';
-    container.style.top = '50%';
-    container.style.left = '50%';
-    container.style.transform = 'translate(-50%, -50%)';
-    container.style.zIndex = '100001';
-    container.style.background = '#2c211b';
-    container.style.padding = '20px';
-    container.style.borderRadius = '20px';
-    document.body.appendChild(container);
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: async (res) => {
-        try {
-          let cred = firebase.auth.GoogleAuthProvider.credential(res.credential);
-          await AppState.firebase.auth.signInWithCredential(cred);
-          container.remove();
-        } catch(e) { AppState.addNotification("Error Google", "error"); container.remove(); }
-      }
-    });
-    google.accounts.id.renderButton(container, { theme: 'outline', size: 'large' });
-    setTimeout(() => {
-      window.addEventListener('click', function close(e) {
-        if(!container.contains(e.target)) { container.remove(); window.removeEventListener('click', close); }
-      });
-    }, 100);
-  }
-  
-  function hideLoading() {
-    let ls = document.getElementById('loading-screen');
-    if(ls) {
-      ls.style.opacity = '0';
-      setTimeout(() => {
-        ls.style.display = 'none';
-        document.getElementById('social-app').style.display = 'block';
-      }, 500);
-    }
-  }
-  
-  function updateProgress(percent, msg) {
-    let bar = document.getElementById('loading-progress-bar');
-    let status = document.getElementById('loading-status');
-    if(bar) bar.style.width = percent + '%';
-    if(status) status.innerText = msg || '';
-  }
-  
-  // INICIO - SIN ERRORES
-  window.addEventListener('load', async function() {
-    updateProgress(10, 'Inicializando...');
-    await initFirebase();
-    updateProgress(100, 'Listo');
-    setTimeout(() => {
-      if(!AppState.user.current) window.navigateTo('public');
-    }, 500);
-  });
-  
-  // Side menu listeners
-  setTimeout(() => {
-    document.getElementById('sidePerfilBtn')?.addEventListener('click', () => window.navigateTo('perfil'));
-    document.getElementById('sideShareBtn')?.addEventListener('click', () => window.navigateTo('share'));
-    document.getElementById('sideSubastasBtn')?.addEventListener('click', () => window.navigateTo('ventas'));
-    document.getElementById('sideJuezBtn')?.addEventListener('click', () => window.navigateTo('juez'));
-    document.getElementById('sideConfigBtn')?.addEventListener('click', () => window.navigateTo('configuraciones'));
-    document.getElementById('sideLogoutBtn')?.addEventListener('click', () => handleLogout());
-    document.getElementById('side-menu-overlay')?.addEventListener('click', () => window.toggleSideMenu(false));
-  }, 200);
-  
-  // Exponer funciones globales
-  window.handleLogin = handleLogin;
-  window.handleLogout = handleLogout;
-  window.handleRegister = handleRegister;
-  window.resetPassword = resetPassword;
-  window.mostrarGoogleModal = mostrarGoogleModal;
+  return {
+    get state() { return state; },
+    setUser(userData, profileData) { state.user.current = userData; state.user.profile = profileData; notify('user'); },
+    clearUser() { if(state.rooster.listener && state.firebase.database) state.rooster.listener(); state.user.current = null; state.user.profile = null; notify('user'); },
+    setScreen(screen) { if(window[`${screen}Killer`] && typeof window[`${screen}Killer`]==='function') window[`${screen}Killer`](); state.ui.currentScreen = screen; localStorage.setItem('lastScreen', screen); notify('screen'); renderCurrentScreen(); },
+    setLoading(loading) { state.ui.isLoading = loading; notify('loading'); },
+    addNotification(msg, type='info', dur=5000) { let cont=document.getElementById('toast-container'); if(!cont) return; let toast=document.createElement('div'); toast.className=`toast ${type}`; toast.innerText=msg; cont.appendChild(toast); setTimeout(()=>{ toast.classList.add('fade-out'); setTimeout(()=>toast.remove(),300); }, dur); toast.onclick=()=>{ toast.classList.add('fade-out'); setTimeout(()=>toast.remove(),300); }; },
+    persistentCache: cache,
+    subscribe(fn) { state.subscribers.push(fn); },
+    protectAppState() { if(state.user.profile) Object.freeze(state.user.profile); Object.preventExtensions(state); }
+  };
 })();
+
+// ============================================================
+// FUNCIONES AUXILIARES
+// ============================================================
+window.getInitials = (name) => name ? name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '??';
+window.formatTime = (ts) => { let diff = Date.now() - ts; if(diff<60000) return 'Ahora'; if(diff<3600000) return `${Math.floor(diff/60000)} min`; if(diff<86400000) return `${Math.floor(diff/3600000)} h`; return new Date(ts).toLocaleDateString(); };
+
+window.toggleSideMenu = (open) => { 
+  let menu = document.getElementById('side-menu'); 
+  let overlay = document.getElementById('side-menu-overlay'); 
+  if(open===true || (menu.style.right !== '0px' && open!==false)) { 
+    menu.style.right = '0px'; 
+    overlay.style.display = 'block'; 
+    document.body.style.overflow='hidden'; 
+  } else { 
+    menu.style.right = '-350px'; 
+    overlay.style.display = 'none'; 
+    document.body.style.overflow=''; 
+  } 
+};
+
+function updateSideMenuContent() { 
+  let prof = AppState.state.user.profile; 
+  let user = AppState.state.user.current; 
+  let container = document.getElementById('sideMenuProfile'); 
+  if(container && user) { 
+    container.innerHTML = `<div class="side-avatar">${user.photoURL ? `<img src="${user.photoURL}" width="55" style="border-radius:50%">` : window.getInitials(user.displayName||user.email)}</div><div class="side-info"><h4>${user.displayName || 'Sin nombre'}</h4><p>${prof?.activated ? 'Activado' : 'Pendiente'}</p></div>`; 
+  } 
+  let subastaBtn=document.getElementById('sideSubastasBtn'); 
+  if(subastaBtn) subastaBtn.style.display = prof?.ventas ? 'flex' : 'none'; 
+  let juezBtn=document.getElementById('sideJuezBtn'); 
+  if(juezBtn) juezBtn.style.display = prof?.isJudge ? 'flex' : 'none'; 
+  let adminBtn=document.getElementById('sideAdminCotejoBtn'); 
+  if(adminBtn) adminBtn.style.display = prof?.gallo ? 'flex' : 'none'; 
+}
+
+window.navigateTo = (section) => { 
+  if(navigator.userAgent.includes('Googlebot')) return; 
+  window.toggleSideMenu(false); 
+  if(section!=='login' && section!=='activation_pending') localStorage.setItem('lastScreen', section); 
+  AppState.setScreen(section); 
+};
+
+function renderCurrentScreen() { 
+  let scr = AppState.state.ui.currentScreen; 
+  if(window[`render${scr.charAt(0).toUpperCase()+scr.slice(1)}Screen`]) 
+    window[`render${scr.charAt(0).toUpperCase()+scr.slice(1)}Screen`](); 
+  else 
+    document.getElementById('social-app').innerHTML = '<div class="screen-card">Error 404</div>'; 
+}
+
+// Killers
+window.publicKiller = ()=>{};
+window.ventasKiller = ()=>{};
+window.shareKiller = ()=>{};
+window.roosterKiller = ()=>{};
+window.adminKiller = ()=>{};
+
+// ============================================================
+// RENDER DE PANTALLAS (COMPLETO)
+// ============================================================
+window.renderPublicScreen = () => { 
+  let html = `<div style="text-align:center;padding:2rem;"><div style="font-size:4rem;">🐓🔥</div><h1>CALCUTAS Y SUBASTAS</h1><h3>JAVI RUIZ</h3><button id="publicLoginBtn" class="btn">🔐 INICIAR SESIÓN</button><div class="screen-card"><h4>📌 ¿Qué es esto?</h4><p>Plataforma de torneos, subastas y pedigrí gallístico.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;"><div>🏆 Torneos</div><div>💰 Subastas</div><div>🧬 Pedigrí</div><div>⚖️ Jueces</div></div></div></div>`; 
+  document.getElementById('social-app').innerHTML = html; 
+  document.getElementById('publicLoginBtn')?.addEventListener('click', ()=>window.handleLoginClick()); 
+};
+
+window.renderLoginScreen = () => { 
+  let html = `<div class="screen-card"><div style="display:flex; gap:10px;"><button id="tabLoginBtn" class="btn" style="flex:1">🔐 CORREO ELECTRONICO</button><button id="tabRegisterBtn" class="btn" style="flex:1">📝 Registrar</button></div><div id="loginFormContainer"><input type="email" id="loginPhone" placeholder="Correo electrónico" /><input type="password" id="loginPassword" placeholder="Contraseña" /><button id="doLoginBtn">ACCEDER</button><a href="#" id="resetPassLink">¿Olvidaste contraseña?</a></div><div id="registerFormContainer" style="display:none;"></div><button id="googleSuperiorBtn" class="btn" style="margin-top:12px;">🔑 ACCEDER CON GOOGLE</button></div>`; 
+  document.getElementById('social-app').innerHTML = html; 
+  document.getElementById('tabLoginBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='block'; document.getElementById('registerFormContainer').style.display='none'; }; 
+  document.getElementById('tabRegisterBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='none'; document.getElementById('registerFormContainer').style.display='block'; if(!document.getElementById('registerFormContainer').innerHTML) window.renderRegisterForm(); }; 
+  document.getElementById('doLoginBtn').onclick = () => window.handleLogin(); 
+  document.getElementById('resetPassLink').onclick = (e) => { e.preventDefault(); window.resetPassword(); }; 
+  document.getElementById('googleSuperiorBtn').onclick = () => window.mostrarModalGoogleSuperior(); 
+};
+
+window.renderRegisterForm = function() { 
+  let municipiosChiapas = ['Tuxtla Gutiérrez','Tapachula','Comitán','San Cristóbal','Las Margaritas','Pichucalco','Ocosingo','Chiapa de Corzo','Villaflores','Tonalá','Arriaga','Mapastepec','Huixtla','Cacahoatán','Unión Juárez','Motozintla','Frontera Comalapa','La Trinitaria','Venustiano Carranza','Socoltenango','Yajalón','Palenque','Salto de Agua','Tila','Sabanilla','Simojovel','El Bosque','Chalchihuitán','Larráinzar','Zinacantán','Chamula','Mitontic','Huixtán','Teopisca','Amatenango del Valle','Comitán','La Independencia','Las Rosas','Jiquipilas','Cintalapa','Ocozocoautla','Bochil','Ixtapa','Soyaló','Copainalá','Chicoasén','Suchiapa','Villa Corzo','Reforma','Juárez','Ostuacán','Pichucalco','Sunuapa','Ixtapangajoya','Solosuchiapa','Ixhuatán','Chapultenango','Amatán','Tapilula','Rayón','Pantepec','Ocotepec','Coapilla','Jitotol','Pueblo Nuevo Solistahuacán','Huitiupán','Sabanilla','Tumbalá','Sabanilla','Tila','Tumbalá','Chilón','Sitalá','Sabanilla','Salto de Agua','Palmas','Mazapa de Madero','El Porvenir','La Grandeza','Siltepec','Bellavista','Montecristo de Guerrero','Ángel Albino Corzo','La Concordia','Villa Comaltitlán','Acapetahua','Escuintla','Villa Comaltitlán','Acapetahua','Acacoyagua','Escuintla','Tuzantán','Huehuetán','Mazatán','Tapachula','Cacahoatán','Unión Juárez','Tuxtla Chico','Frontera Hidalgo','Suchiate','Brisas','Metapa','Catazajá','La Libertad','Emiliano Zapata','Benemérito de las Américas','Marqués de Comillas','Palenque','Catazajá','La Libertad','Emiliano Zapata','Benemérito de las Américas','Otro']; 
+  let opts = municipiosChiapas.map(m=>`<option value="${m}">${m}</option>`).join(''); 
+  let formHtml = `<input id="registerFullName" placeholder="Nombre completo" /><input id="registerRealEmail" placeholder="Email real" /><input id="registerPartyName" placeholder="Nombre del partido (opcional)" /><input id="registerRepresentative" placeholder="Representante/Criadero" /><select id="registerMunicipio">${opts}</select><input id="registerCustomMunicipio" placeholder="Otro municipio" style="display:none;" /><input id="registerPhonePrefix" value="+52 961" readonly style="background:#2a201a;" /><input id="registerPhone" placeholder="Teléfono (7 dígitos)" /><input id="registerPassword" type="password" placeholder="Contraseña (mín 6 caracteres)" /><input id="registerConfirmPassword" type="password" placeholder="Confirmar contraseña" /><label><input type="checkbox" id="registerTerms" /> Acepto términos y condiciones</label><button id="completeRegisterBtn">REGISTRARSE</button>`; 
+  document.getElementById('registerFormContainer').innerHTML = formHtml; 
+  document.getElementById('completeRegisterBtn').onclick = () => window.handleCompleteRegister(); 
+  let munSelect = document.getElementById('registerMunicipio'); 
+  let customMun = document.getElementById('registerCustomMunicipio'); 
+  let prefixInput = document.getElementById('registerPhonePrefix');
+  munSelect.onchange = () => { 
+    if(munSelect.value === 'Otro') { 
+      customMun.style.display = 'block'; 
+    } else { 
+      customMun.style.display = 'none'; 
+      prefixInput.value = '+52 961';
+    } 
+  }; 
+};
+
+window.renderActivationPendingScreen = () => { 
+  document.getElementById('social-app').innerHTML = `<div class="screen-card"><div style="text-align:center;"><span style="font-size:4rem;">⏳</span><h2>Cuenta en revisión</h2><p>Tu cuenta está pendiente de activación por un administrador.</p><div style="background:#3b2c24;border-radius:20px;padding:15px;margin:15px 0;"><p><strong>📧 ${AppState.state.user.current?.email || ''}</strong></p><p><strong>👤 ${AppState.state.user.current?.displayName || 'Sin nombre'}</strong></p></div><button id="checkActivationBtn" class="btn">Verificar estado</button><button id="logoutPendingBtn" class="btn" style="background:#5a3a2a;margin-top:10px;">Cerrar sesión</button></div></div>`; 
+  document.getElementById('checkActivationBtn').onclick = () => window.checkActivationStatusWithFeedback(); 
+  document.getElementById('logoutPendingBtn').onclick = () => window.handleLogout(); 
+};
+
+window.renderShareScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">🔗</span><h2>Publicaciones Compartidas</h2><p>Aquí aparecerán las publicaciones compartidas</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderVentasScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">💰</span><h2>Calcutas y Subastas</h2><p>Módulo de subastas en construcción</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderRoosterScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">🏆</span><h2>Gestión de Torneos</h2><p>Módulo de torneos en desarrollo</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderJuezScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">⚖️</span><h2>Panel del Juez</h2><p>Módulo para jueces en construcción</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderPerfilScreen = () => { let user = AppState.state.user.current; let profile = AppState.state.user.profile; document.getElementById('social-app').innerHTML = `<div class="screen-card"><div style="text-align:center;"><div style="font-size:4rem;">👤</div><h2>${user?.displayName || 'Usuario'}</h2><p>📧 ${user?.email || ''}</p><hr style="margin:15px 0;border-color:#5e3e2c;"><p><strong>Partido:</strong> ${profile?.partyName || 'No especificado'}</p><p><strong>Teléfono:</strong> ${profile?.formattedPhone || profile?.phone || 'No registrado'}</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div></div>`; };
+window.renderConfiguracionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">⚙️</span><h2>Configuraciones</h2><p>Opciones de configuración próximamente</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderPublicacionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">⚔️</span><h2>Enfrentamientos</h2><p>Módulo de enfrentamientos en construcción</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderPedigriScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">🧬</span><h2>Pedigrí</h2><p>Registro genealógico en construcción</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderAdminScreen = () => { let profile = AppState.state.user.profile; if(profile?.gallo !== true) { document.getElementById('social-app').innerHTML = `<div class="screen-card"><h2>Acceso Denegado</h2><p>No tienes permisos de administrador</p><button onclick="navigateTo('public')" class="btn">Volver</button></div>`; return; } document.getElementById('social-app').innerHTML = `<div class="screen-card"><span style="font-size:3rem;">👑</span><h2>Panel de Administración</h2><p>Módulo de administración en construcción</p><button onclick="navigateTo('public')" class="btn">Volver al Inicio</button></div>`; };
+window.renderScreenSkeleton = (name) => { document.getElementById('social-app').innerHTML = `<div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>`; };
+
+// ============================================================
+// FUNCIONES DE AUTENTICACIÓN (CORREGIDAS)
+// ============================================================
+async function loadUserProfile(uid) { 
+  if(!AppState.state.firebase.database) AppState.state.firebase.database = firebase.database(); 
+  let cached = AppState.persistentCache.get('profile', uid); 
+  if(cached) { 
+    AppState.setUser(AppState.state.user.current, cached); 
+    updateSideMenuContent(); 
+    return true; 
+  } 
+  let snap = await AppState.state.firebase.database.ref(`users/${uid}`).once('value'); 
+  let data = snap.val() || { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false }; 
+  AppState.persistentCache.set('profile', data, uid); 
+  AppState.setUser(AppState.state.user.current, data); 
+  updateSideMenuContent(); 
+  return true; 
+}
+
+// FUNCIÓN INICIALIZAR FIREBASE - CORREGIDA
+async function initializeFirebase() { 
+  if(AppState.state.firebase.isEnabled) return true;
+  
+  // ESPERAR A QUE FIREBASE EXISTA
+  let esperas = 0;
+  while(typeof firebase === 'undefined' && esperas < 20) {
+    await new Promise(r => setTimeout(r, 200));
+    esperas++;
+  }
+  
+  if(typeof firebase === 'undefined') {
+    AppState.addNotification("Error: Firebase no cargó, recargue la página", "error");
+    return false;
+  }
+  
+  try { 
+    if(!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_MAIN); 
+    }
+    AppState.state.firebase.auth = firebase.auth(); 
+    AppState.state.firebase.database = firebase.database(); 
+    AppState.state.firebase.isEnabled = true; 
+    AppState.state.firebase.isInitialized = true;
+    
+    firebase.auth().onAuthStateChanged(async (user) => { 
+      if(user) { 
+        AppState.setUser(user, null); 
+        await loadUserProfile(user.uid); 
+        if(AppState.state.user.profile?.activated) navigateTo('public'); 
+        else navigateTo('activation_pending'); 
+      } else { 
+        AppState.clearUser(); 
+        if(AppState.state.ui.currentScreen !== 'login' && AppState.state.ui.currentScreen !== 'public') 
+          navigateTo('public'); 
+      } 
+      hideLoadingScreen(); 
+    }); 
+    return true;
+  } catch(e) { 
+    console.error(e); 
+    AppState.addNotification("Error de conexión: " + e.message, "error");
+    return false;
+  } 
+}
+
+function hideLoadingScreen() { 
+  let ls = document.getElementById('loading-screen'); 
+  if(ls) { 
+    ls.style.opacity='0'; 
+    setTimeout(()=>{ 
+      ls.style.display='none'; 
+      document.getElementById('social-app').style.display='block'; 
+    },500); 
+  } 
+  AppState.setLoading(false); 
+}
+
+function updateLoadingProgress(percent, msg) { 
+  let bar = document.getElementById('loading-progress-bar'); 
+  let status = document.getElementById('loading-status'); 
+  if(bar) bar.style.width = `${percent}%`; 
+  if(status) status.innerText = msg||''; 
+}
+
+window.handleLoginClick = async () => { 
+  if(!AppState.state.firebase.isEnabled) {
+    await initializeFirebase(); 
+  }
+  navigateTo('login'); 
+};
+
+window.handleLogin = async () => { 
+  let email = document.getElementById('loginPhone')?.value; 
+  let pwd = document.getElementById('loginPassword')?.value; 
+  if(!email || !pwd) return AppState.addNotification("Complete campos", "warning"); 
+  if(!AppState.state.firebase.auth) {
+    await initializeFirebase();
+  }
+  try { 
+    await AppState.state.firebase.auth.signInWithEmailAndPassword(email, pwd); 
+    AppState.addNotification("Bienvenido", "success"); 
+  } catch(e) { 
+    AppState.addNotification(e.message, "error"); 
+  } 
+};
+
+window.resetPassword = async () => { 
+  let email = document.getElementById('loginPhone')?.value; 
+  if(!email) return AppState.addNotification("Ingrese email", "warning"); 
+  if(!AppState.state.firebase.auth) await initializeFirebase();
+  try { 
+    await AppState.state.firebase.auth.sendPasswordResetEmail(email); 
+    AppState.addNotification("Correo enviado", "info"); 
+  } catch(e) { 
+    AppState.addNotification(e.message, "error"); 
+  } 
+};
+
+window.handleCompleteRegister = async () => { 
+  let email = document.getElementById('registerRealEmail')?.value; 
+  let pwd = document.getElementById('registerPassword')?.value; 
+  let confirm = document.getElementById('registerConfirmPassword')?.value; 
+  let fullName = document.getElementById('registerFullName')?.value;
+  let phone = document.getElementById('registerPhone')?.value;
+  let terms = document.getElementById('registerTerms')?.checked;
+  
+  if(!fullName) return AppState.addNotification("Nombre completo requerido", "warning");
+  if(!email) return AppState.addNotification("Email requerido", "warning");
+  if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden","error"); 
+  if(pwd.length < 6) return AppState.addNotification("Contraseña mínima 6 caracteres","warning");
+  if(!terms) return AppState.addNotification("Debes aceptar los términos","warning");
+  if(!AppState.state.firebase.auth) await initializeFirebase();
+  
+  try { 
+    let cred = await AppState.state.firebase.auth.createUserWithEmailAndPassword(email, pwd); 
+    await cred.user.updateProfile({displayName: fullName}); 
+    let municipio = document.getElementById('registerMunicipio')?.value;
+    if(municipio === 'Otro') municipio = document.getElementById('registerCustomMunicipio')?.value;
+    let newProfile = { 
+      activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false,
+      displayName: fullName, realEmail: email, phone: phone || '', municipio: municipio || '',
+      partyName: document.getElementById('registerPartyName')?.value || '',
+      representative: document.getElementById('registerRepresentative')?.value || '',
+      registeredAt: Date.now(), registeredWith: 'email'
+    }; 
+    await AppState.state.firebase.database.ref(`users/${cred.user.uid}`).set(newProfile); 
+    AppState.addNotification("Registro exitoso, espera activación","success"); 
+    navigateTo('activation_pending'); 
+  } catch(e) { 
+    AppState.addNotification(e.message,"error"); 
+  } 
+};
+
+window.handleLogout = async () => { 
+  window.toggleSideMenu(false); 
+  AppState.addNotification("Cerrando sesión...","info"); 
+  AppState.persistentCache.clearUserCache(AppState.state.user.current?.uid); 
+  localStorage.removeItem('legado_usuario_recurrente');
+  localStorage.removeItem('lastScreen');
+  try { 
+    if(AppState.state.firebase.auth) await AppState.state.firebase.auth.signOut(); 
+  } catch(e){} 
+  AppState.clearUser(); 
+  navigateTo('public'); 
+};
+
+window.checkActivationStatusWithFeedback = async () => { 
+  let uid = AppState.state.user.current?.uid; 
+  if(!uid) return;
+  if(!AppState.state.firebase.database) await initializeFirebase();
+  let snap = await AppState.state.firebase.database.ref(`users/${uid}/activated`).once('value'); 
+  if(snap.val() === true) { 
+    AppState.addNotification("Cuenta activada!", "success"); 
+    await loadUserProfile(uid); 
+    navigateTo('public'); 
+  } else { 
+    AppState.addNotification("Aún pendiente de activación", "warning");
+    setTimeout(() => {
+      if(confirm("¿Solicitar activación al administrador?")) {
+        window.open("https://wa.me/5219611150394?text=Hola,%20solicito%20activaci%C3%B3n%20de%20mi%20cuenta:%20" + encodeURIComponent(AppState.state.user.current?.email || ""), "_blank");
+      }
+    }, 500);
+  } 
+};
+
+// ============================================================
+// GOOGLE MODALS
+// ============================================================
+window.mostrarModalGoogleInferior = () => { 
+  setTimeout(() => {
+    if(typeof google === 'undefined' || !google.accounts) return;
+    if(document.getElementById('google-one-tap-container')) return;
+    let div = document.createElement('div'); 
+    div.id='google-one-tap-container'; 
+    div.style.position='fixed'; 
+    div.style.bottom='20px'; 
+    div.style.left='0'; 
+    div.style.width='100%'; 
+    div.style.display='flex'; 
+    div.style.justifyContent='center'; 
+    div.style.zIndex='100000'; 
+    document.body.appendChild(div); 
+    google.accounts.id.initialize({ 
+      client_id: GOOGLE_CLIENT_ID, 
+      callback: async (res) => { 
+        try { 
+          await initializeFirebase();
+          let cred = firebase.auth.GoogleAuthProvider.credential(res.credential); 
+          await AppState.state.firebase.auth.signInWithCredential(cred); 
+          document.getElementById('google-one-tap-container')?.remove();
+        } catch(e){ 
+          AppState.addNotification("Error Google: " + e.message,"error"); 
+        } 
+      } 
+    }); 
+    google.accounts.id.prompt(); 
+  }, 1000);
+};
+
+window.mostrarModalGoogleSuperior = () => { 
+  if(typeof google === 'undefined' || !google.accounts) {
+    AppState.addNotification("Cargando Google, intente de nuevo", "warning");
+    return;
+  }
+  let container = document.createElement('div'); 
+  container.id='google-one-tap-container-superior'; 
+  container.style.position='fixed'; 
+  container.style.top='120px'; 
+  container.style.left='50%'; 
+  container.style.transform='translateX(-50%)'; 
+  container.style.zIndex='100001'; 
+  container.style.background='#2c211b';
+  container.style.padding='20px';
+  container.style.borderRadius='20px';
+  container.style.boxShadow='0 0 20px rgba(0,0,0,0.5)';
+  document.body.appendChild(container); 
+  google.accounts.id.renderButton(container, { theme:'outline', size:'large' }); 
+  setTimeout(()=>{ 
+    window.addEventListener('click', function close(e){ 
+      if(!container.contains(e.target)){ container.remove(); window.removeEventListener('click',close); } 
+    }); 
+  },100); 
+};
+
+// ============================================================
+// FUNCIONES ADMIN
+// ============================================================
+window.toggleUserActivation = async (uid, activate) => {
+  if(!AppState.state.user.profile?.gallo) return AppState.addNotification("No tienes permisos de admin", "error");
+  if(uid === AppState.state.user.current?.uid && !activate) return AppState.addNotification("No puedes desactivarte a ti mismo", "error");
+  try {
+    await AppState.state.firebase.database.ref(`users/${uid}/activated`).set(activate);
+    AppState.addNotification(`Usuario ${activate ? 'activado' : 'desactivado'}`, "success");
+  } catch(e) { AppState.addNotification(e.message, "error"); }
+};
+
+window.toggleUserGallo = async (uid, setGallo) => {
+  if(!AppState.state.user.profile?.gallo) return AppState.addNotification("No tienes permisos de admin", "error");
+  try {
+    await AppState.state.firebase.database.ref(`users/${uid}/gallo`).set(setGallo);
+    AppState.addNotification(`Rol admin ${setGallo ? 'asignado' : 'revocado'}`, "success");
+  } catch(e) { AppState.addNotification(e.message, "error"); }
+};
+
+window.toggleUserJudge = async (uid, setJudge) => {
+  if(!AppState.state.user.profile?.gallo) return AppState.addNotification("No tienes permisos de admin", "error");
+  try {
+    await AppState.state.firebase.database.ref(`users/${uid}/isJudge`).set(setJudge);
+    AppState.addNotification(`Juez ${setJudge ? 'asignado' : 'revocado'}`, "success");
+  } catch(e) { AppState.addNotification(e.message, "error"); }
+};
+
+// ============================================================
+// FUNCIONES ADICIONALES
+// ============================================================
+window.getDeviceFingerprint = async () => { return "simulated_fingerprint_" + Date.now(); };
+window.checkActivationStatus = window.checkActivationStatusWithFeedback;
+window.openAppInfoModal = () => { AppState.addNotification("Calcutas y Subastas Javi Ruiz - v2.0", "info"); };
+window.openTermsModal = () => { AppState.addNotification("Términos y condiciones disponibles en el footer", "info"); };
+window.openPrivacyModal = () => { AppState.addNotification("Política de privacidad disponible en el footer", "info"); };
+window.copyRoosterUrl = () => {};
+window.shareRoosterSection = () => {};
+window.logoutAndGoPublic = window.handleLogout;
+window.updatePhonePrefix = () => {};
+window.togglePasswordVisibility = () => {};
+window.mostrarNotificacionYModal = () => {};
+window.mostrarModalInformativo = () => { AppState.addNotification("CALCUTAS Y SUBASTAS JAVI RUIZ - Plataforma gallística", "info"); };
+
+// ============================================================
+// INICIALIZACIÓN PRINCIPAL
+// ============================================================
+window.addEventListener('load', async () => { 
+  updateLoadingProgress(10, 'Conectando con servidores...'); 
+  await initializeFirebase(); 
+  updateLoadingProgress(80, 'Verificando autenticación...'); 
+  setTimeout(() => { 
+    if(!AppState.state.user.current && !AppState.state.ui.currentScreen) navigateTo('public'); 
+  }, 500); 
+  setTimeout(() => window.mostrarModalGoogleInferior(), 2000);
+});
+
+// Side menu listeners
+setTimeout(() => {
+  document.getElementById('sidePerfilBtn')?.addEventListener('click',()=>navigateTo('perfil'));
+  document.getElementById('sideShareBtn')?.addEventListener('click',()=>navigateTo('share'));
+  document.getElementById('sideSubastasBtn')?.addEventListener('click',()=>navigateTo('ventas'));
+  document.getElementById('sideJuezBtn')?.addEventListener('click',()=>navigateTo('juez'));
+  document.getElementById('sideConfigBtn')?.addEventListener('click',()=>navigateTo('configuraciones'));
+  document.getElementById('sideLogoutBtn')?.addEventListener('click',()=>window.handleLogout());
+  document.getElementById('side-menu-overlay')?.addEventListener('click',()=>window.toggleSideMenu(false));
+  document.getElementById('footerTerms')?.addEventListener('click',(e)=>{ e.preventDefault(); window.openTermsModal(); });
+  document.getElementById('footerPrivacy')?.addEventListener('click',(e)=>{ e.preventDefault(); window.openPrivacyModal(); });
+}, 200);
+
+// Connection bar
+window.addEventListener('online',()=>{ let bar=document.getElementById('connection-status-bar'); bar.style.transform='translateY(0)'; document.getElementById('connMsg').innerText='¡Conexión restablecida! Es seguro usarlo.'; setTimeout(()=>{ bar.style.transform='translateY(100%)'; },9000); });
+window.addEventListener('offline',()=>{ let bar=document.getElementById('connection-status-bar'); bar.style.transform='translateY(0)'; document.getElementById('connMsg').innerText='¡Sin acceso a internet! Conectate a una red...'; });
+
+// Suscripción
+AppState.subscribe(()=>{ if(AppState.state.ui.currentScreen === 'login' && window.renderLoginScreen) window.renderLoginScreen(); else renderCurrentScreen(); });
+AppState.protectAppState();
+window.AppState = AppState.state;
+
+console.log("✅ Aplicación iniciada correctamente");
 </script>
 </body>
 </html>
