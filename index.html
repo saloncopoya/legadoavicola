@@ -267,8 +267,9 @@ async function loadUserProfile(uid) {
 
 // FUNCIÓN INICIALIZAR FIREBASE - CORREGIDA
 async function initializeFirebase() { 
-  if(AppState.state.firebase.isEnabled) return true;
-  
+// Verificar que AppState.state.firebase EXISTE antes de usarlo
+if(!AppState.state || !AppState.state.firebase) return false;
+if(AppState.state.firebase.isEnabled) return true;  
   // ESPERAR A QUE FIREBASE EXISTA
   let esperas = 0;
   while(typeof firebase === 'undefined' && esperas < 20) {
