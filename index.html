@@ -117,16 +117,16 @@
     color: white;
     font-weight: 700;
     text-align: center;
-    white-space: normal;  
-       word-break: break-word;
+    white-space: normal;  /* &#8592; PERMITE SALTOS DE LÍNEA */
+    word-break: break-word;
 }
 
 .ventas-screen td,
 #ventas-main-container td {
     padding: 10px 8px;
     border-bottom: 1px solid #eee;
-    white-space: normal;   
-        word-break: break-word;
+    white-space: normal;   /* &#8592; PERMITE SALTOS DE LÍNEA */
+    word-break: break-word;
 }
 
 /* RESPONSIVE MÓVIL - MISMO QUE PUBLIC */
@@ -542,9 +542,7 @@ animation: fadeIn 0.15s ease forwards;
 
   
   
-<div id='social-app' style='display: none;'>
-    <div id="public-main-container"></div>
-</div>
+<div id='social-app' style='display: none;'/>  
 
   
  <script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js'></script>
@@ -6050,31 +6048,42 @@ const lastScreen = localStorage.getItem('lastScreen');
     AppState.ui.pendingScreen = null;
   
   
-    
-  } else {
-    // --- Lógica ORIGINAL para usuarios NO recurrentes o que no están en la raíz ---
+   } else {
+    // --- Lógica CORREGIDA para usuarios NO recurrentes ---
     console.log("👤 Usuario no recurrente o con sección específica.");
     
-    // Leer URL inicial (igual que antes)
+    // Leer URL inicial
     const sectionParam = urlParams.get('section');
     const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
     const section = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
 
-    // Prioridad: URL > última pantalla > null
-    pantallaInicial = section;
-const lastScreen = localStorage.getItem('lastScreen');
-    if (!pantallaInicial && lastScreen && lastScreen !== 'public') {
-      pantallaInicial = lastScreen;
-      console.log(`📱 Restaurando pantalla anterior: ${lastScreen}`);
+    // Prioridad: URL > última pantalla > PUBLIC (no null)
+    let pantallaInicial = section;
+    const lastScreen = localStorage.getItem('lastScreen');
+    
+    // 🔥 CORRECCIÓN MÁS IMPORTANTE: Si no hay sección en la URL, ir a 'public'
+    if (!pantallaInicial) {
+        if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
+            pantallaInicial = lastScreen;
+            console.log(`📱 Restaurando pantalla anterior: ${lastScreen}`);
+        } else {
+            // 👇 ESTA ES LA LÍNEA MÁGICA QUE FALTABA
+            pantallaInicial = 'public';
+            console.log(`🏠 Sin sección en URL, yendo a pantalla pública por defecto`);
+        }
     }
     
     console.log("🌐 Pantalla inicial:", pantallaInicial);
     
-    // Guardar sección pendiente si existe y no es pública
+    // Guardar sección pendiente si existe
     if (pantallaInicial && pantallaInicial !== 'public') {
       AppState.ui.pendingScreen = pantallaInicial;
     }
+    
+    // 👇 NUEVO: Mostrar la pantalla de inmediato para evitar el blanco
+    AppState.setScreen(pantallaInicial);
   }
+  
   // ==============================================
   // FIN DE LA NUEVA LÓGICA
   // ==============================================
