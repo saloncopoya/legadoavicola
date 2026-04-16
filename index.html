@@ -1,519 +1,429 @@
 <!DOCTYPE html>
-<html lang='es-MX'>
+<html lang="es-MX">
 <head>
-<title>Calcutas y Subastas Javi Ruiz</title>
-<meta charset='UTF-8'/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; }
-    .top-nav-item.active { color: #8B4513; font-weight: 700; }
-    @media (max-width: 768px) {
-        .public-screen table, #public-main-container table { font-size: 9px !important; }
-        .public-screen th, .public-screen td { padding: 1px 1px !important; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Calcutas y Subastas Javi Ruiz</title>
+  <!-- Firebase v9 compat + Google Identity + html2canvas -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
-    @media (min-width: 768px) {
-        .public-screen table, #public-main-container table { font-size: 18px !important; }
-        .public-screen th, .public-screen td { padding: 12px 8px !important; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, 'Roboto', sans-serif;
+      background: #1a120b;
+      color: #f5ede0;
+      overflow-x: hidden;
     }
-    .ventas-screen th { background: #8B4513; color: white; padding: 12px 8px; }
-    #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999999; width: 90%; max-width: 350px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-    .toast-message { background: #323232; color: white; padding: 12px 20px; border-radius: 12px; font-weight: 500; text-align: center; pointer-events: auto; border-left: 5px solid; animation: fadeIn 0.15s ease; margin-bottom: 5px; }
-    .toast-success { background: #42b72a; border-left-color: #2e7d32; }
-    .toast-error { background: #d93025; border-left-color: #b71c1c; }
-    .toast-warning { background: #ff9800; border-left-color: #f57c00; }
-    .toast-info { background: #8B4513; border-left-color: #5e2e0e; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-    #connection-status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a2634; color: white; padding: 12px 16px; z-index: 9999; transform: translateY(100%); transition: transform 0.3s; display: flex; align-items: center; justify-content: center; gap: 16px; cursor: pointer; }
-    #connection-status-bar.visible { transform: translateY(0); }
-    button { cursor: pointer; transition: all 0.2s ease; }
+    /* loading screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #2e241f;
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.5s ease;
+      backdrop-filter: blur(2px);
+    }
+    .loader-container {
+      text-align: center;
+      width: 80%;
+      max-width: 320px;
+    }
+    .loader-logo {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .progress-bar-bg {
+      background: #5e3a2c;
+      border-radius: 40px;
+      height: 12px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    #loading-progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #d99e4c;
+      transition: width 0.3s ease;
+    }
+    #loading-status {
+      font-size: 0.9rem;
+      color: #e2c9a7;
+    }
+    /* main app container */
+    #social-app {
+      display: none;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+    /* side menu */
+    #side-menu {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 280px;
+      height: 100%;
+      background: #2c211b;
+      box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+      z-index: 100010;
+      transition: right 0.3s cubic-bezier(0.2,0.9,0.4,1.1);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem;
+      border-left: 1px solid #b97f44;
+    }
+    #side-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 100005;
+      display: none;
+      backdrop-filter: blur(3px);
+    }
+    .side-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #5e3e2c;
+      margin-bottom: 20px;
+    }
+    .side-avatar {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #8b5a2b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.6rem;
+      color: white;
+      object-fit: cover;
+    }
+    .side-info h4 {
+      font-size: 1rem;
+    }
+    .side-info p {
+      font-size: 0.7rem;
+      color: #cb9e6b;
+    }
+    .side-menu-item {
+      background: none;
+      border: none;
+      color: #f0e2d0;
+      padding: 14px 0;
+      text-align: left;
+      font-size: 1rem;
+      font-weight: 500;
+      border-bottom: 1px solid #3f2c21;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: 0.2s;
+    }
+    .side-menu-item.logout {
+      color: #f9a26c;
+      margin-top: auto;
+      border-top: 1px solid #5e3e2c;
+      margin-top: 20px;
+    }
+    /* toast container */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999999;
+      width: auto;
+      max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto;
+      background: #2c241e;
+      border-left: 5px solid;
+      border-radius: 14px;
+      padding: 12px 16px;
+      color: white;
+      font-size: 0.85rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      animation: fadeIn 0.25s ease;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+    .toast.success { border-left-color: #42b72a; background: #1f3a1a; }
+    .toast.error { border-left-color: #d93025; background: #401c1a; }
+    .toast.warning { border-left-color: #ff9800; background: #442b0a; }
+    .toast.info { border-left-color: #8B4513; }
+    .toast.blue { border-left-color: #2196F3; }
+    .toast.fade-out { animation: fadeOutClean 0.25s forwards; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(-10px);} to { opacity:1; transform: translateY(0);} }
+    @keyframes fadeOutClean { to { opacity:0; transform: scale(0.95); visibility: hidden; } }
+    /* connection bar */
+    #connection-status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #2c2e31;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.75rem;
+      z-index: 100000;
+      transform: translateY(100%);
+      transition: transform 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    /* skeletons */
+    .skeleton-card {
+      background: #2b2a28;
+      border-radius: 18px;
+      height: 100px;
+      margin: 12px;
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+    /* general responsive */
+    .screen-card {
+      background: #2a201a;
+      border-radius: 32px;
+      padding: 20px;
+      margin: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    button, .btn {
+      background: #b97f44;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 60px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
     button:active { transform: scale(0.97); }
-    .hidden { display: none !important; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 10px; }
-</style>
+    input, select {
+      background: #3b2c24;
+      border: 1px solid #7a532e;
+      padding: 12px;
+      border-radius: 30px;
+      color: white;
+      width: 100%;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.7rem;
+      color: #b99e7c;
+      border-top: 1px solid #4a3427;
+      margin-top: 20px;
+    }
+    @media (max-width: 768px) { .screen-card { margin: 12px; } }
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #1f1611;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 12px;
+      z-index: 1000;
+      border-top: 1px solid #885e38;
+    }
+    .nav-icon {
+      background: none;
+      font-size: 1.6rem;
+      padding: 6px;
+    }
+    .profile-nav {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid #b97f44;
+      background: #5e3a2c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
 </head>
 <body>
-
-<div id='side-menu' style='position: fixed; top: 0; right: -350px; width: 280px; height: 100vh; background: white; box-shadow: -5px 0 30px rgba(0,0,0,0.2); z-index: 1001; padding: 20px; transition: right 0.3s ease;'>
-    <div id='side-menu-content'></div>
+<div id="loading-screen">
+  <div class="loader-container">
+    <div class="loader-logo">🐓⚡</div>
+    <div class="progress-bar-bg"><div id="loading-progress-bar"></div></div>
+    <div id="loading-status">Iniciando...</div>
+    <div id="loading-sub" style="font-size: 0.7rem; margin-top: 12px;"></div>
+  </div>
 </div>
-<div id='side-menu-overlay' onclick='toggleSideMenu()' style='position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; display: none;'></div>
-
-<div id='toast-container'></div>
-
-<div id='loading-screen'>
-    <div style='font-size: 60px; color: white; margin-bottom: 20px;'>🐓</div>
-    <div style='font-size: 32px; color: white; font-weight: 800; margin-bottom: 30px; display: flex; gap: 5px;'><span>J</span><span>A</span><span>V</span><span>I</span><span> </span><span>R</span><span>U</span><span>I</span><span>Z</span></div>
-    <div style='width: 80%; max-width: 300px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 15px;'>
-        <div id='loading-progress-bar' style='width: 0%; height: 100%; background: #FFD700; transition: width 0.3s ease;'></div>
-    </div>
-    <div id='loading-status' style='font-size: 14px; color: rgba(255,255,255,0.9);'>Inicializando aplicación</div>
-    <button id='loading-reload-btn' onclick='location.reload()' style='display: none; margin-top: 25px; padding: 12px 30px; background: rgba(255,255,255,0.15); color: white; border-radius: 8px;'>⚠️ RECARGAR</button>
+<div id="social-app"></div>
+<div id="side-menu-overlay"></div>
+<div id="side-menu">
+  <div class="side-header" id="sideMenuProfile"></div>
+  <button class="side-menu-item" id="sidePerfilBtn">👤 MI PERFIL</button>
+  <button class="side-menu-item" id="sideShareBtn">🔗 COMPARTIR</button>
+  <button class="side-menu-item" id="sideSubastasBtn" style="display:none;">💰 SUBASTAS</button>
+  <button class="side-menu-item" id="sideJuezBtn" style="display:none;">⚖️ PANEL JUEZ</button>
+  <button class="side-menu-item" id="sideConfigBtn">⚙️ CONFIGURACIONES</button>
+  <button class="side-menu-item" id="sideAdminCotejoBtn" style="display:none;">🤖 CREAR COTEJO COMPUTARIZADO</button>
+  <button class="side-menu-item logout" id="sideLogoutBtn">🚪 CERRAR SESIÓN</button>
 </div>
-
-<div id='connection-status-bar'>
-    <span id='connection-status-message'>Verificando conexión...</span>
-</div>
-
-<div id='social-app' style='display: none;'></div>
-
-<script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js'></script>
-<script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js'></script>
-<script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js'></script>
-<script src='https://accounts.google.com/gsi/client'></script>
+<div id="toast-container"></div>
+<div id="connection-status-bar"><span id="connMsg"></span><span class="wifi-dots">📶</span></div>
+<footer style="margin-top: 2rem;"><span>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - v2.0</span><br><a href="#" id="footerTerms" style="color:#cb9e6b;">Términos</a> | <a href="#" id="footerPrivacy">Privacidad</a></footer>
 
 <script>
-// ==============================================
-// CONFIGURACIÓN COMPLETA
-// ==============================================
-window.FIREBASE_CONFIG = {
+  // ---------- CONFIGURACIONES FIREBASE ----------
+  const FIREBASE_MAIN = {
     apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
     authDomain: "galloslivebadge.firebaseapp.com",
     databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
     projectId: "galloslivebadge",
-    messagingSenderId: "979482928760",
-    appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
-};
+  };
+  const FIREBASE_ADMIN = {
+    apiKey: "AIzaSyBMON_hBlUJfE-_L6qrt8MEP6JZrculRcs",
+    authDomain: "premiumcotejosgallistico-59e76.firebaseapp.com",
+    databaseURL: "https://premiumcotejosgallistico-59e76-default-rtdb.firebaseio.com",
+    projectId: "premiumcotejosgallistico-59e76",
+  };
+  const GOOGLE_CLIENT_ID = "979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com";
 
-// ==============================================
-// RECURRENT USER MANAGER
-// ==============================================
-const RecurrentUserManager = {
-    STORAGE_KEY: 'legado_usuario_recurrente',
-    markAsRecurrent() { try { localStorage.setItem(this.STORAGE_KEY, 'true'); } catch(e) {} },
-    isRecurrent() { try { return localStorage.getItem(this.STORAGE_KEY) === 'true'; } catch(e) { return false; } },
-    clear() { try { localStorage.removeItem(this.STORAGE_KEY); } catch(e) {} }
-};
+  // ---------- AppState singleton ----------
+  window.AppState = (function() {
+    let state = {
+      firebase: { app: null, auth: null, database: null, isEnabled: false, isInitialized: false },
+      user: { current: null, profile: null },
+      ui: { currentScreen: 'public', pendingScreen: null, isLoading: true, isLoadingScreen: false, loadingScreenName: '', activeTab: 'login', formData: { register: {}, login: {} } },
+      rooster: { cotejoState: false, listener: null, tournamentInfo: null, roosters: [] },
+      persistentCache: { version: '2.0' },
+      subscribers: [],
+      _isNotifying: false
+    };
+    const cache = {
+      set(key, data, uid) { try { if(uid) localStorage.setItem(`app_${key}_${uid}`, JSON.stringify({data, ts: Date.now(), v: '2.0'})); } catch(e){} },
+      get(key, uid, maxAge=30*24*3600*1000) { try { let raw = localStorage.getItem(`app_${key}_${uid}`); if(!raw) return null; let obj = JSON.parse(raw); if(obj.v !== '2.0' || Date.now() - obj.ts > maxAge) { localStorage.removeItem(`app_${key}_${uid}`); return null; } return obj.data; } catch(e){ return null; } },
+      clearUserCache(uid) { Object.keys(localStorage).forEach(k => { if(k.startsWith('app_') && k.endsWith(uid)) localStorage.removeItem(k); }); },
+      setGlobal(key, data) { localStorage.setItem(`app_global_${key}`, JSON.stringify({data, ts: Date.now(), v:'2.0'})); },
+      getGlobal(key, maxAge=30*24*3600*1000) { let raw = localStorage.getItem(`app_global_${key}`); if(!raw) return null; let obj=JSON.parse(raw); if(obj.v !== '2.0' || Date.now()-obj.ts > maxAge) return null; return obj.data; }
+    };
+    function notify(prop) { if(state._isNotifying) return; state._isNotifying=true; state.subscribers.forEach(cb=>cb(prop)); state._isNotifying=false; }
+    return {
+      get state() { return state; },
+      setUser(userData, profileData) { state.user.current = userData; state.user.profile = profileData; notify('user'); },
+      clearUser() { if(state.rooster.listener && state.firebase.database) state.rooster.listener(); state.user.current = null; state.user.profile = null; notify('user'); },
+      setScreen(screen) { if(window[`${screen}Killer`] && typeof window[`${screen}Killer`]==='function') window[`${screen}Killer`](); state.ui.currentScreen = screen; localStorage.setItem('lastScreen', screen); notify('screen'); },
+      setLoading(loading) { state.ui.isLoading = loading; notify('loading'); },
+      addNotification(msg, type='info', dur=5000) { let cont=document.getElementById('toast-container'); if(!cont) return; let toast=document.createElement('div'); toast.className=`toast ${type}`; toast.innerText=msg; cont.appendChild(toast); setTimeout(()=>{ toast.classList.add('fade-out'); setTimeout(()=>toast.remove(),300); }, dur); toast.onclick=()=>{ toast.classList.add('fade-out'); setTimeout(()=>toast.remove(),300); }; },
+      persistentCache: cache,
+      subscribe(fn) { state.subscribers.push(fn); },
+      protectAppState() { if(state.user.profile) Object.freeze(state.user.profile); Object.preventExtensions(state); }
+    };
+  })();
 
-// ==============================================
-// APPSTATE COMPLETO
-// ==============================================
-const AppState = {
-    firebase: { app: null, auth: null, database: null, isEnabled: false },
-    user: { current: null, profile: null },
-    ui: { currentScreen: 'public', pendingScreen: null, isLoading: true, activeTab: 'login', formData: { register: {}, login: {} } },
-    persistentCache: {
-        enabled: true, version: '2.0',
-        set(key, data, uid) { try { localStorage.setItem(`app_${key}_${uid}`, JSON.stringify({ version: this.version, timestamp: Date.now(), uid, data })); } catch(e) {} },
-        get(key, uid, maxAge=30*24*60*60*1000) { try { const c = localStorage.getItem(`app_${key}_${uid}`); if(!c) return null; const d = JSON.parse(c); if(d.version !== this.version || Date.now()-d.timestamp > maxAge) return null; return d.data; } catch(e){ return null; } },
-        setGlobal(key, data) { try { localStorage.setItem(`global_${key}`, JSON.stringify({ version: this.version, timestamp: Date.now(), data })); } catch(e) {} },
-        getGlobal(key, maxAge=30*24*60*60*1000) { try { const c = localStorage.getItem(`global_${key}`); if(!c) return null; const d = JSON.parse(c); if(d.version !== this.version || Date.now()-d.timestamp > maxAge) return null; return d.data; } catch(e){ return null; } }
-    },
-    addNotification(message, type='info', duration=4000) {
-        const container = document.getElementById('toast-container');
-        if(!container) return;
-        const toast = document.createElement('div');
-        toast.className = `toast-message toast-${type}`;
-        toast.textContent = message;
-        toast.onclick = () => toast.remove();
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), duration);
-    },
-    setUser(userData, profileData) { this.user.current = userData; this.user.profile = profileData; this.renderApp(); },
-    clearUser() { this.user.current = null; this.user.profile = null; this.renderApp(); },
-    setScreen(screen) { this.ui.currentScreen = screen; this.renderApp(); },
-    renderApp() { renderApp(); }
-};
-
-// ==============================================
-// FUNCIONES AUXILIARES
-// ==============================================
-function getInitials(name) { if(!name) return '?'; return name[0].toUpperCase(); }
-function sanitizarInput(t) { if(!t) return ''; return String(t).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
-function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-
-const municipiosChiapas = [
-    { id: 1, nombre: "Tuxtla Gutiérrez", prefijo: "961" },
-    { id: 2, nombre: "Tapachula", prefijo: "962" },
-    { id: 3, nombre: "San Cristóbal de las Casas", prefijo: "967" }
-];
-
-const RateLimiter = {
-    recordAttempt(action) { const key = `rate_${action}`; const now = Date.now(); const attempts = JSON.parse(localStorage.getItem(key) || '[]'); const recent = attempts.filter(t => now - t < 900000); recent.push(now); localStorage.setItem(key, JSON.stringify(recent)); return recent.length; },
-    canAttempt(action, maxAttempts=5) { const key = `rate_${action}`; const now = Date.now(); const attempts = JSON.parse(localStorage.getItem(key) || '[]'); const recent = attempts.filter(t => now - t < 900000); localStorage.setItem(key, JSON.stringify(recent)); return recent.length < maxAttempts; }
-};
-
-// ==============================================
-// FINGERPRINT
-// ==============================================
-let cachedFingerprintPromise = null;
-function generateHash(str) {
-    if(cachedFingerprintPromise) return cachedFingerprintPromise;
-    if(window.crypto && window.crypto.subtle) {
-        cachedFingerprintPromise = crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(hash => Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join(''));
-        return cachedFingerprintPromise;
-    }
-    let hash = 0;
-    for(let i=0; i<str.length; i++) { const char = str.charCodeAt(i); hash = ((hash<<5)-hash)+char; hash = hash & hash; }
-    cachedFingerprintPromise = Promise.resolve(hash.toString(36));
-    return cachedFingerprintPromise;
-}
-window.getDeviceFingerprint = function() {
-    try {
-        let gpuRenderer = 'unknown';
-        try { const canvas = document.createElement('canvas'); const gl = canvas.getContext('webgl'); if(gl) { const debugInfo = gl.getExtension('WEBGL_debug_renderer_info'); if(debugInfo) gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL); } } catch(e) {}
-        const cpuCores = navigator.hardwareConcurrency || 'unknown';
-        const pixelRatio = window.devicePixelRatio || 1;
-        const physicalResolution = `${Math.round(screen.width * pixelRatio)}x${Math.round(screen.height * pixelRatio)}`;
-        const ua = navigator.userAgent;
-        let osFamily = 'unknown';
-        if(ua.includes('Android')) osFamily = 'android';
-        else if(ua.includes('iPhone')||ua.includes('iPad')) osFamily = 'ios';
-        else if(ua.includes('Windows')) osFamily = 'windows';
-        let architecture = 'unknown';
-        if(ua.includes('arm64')) architecture = 'arm64';
-        const components = { gpu: gpuRenderer, cores: cpuCores, resolution: physicalResolution, os: osFamily, arch: architecture };
-        const uniqueString = `${gpuRenderer}|${cpuCores}|${physicalResolution}|${osFamily}|${architecture}`;
-        return generateHash(uniqueString).then(hash => ({ fingerprint: hash, components: components, userAgent: ua }));
-    } catch(error) { return Promise.reject(error); }
-};
-
-// ==============================================
-// LOADING SCREEN
-// ==============================================
-let loadingTimeoutId = null;
-function showLoadingScreen(message, progress=0) {
-    const ls = document.getElementById('loading-screen');
-    if(ls) ls.style.display = 'flex';
-    const bar = document.getElementById('loading-progress-bar');
-    if(bar) bar.style.width = progress+'%';
-    const statusDiv = document.getElementById('loading-status');
-    if(statusDiv && message) statusDiv.textContent = message;
-    if(loadingTimeoutId) clearTimeout(loadingTimeoutId);
-    loadingTimeoutId = setTimeout(() => {
-        const btn = document.getElementById('loading-reload-btn');
-        if(btn && document.getElementById('loading-screen')?.style.display !== 'none') btn.style.display = 'block';
-    }, 15000);
-}
-function hideLoadingScreen() {
-    const ls = document.getElementById('loading-screen');
-    if(ls) ls.style.display = 'none';
-    if(loadingTimeoutId) clearTimeout(loadingTimeoutId);
-}
-function updateLoadingProgress(percent, message) {
-    const bar = document.getElementById('loading-progress-bar');
-    if(bar) bar.style.width = percent+'%';
-    const statusDiv = document.getElementById('loading-status');
-    if(statusDiv && message) statusDiv.textContent = message;
-}
-
-// ==============================================
-// FIREBASE Y AUTH
-// ==============================================
-function initializeFirebase() {
-    if(AppState.firebase.isEnabled) return true;
-    try {
-        const firebaseApp = firebase.initializeApp(window.FIREBASE_CONFIG);
-        AppState.firebase.app = firebaseApp;
-        AppState.firebase.auth = firebase.auth();
-        AppState.firebase.isEnabled = true;
-        setupAuthListener();
-        return true;
-    } catch(e) { console.error(e); return false; }
-}
-
-async function loadUserProfile(uid) {
-    if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
-    const cached = AppState.persistentCache.get('profile', uid);
-    if(cached) { AppState.setUser(AppState.firebase.auth.currentUser, cached); return true; }
-    const snap = await AppState.firebase.database.ref('users/'+uid).once('value');
-    if(snap.exists()) {
-        const profile = { id: uid, ...snap.val() };
-        AppState.persistentCache.set('profile', profile, uid);
-        AppState.setUser(AppState.firebase.auth.currentUser, profile);
-        return true;
-    }
-    return false;
-}
-
-async function verificarDispositivo(user) {
-    if(!user) return false;
-    if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
-    try {
-        const currentDevice = await window.getDeviceFingerprint();
-        const userSnap = await AppState.firebase.database.ref('users/'+user.uid).once('value');
-        if(!userSnap.exists()) return true;
-        const userProfile = userSnap.val();
-        const maxDevices = userProfile.maxDevices || 1;
-        const devicesSnap = await AppState.firebase.database.ref(`dispositivos_autorizados/${user.uid}`).once('value');
-        const authorizedDevices = devicesSnap.val() || {};
-        if(authorizedDevices[currentDevice.fingerprint]) {
-            await AppState.firebase.database.ref(`dispositivos_autorizados/${user.uid}/${currentDevice.fingerprint}/lastLogin`).set(firebase.database.ServerValue.TIMESTAMP);
-            return true;
-        }
-        const devicesCount = Object.keys(authorizedDevices).length;
-        if(devicesCount < maxDevices) {
-            await AppState.firebase.database.ref(`dispositivos_autorizados/${user.uid}/${currentDevice.fingerprint}`).set({ fingerprint: currentDevice.fingerprint, firstSeen: firebase.database.ServerValue.TIMESTAMP, verified: true });
-            return true;
-        }
-        await AppState.firebase.auth.signOut();
-        AppState.addNotification(`🚫 LÍMITE DE DISPOSITIVOS ALCANZADO (${maxDevices}). Contacta al administrador.`, 'error', 8000);
-        return false;
-    } catch(e) { return false; }
-}
-
-function setupAuthListener() {
-    if(!AppState.firebase.auth) return;
-    AppState.firebase.auth.onAuthStateChanged(async (user) => {
-        if(user) {
-            if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
-            const accesoPermitido = await verificarDispositivo(user);
-            if(!accesoPermitido) { AppState.clearUser(); AppState.setScreen('public'); return; }
-            const perfilExiste = await loadUserProfile(user.uid);
-            if(!perfilExiste) return;
-            const profile = AppState.user.profile;
-            if(profile?.activated === true) { RecurrentUserManager.markAsRecurrent(); AppState.setScreen('public'); }
-            else { AppState.setScreen('activation_pending'); }
-            hideLoadingScreen();
-        } else {
-            AppState.clearUser();
-            if(AppState.ui.currentScreen !== 'public') AppState.setScreen('public');
-            hideLoadingScreen();
-        }
-    });
-}
-
-// ==============================================
-// GOOGLE LOGIN
-// ==============================================
-window.handleGoogleCredentialResponse = async function(response) {
-    showLoadingScreen('Autenticando con Google...', 50);
-    try {
-        if(!AppState.firebase.isEnabled) initializeFirebase();
-        const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
-        const result = await AppState.firebase.auth.signInWithCredential(credential);
-        if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
-        const user = result.user;
-        const snap = await AppState.firebase.database.ref('users/'+user.uid).once('value');
-        if(!snap.exists()) {
-            await AppState.firebase.database.ref('users/'+user.uid).set({
-                uid: user.uid, displayName: user.displayName, realEmail: user.email, photoURL: user.photoURL,
-                registeredAt: Date.now(), registeredWith: 'google', maxDevices: 1,
-                activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false
-            });
-            await loadUserProfile(user.uid);
-            AppState.addNotification('✅ Registro exitoso. Pendiente de activación.', 'success');
-            AppState.setScreen('activation_pending');
-        } else {
-            await loadUserProfile(user.uid);
-            const profile = AppState.user.profile;
-            if(profile?.activated === true) AppState.setScreen('public');
-            else AppState.setScreen('activation_pending');
-        }
-        hideLoadingScreen();
-    } catch(error) { hideLoadingScreen(); AppState.addNotification('Error con Google', 'error'); }
-};
-
-window.mostrarModalGoogleInferior = function() {
-    if(AppState.user.current) return;
-    let container = document.getElementById('google-one-tap-container');
-    if(!container) { container = document.createElement('div'); container.id = 'google-one-tap-container'; container.style.cssText = 'position:fixed; bottom:20px; left:0; right:0; display:flex; justify-content:center; z-index:10001;'; document.body.appendChild(container); }
-    google.accounts.id.initialize({ client_id: '979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com', callback: window.handleGoogleCredentialResponse });
-    google.accounts.id.prompt();
-};
-
-// ==============================================
-// LOGIN / REGISTER
-// ==============================================
-window.handleLogin = async function() {
-    const email = document.getElementById('loginPhone')?.value.trim();
-    const password = document.getElementById('loginPassword')?.value;
-    if(!email || !password) { AppState.addNotification('Completa todos los campos', 'warning'); return; }
-    if(!RateLimiter.canAttempt(`login_${email}`, 3)) { AppState.addNotification('Demasiados intentos.', 'error'); return; }
-    if(!AppState.firebase.isEnabled) initializeFirebase();
-    showLoadingScreen('Iniciando sesión...', 30);
-    try {
-        RateLimiter.recordAttempt(`login_${email}`);
-        await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
-        hideLoadingScreen();
-    } catch(error) { hideLoadingScreen(); AppState.addNotification('❌ Email o contraseña incorrectos', 'error'); }
-};
-
-window.handleCompleteRegister = async function() {
-    const fullName = sanitizarInput(document.getElementById('registerFullName')?.value || '');
-    const realEmail = document.getElementById('registerRealEmail')?.value.trim();
-    const partyName = sanitizarInput(document.getElementById('registerPartyName')?.value || '');
-    const representative = sanitizarInput(document.getElementById('registerRepresentative')?.value || '');
-    const phoneNumber = document.getElementById('registerPhone')?.value.trim() || '';
-    const password = document.getElementById('registerPassword')?.value;
-    const confirmPassword = document.getElementById('registerConfirmPassword')?.value;
-    const termsAccepted = document.getElementById('registerTerms')?.checked || false;
-    
-    if(!fullName || !realEmail || !password) { AppState.addNotification('Completa campos obligatorios', 'error'); return; }
-    if(!validateEmail(realEmail)) { AppState.addNotification('Email inválido', 'error'); return; }
-    if(password.length < 6) { AppState.addNotification('Contraseña mínimo 6 caracteres', 'error'); return; }
-    if(password !== confirmPassword) { AppState.addNotification('Las contraseñas no coinciden', 'error'); return; }
-    if(!termsAccepted) { AppState.addNotification('Debes aceptar los términos', 'error'); return; }
-    if(!AppState.firebase.isEnabled) initializeFirebase();
-    showLoadingScreen('Registrando cuenta...', 20);
-    try {
-        const userCredential = await AppState.firebase.auth.createUserWithEmailAndPassword(realEmail, password);
-        if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
-        const user = userCredential.user;
-        await user.updateProfile({ displayName: fullName });
-        await AppState.firebase.database.ref('users/'+user.uid).set({
-            uid: user.uid, displayName: fullName, realEmail: realEmail, registeredAt: Date.now(), registeredWith: 'email',
-            activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, maxDevices: 1,
-            ...(partyName && { partyName }), ...(representative && { representative }), ...(phoneNumber && { phone: phoneNumber })
-        });
-        await AppState.firebase.auth.signOut();
-        AppState.addNotification('✅ Cuenta creada. Pendiente de activación.', 'success');
-        hideLoadingScreen();
-        AppState.setScreen('public');
-    } catch(error) { hideLoadingScreen(); AppState.addNotification('Error al registrar', 'error'); }
-};
-
-window.resetPassword = async function() {
-    const email = document.getElementById('loginPhone')?.value.trim();
-    if(!email) { AppState.addNotification('Ingresa tu correo', 'error'); return; }
-    if(!AppState.firebase.auth) initializeFirebase();
-    try { await AppState.firebase.auth.sendPasswordResetEmail(email); AppState.addNotification(`✅ Enlace enviado a ${email}`, 'success'); } catch(e) { AppState.addNotification('Error al enviar', 'error'); }
-};
-
-window.handleLogout = async function() {
-    if(AppState.user.current?.uid && AppState.persistentCache) { try { for(let i=0; i<localStorage.length; i++){ const k=localStorage.key(i); if(k && k.startsWith('app_') && k.endsWith(AppState.user.current.uid)) localStorage.removeItem(k); } } catch(e){} }
-    RecurrentUserManager.clear();
-    if(AppState.firebase.auth) await AppState.firebase.auth.signOut();
-    AppState.clearUser();
-    localStorage.removeItem('lastScreen');
-    sessionStorage.clear();
-    window.history.pushState({}, '', '/');
-    AppState.setScreen('public');
-    hideLoadingScreen();
-};
-
-// ==============================================
-// RENDER PANTALLAS
-// ==============================================
-function renderPublicScreen() {
-    return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px;"><div style="background:linear-gradient(135deg,#8B4513 0%,#D2691E 100%); border-radius:24px; padding:40px 20px; text-align:center; margin-bottom:30px; color:white;"><div style="font-size:60px;">🐓</div><h1 style="font-size:28px;">CALCUTAS Y SUBASTAS</h1><p>JAVI RUIZ</p><button onclick="handleLoginClick()" style="background:#FFD700; color:#8B4513; border:none; padding:14px 30px; border-radius:50px; font-weight:bold; margin-top:20px;">🔐 INICIAR SESIÓN</button></div><div style="background:white; border-radius:20px; padding:24px;"><h2 style="color:#8B4513;">📌 ¿Qué es esto?</h2><p>Plataforma especializada para aficionados, criadores, jueces y organizadores de toda Latinoamérica.</p><div style="display:grid; grid-template-columns:repeat(2,1fr); gap:15px; margin-top:20px;"><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">🏆</div><div>Torneos</div></div><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">💰</div><div>Subastas</div></div><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">🧬</div><div>Pedigrí</div></div><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">⚖️</div><div>Jueces</div></div></div></div></div></div>`;
-}
-
-function renderPublicTopBar() {
-    return `<nav style="position:fixed; top:0; left:0; right:0; height:50px; background:white; display:flex; justify-content:space-between; align-items:center; padding:0 16px; z-index:1000; box-shadow:0 2px 10px rgba(0,0,0,0.1);"><button onclick="handleLoginClick()" style="background:transparent; border:2px solid #8B4513; border-radius:30px; padding:8px 12px; font-weight:700;">🔑 INICIAR SESIÓN</button><button onclick="navigateTo('share')" style="background:#f5f5f5; border:2px solid #8B4513; border-radius:40px; padding:8px 16px;">🔗 Publicaciones</button><button onclick="mostrarModalInformativo()" style="background:transparent; border:none; font-size:24px;">ℹ️</button></nav>`;
-}
-
-function renderLoginScreen() {
-    return `<div style="position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifOZH9-0lYvE26eERqh2GlCJ8FluQTtfWIv0511ORLE78-buORw3OT-V5jHrU8yRK-HX_AmMD3FQRF2wiVUVLNKkEhepibWafLLBPvX6YNsTuRL3uJ1OpVD1bcJ9R4FBXfBN9xyYOG3b_v1fMuqZOLkaZrfCJmltGJZsZhKN-5IM7WfstdaM_0ry0nLEY/s320/Gemini_Generated_Image_4l1ocl4l1ocl4l1o.png'); background-size:cover; display:flex; align-items:center; justify-content:center;"><div style="background:white; border-radius:28px; padding:20px; width:90%; max-width:400px;"><div style="display:flex; gap:8px; margin-bottom:20px;"><button onclick="showLoginForm()" id="tabLoginBtn" style="flex:1; padding:10px; background:#8B4513; color:white; border:none; border-radius:30px;">🔐 CORREO</button><button onclick="showRegisterForm()" id="tabRegBtn" style="flex:1; padding:10px; background:#f0f0f0; color:#666; border:none; border-radius:30px;">📝 Registrar</button></div><div id="loginFormDiv"><input type="email" id="loginPhone" placeholder="Correo electrónico" style="width:100%; padding:14px; margin-bottom:12px; border-radius:8px; border:1px solid #ddd;"><input type="password" id="loginPassword" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:12px; border-radius:8px; border:1px solid #ddd;"><button onclick="handleLogin()" style="width:100%; background:#8B4513; color:white; padding:14px; border:none; border-radius:40px; font-weight:bold;">ACCEDER</button><div style="text-align:center; margin-top:12px;"><a href="#" onclick="resetPassword()" style="color:#8B4513;">¿Olvidaste contraseña?</a></div><button onclick="mostrarModalGoogleInferior()" style="width:100%; margin-top:12px; background:#4285F4; color:white; padding:12px; border:none; border-radius:40px;">🔵 Iniciar con Google</button></div><div id="registerFormDiv" style="display:none;"><input type="text" id="registerFullName" placeholder="Nombre completo *" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="email" id="registerRealEmail" placeholder="Correo electrónico *" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="text" id="registerPartyName" placeholder="Partido (opcional)" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="text" id="registerRepresentative" placeholder="Representante (opcional)" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="tel" id="registerPhone" placeholder="Teléfono (opcional)" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="password" id="registerPassword" placeholder="Contraseña *" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="password" id="registerConfirmPassword" placeholder="Confirmar *" style="width:100%; padding:12px; margin-bottom:12px; border-radius:8px;"><label style="display:flex; gap:8px;"><input type="checkbox" id="registerTerms"> Acepto términos</label><button onclick="handleCompleteRegister()" style="width:100%; margin-top:16px; background:#8B4513; color:white; padding:14px; border:none; border-radius:40px;">CREAR CUENTA</button></div></div></div>`;
-}
-
-function renderActivationPendingScreen() {
-    const p = AppState.user.profile || {};
-    return `<div style="min-height:100vh; background:linear-gradient(135deg,#8B4513,#D2691E); display:flex; align-items:center; justify-content:center;"><div style="background:white; border-radius:20px; padding:24px; max-width:400px; text-align:center;"><div style="font-size:60px;">⏳</div><h2>Cuenta en revisión</h2><p>${p.displayName || 'Usuario'}, tu cuenta está pendiente de activación.</p><button onclick="checkActivationStatus()" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:40px; margin-top:16px;">Verificar estado</button><button onclick="handleLogout()" style="background:#f0f2f5; margin-top:12px; padding:12px 24px; border:none; border-radius:40px;">Cerrar sesión</button></div></div>`;
-}
-
-window.renderShareScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🔗 Publicaciones Compartidas</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderVentasScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>💰 Calcutas y Subastas</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderRoosterScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🏆 Torneos</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderPerfilScreen = function() { const p=AppState.user.profile||{}; return `<div style="padding-top:80px; text-align:center;"><div style="width:80px;height:80px;background:#8B4513;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px;color:white;">👤</div><h2>${p.displayName||'Usuario'}</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderAdminScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🔧 Panel Admin</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderPublicacionesScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>⚔️ Enfrentamientos</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderPedigriScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🧬 Pedigrí</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderJuezScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>⚖️ Panel Juez</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-window.renderConfiguracionesScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>⚙️ Configuración</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div>`; };
-
-function renderMobileNavBar() {
-    if(!AppState.user.current) return '';
-    const p = AppState.user.profile || {};
-    return `<nav style="position:fixed; top:0; left:0; right:0; height:60px; background:white; display:flex; justify-content:space-between; align-items:center; padding:0 16px; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,0.1);"><div style="display:flex; gap:8px;"><button onclick="navigateTo('public')" style="background:transparent; border:none; font-size:24px;">🏠</button><button onclick="navigateTo('share')" style="background:transparent; border:none;">🔗</button>${p.ventas ? '<button onclick="navigateTo(\'ventas\')" style="background:transparent; border:none;">💰</button>' : ''}</div><button onclick="toggleSideMenu()" style="width:40px; height:40px; border-radius:50%; background:#8B4513; color:white; border:none;">☰</button></nav>`;
-}
-
-function updateSideMenuContent() {
-    const menu = document.getElementById('side-menu-content');
-    if(!menu) return;
-    const p = AppState.user.profile;
-    if(!p) return;
-    menu.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:30px;"><div><strong>${p.displayName||'Usuario'}</strong><div style="font-size:12px;">${p.gallo ? 'Admin' : 'Miembro'}</div></div><button onclick="toggleSideMenu()" style="background:none; border:none; font-size:24px;">✕</button></div><button onclick="navigateTo('perfil')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">👤 Mi Perfil</button><button onclick="navigateTo('share')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">🔗 Publicaciones</button>${p.ventas ? '<button onclick="navigateTo(\'ventas\')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">💰 Subastas</button>' : ''}${p.isJudge ? '<button onclick="navigateTo(\'juez\')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">⚖️ Juez</button>' : ''}<button onclick="handleLogout()" style="display:block; width:100%; padding:12px; margin-top:20px; background:#d32f2f; color:white; border:none; border-radius:12px;">🚪 Cerrar Sesión</button>`;
-}
-
-function toggleSideMenu() {
-    const menu = document.getElementById('side-menu');
-    const overlay = document.getElementById('side-menu-overlay');
-    if(menu.style.right === '0px') { menu.style.right = '-350px'; overlay.style.display = 'none'; document.body.style.overflow = ''; }
-    else { menu.style.right = '0px'; overlay.style.display = 'block'; document.body.style.overflow = 'hidden'; updateSideMenuContent(); }
-}
-
-function renderApp() {
-    const appDiv = document.getElementById('social-app');
-    if(!appDiv) return;
-    const screen = AppState.ui.currentScreen;
-    const user = AppState.user.current;
-    let topBar = '';
-    if(user && screen !== 'login' && screen !== 'activation_pending') topBar = renderMobileNavBar();
-    else if(screen === 'public') topBar = renderPublicTopBar();
-    let content = '';
-    if(screen === 'public') content = renderPublicScreen();
-    else if(screen === 'login') content = renderLoginScreen();
-    else if(screen === 'activation_pending') content = renderActivationPendingScreen();
-    else if(screen === 'share') content = window.renderShareScreen();
-    else if(screen === 'ventas') content = window.renderVentasScreen();
-    else if(screen === 'rooster') content = window.renderRoosterScreen();
-    else if(screen === 'perfil') content = window.renderPerfilScreen();
-    else if(screen === 'admin') content = window.renderAdminScreen();
-    else if(screen === 'publicaciones') content = window.renderPublicacionesScreen();
-    else if(screen === 'pedigri') content = window.renderPedigriScreen();
-    else if(screen === 'juez') content = window.renderJuezScreen();
-    else if(screen === 'configuraciones') content = window.renderConfiguracionesScreen();
-    else content = renderPublicScreen();
-    appDiv.innerHTML = topBar + `<div style="padding-top: ${topBar ? '60px' : '0'};">${content}</div>`;
-}
-
-// ==============================================
-// GLOBALES Y NAVEGACIÓN
-// ==============================================
-window.navigateTo = function(section) {
-    if(section === 'login' && !AppState.firebase.isEnabled) initializeFirebase();
-    if(section !== 'login' && section !== 'public' && !AppState.user.current) { AppState.addNotification('Debes iniciar sesión', 'warning'); section = 'public'; }
-    AppState.setScreen(section);
-    window.history.pushState({}, '', `/?section=${section}`);
-};
-
-window.checkActivationStatus = async function() {
-    if(!AppState.user.current || !AppState.firebase.database) { AppState.addNotification('Error', 'error'); return; }
-    const snap = await AppState.firebase.database.ref('users/'+AppState.user.current.uid+'/activated').once('value');
-    if(snap.val() === true) { AppState.addNotification('✅ ¡Cuenta activada!', 'success'); await loadUserProfile(AppState.user.current.uid); AppState.setScreen('public'); }
-    else { AppState.addNotification('⏳ Cuenta no activada aún', 'warning'); }
-};
-
-window.showLoginForm = function() { document.getElementById('loginFormDiv').style.display='block'; document.getElementById('registerFormDiv').style.display='none'; document.getElementById('tabLoginBtn').style.background='#8B4513'; document.getElementById('tabRegBtn').style.background='#f0f0f0'; };
-window.showRegisterForm = function() { document.getElementById('loginFormDiv').style.display='none'; document.getElementById('registerFormDiv').style.display='block'; document.getElementById('tabRegBtn').style.background='#8B4513'; document.getElementById('tabLoginBtn').style.background='#f0f0f0'; };
-window.handleLoginClick = function() { if(!AppState.firebase.isEnabled) initializeFirebase(); navigateTo('login'); setTimeout(() => mostrarModalGoogleInferior(), 500); };
-window.mostrarModalInformativo = function() { AppState.addNotification('CALCUTAS Y SUBASTAS JAVI RUIZ - Versión 2.0', 'info'); };
-window.logoutAndGoPublic = handleLogout;
-
-// ==============================================
-// CONEXIÓN Y CARGA INICIAL
-// ==============================================
-function updateConnectionBar() {
-    const bar = document.getElementById('connection-status-bar');
-    const msg = document.getElementById('connection-status-message');
-    if(!navigator.onLine) { bar.classList.add('visible'); bar.style.backgroundColor = '#626466'; msg.textContent = '¡Sin acceso a internet! Conectate a una red....'; }
-    else if(bar.classList.contains('visible')) { bar.classList.remove('visible'); }
-}
-window.addEventListener('online', updateConnectionBar);
-window.addEventListener('offline', updateConnectionBar);
-updateConnectionBar();
-
-window.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const section = urlParams.get('section');
-    if(section && ['public','login','share','ventas','rooster','perfil','admin'].includes(section)) AppState.ui.currentScreen = section;
-    initializeFirebase();
-    renderApp();
-    setTimeout(() => {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('social-app').style.display = 'block';
-        if(AppState.ui.currentScreen === 'public' && !AppState.user.current) setTimeout(() => mostrarModalGoogleInferior(), 2000);
-    }, 1500);
-});
+  // helpers globales
+  window.getInitials = (name) => name ? name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '??';
+  window.formatTime = (ts) => { let diff = Date.now() - ts; if(diff<60000) return 'Ahora'; if(diff<3600000) return `${Math.floor(diff/60000)} min`; if(diff<86400000) return `${Math.floor(diff/3600000)} h`; return new Date(ts).toLocaleDateString(); };
+  window.toggleSideMenu = (open) => { let menu = document.getElementById('side-menu'); let overlay = document.getElementById('side-menu-overlay'); if(open===true || (menu.style.right !== '0px' && open!==false)) { menu.style.right = '0px'; overlay.style.display = 'block'; document.body.style.overflow='hidden'; } else { menu.style.right = '-350px'; overlay.style.display = 'none'; document.body.style.overflow=''; } };
+  function updateSideMenuContent() { let prof = AppState.state.user.profile; let user = AppState.state.user.current; let container = document.getElementById('sideMenuProfile'); if(container && user) { container.innerHTML = `<div class="side-avatar">${user.photoURL ? `<img src="${user.photoURL}" width="55" style="border-radius:50%">` : window.getInitials(user.displayName||user.email)}</div><div class="side-info"><h4>${user.displayName || 'Sin nombre'}</h4><p>${prof?.activated ? 'Activado' : 'Pendiente'}</p></div>`; } let subastaBtn=document.getElementById('sideSubastasBtn'); if(subastaBtn) subastaBtn.style.display = prof?.ventas ? 'flex' : 'none'; let juezBtn=document.getElementById('sideJuezBtn'); if(juezBtn) juezBtn.style.display = prof?.isJudge ? 'flex' : 'none'; let adminBtn=document.getElementById('sideAdminCotejoBtn'); if(adminBtn) adminBtn.style.display = prof?.gallo ? 'flex' : 'none'; }
+  window.navigateTo = (section) => { if(navigator.userAgent.includes('Googlebot')) return; window.toggleSideMenu(false); if(section!=='login' && section!=='activation_pending') localStorage.setItem('lastScreen', section); AppState.setScreen(section); renderCurrentScreen(); };
+  function renderCurrentScreen() { let scr = AppState.state.ui.currentScreen; let loader = AppState.state.ui.isLoadingScreen; if(loader && window.renderScreenSkeleton) window.renderScreenSkeleton(AppState.state.ui.loadingScreenName); else if(window[`render${scr.charAt(0).toUpperCase()+scr.slice(1)}Screen`]) window[`render${scr.charAt(0).toUpperCase()+scr.slice(1)}Screen`](); else document.getElementById('social-app').innerHTML = '<div class="screen-card">Error 404</div>'; }
+  // Killer placeholders
+  window.publicKiller = ()=>{};
+  window.ventasKiller = ()=>{};
+  window.shareKiller = ()=>{};
+  window.roosterKiller = ()=>{};
+  window.adminKiller = ()=>{};
+  // Pantalla publica
+  window.renderPublicScreen = () => { let html = `<div style="text-align:center;padding:2rem;"><div style="font-size:4rem;">🐓🔥</div><h1>CALCUTAS Y SUBASTAS</h1><h3>JAVI RUIZ</h3><button id="publicLoginBtn" class="btn">🔐 INICIAR SESIÓN</button><div class="screen-card"><h4>📌 ¿Qué es esto?</h4><p>Plataforma de torneos, subastas y pedigrí gallístico.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;"><div>🏆 Torneos</div><div>💰 Subastas</div><div>🧬 Pedigrí</div><div>⚖️ Jueces</div></div></div></div>`; document.getElementById('social-app').innerHTML = html; document.getElementById('publicLoginBtn')?.addEventListener('click', ()=>window.handleLoginClick()); };
+  window.renderLoginScreen = () => { let html = `<div class="screen-card"><div style="display:flex; gap:10px;"><button id="tabLoginBtn" class="btn" style="flex:1">🔐 CORREO ELECTRONICO</button><button id="tabRegisterBtn" class="btn" style="flex:1">📝 Registrar</button></div><div id="loginFormContainer"><input type="email" id="loginPhone" placeholder="Correo electrónico" /><input type="password" id="loginPassword" placeholder="Contraseña" /><button id="doLoginBtn">ACCEDER</button><a href="#" id="resetPassLink">¿Olvidaste contraseña?</a></div><div id="registerFormContainer" style="display:none;"></div><button id="googleSuperiorBtn" class="btn" style="margin-top:12px;">🔑 ACCEDER CON GOOGLE</button></div>`; document.getElementById('social-app').innerHTML = html; document.getElementById('tabLoginBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='block'; document.getElementById('registerFormContainer').style.display='none'; }; document.getElementById('tabRegisterBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='none'; document.getElementById('registerFormContainer').style.display='block'; if(!document.getElementById('registerFormContainer').innerHTML) window.renderRegisterForm(); }; document.getElementById('doLoginBtn').onclick = () => window.handleLogin(); document.getElementById('resetPassLink').onclick = (e) => { e.preventDefault(); window.resetPassword(); }; document.getElementById('googleSuperiorBtn').onclick = () => window.mostrarModalGoogleSuperior(); window.renderRegisterForm = function() { let municipios = ['Tuxtla Gutiérrez','Tapachula','Comitán','San Cristóbal','Otro']; let opts = municipios.map(m=>`<option value="${m}">${m}</option>`).join(''); let formHtml = `<input id="registerFullName" placeholder="Nombre completo" /><input id="registerRealEmail" placeholder="Email real" /><input id="registerPartyName" placeholder="Nombre del partido (opcional)" /><input id="registerRepresentative" placeholder="Representante/Criadero" /><select id="registerMunicipio">${opts}</select><input id="registerCustomMunicipio" placeholder="Otro municipio" style="display:none;" /><input id="registerPhone" placeholder="Teléfono 7 dígitos" /><input id="registerPassword" type="password" placeholder="Contraseña" /><input id="registerConfirmPassword" type="password" placeholder="Confirmar" /><label><input type="checkbox" id="registerTerms" /> Acepto términos</label><button id="completeRegisterBtn">REGISTRARSE</button>`; document.getElementById('registerFormContainer').innerHTML = formHtml; document.getElementById('completeRegisterBtn').onclick = () => window.handleCompleteRegister(); let munSelect = document.getElementById('registerMunicipio'); let customMun = document.getElementById('registerCustomMunicipio'); munSelect.onchange = () => { customMun.style.display = munSelect.value === 'Otro' ? 'block' : 'none'; }; }; if(document.getElementById('registerFormContainer')) window.renderRegisterForm(); };
+  window.handleLogin = async () => { let email = document.getElementById('loginPhone')?.value; let pwd = document.getElementById('loginPassword')?.value; if(!email || !pwd) return AppState.addNotification("Complete campos", "warning"); try { await AppState.state.firebase.auth.signInWithEmailAndPassword(email, pwd); AppState.addNotification("Bienvenido", "success"); await loadUserProfile(AppState.state.user.current.uid); navigateTo('public'); } catch(e) { AppState.addNotification(e.message, "error"); } };
+  window.resetPassword = async () => { let email = document.getElementById('loginPhone')?.value; if(!email) return AppState.addNotification("Ingrese email", "warning"); try { await AppState.state.firebase.auth.sendPasswordResetEmail(email); AppState.addNotification("Correo enviado", "info"); } catch(e) { AppState.addNotification(e.message, "error"); } };
+  window.handleCompleteRegister = async () => { let email=document.getElementById('registerRealEmail')?.value, pwd=document.getElementById('registerPassword')?.value, confirm=document.getElementById('registerConfirmPassword')?.value; if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden","error"); try { let cred = await AppState.state.firebase.auth.createUserWithEmailAndPassword(email, pwd); await cred.user.updateProfile({displayName: document.getElementById('registerFullName').value}); let newProfile = { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, displayName: document.getElementById('registerFullName').value, realEmail: email, phone: document.getElementById('registerPhone').value || '' }; await AppState.state.firebase.database.ref(`users/${cred.user.uid}`).set(newProfile); AppState.addNotification("Registro exitoso, espera activación","success"); navigateTo('activation_pending'); } catch(e) { AppState.addNotification(e.message,"error"); } };
+  // Pantalla activation pending
+  window.renderActivationPendingScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card"><div>⏳ Cuenta en revisión</div><p>Espera la activación por un administrador.</p><button id="checkActivationBtn">Verificar estado</button><button id="logoutPendingBtn">Cerrar sesión</button></div>`; document.getElementById('checkActivationBtn').onclick = () => window.checkActivationStatusWithFeedback(); document.getElementById('logoutPendingBtn').onclick = () => window.handleLogout(); };
+  window.checkActivationStatusWithFeedback = async () => { let uid = AppState.state.user.current?.uid; let snap = await AppState.state.firebase.database.ref(`users/${uid}/activated`).once('value'); if(snap.val() === true) { AppState.addNotification("Cuenta activada!", "success"); await loadUserProfile(uid); navigateTo('public'); } else AppState.addNotification("Aún pendiente", "warning"); };
+  // pantallas placeholder
+  window.renderShareScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🔗 Publicaciones compartidas (próximamente)<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderVentasScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">💰 Subastas en construcción<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderRoosterScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🏆 Torneos en desarrollo<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderJuezScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚖️ Panel del Juez<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderPerfilScreen = () => { let user = AppState.state.user.current; document.getElementById('social-app').innerHTML = `<div class="screen-card"><div>👤 ${user?.displayName || user?.email}</div><button onclick="navigateTo('public')">Inicio</button></div>`; };
+  window.renderConfiguracionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚙️ Configuraciones próximamente<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderPublicacionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚔️ Enfrentamientos en construcción<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderPedigriScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🧬 Pedigrí en construcción<button onclick="navigateTo('public')">Volver</button></div>`; };
+  window.renderAdminScreen = () => { let profile = AppState.state.user.profile; if(profile?.gallo !== true) { document.getElementById('social-app').innerHTML = `<div class="screen-card">Acceso denegado</div>`; return; } document.getElementById('social-app').innerHTML = `<div class="screen-card">👑 Panel Administración (próximamente)</div>`; };
+  // ---------- Firebase & Loading ----------
+  async function loadUserProfile(uid) { if(!AppState.state.firebase.database) AppState.state.firebase.database = firebase.database(); let cached = AppState.persistentCache.get('profile', uid); if(cached) { AppState.setUser(AppState.state.user.current, cached); updateSideMenuContent(); return true; } let snap = await AppState.state.firebase.database.ref(`users/${uid}`).once('value'); let data = snap.val() || { activated: false }; AppState.persistentCache.set('profile', data, uid); AppState.setUser(AppState.state.user.current, data); updateSideMenuContent(); return true; }
+  async function initializeFirebase() { if(AppState.state.firebase.isEnabled) return; try { firebase.initializeApp(FIREBASE_MAIN); AppState.state.firebase.auth = firebase.auth(); AppState.state.firebase.isEnabled = true; AppState.state.firebase.database = firebase.database(); firebase.auth().onAuthStateChanged(async (user) => { if(user) { AppState.setUser(user, null); await loadUserProfile(user.uid); if(AppState.state.user.profile?.activated) navigateTo('public'); else navigateTo('activation_pending'); } else { AppState.clearUser(); navigateTo('public'); } hideLoadingScreen(); }); } catch(e) { console.error(e); } }
+  function hideLoadingScreen() { let ls = document.getElementById('loading-screen'); if(ls) { ls.style.opacity='0'; setTimeout(()=>{ ls.style.display='none'; document.getElementById('social-app').style.display='block'; },500); } AppState.setLoading(false); }
+  function updateLoadingProgress(percent, msg) { let bar = document.getElementById('loading-progress-bar'); let status = document.getElementById('loading-status'); if(bar) bar.style.width = `${percent}%`; if(status) status.innerText = msg||''; }
+  window.handleLoginClick = () => { if(!AppState.state.firebase.isEnabled) initializeFirebase(); navigateTo('login'); };
+  window.handleLogout = async () => { window.toggleSideMenu(false); AppState.addNotification("Cerrando sesión...","info"); AppState.persistentCache.clearUserCache(AppState.state.user.current?.uid); localStorage.removeItem('legado_usuario_recurrente'); try { await AppState.state.firebase.auth.signOut(); } catch(e){} AppState.clearUser(); navigateTo('public'); location.reload(); };
+  // google modals
+  window.mostrarModalGoogleInferior = () => { if(document.getElementById('google-one-tap-container')) return; let div = document.createElement('div'); div.id='google-one-tap-container'; div.style.position='fixed'; div.style.bottom='20px'; div.style.left='0'; div.style.width='100%'; div.style.display='flex'; div.style.justifyContent='center'; div.style.zIndex='100000'; document.body.appendChild(div); google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: async (res) => { try { let cred = firebase.auth.GoogleAuthProvider.credential(res.credential); await AppState.state.firebase.auth.signInWithCredential(cred); } catch(e){ AppState.addNotification("Error Google","error"); } } }); google.accounts.id.prompt(); };
+  window.mostrarModalGoogleSuperior = () => { let container = document.createElement('div'); container.id='google-one-tap-container-superior'; container.style.position='fixed'; container.style.top='120px'; container.style.left='50%'; container.style.transform='translateX(-50%)'; container.style.zIndex='100001'; document.body.appendChild(container); google.accounts.id.renderButton(container, { theme:'outline', size:'large' }); setTimeout(()=>{ container.addEventListener('click',()=>{}); window.addEventListener('click', function close(e){ if(!container.contains(e.target)){ container.remove(); window.removeEventListener('click',close); } }); },100); };
+  // inicialización y eventos
+  window.addEventListener('load', async () => { document.getElementById('loading-screen').style.display='flex'; updateLoadingProgress(10,'Conectando...'); await initializeFirebase(); updateLoadingProgress(80,'Verificando sesión'); setTimeout(()=>{ if(!AppState.state.user.current && !AppState.state.ui.currentScreen) navigateTo('public'); },500); window.mostrarModalGoogleInferior(); });
+  window.renderScreenSkeleton = (name) => { document.getElementById('social-app').innerHTML = `<div class="skeleton-card"></div><div class="skeleton-card"></div>`; };
+  // side menu listeners
+  document.getElementById('sidePerfilBtn')?.addEventListener('click',()=>navigateTo('perfil'));
+  document.getElementById('sideShareBtn')?.addEventListener('click',()=>navigateTo('share'));
+  document.getElementById('sideSubastasBtn')?.addEventListener('click',()=>navigateTo('ventas'));
+  document.getElementById('sideJuezBtn')?.addEventListener('click',()=>navigateTo('juez'));
+  document.getElementById('sideConfigBtn')?.addEventListener('click',()=>navigateTo('configuraciones'));
+  document.getElementById('sideLogoutBtn')?.addEventListener('click',()=>window.handleLogout());
+  document.getElementById('side-menu-overlay')?.addEventListener('click',()=>window.toggleSideMenu(false));
+  // Connection bar simulator
+  window.addEventListener('online',()=>{ let bar=document.getElementById('connection-status-bar'); bar.style.transform='translateY(0)'; document.getElementById('connMsg').innerText='Conexión restablecida'; setTimeout(()=>{ bar.style.transform='translateY(100%)'; },5000); });
+  window.addEventListener('offline',()=>{ let bar=document.getElementById('connection-status-bar'); bar.style.transform='translateY(0)'; document.getElementById('connMsg').innerText='Sin internet'; });
+  // adicional functions
+  window.getDeviceFingerprint = async () => "simulated_fingerprint";
+  window.checkActivationStatus = window.checkActivationStatusWithFeedback;
+  window.openAppInfoModal = ()=>{ AppState.addNotification("Info App - versión 2.0","info"); };
+  window.openTermsModal = ()=>{ AppState.addNotification("Términos y condiciones","info"); };
+  window.openPrivacyModal = ()=>{ AppState.addNotification("Política de privacidad","info"); };
+  window.copyRoosterUrl = ()=>{};
+  window.shareRoosterSection = ()=>{};
+  window.logoutAndGoPublic = window.handleLogout;
+  window.toggleUserActivation = ()=>{};
+  window.toggleUserGallo = ()=>{};
+  window.toggleUserJudge = ()=>{};
+  window.updatePhonePrefix = ()=>{};
+  window.togglePasswordVisibility = ()=>{};
+  window.mostrarNotificacionYModal = ()=>{};
+  window.mostrarModalInformativo = ()=>{ AppState.addNotification("Información de la App","info"); };
+  // suscripción y protección final
+  AppState.subscribe(()=>{ if(AppState.state.ui.currentScreen === 'login' && window.renderLoginScreen) window.renderLoginScreen(); else renderCurrentScreen(); });
+  AppState.protectAppState();
+  window.AppState = AppState.state;
 </script>
-
-<footer style='background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%); color:#fff; padding:40px 20px; text-align:center; margin-top:40px;'>
-    <p>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - Todos los derechos reservados © 2026</p>
-    <p style="font-size:12px;">Versión 2.0 | Gestión Avícola Digital</p>
-</footer>
 </body>
 </html>
