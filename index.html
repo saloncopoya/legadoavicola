@@ -492,30 +492,7 @@
     
     <script>
         // ==================== SECURITY & SANITIZATION ====================
-        (function() {
-            // Anti-debugging
-            setInterval(() => {
-                debugger;
-                const start = performance.now();
-                const end = performance.now();
-                if (end - start > 100) {
-                    document.body.innerHTML = '<h1>Debugging detected</h1>';
-                    throw new Error('Debugger detected');
-                }
-            }, 1000);
-            
-            // Bloquear eval y Function
-            const originalEval = window.eval;
-            window.eval = function() { throw new Error('Eval blocked'); };
-            
-            // Detectar DevTools
-            let devtools = /./;
-            devtools.toString = () => {
-                document.body.innerHTML = '<h1>DevTools detected</h1>';
-                throw new Error('DevTools');
-            };
-            console.log('%c', devtools);
-        })();
+        
         
         // Sanitización de inputs
         function sanitizeInput(input) {
