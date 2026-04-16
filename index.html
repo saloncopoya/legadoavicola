@@ -381,6 +381,7 @@
         <button class="icon-btn" id="menuToggle" aria-label="Menú">☰</button>
     </div>
 </header>
+    
 
 <main class="main-content" id="mainContent">
     <div class="spinner"></div>
@@ -640,19 +641,20 @@
     }
     
     function updateUIForAuth() {
-        const isLoggedIn = !!currentUser;
-        
-        document.querySelectorAll('#protectedNav, #torneosNav, #perfilNav').forEach(el => {
-            if (el) el.style.display = isLoggedIn ? 'flex' : 'none';
-        });
-        
-        const loginNav = document.getElementById('loginNav');
-        if (loginNav) loginNav.style.display = isLoggedIn ? 'none' : 'flex';
-        
-        if (isLoggedIn && (currentRoute === '/login' || currentRoute === '/register')) {
-            navigateTo('/dashboard');
-        }
+    const isLoggedIn = !!currentUser;
+    
+    // Agrega #tablasNav a la lista
+    document.querySelectorAll('#protectedNav, #torneosNav, #perfilNav, #tablasNav').forEach(el => {
+        if (el) el.style.display = isLoggedIn ? 'flex' : 'none';
+    });
+    
+    const loginNav = document.getElementById('loginNav');
+    if (loginNav) loginNav.style.display = isLoggedIn ? 'none' : 'flex';
+    
+    if (isLoggedIn && (currentRoute === '/login' || currentRoute === '/register')) {
+        navigateTo('/dashboard');
     }
+}
     
     // ============================================
     // 5. GESTIÓN DE TORNEOS (OFFLINE-FIRST)
