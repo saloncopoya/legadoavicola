@@ -5582,10 +5582,9 @@ async function renderApp(changedProperty) {
 
 
 
-
-if (changedProperty === 'notifications' || changedProperty === 'loading' || changedProperty === 'cotejo') {
-    return; // Salir inmediatamente, no renderizar
-  }
+if (changedProperty === 'notifications' || changedProperty === 'cotejo') {
+    return; // Solo ignorar notificaciones y cotejo
+}
 
   const app = document.getElementById('social-app');
   if (!app) return;
@@ -6525,62 +6524,6 @@ statusEl.style.fontSize = '20px';
 }
 
 
-
-function hideLoadingScreen() {
-  console.log("🟪🟪 [HIDE-LOADING] hideLoadingScreen INICIADO", {
-    timestamp: new Date().toISOString(),
-    stack: new Error().stack.split('\n')[1]
-  });
-
-  // CANCELAR TIMEOUT PENDIENTE
-  if (loadingTimeoutId) {
-    console.log("🟪 [HIDE-LOADING] Cancelando timeout pendiente:", loadingTimeoutId);
-    clearTimeout(loadingTimeoutId);
-    loadingTimeoutId = null;
-  }
-  
-  // CANCELAR INTERVALO
-  if (loadingInterval) {
-    clearInterval(loadingInterval);
-    loadingInterval = null;
-  }
-  
-  // OCULTAR BOTÓN SI ESTÁ VISIBLE
-  const reloadBtn = document.getElementById('loading-reload-btn');
-  if (reloadBtn) {
-    reloadBtn.style.display = 'none';
-  }
-  
-  // 🔥 SOLUCIÓN PRINCIPAL: Forzar ocultación COMPLETA
-  const loadingScreen = document.getElementById('loading-screen');
-  if (loadingScreen) {
-    console.log("🟪 [HIDE-LOADING] Ocultando pantalla");
-    loadingScreen.style.display = 'none';
-    loadingScreen.style.opacity = '0';
-    loadingScreen.style.visibility = 'hidden';  // ← NUEVO: Capa extra de seguridad
-  } else {
-    console.error("🔴 [HIDE-LOADING] No se encontró #loading-screen");
-  }
-
-  // FORZAR QUE EL CONTENIDO PRINCIPAL SEA VISIBLE
-  const socialApp = document.getElementById('social-app');
-  if (socialApp) {
-    console.log("🟪 [HIDE-LOADING] Forzando mostrar social-app");
-    socialApp.style.display = 'block';
-    socialApp.style.visibility = 'visible';
-  }
-  
-  // 🔥 NUEVO: Forzar que cualquier elemento modal o overlay se oculte
-  const overlays = document.querySelectorAll('[id*="overlay"], [id*="modal"]');
-  overlays.forEach(overlay => {
-    if (overlay.style.display === 'flex' || overlay.style.display === 'block') {
-      console.log("🟪 [HIDE-LOADING] Ocultando overlay:", overlay.id);
-      overlay.style.display = 'none';
-    }
-  });
-  
-  console.log("🟢 [HIDE-LOADING] hideLoadingScreen COMPLETADO");
-}
 
 
 
