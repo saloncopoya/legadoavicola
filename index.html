@@ -395,6 +395,10 @@
         <span>🏆</span>
         <span>Torneos</span>
     </button>
+    <button class="nav-item" data-route="/tablas-datos" id="tablasNav">
+        <span>📊</span>
+        <span>Tablas</span>
+    </button>
     <button class="nav-item" data-route="/dashboard" id="protectedNav" style="display:none;">
         <span>📊</span>
         <span>Dashboard</span>
@@ -489,36 +493,41 @@
     // ============================================
     
     function initDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open('GallosLiveDB', 3);
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('GallosLiveDB', 4); // Cambia versión a 4
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+            db = request.result;
+            resolve(db);
+        };
+        
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
             
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => {
-                db = request.result;
-                resolve(db);
-            };
+            if (!db.objectStoreNames.contains('offlineTorneos')) {
+                const store = db.createObjectStore('offlineTorneos', { keyPath: 'id', autoIncrement: true });
+                store.createIndex('userId', 'userId', { unique: false });
+                store.createIndex('syncStatus', 'syncStatus', { unique: false });
+            }
             
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                
-                if (!db.objectStoreNames.contains('offlineTorneos')) {
-                    const store = db.createObjectStore('offlineTorneos', { keyPath: 'id', autoIncrement: true });
-                    store.createIndex('userId', 'userId', { unique: false });
-                    store.createIndex('syncStatus', 'syncStatus', { unique: false });
-                }
-                
-                if (!db.objectStoreNames.contains('pendingOps')) {
-                    const pendingStore = db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
-                    pendingStore.createIndex('userId', 'userId', { unique: false });
-                    pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
-                }
-                
-                if (!db.objectStoreNames.contains('users')) {
-                    db.createObjectStore('users', { keyPath: 'uid' });
-                }
-            };
-        });
-    }
+            if (!db.objectStoreNames.contains('pendingOps')) {
+                const pendingStore = db.createObjectStore('pendingOps', { keyPath: 'id', autoIncrement: true });
+                pendingStore.createIndex('userId', 'userId', { unique: false });
+                pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+            
+            if (!db.objectStoreNames.contains('users')) {
+                db.createObjectStore('users', { keyPath: 'uid' });
+            }
+            
+            // 👇 AGREGA ESTE NUEVO STORE 👇
+            if (!db.objectStoreNames.contains('savedTables')) {
+                db.createObjectStore('savedTables', { keyPath: 'id', autoIncrement: true });
+            }
+        };
+    });
+}
     
     async function saveToDB(store, data) {
         return new Promise((resolve, reject) => {
@@ -809,6 +818,13 @@
             requiresAuth: true,
             render: renderConfiguracion
         },
+            '/tablas-datos': {
+        title: 'Editor de Tablas - GallosLive',
+        description: 'Crea y edita tablas de datos con filas y columnas',
+        ogImage: 'og-tablas.jpg',
+        requiresAuth: true,
+        render: renderTablasDatos
+    },
         '/login': {
             title: 'Iniciar Sesión - GallosLive',
             description: 'Accede a tu cuenta',
@@ -1272,6 +1288,504 @@
                 setTimeout(() => location.reload(), 1500);
             }
         });
+    }
+
+
+        // ============================================
+    // EDITOR DE TABLAS DE DATOS
+    // ============================================
+    
+    function renderTablasDatos(container) {
+        container.innerHTML = `
+            <style>
+                .table-editor {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    box-shadow: var(--shadow);
+                }
+                .table-controls {
+                    display: flex;
+                    gap: 12px;
+                    margin-bottom: 20px;
+                    flex-wrap: wrap;
+                }
+                .table-controls input {
+                    padding: 8px 12px;
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    width: 100px;
+                }
+                .data-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                    overflow-x: auto;
+                    display: block;
+                }
+                .data-table th,
+                .data-table td {
+                    border: 1px solid var(--border);
+                    padding: 12px;
+                    text-align: left;
+                    min-width: 120px;
+                }
+                .data-table th {
+                    background: var(--primary);
+                    color: white;
+                    position: relative;
+                }
+                .data-table th button {
+                    position: absolute;
+                    right: 5px;
+                    top: 5px;
+                    background: rgba(255,255,255,0.2);
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    padding: 2px 6px;
+                }
+                .data-table td input {
+                    width: 100%;
+                    border: none;
+                    padding: 8px;
+                    font-family: inherit;
+                    background: transparent;
+                }
+                .data-table td input:focus {
+                    outline: none;
+                    background: #f0f2f5;
+                }
+                .btn-icon {
+                    padding: 8px 16px;
+                    margin: 0 4px;
+                }
+                .table-actions {
+                    margin-top: 20px;
+                    display: flex;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                }
+                .import-export {
+                    margin-top: 20px;
+                    padding: 16px;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                }
+                textarea {
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid var(--border);
+                    border-radius: 8px;
+                    font-family: monospace;
+                    font-size: 12px;
+                }
+                .saved-tables-list {
+                    margin-top: 20px;
+                    padding: 16px;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                }
+                .saved-table-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px;
+                    border-bottom: 1px solid var(--border);
+                }
+                .saved-table-item button {
+                    margin-left: 8px;
+                }
+            </style>
+            
+            <div class="table-editor">
+                <h2>📊 Editor de Tablas de Datos</h2>
+                <p style="margin-bottom: 16px; color: var(--gray);">Crea, edita y gestiona tablas con filas y columnas personalizadas</p>
+                
+                <!-- Controles de dimensión -->
+                <div class="table-controls">
+                    <div>
+                        <label>📊 Columnas:</label>
+                        <input type="number" id="colsCount" min="1" max="20" value="3">
+                    </div>
+                    <div>
+                        <label>📋 Filas:</label>
+                        <input type="number" id="rowsCount" min="1" max="50" value="3">
+                    </div>
+                    <button class="btn btn-primary" id="createTableBtn">➕ Crear Tabla</button>
+                    <button class="btn" id="addRowBtn">➕ Añadir Fila</button>
+                    <button class="btn" id="addColBtn">➕ Añadir Columna</button>
+                </div>
+                
+                <!-- Tabla dinámica -->
+                <div id="tableViewer" style="overflow-x: auto;">
+                    <table class="data-table" id="dynamicTable">
+                        <thead id="tableHeader"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                
+                <!-- Acciones de la tabla -->
+                <div class="table-actions">
+                    <button class="btn btn-primary" id="saveTableBtn">💾 Guardar Tabla</button>
+                    <button class="btn btn-secondary" id="exportCSVBtn">📥 Exportar CSV</button>
+                    <button class="btn" id="clearTableBtn">🗑️ Limpiar Tabla</button>
+                </div>
+                
+                <!-- Importar/Exportar -->
+                <div class="import-export">
+                    <h3>📋 Importar/Exportar Datos</h3>
+                    <textarea id="csvData" rows="4" placeholder="Pega datos CSV aquí...&#10;Nombre,Email,Telefono&#10;Juan,juan@email.com,123456789&#10;Maria,maria@email.com,987654321"></textarea>
+                    <div style="margin-top: 12px;">
+                        <button class="btn btn-primary" id="importCSVBtn">📤 Importar CSV</button>
+                        <button class="btn" id="copyTableBtn">📋 Copiar Tabla</button>
+                    </div>
+                </div>
+                
+                <!-- Tablas guardadas -->
+                <div class="saved-tables-list" id="savedTablesList">
+                    <h3>💾 Tablas Guardadas</h3>
+                    <div id="tablesListContainer">Cargando...</div>
+                </div>
+            </div>
+        `;
+        
+        // Estado de la tabla actual
+        let currentTableData = {
+            headers: [],
+            rows: [],
+            id: null
+        };
+        
+        // Cargar tablas guardadas
+        async function loadSavedTables() {
+            const savedTables = await getFromDB('savedTables') || [];
+            const container = document.getElementById('tablesListContainer');
+            if (savedTables.length === 0) {
+                container.innerHTML = '<p style="color: var(--gray);">No hay tablas guardadas aún</p>';
+                return;
+            }
+            
+            container.innerHTML = savedTables.map((table, idx) => `
+                <div class="saved-table-item">
+                    <div>
+                        <strong>${escapeHtml(table.name || `Tabla ${idx + 1}`)}</strong>
+                        <small style="color: var(--gray);">${table.headers.length} cols × ${table.rows.length} filas</small>
+                    </div>
+                    <div>
+                        <button class="btn-icon" onclick="window.loadTableData(${idx})">📂 Cargar</button>
+                        <button class="btn-icon btn-danger" onclick="window.deleteTableData(${idx})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Exponer funciones globales para los botones dinámicos
+            window.loadTableData = async (index) => {
+                const tables = await getFromDB('savedTables');
+                if (tables[index]) {
+                    currentTableData = tables[index];
+                    renderTable();
+                    showToast('✅ Tabla cargada correctamente', 'success');
+                }
+            };
+            
+            window.deleteTableData = async (index) => {
+                if (confirm('¿Eliminar esta tabla?')) {
+                    const tables = await getFromDB('savedTables');
+                    tables.splice(index, 1);
+                    await saveToDB('savedTables', tables);
+                    loadSavedTables();
+                    showToast('🗑️ Tabla eliminada', 'info');
+                }
+            };
+        }
+        
+        // Renderizar tabla
+        function renderTable() {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+            
+            if (!currentTableData.headers.length) {
+                thead.innerHTML = '';
+                tbody.innerHTML = '';
+                return;
+            }
+            
+            // Renderizar headers con botones de eliminar
+            thead.innerHTML = `
+                <tr>
+                    ${currentTableData.headers.map((header, colIdx) => `
+                        <th>
+                            <input type="text" value="${escapeHtml(header)}" 
+                                   onchange="window.updateHeader(${colIdx}, this.value)"
+                                   style="background: transparent; color: white; border: none; font-weight: bold;">
+                            <button onclick="window.deleteColumn(${colIdx})" style="background: rgba(255,0,0,0.3); color: white;">✖</button>
+                        </th>
+                    `).join('')}
+                    <th style="background: var(--secondary);">
+                        <button onclick="window.addNewColumn()" style="background: white; color: black;">+ Col</button>
+                    </th>
+                </tr>
+            `;
+            
+            // Renderizar filas
+            tbody.innerHTML = currentTableData.rows.map((row, rowIdx) => `
+                <tr>
+                    ${currentTableData.headers.map((_, colIdx) => `
+                        <td>
+                            <input type="text" value="${escapeHtml(row[colIdx] || '')}" 
+                                   onchange="window.updateCell(${rowIdx}, ${colIdx}, this.value)">
+                        </td>
+                    `).join('')}
+                    <td style="text-align: center; background: #f8fafc;">
+                        <button onclick="window.deleteRow(${rowIdx})" style="background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px;">✖</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Botón para añadir fila al final
+            tbody.innerHTML += `
+                <tr style="background: #f8fafc;">
+                    <td colspan="${currentTableData.headers.length + 1}" style="text-align: center;">
+                        <button onclick="window.addNewRow()" style="background: var(--secondary); color: white; padding: 8px; border: none; border-radius: 4px;">➕ Añadir Fila</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Funciones de manipulación de datos
+        window.updateCell = (rowIdx, colIdx, value) => {
+            if (!currentTableData.rows[rowIdx]) currentTableData.rows[rowIdx] = [];
+            currentTableData.rows[rowIdx][colIdx] = value;
+        };
+        
+        window.updateHeader = (colIdx, value) => {
+            currentTableData.headers[colIdx] = value;
+            renderTable();
+        };
+        
+        window.deleteColumn = (colIdx) => {
+            if (confirm('¿Eliminar esta columna?')) {
+                currentTableData.headers.splice(colIdx, 1);
+                currentTableData.rows = currentTableData.rows.map(row => {
+                    row.splice(colIdx, 1);
+                    return row;
+                });
+                renderTable();
+                showToast('🗑️ Columna eliminada', 'info');
+            }
+        };
+        
+        window.deleteRow = (rowIdx) => {
+            if (confirm('¿Eliminar esta fila?')) {
+                currentTableData.rows.splice(rowIdx, 1);
+                renderTable();
+                showToast('🗑️ Fila eliminada', 'info');
+            }
+        };
+        
+        window.addNewRow = () => {
+            const newRow = new Array(currentTableData.headers.length).fill('');
+            currentTableData.rows.push(newRow);
+            renderTable();
+            showToast('➕ Nueva fila añadida', 'success');
+        };
+        
+        window.addNewColumn = () => {
+            const newColName = prompt('Nombre de la nueva columna:', `Columna ${currentTableData.headers.length + 1}`);
+            if (newColName) {
+                currentTableData.headers.push(newColName);
+                currentTableData.rows = currentTableData.rows.map(row => {
+                    row.push('');
+                    return row;
+                });
+                renderTable();
+                showToast('➕ Nueva columna añadida', 'success');
+            }
+        };
+        
+        // Crear tabla desde dimensiones
+        document.getElementById('createTableBtn').addEventListener('click', () => {
+            const cols = parseInt(document.getElementById('colsCount').value);
+            const rows = parseInt(document.getElementById('rowsCount').value);
+            
+            if (cols < 1 || cols > 20 || rows < 1 || rows > 50) {
+                showToast('❌ Columnas: 1-20, Filas: 1-50', 'error');
+                return;
+            }
+            
+            currentTableData = {
+                headers: Array.from({ length: cols }, (_, i) => `Columna ${i + 1}`),
+                rows: Array.from({ length: rows }, () => Array(cols).fill('')),
+                id: Date.now()
+            };
+            renderTable();
+            showToast(`✅ Tabla ${cols}x${rows} creada`, 'success');
+        });
+        
+        // Añadir fila
+        document.getElementById('addRowBtn').addEventListener('click', () => {
+            if (!currentTableData.headers.length) {
+                showToast('❌ Crea una tabla primero', 'error');
+                return;
+            }
+            currentTableData.rows.push(new Array(currentTableData.headers.length).fill(''));
+            renderTable();
+            showToast('➕ Fila añadida', 'success');
+        });
+        
+        // Añadir columna
+        document.getElementById('addColBtn').addEventListener('click', () => {
+            if (!currentTableData.headers.length) {
+                showToast('❌ Crea una tabla primero', 'error');
+                return;
+            }
+            const newColName = prompt('Nombre de la nueva columna:', `Columna ${currentTableData.headers.length + 1}`);
+            if (newColName) {
+                currentTableData.headers.push(newColName);
+                currentTableData.rows = currentTableData.rows.map(row => {
+                    row.push('');
+                    return row;
+                });
+                renderTable();
+                showToast('➕ Columna añadida', 'success');
+            }
+        });
+        
+        // Guardar tabla
+        document.getElementById('saveTableBtn').addEventListener('click', async () => {
+            if (!currentTableData.headers.length) {
+                showToast('❌ No hay tabla para guardar', 'error');
+                return;
+            }
+            
+            const tableName = prompt('Nombre para esta tabla:', `Tabla ${new Date().toLocaleString()}`);
+            if (!tableName) return;
+            
+            const savedTables = await getFromDB('savedTables') || [];
+            const tableToSave = {
+                ...currentTableData,
+                name: tableName,
+                savedAt: new Date().toISOString()
+            };
+            
+            if (currentTableData.id) {
+                const index = savedTables.findIndex(t => t.id === currentTableData.id);
+                if (index !== -1) {
+                    savedTables[index] = tableToSave;
+                } else {
+                    savedTables.push(tableToSave);
+                }
+            } else {
+                tableToSave.id = Date.now();
+                savedTables.push(tableToSave);
+            }
+            
+            await saveToDB('savedTables', savedTables);
+            currentTableData.id = tableToSave.id;
+            loadSavedTables();
+            showToast('💾 Tabla guardada correctamente', 'success');
+        });
+        
+        // Exportar CSV
+        document.getElementById('exportCSVBtn').addEventListener('click', () => {
+            if (!currentTableData.headers.length) {
+                showToast('❌ No hay datos para exportar', 'error');
+                return;
+            }
+            
+            const csvRows = [];
+            csvRows.push(currentTableData.headers.join(','));
+            currentTableData.rows.forEach(row => {
+                csvRows.push(row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','));
+            });
+            
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', `tabla_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('📥 CSV exportado', 'success');
+        });
+        
+        // Importar CSV
+        document.getElementById('importCSVBtn').addEventListener('click', () => {
+            const csvText = document.getElementById('csvData').value;
+            if (!csvText.trim()) {
+                showToast('❌ Pega datos CSV primero', 'error');
+                return;
+            }
+            
+            try {
+                const lines = csvText.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+                const rows = lines.slice(1).map(line => {
+                    const regex = /(".*?"|[^,]+)(?=\s*,|\s*$)/g;
+                    let matches = [];
+                    let match;
+                    while ((match = regex.exec(line)) !== null) {
+                        matches.push(match[0].replace(/^"|"$/g, ''));
+                    }
+                    return matches;
+                });
+                
+                currentTableData = {
+                    headers: headers,
+                    rows: rows,
+                    id: Date.now()
+                };
+                renderTable();
+                showToast(`📤 Importado: ${headers.length} columnas, ${rows.length} filas`, 'success');
+            } catch (error) {
+                showToast('❌ Error al importar CSV', 'error');
+            }
+        });
+        
+        // Copiar tabla
+        document.getElementById('copyTableBtn').addEventListener('click', () => {
+            if (!currentTableData.headers.length) {
+                showToast('❌ No hay tabla para copiar', 'error');
+                return;
+            }
+            
+            let textToCopy = currentTableData.headers.join('\t') + '\n';
+            currentTableData.rows.forEach(row => {
+                textToCopy += row.join('\t') + '\n';
+            });
+            
+            navigator.clipboard.writeText(textToCopy);
+            showToast('📋 Tabla copiada al portapapeles', 'success');
+        });
+        
+        // Limpiar tabla
+        document.getElementById('clearTableBtn').addEventListener('click', () => {
+            if (confirm('¿Limpiar la tabla actual? Los cambios no guardados se perderán.')) {
+                currentTableData = { headers: [], rows: [], id: null };
+                renderTable();
+                showToast('🧹 Tabla limpiada', 'info');
+            }
+        });
+        
+        // Función auxiliar escapeHtml
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Inicializar
+        loadSavedTables();
     }
     
     function renderLogin(container) {
