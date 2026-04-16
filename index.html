@@ -485,10 +485,10 @@
     }
     
     // Validación de password
-    function validatePassword(password) {
-        return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
-    }
     
+function validatePassword(password) {
+    return true; // SIEMPRE VÁLIDO - NO VALIDA NADA
+}
     // ============================================
     // 2. INDEXEDDB - ALMACENAMIENTO OFFLINE
     // ============================================
@@ -598,8 +598,13 @@
     // 4. FUNCIONES DE AUTENTICACIÓN
     // ============================================
     
-    async function handleLogin(email, password) {
-    // SIN NINGUNA VALIDACIÓN - ACEPTA CUALQUIER CONTRASEÑA
+    // ELIMINA ESTA VALIDACIÓN MALDITA - Está en la función handleLogin
+async function handleLogin(email, password) {
+    // ❌❌❌ BORRA ESTAS LÍNEAS ❌❌❌
+    // if (!validateEmail(email)) throw new Error('Email inválido');
+    // if (!validatePassword(password)) throw new Error('Password debe tener 8+ caracteres, una mayúscula y un número');
+    
+    // ✅ SOLO ESTO - SIN VALIDACIÓN DE NADA
     const result = await auth.signInWithEmailAndPassword(email, password);
     currentUser = result.user;
     
