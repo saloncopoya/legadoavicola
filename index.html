@@ -4278,178 +4278,21 @@ function abrirEnNavegadorExterno(url) {
 window.renderPublicScreen = function() {
     console.log("🏠 Pantalla pública - CON 3 BOTONES CON LÓGICA DE PERMISOS");
 
-    // ===== VARIABLES DE ESTADO MÍNIMAS =====
-    let adminDb = null;
-    let inicializado = false;
-
-    // ===== INICIALIZAR BD PUBLIC =====
-    const initAdminDB = async () => {
-        if (inicializado && adminDb) return true;
-        console.log("🔥 Inicializando Firebase...");
-        try {
-            adminDb = getAdminDatabase();
-            if (adminDb) { inicializado = true; return true; }
-            return false;
-        } catch (error) {
-            console.error("❌ Error:", error);
-            return false;
-        }
-    };
-
-    // ===== RENDERIZADO CON 3 BOTONES (CONDICIONAL) =====
-    const renderUI = () => {
-        const container = document.getElementById('public-main-container');
-        if (!container) return;
-        
-        // Obtener estado del usuario
-        const userLoggedIn = AppState?.user?.current !== null;
-        const userProfile = AppState?.user?.profile;
-        const tienePermisoSubasta = userProfile?.subasta === true;
-        
-        // CSS para las cards
-        const cardStyle = `
-            background: white;
-            border-radius: 20px;
-            padding: 28px 20px;
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid #e0e0e0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        `;
-        
-        const iconStyle = `font-size: 48px; margin-bottom: 16px; display: block;`;
-        const titleStyle = `font-size: 20px; font-weight: 800; color: #8B4513; margin-bottom: 8px;`;
-        const descStyle = `font-size: 13px; color: #666; line-height: 1.4;`;
-        
-        // Construir los botones dinámicamente
-        let botonesHTML = '';
-        
-        // ==============================================
-        // BOTÓN 1: INICIAR SESIÓN → Solo para NO logueados
-        // ==============================================
-        if (!userLoggedIn) {
-            botonesHTML += `
-                <div onclick="handleLoginClick()" style="${cardStyle}">
-                    <span style="${iconStyle}">🔐</span>
-                    <div style="${titleStyle}">Iniciar Sesión</div>
-                    <div style="${descStyle}">Registrate y Accede a tu cuenta para ver el contenido.</div>
-                </div>
-            `;
-        }
-        
-       // ==============================================
-// BOTÓN 2: VER SUBASTAS 
-// - No logueados: MUESTRA
-// - Logueados SIN permiso subasta: MUESTRA
-// - Logueados CON permiso subasta: OCULTO
-// ==============================================
-if (!userLoggedIn || (userLoggedIn && !tienePermisoSubasta)) {
-    botonesHTML += `
-        <div onclick="navigateTo('ventas')" style="${cardStyle}">
-            <span style="${iconStyle}">💰</span>
-            <div style="${titleStyle}">Ver Tabla Calcutas/Subasta</div>
-            <div style="${descStyle}">Visualizacion de todas las tablas completas</div>
-        </div>
-    `;
-}
-
-        
-
-        // ==============================================
-        // BOTÓN 3: CREAR TABLA → Lógica especial
-        // - No logueados: redirige a login
-        // - Logueados CON permiso subasta: redirige a ventas y muestra botón
-        // - Logueados SIN permiso subasta: NO muestra el botón
-        // ==============================================
-        if (!userLoggedIn) {
-            // No logueados: mostrar botón que redirige a login
-            botonesHTML += `
-                <div onclick="navigateTo('login')" style="${cardStyle}">
-                    <span style="${iconStyle}">📊</span>
-                    <div style="${titleStyle}">Crear Tabla</div>
-                    <div style="${descStyle}">SOLO ADMINISTRADORES AUTORIZADOS</div>
-                </div>
-            `;
-        } else if (userLoggedIn && tienePermisoSubasta) {
-            // Logueados CON permiso: mostrar botón que va a ventas
-            botonesHTML += `
-                <div onclick="navigateTo('ventas')" style="${cardStyle}">
-                    <span style="${iconStyle}">📊</span>
-                    <div style="${titleStyle}">CREAR TABLA NUEVA</div>
-                    <div style="${descStyle}">Ingresa los datos en todos los campos para generar la tabla y Guardar Tablas.</div>
-                </div>
-            `;
-        }
-        // Logueados SIN permiso subasta: NO mostrar el botón (no se agrega nada)
-        
-        container.innerHTML = `
-            <div style="min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%); padding: 20px;">
-                
-                <!-- Logo/Título principal -->
-                <div style="text-align: center; margin-bottom: 40px; padding-top: 20px;">
-                    <div style="font-size: 70px; margin-bottom: 10px;">🐓</div>
-                    <h1 style="color: #8B4513; font-size: 24px; margin: 0;">Calcutas y Subastas</h1>
-                    <p style="color: #666; font-size: 14px; margin: 5px 0 0;">Javi Ruiz</p>
-                </div>
-                
-                <!-- CONTENEDOR DE LOS BOTONES -->
-                <div style="max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
-                    ${botonesHTML}
-                </div>
-                
-                <!-- Pie de página -->
-                <div style="text-align: center; margin-top: 50px; color: #999; font-size: 12px;">
-                    <p>© 2026 Calcutas y Subastas Javi Ruiz</p>
-                </div>
-            </div>
-        `;
-    };
-
-    // Exponer la función globalmente
-    window.verificarLoginYNavegar = function(destino) {
-        const userLoggedIn = AppState?.user?.current !== null;
-        if (!userLoggedIn) {
-            AppState.addNotification('Debes iniciar sesión para acceder a esta sección', 'warning');
-            navigateTo('login');
-        } else {
-            navigateTo(destino);
-        }
-    };
-
-    // ===== INICIALIZAR =====
-    const init = async () => {
-        await initAdminDB();
-        renderUI();
-        
-        // Escuchar cambios en el estado del usuario para re-renderizar
-        if (AppState) {
-            AppState.subscribe((propriedadCambiada) => {
-                if (propriedadCambiada === 'user') {
-                    renderUI();
-                }
-            });
-        }
-    };
+     console.log("🏠 Pantalla pública - INICIANDO RENDERIZADO");
+    console.log("🔍 Verificando container...");
     
-    init();
-
-    // ===== LIMPIAR AL SALIR =====
-    window.publicKiller = function() {
-        console.log("🔪 Matando recursos de pantalla pública...");
-        if (typeof adminDb !== 'undefined') {
-            adminDb = null;
-        }
-        inicializado = false;
-    };
-
-    // ===== HTML INICIAL =====
-    return `
-        <div id="public-main-container" role="main" style="min-height: 100vh;">
-            <div style="min-height:100vh;"></div>
+    const container = document.getElementById('public-main-container');
+    console.log("🔍 Container existe?", !!container);
+   return `
+        <div style="padding: 100px 20px; text-align: center;">
+            <h1 style="color: #8B4513;">TEST - SÍ FUNCIONA</h1>
+            <p>Si ves esto, el problema está en tu renderPublicScreen original</p>
+            <button onclick="navigateTo('login')" style="background:#8B4513; color:white; padding:10px 20px;">
+                Ir a Login
+            </button>
         </div>
     `;
 };
-
 
 
 
@@ -5636,6 +5479,11 @@ const coreScreens = {
   'public': renderPublicScreen  // ← AÑADE ESTA LÍNEA
 
 };
+
+console.log("🔍 coreScreens tiene 'public'?", !!coreScreens['public']);
+console.log("🔍 currentScreen es:", currentScreen);
+console.log("🔍 coreScreens[currentScreen] existe?", !!coreScreens[currentScreen]);
+
 
 // Si es pantalla core, renderizar directamente
 
