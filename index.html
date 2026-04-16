@@ -845,12 +845,11 @@
         const page = pages[pageKey] || pages['/'];
         document.title = page.title;
         
+        // Crear o actualizar meta tags OG
         let ogTitle = document.querySelector('meta[property="og:title"]');
         let ogDesc = document.querySelector('meta[property="og:description"]');
         let ogImage = document.querySelector('meta[property="og:image"]');
-        let twitterTitle = document.querySelector('meta[name="twitter:title"]');
-        let twitterDesc = document.querySelector('meta[name="twitter:description"]');
-        let twitterImage = document.querySelector('meta[name="twitter:image"]');
+        let ogUrl = document.querySelector('meta[property="og:url"]');
         
         if (!ogTitle) {
             ogTitle = document.createElement('meta');
@@ -867,12 +866,61 @@
             ogImage.setAttribute('property', 'og:image');
             document.head.appendChild(ogImage);
         }
+        if (!ogUrl) {
+            ogUrl = document.createElement('meta');
+            ogUrl.setAttribute('property', 'og:url');
+            document.head.appendChild(ogUrl);
+        }
         
         ogTitle.setAttribute('content', page.title);
         ogDesc.setAttribute('content', page.description);
-        ogImage.setAttribute('content', `/images/og/${page.ogImage}`);
+        ogUrl.setAttribute('content', window.location.href);
+        
+        // Generar imagen dinámica según la página
+        const imageDataUrl = generatePageImage(pageKey, page.title);
+        ogImage.setAttribute('content', imageDataUrl);
     }
     
+    // Función para generar imagen según la página
+    function generatePageImage(route, title) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 630;
+        const ctx = canvas.getContext('2d');
+        
+        // Fondo con gradiente
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#1877f2');
+        gradient.addColorStop(1, '#8b5cf6');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Texto principal
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 55px "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        let displayTitle = title.length > 45 ? title.substring(0, 42) + '...' : title;
+        ctx.fillText(displayTitle, canvas.width/2, canvas.height/2 - 40);
+        
+        // Subtítulo
+        ctx.font = '35px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.fillText('GallosLive', canvas.width/2, canvas.height/2 + 70);
+        
+        // Emoji según la ruta
+        let emoji = '🐓';
+        if (route === '/torneos-publicos' || route === '/mis-torneos') emoji = '🏆';
+        if (route === '/dashboard') emoji = '📊';
+        if (route === '/perfil') emoji = '👤';
+        if (route === '/tablas-datos') emoji = '📋';
+        if (route === '/login') emoji = '🔐';
+        if (route === '/register') emoji = '📝';
+        
+        ctx.font = '100px "Segoe UI Emoji"';
+        ctx.fillText(emoji, canvas.width/2, canvas.height - 120);
+        
+        return canvas.toDataURL('image/png');
+    }
     async function navigateTo(route) {
         const page = pages[route];
         if (!page) {
@@ -887,14 +935,13 @@
         }
         
         currentRoute = route;
-        updateMetaTags(route);
+        updateMetaTags(route);  // Esta línea actualiza título e imagen
         
         const content = document.getElementById('mainContent');
         content.innerHTML = '<div class="spinner"></div>';
         
         await page.render(content);
         
-        // Actualizar navegación activa
         document.querySelectorAll('.nav-item').forEach(item => {
             if (item.dataset.route === route) {
                 item.classList.add('active');
@@ -903,10 +950,8 @@
             }
         });
         
-        // Actualizar URL sin recargar
         window.history.pushState({}, '', route);
     }
-    
     // ============================================
     // 7. RENDERIZADO DE PÁGINAS
     // ============================================
@@ -1921,12 +1966,18 @@
                 await syncPendingOperations();
             }
             
-            const initialRoute = window.location.pathname;
+            let initialRoute = window.location.pathname;
+            
             if (pages[initialRoute]) {
-                navigateTo(initialRoute);
+                if (pages[initialRoute].requiresAuth && !currentUser) {
+                    navigateTo('/login');
+                } else {
+                    navigateTo(initialRoute);
+                }
             } else {
                 navigateTo('/');
             }
+            
         });
         
         // Navegación por botones
