@@ -7262,13 +7262,21 @@ ${userProfile.ventas === true ? `
 }
 
 
-// MODIFICAR renderApp para que actualice el menú
-const originalRenderApp = renderApp;
-renderApp = async function() {
-  await originalRenderApp();
-  updateSideMenuContent();
-};
 
+// ==============================================
+// PARCHE PARA RENDERAPP (Agregado manualmente)
+// ==============================================
+if (typeof renderApp === 'function' && typeof updateSideMenuContent === 'function') {
+    const originalRender = renderApp;
+    window.renderApp = function(propiedad) {
+        originalRender(propiedad);
+        setTimeout(function() {
+            updateSideMenuContent();
+        }, 150);
+    };
+    renderApp = window.renderApp;
+    console.log('✅ RenderApp parcheada correctamente');
+}
 
 
 </script>
