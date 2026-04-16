@@ -644,7 +644,7 @@
     const isLoggedIn = !!currentUser;
     
     // Agrega #tablasNav a la lista
-    document.querySelectorAll('#protectedNav, #torneosNav, #perfilNav, #tablasNav').forEach(el => {
+    document.querySelectorAll('#protectedNav, #torneosNav, #perfilNav, #tablasNav, #tablasNavBottom').forEach(el => {
         if (el) el.style.display = isLoggedIn ? 'flex' : 'none';
     });
     
