@@ -12,236 +12,49 @@
     .top-nav-item.active span:first-child {
       color: #8B4513;
     }
-  
-    /* ============================================== */
-    /* ESTILOS RESPONSIVOS PARA TABLAS DE TORNEOS    */
-    /* ============================================== */
     @media (max-width: 768px) {
-        .public-screen table,
-        #public-main-container table {
-            font-size: 9px !important;
-        }
-        .public-screen th,
-        .public-screen td,
-        #public-main-container th,
-        #public-main-container td {
-            padding: 1px 1px !important;
-            word-break: break-word !important;
-        }
-        .public-screen table td:last-child,
-        #public-main-container table td:last-child {
-            min-width: 55px !important;
-            width: 55px !important;
-        }
-        .public-screen tbody td:first-child,
-        #public-main-container tbody td:first-child {
-            font-size: 11px !important;
-            font-weight: 900 !important;
-        }
-        .public-screen table tbody td:last-child,
-        #public-main-container table tbody td:last-child,
-        .public-screen table tbody td:nth-last-child(2),
-        #public-main-container table tbody td:nth-last-child(2) {
-            font-size: 10px !important;
-            font-weight: 900 !important;
-        }
+        .public-screen table, #public-main-container table { font-size: 9px !important; }
+        .public-screen th, .public-screen td, #public-main-container th, #public-main-container td { padding: 1px 1px !important; word-break: break-word !important; }
+        .public-screen table td:last-child, #public-main-container table td:last-child { min-width: 55px !important; width: 55px !important; }
+        .public-screen tbody td:first-child, #public-main-container tbody td:first-child { font-size: 11px !important; font-weight: 900 !important; }
+        .public-screen table tbody td:last-child, #public-main-container table tbody td:last-child,
+        .public-screen table tbody td:nth-last-child(2), #public-main-container table tbody td:nth-last-child(2) { font-size: 10px !important; font-weight: 900 !important; }
     }
     @media (min-width: 768px) {
-        .public-screen table,
-        #public-main-container table {
-            font-size: 18px !important;
-        }
-        .public-screen th,
-        .public-screen td,
-        #public-main-container th,
-        #public-main-container td {
-            padding: 12px 8px !important;
-        }
-        .public-screen table,
-        #public-main-container table {
-            font-size: 20px !important;
-        }
+        .public-screen table, #public-main-container table { font-size: 18px !important; }
+        .public-screen th, .public-screen td, #public-main-container th, #public-main-container td { padding: 12px 8px !important; }
+        .public-screen table, #public-main-container table { font-size: 20px !important; }
     }
-    /* ============================================== */
-    /* ESTILOS PARA TABLA DE VENTAS - IGUAL QUE COTEJO */
-    /* ============================================== */
-    .ventas-screen table,
-    #ventas-main-container table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-        table-layout: auto;  
-    }
-    .ventas-screen th,
-    #ventas-main-container th {
-        padding: 12px 8px;
-        background: #8B4513;
-        color: white;
-        font-weight: 700;
-        text-align: center;
-        white-space: normal;
-        word-break: break-word;
-    }
-    .ventas-screen td,
-    #ventas-main-container td {
-        padding: 10px 8px;
-        border-bottom: 1px solid #eee;
-        white-space: normal;
-        word-break: break-word;
-    }
-    @media (max-width: 768px) {
-        .ventas-screen table,
-        #ventas-main-container table {
-            font-size: 12px !important;
-        }
-        .ventas-screen th,
-        .ventas-screen td,
-        #ventas-main-container th,
-        #ventas-main-container td {
-            padding: 10px 0px !important;
-        }
-    }
-    /* ============================================== */
-    /* NOTIFICACIONES APILADAS - CON SALIDA LIMPIA */
-    /* ============================================== */
-    #toast-container {
-        display: flex;
-        flex-direction: column-reverse;
-        align-items: center;
-        gap: 5px;
-        pointer-events: none;
-        z-index: 999999;
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 350px;
-    }
-    .toast-message {
-        background: #323232;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 12px;
-        font-weight: 500;
-        font-size: 14px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        width: 100%;
-        text-align: center;
-        pointer-events: auto;
-        border-left: 5px solid;
-        box-sizing: border-box;
-        margin-bottom: -5px;
-        transition: all 0.2s ease;
-        animation: fadeIn 0.15s ease forwards;
-        position: relative;
-        z-index: 1;
-    }
-    .toast-message:last-child {
-        margin-bottom: 0;
-        box-shadow: 0 12px 28px rgba(0,0,0,0.3);
-        z-index: 10;
-    }
+    .ventas-screen table, #ventas-main-container table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: auto; }
+    .ventas-screen th, #ventas-main-container th { padding: 12px 8px; background: #8B4513; color: white; font-weight: 700; text-align: center; white-space: normal; word-break: break-word; }
+    .ventas-screen td, #ventas-main-container td { padding: 10px 8px; border-bottom: 1px solid #eee; white-space: normal; word-break: break-word; }
+    @media (max-width: 768px) { .ventas-screen table, #ventas-main-container table { font-size: 12px !important; } .ventas-screen th, .ventas-screen td, #ventas-main-container th, #ventas-main-container td { padding: 10px 0px !important; } }
+    #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; width: 90%; max-width: 350px; }
+    .toast-message { background: #323232; color: white; padding: 12px 20px; border-radius: 12px; font-weight: 500; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.25); width: 100%; text-align: center; pointer-events: auto; border-left: 5px solid; box-sizing: border-box; margin-bottom: -5px; transition: all 0.2s ease; animation: fadeIn 0.15s ease forwards; position: relative; z-index: 1; }
+    .toast-message:last-child { margin-bottom: 0; box-shadow: 0 12px 28px rgba(0,0,0,0.3); z-index: 10; }
     .toast-success { background: #42b72a; border-left-color: #2e7d32; }
     .toast-error { background: #d93025; border-left-color: #b71c1c; }
     .toast-warning { background: #ff9800; border-left-color: #f57c00; }
     .toast-info { background: #8B4513; border-left-color: #5e2e0e; }
     .toast-blue { background: #2196F3; border-left-color: #0b5e9e; }
-    .toast-message:hover {
-        opacity: 0.95;
-        transform: scale(1.02);
-        cursor: pointer;
-    }
-    @keyframes fadeIn {
-        0% { opacity: 0; transform: translateY(-10px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-    .toast-message.fade-out {
-        animation: fadeOutClean 0.25s ease forwards !important;
-        pointer-events: none;
-    }
-    @keyframes fadeOutClean {
-        0% { opacity: 1; transform: scale(1); margin-bottom: -35px; }
-        100% { opacity: 0; transform: scale(0.8); margin-bottom: -35px; }
-    }
-    /* ============================================== */
-    /* PANTALLA DE CARGA */
-    /* ============================================== */
-    #loading-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
-    /* ============================================== */
-    /* BARRA DE CONEXIÓN */
-    /* ============================================== */
-    #connection-status-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #1a2634;
-        color: #ffffff;
-        text-align: center;
-        padding: 12px 16px;
-        font-size: 14px;
-        font-weight: 500;
-        z-index: 9999;
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        box-shadow: 0 -8px 20px rgba(0,0,0,0.2);
-        border-top: 1px solid rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        cursor: pointer;
-    }
-    #connection-status-bar.visible {
-        transform: translateY(0) !important;
-    }
-    .wifi-bar {
-        width: 4px;
-        background: #4a90e2;
-        border-radius: 2px;
-    }
+    .toast-message:hover { opacity: 0.95; transform: scale(1.02); cursor: pointer; }
+    @keyframes fadeIn { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+    .toast-message.fade-out { animation: fadeOutClean 0.25s ease forwards !important; pointer-events: none; }
+    @keyframes fadeOutClean { 0% { opacity: 1; transform: scale(1); margin-bottom: -35px; } 100% { opacity: 0; transform: scale(0.8); margin-bottom: -35px; } }
+    #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+    #connection-status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #1a2634; color: #ffffff; text-align: center; padding: 12px 16px; font-size: 14px; font-weight: 500; z-index: 9999; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 -8px 20px rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; gap: 16px; cursor: pointer; }
+    #connection-status-bar.visible { transform: translateY(0) !important; }
+    .wifi-bar { width: 4px; background: #4a90e2; border-radius: 2px; }
     .hidden { display: none !important; }
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        background: #f8f9fa;
-        overflow-x: hidden;
-    }
-    button {
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8f9fa; overflow-x: hidden; }
+    button { cursor: pointer; transition: all 0.2s ease; }
     button:active { transform: scale(0.97); }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 10px; }
-    @keyframes slideUp {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes loading {
-        0% { width: 0%; opacity: 0.5; }
-        50% { width: 70%; opacity: 1; }
-        100% { width: 100%; opacity: 0.5; }
-    }
+    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes loading { 0% { width: 0%; opacity: 0.5; } 50% { width: 70%; opacity: 1; } 100% { width: 100%; opacity: 0.5; } }
 </style>
 </head>
 <body>
@@ -289,7 +102,7 @@
 
 <script>
 // ==============================================
-// CONFIGURACIÓN FIREBASE (COMPLETA)
+// CONFIGURACIÓN FIREBASE
 // ==============================================
 window.FIREBASE_CONFIG = {
     apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
@@ -339,7 +152,7 @@ const AppState = {
     _isNotifying: false,
     setUser(userData, profileData) { this.user.current = userData; this.user.profile = profileData; this.notify('user'); },
     clearUser() { this.user.current = null; this.user.profile = null; this.notify('user'); },
-    setScreen(screen) { if(this.ui.currentScreen === screen) return; if(this.ui.currentScreen === 'public' && window.publicKiller) window.publicKiller(); this.ui.currentScreen = screen; this.notify('screen'); },
+    setScreen(screen) { if(this.ui.currentScreen === screen) return; this.ui.currentScreen = screen; this.notify('screen'); },
     setLoading(loading) { this.ui.isLoading = loading; this.notify('loading'); },
     addNotification(message, type='info', duration=5000) {
         const container = document.getElementById('toast-container');
@@ -369,23 +182,15 @@ function formatTime(timestamp) { if(!timestamp) return 'Ahora'; const diff = Dat
 function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 function esGooglebot() { var ua = navigator.userAgent; return ua.includes('Googlebot') || ua.includes('Google-Search'); }
 
-// ==============================================
-// MUNICIPIOS CHIAPAS (MUESTRA)
-// ==============================================
 const municipiosChiapas = [
     { id: 1, nombre: "Tuxtla Gutiérrez", prefijo: "961" },
     { id: 2, nombre: "Tapachula", prefijo: "962" },
-    { id: 3, nombre: "San Cristóbal de las Casas", prefijo: "967" },
-    { id: 4, nombre: "Comitán de Domínguez", prefijo: "963" }
+    { id: 3, nombre: "San Cristóbal de las Casas", prefijo: "967" }
 ];
 
-// ==============================================
-// RATE LIMITING
-// ==============================================
 const RateLimiter = {
     recordAttempt(action) { const key = `rate_${action}`; const now = Date.now(); const attempts = JSON.parse(localStorage.getItem(key) || '[]'); const recent = attempts.filter(t => now - t < 900000); recent.push(now); localStorage.setItem(key, JSON.stringify(recent)); return recent.length; },
-    canAttempt(action, maxAttempts=5) { const key = `rate_${action}`; const now = Date.now(); const attempts = JSON.parse(localStorage.getItem(key) || '[]'); const recent = attempts.filter(t => now - t < 900000); localStorage.setItem(key, JSON.stringify(recent)); return recent.length < maxAttempts; },
-    getWaitTime(action, maxAttempts=5) { const key = `rate_${action}`; const now = Date.now(); const attempts = JSON.parse(localStorage.getItem(key) || '[]'); if(attempts.length < maxAttempts) return 0; const oldest = Math.min(...attempts); const waitTime = 900000 - (now - oldest); return waitTime > 0 ? Math.ceil(waitTime/1000) : 0; }
+    canAttempt(action, maxAttempts=5) { const key = `rate_${action}`; const now = Date.now(); const attempts = JSON.parse(localStorage.getItem(key) || '[]'); const recent = attempts.filter(t => now - t < 900000); localStorage.setItem(key, JSON.stringify(recent)); return recent.length < maxAttempts; }
 };
 
 // ==============================================
@@ -415,7 +220,6 @@ window.getDeviceFingerprint = function() {
         if(ua.includes('Android')) osFamily = 'android';
         else if(ua.includes('iPhone')||ua.includes('iPad')) osFamily = 'ios';
         else if(ua.includes('Windows')) osFamily = 'windows';
-        else if(ua.includes('Mac OS')) osFamily = 'macos';
         let architecture = 'unknown';
         if(ua.includes('arm64')) architecture = 'arm64';
         const components = { gpu: gpuRenderer, cores: cpuCores, resolution: physicalResolution, os: osFamily, arch: architecture };
@@ -425,7 +229,7 @@ window.getDeviceFingerprint = function() {
 };
 
 // ==============================================
-// LOADING SCREEN CONTROLS
+// LOADING SCREEN
 // ==============================================
 let loadingTimeoutId = null;
 function showLoadingScreen(message, progress=0) {
@@ -454,7 +258,7 @@ function updateLoadingProgress(percent, message) {
 }
 
 // ==============================================
-// INICIALIZAR FIREBASE
+// FIREBASE INIT Y AUTH
 // ==============================================
 function initializeFirebase() {
     if(AppState.firebase.isEnabled) return true;
@@ -468,16 +272,10 @@ function initializeFirebase() {
     } catch(e) { console.error(e); return false; }
 }
 
-// ==============================================
-// AUTH LISTENER
-// ==============================================
 async function loadUserProfile(uid) {
     if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
     const cached = AppState.persistentCache.get('profile', uid);
-    if(cached) {
-        AppState.setUser(AppState.firebase.auth.currentUser, cached);
-        return true;
-    }
+    if(cached) { AppState.setUser(AppState.firebase.auth.currentUser, cached); return true; }
     const snap = await AppState.firebase.database.ref('users/'+uid).once('value');
     if(snap.exists()) {
         const profile = { id: uid, ...snap.val() };
@@ -522,7 +320,7 @@ function setupAuthListener() {
             const accesoPermitido = await verificarDispositivo(user);
             if(!accesoPermitido) { AppState.clearUser(); AppState.setScreen('public'); return; }
             const perfilExiste = await loadUserProfile(user.uid);
-            if(!perfilExiste) { return; }
+            if(!perfilExiste) return;
             const profile = AppState.user.profile;
             if(profile?.activated === true) { RecurrentUserManager.markAsRecurrent(); AppState.setScreen('public'); }
             else { AppState.setScreen('activation_pending'); }
@@ -536,24 +334,58 @@ function setupAuthListener() {
 }
 
 // ==============================================
+// GOOGLE LOGIN
+// ==============================================
+window.handleGoogleCredentialResponse = async function(response) {
+    showLoadingScreen('Autenticando con Google...', 50);
+    try {
+        if(!AppState.firebase.isEnabled) initializeFirebase();
+        const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+        const result = await AppState.firebase.auth.signInWithCredential(credential);
+        if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
+        const user = result.user;
+        const snap = await AppState.firebase.database.ref('users/'+user.uid).once('value');
+        if(!snap.exists()) {
+            const defaultPermissions = { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false };
+            await AppState.firebase.database.ref('users/'+user.uid).set({
+                uid: user.uid, displayName: user.displayName, realEmail: user.email, photoURL: user.photoURL,
+                registeredAt: Date.now(), registeredWith: 'google', maxDevices: 1, ...defaultPermissions
+            });
+            await loadUserProfile(user.uid);
+            AppState.addNotification('✅ Registro exitoso. Pendiente de activación.', 'success');
+            AppState.setScreen('activation_pending');
+        } else {
+            await loadUserProfile(user.uid);
+            const profile = AppState.user.profile;
+            if(profile?.activated === true) AppState.setScreen('public');
+            else AppState.setScreen('activation_pending');
+        }
+        hideLoadingScreen();
+    } catch(error) { hideLoadingScreen(); AppState.addNotification('Error con Google', 'error'); }
+};
+
+window.mostrarModalGoogleInferior = function() {
+    if(AppState.user.current) return;
+    const container = document.getElementById('google-one-tap-container') || (() => { const d=document.createElement('div'); d.id='google-one-tap-container'; d.style.cssText='position:fixed; bottom:20px; left:0; right:0; display:flex; justify-content:center; z-index:10001;'; document.body.appendChild(d); return d; })();
+    google.accounts.id.initialize({ client_id: '979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com', callback: window.handleGoogleCredentialResponse });
+    google.accounts.id.prompt();
+};
+
+// ==============================================
 // HANDLE LOGIN / REGISTER
 // ==============================================
 window.handleLogin = async function() {
     const email = document.getElementById('loginPhone')?.value.trim();
     const password = document.getElementById('loginPassword')?.value;
     if(!email || !password) { AppState.addNotification('Completa todos los campos', 'warning'); return; }
-    if(!RateLimiter.canAttempt(`login_${email}`, 3)) { AppState.addNotification('Demasiados intentos. Espera unos minutos.', 'error'); return; }
+    if(!RateLimiter.canAttempt(`login_${email}`, 3)) { AppState.addNotification('Demasiados intentos.', 'error'); return; }
     if(!AppState.firebase.isEnabled) initializeFirebase();
     showLoadingScreen('Iniciando sesión...', 30);
     try {
         RateLimiter.recordAttempt(`login_${email}`);
         await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
         hideLoadingScreen();
-    } catch(error) {
-        hideLoadingScreen();
-        if(error.code === 'auth/invalid-login-credentials') AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
-        else AppState.addNotification('Error al iniciar sesión', 'error');
-    }
+    } catch(error) { hideLoadingScreen(); AppState.addNotification('❌ Email o contraseña incorrectos', 'error'); }
 };
 
 window.handleCompleteRegister = async function() {
@@ -566,7 +398,7 @@ window.handleCompleteRegister = async function() {
     const confirmPassword = document.getElementById('registerConfirmPassword')?.value;
     const termsAccepted = document.getElementById('registerTerms')?.checked || false;
     
-    if(!fullName || !realEmail || !password || !confirmPassword) { AppState.addNotification('Completa los campos obligatorios', 'error'); return; }
+    if(!fullName || !realEmail || !password) { AppState.addNotification('Completa campos obligatorios', 'error'); return; }
     if(!validateEmail(realEmail)) { AppState.addNotification('Email inválido', 'error'); return; }
     if(password.length < 6) { AppState.addNotification('Contraseña mínimo 6 caracteres', 'error'); return; }
     if(password !== confirmPassword) { AppState.addNotification('Las contraseñas no coinciden', 'error'); return; }
@@ -578,36 +410,27 @@ window.handleCompleteRegister = async function() {
         if(!AppState.firebase.database) AppState.firebase.database = firebase.database();
         const user = userCredential.user;
         await user.updateProfile({ displayName: fullName });
-        await AppState.firebase.database.ref('users/' + user.uid).set({
+        await AppState.firebase.database.ref('users/'+user.uid).set({
             uid: user.uid, displayName: fullName, realEmail: realEmail, registeredAt: Date.now(), registeredWith: 'email',
             activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, maxDevices: 1,
             ...(partyName && { partyName }), ...(representative && { representative }), ...(phoneNumber && { phone: phoneNumber })
         });
-        await loadUserProfile(user.uid);
-        AppState.addNotification('✅ Cuenta creada. Pendiente de activación.', 'success');
         await AppState.firebase.auth.signOut();
+        AppState.addNotification('✅ Cuenta creada. Pendiente de activación.', 'success');
         hideLoadingScreen();
         AppState.setScreen('public');
-    } catch(error) {
-        hideLoadingScreen();
-        if(error.code === 'auth/email-already-in-use') AppState.addNotification('Este email ya está registrado', 'error');
-        else AppState.addNotification('Error al registrar', 'error');
-    }
+    } catch(error) { hideLoadingScreen(); AppState.addNotification('Error al registrar', 'error'); }
 };
 
 window.resetPassword = async function() {
     const email = document.getElementById('loginPhone')?.value.trim();
-    if(!email) { AppState.addNotification('Ingresa tu correo electrónico', 'error'); return; }
+    if(!email) { AppState.addNotification('Ingresa tu correo', 'error'); return; }
     if(!AppState.firebase.auth) initializeFirebase();
-    try {
-        await AppState.firebase.auth.sendPasswordResetEmail(email);
-        AppState.addNotification(`✅ Se envió un enlace de recuperación a: ${email}`, 'success');
-    } catch(error) { AppState.addNotification('Error al enviar correo de recuperación', 'error'); }
+    try { await AppState.firebase.auth.sendPasswordResetEmail(email); AppState.addNotification(`✅ Enlace enviado a ${email}`, 'success'); } catch(e) { AppState.addNotification('Error al enviar', 'error'); }
 };
 
 window.handleLogout = async function() {
-    const currentUid = AppState.user.current?.uid;
-    if(currentUid && AppState.persistentCache) AppState.persistentCache.clearUserCache(currentUid);
+    if(AppState.user.current?.uid && AppState.persistentCache) AppState.persistentCache.clearUserCache(AppState.user.current.uid);
     RecurrentUserManager.clear();
     if(AppState.firebase.auth) await AppState.firebase.auth.signOut();
     AppState.clearUser();
@@ -619,90 +442,39 @@ window.handleLogout = async function() {
 };
 
 // ==============================================
-// RENDER PANTALLAS (COMPLETO)
+// RENDER PANTALLAS (TODAS)
 // ==============================================
 function renderPublicScreen() {
-    return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;">
-        <div style="max-width:800px; margin:0 auto; padding:20px;">
-            <div style="background:linear-gradient(135deg, #8B4513 0%, #D2691E 100%); border-radius:24px; padding:40px 20px; text-align:center; margin-bottom:30px; color:white;">
-                <div style="font-size:60px; margin-bottom:15px;">🐓</div>
-                <h1 style="font-size:28px; margin-bottom:10px;">CALCUTAS Y SUBASTAS</h1>
-                <p style="font-size:16px; opacity:0.9;">JAVI RUIZ</p>
-                <div style="margin-top:25px;"><button onclick="handleLoginClick()" style="background:#FFD700; color:#8B4513; border:none; padding:14px 30px; border-radius:50px; font-weight:bold; font-size:16px; cursor:pointer;">🔐 INICIAR SESIÓN</button></div>
-            </div>
-            <div style="background:white; border-radius:20px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                <h2 style="color:#8B4513; margin-bottom:16px;">📌 ¿Qué es esto?</h2>
-                <p style="color:#555; line-height:1.6; margin-bottom:20px;">Plataforma especializada para aficionados, criadores, jueces y organizadores de toda Latinoamérica para gestionar sus eventos gallísticos en tiempo real.</p>
-                <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:15px;">
-                    <div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">🏆</div><div style="font-weight:bold;">Torneos</div></div>
-                    <div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">💰</div><div style="font-weight:bold;">Subastas</div></div>
-                    <div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">🧬</div><div style="font-weight:bold;">Pedigrí</div></div>
-                    <div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">⚖️</div><div style="font-weight:bold;">Jueces</div></div>
-                </div>
-            </div>
-        </div>
-    </div>`;
+    return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px;"><div style="background:linear-gradient(135deg,#8B4513 0%,#D2691E 100%); border-radius:24px; padding:40px 20px; text-align:center; margin-bottom:30px; color:white;"><div style="font-size:60px;">🐓</div><h1 style="font-size:28px;">CALCUTAS Y SUBASTAS</h1><p>JAVI RUIZ</p><button onclick="handleLoginClick()" style="background:#FFD700; color:#8B4513; border:none; padding:14px 30px; border-radius:50px; font-weight:bold; margin-top:20px;">🔐 INICIAR SESIÓN</button></div><div style="background:white; border-radius:20px; padding:24px;"><h2 style="color:#8B4513;">📌 ¿Qué es esto?</h2><p>Plataforma especializada para aficionados, criadores, jueces y organizadores de toda Latinoamérica.</p><div style="display:grid; grid-template-columns:repeat(2,1fr); gap:15px; margin-top:20px;"><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">🏆</div><div>Torneos</div></div><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">💰</div><div>Subastas</div></div><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">🧬</div><div>Pedigrí</div></div><div style="background:#f5f5f5; padding:15px; border-radius:12px; text-align:center;"><div style="font-size:30px;">⚖️</div><div>Jueces</div></div></div></div></div></div>`;
 }
 
 function renderPublicTopBar() {
-    return `<nav style="position:fixed; top:0; left:0; right:0; height:50px; background:white; box-shadow:0 2px 20px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; padding:0 16px; z-index:1000; border-bottom:1px solid rgba(139,69,19,0.2);">
-        <button onclick="handleLoginClick()" style="background:transparent; border:2px solid #000; color:#4A4A4A; padding:8px 10px; border-radius:30px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:6px;"><span style="font-size:16px;">🔑</span> INICIAR SESIÓN</button>
-        <button onclick="navigateTo('share')" style="background:#f5f5f5; border:2px solid #8B4513; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; color:#8B4513; font-size:10px; font-weight:700; padding:8px 10px; border-radius:40px; gap:2px; min-width:100px;"><span style="font-size:20px;">🔗</span><span>Ver Publicaciones</span></button>
-        <button onclick="window.mostrarModalInformativo && window.mostrarModalInformativo()" style="background:transparent; border:none; font-size:24px; cursor:pointer;">ℹ️</button>
-    </nav>`;
+    return `<nav style="position:fixed; top:0; left:0; right:0; height:50px; background:white; display:flex; justify-content:space-between; align-items:center; padding:0 16px; z-index:1000; box-shadow:0 2px 10px rgba(0,0,0,0.1);"><button onclick="handleLoginClick()" style="background:transparent; border:2px solid #8B4513; border-radius:30px; padding:8px 12px; font-weight:700;">🔑 INICIAR SESIÓN</button><button onclick="navigateTo('share')" style="background:#f5f5f5; border:2px solid #8B4513; border-radius:40px; padding:8px 16px;">🔗 Publicaciones</button><button onclick="window.mostrarModalInformativo()" style="background:transparent; border:none; font-size:24px;">ℹ️</button></nav>`;
 }
 
 function renderLoginScreen() {
-    return `<div style="position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifOZH9-0lYvE26eERqh2GlCJ8FluQTtfWIv0511ORLE78-buORw3OT-V5jHrU8yRK-HX_AmMD3FQRF2wiVUVLNKkEhepibWafLLBPvX6YNsTuRL3uJ1OpVD1bcJ9R4FBXfBN9xyYOG3b_v1fMuqZOLkaZrfCJmltGJZsZhKN-5IM7WfstdaM_0ry0nLEY/s320/Gemini_Generated_Image_4l1ocl4l1ocl4l1o.png'); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; padding:36px; overflow-y:auto;">
-        <div style="width:100%; max-width:400px; margin:auto;">
-            <div style="background:rgba(255,255,255,0.96); border-radius:28px; padding:10px; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
-                <div style="display:flex; gap:8px; margin-bottom:10px;">
-                    <button onclick="showLoginForm()" id="tabLoginBtn" style="flex:1; padding:10px; background:#8B4513; border:none; border-radius:30px; font-weight:700; font-size:14px; color:white; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
-                    <button onclick="showRegisterForm()" id="tabRegBtn" style="flex:1; padding:10px; background:#f0f0f0; border:none; border-radius:30px; font-weight:500; font-size:14px; color:#666; cursor:pointer;">📝 Registrar</button>
-                </div>
-                <div style="max-height:55vh; overflow-y:auto;">
-                    <div id="loginFormDiv"><div class="login-form"><input type="email" id="loginPhone" placeholder="Correo electrónico" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:12px;"><input type="password" id="loginPassword" placeholder="Contraseña" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:12px;"><button onclick="handleLogin()" class="btn-primary" style="width:100%;padding:14px;background:#8B4513;color:white;border:none;border-radius:40px;font-weight:700;font-size:16px;cursor:pointer;">ACCEDER</button><div style="margin-top:12px;text-align:center;"><a href="#" onclick="resetPassword()" style="color:#8B4513;font-size:14px;">¿Olvidaste tu contraseña?</a></div></div></div>
-                    <div id="registerFormDiv" style="display:none;"><div class="login-form"><input type="text" id="registerFullName" placeholder="Nombre completo *" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:8px;"><input type="email" id="registerRealEmail" placeholder="📧 Correo electronico *" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:8px;"><input type="text" id="registerPartyName" placeholder="Partido (opcional)" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:8px;"><input type="text" id="registerRepresentative" placeholder="Representante/Criadero (opcional)" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:8px;"><input type="tel" id="registerPhone" placeholder="Teléfono (opcional)" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:8px;"><input type="password" id="registerPassword" placeholder="Contraseña *" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:8px;"><input type="password" id="registerConfirmPassword" placeholder="Confirmar contraseña *" style="width:100%;padding:14px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:12px;"><label style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><input type="checkbox" id="registerTerms"> Acepto términos y condiciones</label><button onclick="handleCompleteRegister()" style="width:100%;padding:14px;background:#8B4513;color:white;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer;">Crear cuenta</button></div></div>
-                </div>
-            </div>
-        </div>
-    </div>`;
+    return `<div style="position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifOZH9-0lYvE26eERqh2GlCJ8FluQTtfWIv0511ORLE78-buORw3OT-V5jHrU8yRK-HX_AmMD3FQRF2wiVUVLNKkEhepibWafLLBPvX6YNsTuRL3uJ1OpVD1bcJ9R4FBXfBN9xyYOG3b_v1fMuqZOLkaZrfCJmltGJZsZhKN-5IM7WfstdaM_0ry0nLEY/s320/Gemini_Generated_Image_4l1ocl4l1ocl4l1o.png'); background-size:cover; display:flex; align-items:center; justify-content:center;"><div style="background:white; border-radius:28px; padding:20px; width:90%; max-width:400px;"><div style="display:flex; gap:8px; margin-bottom:20px;"><button onclick="showLoginForm()" id="tabLoginBtn" style="flex:1; padding:10px; background:#8B4513; color:white; border:none; border-radius:30px;">🔐 CORREO</button><button onclick="showRegisterForm()" id="tabRegBtn" style="flex:1; padding:10px; background:#f0f0f0; color:#666; border:none; border-radius:30px;">📝 Registrar</button></div><div id="loginFormDiv"><input type="email" id="loginPhone" placeholder="Correo electrónico" style="width:100%; padding:14px; margin-bottom:12px; border-radius:8px; border:1px solid #ddd;"><input type="password" id="loginPassword" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:12px; border-radius:8px; border:1px solid #ddd;"><button onclick="handleLogin()" style="width:100%; background:#8B4513; color:white; padding:14px; border:none; border-radius:40px; font-weight:bold;">ACCEDER</button><div style="text-align:center; margin-top:12px;"><a href="#" onclick="resetPassword()" style="color:#8B4513;">¿Olvidaste contraseña?</a></div><button onclick="window.mostrarModalGoogleInferior()" style="width:100%; margin-top:12px; background:#4285F4; color:white; padding:12px; border:none; border-radius:40px;">🔵 Iniciar con Google</button></div><div id="registerFormDiv" style="display:none;"><input type="text" id="registerFullName" placeholder="Nombre completo *" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="email" id="registerRealEmail" placeholder="Correo electrónico *" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="text" id="registerPartyName" placeholder="Partido (opcional)" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="text" id="registerRepresentative" placeholder="Representante (opcional)" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="tel" id="registerPhone" placeholder="Teléfono (opcional)" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="password" id="registerPassword" placeholder="Contraseña *" style="width:100%; padding:12px; margin-bottom:8px; border-radius:8px;"><input type="password" id="registerConfirmPassword" placeholder="Confirmar *" style="width:100%; padding:12px; margin-bottom:12px; border-radius:8px;"><label style="display:flex; gap:8px;"><input type="checkbox" id="registerTerms"> Acepto términos</label><button onclick="handleCompleteRegister()" style="width:100%; margin-top:16px; background:#8B4513; color:white; padding:14px; border:none; border-radius:40px;">CREAR CUENTA</button></div></div></div>`;
 }
 
 function renderActivationPendingScreen() {
-    const profile = AppState.user.profile || {};
-    return `<div class="login-screen" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); min-height:100vh; display:flex; align-items:center; justify-content:center;">
-        <div style="background:white; border-radius:16px; padding:24px; max-width:500px; text-align:center;">
-            <div style="font-size:60px;">⏳</div>
-            <h2 style="color:#8B4513;">Cuenta en revisión</h2>
-            <p>${profile.displayName || 'Usuario'}, tu cuenta está siendo verificada por un administrador.</p>
-            <button onclick="checkActivationStatusWithFeedback()" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px; margin-top:16px; cursor:pointer;">INGRESAR AHORA</button>
-            <button onclick="handleLogout()" style="background:#f0f2f5; color:#050505; padding:12px 24px; border:1px solid #e4e6eb; border-radius:8px; margin-top:12px; cursor:pointer;">Cerrar sesión</button>
-        </div>
-    </div>`;
+    const p = AppState.user.profile || {};
+    return `<div style="min-height:100vh; background:linear-gradient(135deg,#8B4513,#D2691E); display:flex; align-items:center; justify-content:center;"><div style="background:white; border-radius:20px; padding:24px; max-width:400px; text-align:center;"><div style="font-size:60px;">⏳</div><h2>Cuenta en revisión</h2><p>${p.displayName || 'Usuario'}, tu cuenta está pendiente de activación.</p><button onclick="checkActivationStatusWithFeedback()" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:40px; margin-top:16px;">Verificar estado</button><button onclick="handleLogout()" style="background:#f0f2f5; margin-top:12px; padding:12px 24px; border:none; border-radius:40px;">Cerrar sesión</button></div></div>`;
 }
 
-window.renderShareScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">🔗</div><h2>Publicaciones Compartidas</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver al Inicio</button></div></div>`; };
-window.renderVentasScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">💰</div><h2>Calcutas y Subastas</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver al Inicio</button></div></div>`; };
-window.renderRoosterScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">🏆</div><h2>Gestión de Torneos</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver al Inicio</button></div></div>`; };
-window.renderJuezScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">⚖️</div><h2>Panel del Juez</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver al Inicio</button></div></div>`; };
-window.renderPerfilScreen = function() { const p = AppState.user.profile || {}; return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="width:80px; height:80px; background:#8B4513; border-radius:50%; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; font-size:32px; color:white;">👤</div><h2>${p.displayName || 'Usuario'}</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div></div>`; };
-window.renderAdminScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">🔧</div><h2>Panel de Administración</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div></div>`; };
-window.renderPublicacionesScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">⚔️</div><h2>Enfrentamientos</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div></div>`; };
-window.renderPedigriScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">🧬</div><h2>Pedigrí</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div></div>`; };
-window.renderConfiguracionesScreen = function() { return `<div style="padding-top:80px; min-height:100vh; background:#f8f9fa;"><div style="max-width:800px; margin:0 auto; padding:20px; text-align:center;"><div style="font-size:48px;">⚙️</div><h2>Configuraciones</h2><button onclick="navigateTo('public')" style="background:#8B4513; color:white; padding:12px 24px; border:none; border-radius:8px;">Volver</button></div></div>`; };
+window.renderShareScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🔗 Publicaciones Compartidas</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderVentasScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>💰 Calcutas y Subastas</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderRoosterScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🏆 Torneos</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderPerfilScreen = function() { const p=AppState.user.profile||{}; return `<div style="padding-top:80px; text-align:center;"><div style="width:80px;height:80px;background:#8B4513;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px;color:white;">👤</div><h2>${p.displayName||'Usuario'}</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderAdminScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🔧 Admin</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderPublicacionesScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>⚔️ Enfrentamientos</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderPedigriScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>🧬 Pedigrí</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderJuezScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>⚖️ Panel Juez</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
+window.renderConfiguracionesScreen = function() { return `<div style="padding-top:80px; text-align:center;"><h2>⚙️ Configuración</h2><button onclick="navigateTo('public')">Volver</button></div>`; };
 
 function renderMobileNavBar() {
     if(!AppState.user.current) return '';
     const p = AppState.user.profile || {};
-    return `<nav style="position:fixed; top:0; left:0; right:0; height:60px; background:white; box-shadow:0 2px 20px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; padding:0 16px; z-index:1000;">
-        <div style="display:flex; gap:8px;">
-            <button onclick="navigateTo('public')" style="background:transparent; border:none; font-size:20px; cursor:pointer;">🏠</button>
-            <button onclick="navigateTo('share')" style="background:transparent; border:none; font-size:20px; cursor:pointer;">🔗</button>
-            ${p.ventas ? '<button onclick="navigateTo(\'ventas\')" style="background:transparent; border:none; font-size:20px;">💰</button>' : ''}
-        </div>
-        <button onclick="toggleSideMenu()" style="width:40px; height:40px; border-radius:50%; background:#8B4513; color:white; border:none; font-size:18px;">☰</button>
-    </nav>`;
+    return `<nav style="position:fixed; top:0; left:0; right:0; height:60px; background:white; display:flex; justify-content:space-between; align-items:center; padding:0 16px; z-index:1000; box-shadow:0 2px 8px rgba(0,0,0,0.1);"><div style="display:flex; gap:8px;"><button onclick="navigateTo('public')" style="background:transparent; border:none; font-size:24px;">🏠</button><button onclick="navigateTo('share')" style="background:transparent; border:none;">🔗</button>${p.ventas ? '<button onclick="navigateTo(\'ventas\')" style="background:transparent; border:none;">💰</button>' : ''}</div><button onclick="toggleSideMenu()" style="width:40px; height:40px; border-radius:50%; background:#8B4513; color:white; border:none;">☰</button></nav>`;
 }
 
 function updateSideMenuContent() {
@@ -710,14 +482,7 @@ function updateSideMenuContent() {
     if(!menu) return;
     const p = AppState.user.profile;
     if(!p) return;
-    menu.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;"><div><div style="font-weight:700;">${p.displayName || 'Usuario'}</div><div style="font-size:12px; color:#666;">${p.gallo ? '👑 Administrador' : '👤 Miembro'}</div></div><button onclick="toggleSideMenu()" style="background:none; border:none; font-size:24px;">✕</button></div>
-        <button onclick="navigateTo('perfil')" style="display:flex; align-items:center; gap:16px; width:100%; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer;"><span>👤</span> Mi Perfil</button>
-        <button onclick="navigateTo('share')" style="display:flex; align-items:center; gap:16px; width:100%; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer;"><span>🔗</span> Compartir</button>
-        ${p.ventas ? '<button onclick="navigateTo(\'ventas\')" style="display:flex; align-items:center; gap:16px; width:100%; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer;"><span>💰</span> Subastas</button>' : ''}
-        ${p.isJudge ? '<button onclick="navigateTo(\'juez\')" style="display:flex; align-items:center; gap:16px; width:100%; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer;"><span>⚖️</span> Panel Juez</button>' : ''}
-        ${p.gallo ? '<button onclick="navigateTo(\'admin\')" style="display:flex; align-items:center; gap:16px; width:100%; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer;"><span>🔧</span> CREAR COTEJO COMPUTARIZADO</button>' : ''}
-        <div style="height:1px; background:#eee; margin:16px 0;"></div>
-        <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; width:100%; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; color:#d32f2f;"><span>🚪</span> Cerrar Sesión</button>`;
+    menu.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:30px;"><div><strong>${p.displayName||'Usuario'}</strong><div style="font-size:12px;">${p.gallo ? 'Admin' : 'Miembro'}</div></div><button onclick="toggleSideMenu()" style="background:none; border:none; font-size:24px;">✕</button></div><button onclick="navigateTo('perfil')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">👤 Mi Perfil</button><button onclick="navigateTo('share')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">🔗 Publicaciones</button>${p.ventas ? '<button onclick="navigateTo(\'ventas\')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">💰 Subastas</button>' : ''}${p.isJudge ? '<button onclick="navigateTo(\'juez\')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#f0f0f0; border:none; border-radius:12px;">⚖️ Juez</button>' : ''}<button onclick="handleLogout()" style="display:block; width:100%; padding:12px; margin-top:20px; background:#d32f2f; color:white; border:none; border-radius:12px;">🚪 Cerrar Sesión</button>`;
 }
 
 function toggleSideMenu() {
@@ -758,35 +523,20 @@ async function renderApp() {
 window.navigateTo = function(section) {
     if(section === 'login' && !AppState.firebase.isEnabled) initializeFirebase();
     if(section !== 'login' && section !== 'public' && !AppState.user.current) { AppState.addNotification('Debes iniciar sesión', 'warning'); section = 'public'; }
-    if(section && section !== 'login' && section !== 'activation_pending') localStorage.setItem('lastScreen', section);
     AppState.setScreen(section);
     window.history.pushState({}, '', `/?section=${section}`);
 };
 
 window.checkActivationStatusWithFeedback = async function() {
-    if(!AppState.user.current || !AppState.firebase.database) { AppState.addNotification('Error de conexión', 'error'); return; }
+    if(!AppState.user.current || !AppState.firebase.database) { AppState.addNotification('Error', 'error'); return; }
     const snap = await AppState.firebase.database.ref('users/'+AppState.user.current.uid+'/activated').once('value');
     if(snap.val() === true) { AppState.addNotification('✅ ¡Cuenta activada!', 'success'); await loadUserProfile(AppState.user.current.uid); AppState.setScreen('public'); }
-    else { AppState.addNotification('⏳ Tu cuenta aún no ha sido activada', 'warning'); }
+    else { AppState.addNotification('⏳ Cuenta no activada aún', 'warning'); }
 };
 
-window.showLoginForm = function() {
-    document.getElementById('loginFormDiv').style.display = 'block';
-    document.getElementById('registerFormDiv').style.display = 'none';
-    const loginBtn = document.getElementById('tabLoginBtn');
-    const regBtn = document.getElementById('tabRegBtn');
-    if(loginBtn) { loginBtn.style.background = '#8B4513'; loginBtn.style.color = 'white'; }
-    if(regBtn) { regBtn.style.background = '#f0f0f0'; regBtn.style.color = '#666'; }
-};
-window.showRegisterForm = function() {
-    document.getElementById('loginFormDiv').style.display = 'none';
-    document.getElementById('registerFormDiv').style.display = 'block';
-    const loginBtn = document.getElementById('tabLoginBtn');
-    const regBtn = document.getElementById('tabRegBtn');
-    if(regBtn) { regBtn.style.background = '#8B4513'; regBtn.style.color = 'white'; }
-    if(loginBtn) { loginBtn.style.background = '#f0f0f0'; loginBtn.style.color = '#666'; }
-};
-window.handleLoginClick = function() { if(!AppState.firebase.isEnabled) initializeFirebase(); navigateTo('login'); };
+window.showLoginForm = function() { document.getElementById('loginFormDiv').style.display='block'; document.getElementById('registerFormDiv').style.display='none'; document.getElementById('tabLoginBtn').style.background='#8B4513'; document.getElementById('tabRegBtn').style.background='#f0f0f0'; };
+window.showRegisterForm = function() { document.getElementById('loginFormDiv').style.display='none'; document.getElementById('registerFormDiv').style.display='block'; document.getElementById('tabRegBtn').style.background='#8B4513'; document.getElementById('tabLoginBtn').style.background='#f0f0f0'; };
+window.handleLoginClick = function() { if(!AppState.firebase.isEnabled) initializeFirebase(); navigateTo('login'); setTimeout(() => window.mostrarModalGoogleInferior(), 500); };
 window.mostrarModalInformativo = function() { AppState.addNotification('CALCUTAS Y SUBASTAS JAVI RUIZ - Versión 2.0', 'info'); };
 window.logoutAndGoPublic = handleLogout;
 
@@ -814,24 +564,14 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('social-app').style.display = 'block';
+        if(AppState.ui.currentScreen === 'public' && !AppState.user.current) setTimeout(() => window.mostrarModalGoogleInferior(), 2000);
     }, 1500);
 });
 </script>
 
-<footer style='background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 50%,#0d0d0d 100%);color:#fff;padding:50px 20px 30px;margin-top:40px;border-top:3px solid #D4AF37'>
-    <div style='max-width:1200px;margin:0 auto;text-align:center'>
-        <div style='display:flex;align-items:center;justify-content:center;gap:15px;margin-bottom:20px'>
-            <div style='width:60px;height:60px;background:#D4AF37;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:30px'>🐓</div>
-            <div><div style='font-size:22px;font-weight:800;color:#D4AF37'>CALCUTAS Y SUBASTAS</div><div style='font-size:13px;color:rgba(255,255,255,0.6)'>JAVI RUIZ</div></div>
-        </div>
-        <div style='display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:30px 0;padding:20px 0;border-top:1px solid rgba(212,175,55,0.2);border-bottom:1px solid rgba(212,175,55,0.2)'>
-            <a href='/?section=public' style='background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.3);border-radius:40px;padding:10px 24px;text-decoration:none;color:#fff;font-size:9px;font-weight:600;display:inline-flex;align-items:center;gap:8px'><span>🏠</span> INICIO</a>
-            <a href='/?share=1' style='background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.3);border-radius:40px;padding:10px 24px;text-decoration:none;color:#fff;font-size:9px;font-weight:600;display:inline-flex;align-items:center;gap:8px'><span>🔗</span> PUBLICACIONES</a>
-            <a href='/?section=rooster' style='background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.3);border-radius:40px;padding:10px 24px;text-decoration:none;color:#fff;font-size:9px;font-weight:600;display:inline-flex;align-items:center;gap:8px'><span>🏆</span> TORNEOS</a>
-            <a href='/?section=ventas' style='background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.3);border-radius:40px;padding:10px 24px;text-decoration:none;color:#fff;font-size:9px;font-weight:600;display:inline-flex;align-items:center;gap:8px'><span>💰</span> SUBASTAS</a>
-        </div>
-        <div style='font-size:11px;color:rgba(255,255,255,0.4)'>© 2026 Calcutas y Subastas Javi Ruiz - Todos los derechos reservados<br>Versión 2.0 | Gestión Avícola Digital</div>
-    </div>
+<footer style='background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%); color:#fff; padding:40px 20px; text-align:center; margin-top:40px;'>
+    <p>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - Todos los derechos reservados © 2026</p>
+    <p style="font-size:12px;">Versión 2.0 | Gestión Avícola Digital</p>
 </footer>
 </body>
 </html>
