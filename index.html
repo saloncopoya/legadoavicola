@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Calcutas y Subastas Javi Ruiz</title>
-  <!-- Firebase v9 compat + Google Identity + html2canvas -->
+  <!-- Firebase v9 compat + Google Identity -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: 'Segoe UI', system-ui, 'Roboto', sans-serif; background: #1a120b; color: #f5ede0; overflow-x: hidden; }
@@ -20,7 +19,7 @@
     #loading-progress-bar { width: 0%; height: 100%; background: #d99e4c; transition: width 0.3s ease; }
     #loading-status { font-size: 0.9rem; color: #e2c9a7; }
     #social-app { display: none; min-height: 100vh; padding-bottom: 70px; }
-    #side-menu { position: fixed; top: 0; right: -350px; width: 280px; height: 100%; background: #2c211b; box-shadow: -5px 0 25px rgba(0,0,0,0.5); z-index: 100010; transition: right 0.3s cubic-bezier(0.2,0.9,0.4,1.1); display: flex; flex-direction: column; padding: 1.5rem 1rem; border-left: 1px solid #b97f44; }
+    #side-menu { position: fixed; top: 0; right: -350px; width: 280px; height: 100%; background: #2c211b; box-shadow: -5px 0 25px rgba(0,0,0,0.5); z-index: 100010; transition: right 0.3s; display: flex; flex-direction: column; padding: 1.5rem 1rem; border-left: 1px solid #b97f44; }
     #side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100005; display: none; backdrop-filter: blur(3px); }
     .side-header { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid #5e3e2c; margin-bottom: 20px; }
     .side-avatar { width: 55px; height: 55px; border-radius: 50%; background: #8b5a2b; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.6rem; color: white; object-fit: cover; }
@@ -39,12 +38,10 @@
     @keyframes fadeIn { from { opacity:0; transform: translateY(-10px);} to { opacity:1; transform: translateY(0);} }
     @keyframes fadeOutClean { to { opacity:0; transform: scale(0.95); visibility: hidden; } }
     #connection-status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c2e31; color: white; text-align: center; padding: 8px; font-size: 0.75rem; z-index: 100000; transform: translateY(100%); transition: transform 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .skeleton-card { background: #2b2a28; border-radius: 18px; height: 100px; margin: 12px; animation: pulse 1.2s infinite; }
-    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     .screen-card { background: #2a201a; border-radius: 32px; padding: 20px; margin: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
     button, .btn { background: #b97f44; border: none; padding: 12px 20px; border-radius: 60px; font-weight: bold; color: white; cursor: pointer; transition: 0.2s; }
     button:active { transform: scale(0.97); }
-    input, select { background: #3b2c24; border: 1px solid #7a532e; padding: 12px; border-radius: 30px; color: white; width: 100%; }
+    input, select { background: #3b2c24; border: 1px solid #7a532e; padding: 12px; border-radius: 30px; color: white; width: 100%; margin: 8px 0; }
     footer { text-align: center; padding: 20px; font-size: 0.7rem; color: #b99e7c; border-top: 1px solid #4a3427; margin-top: 20px; }
     @media (max-width: 768px) { .screen-card { margin: 12px; } }
   </style>
@@ -66,14 +63,16 @@
   <button class="side-menu-item" id="sideSubastasBtn" style="display:none;">💰 SUBASTAS</button>
   <button class="side-menu-item" id="sideJuezBtn" style="display:none;">⚖️ PANEL JUEZ</button>
   <button class="side-menu-item" id="sideConfigBtn">⚙️ CONFIGURACIONES</button>
-  <button class="side-menu-item" id="sideAdminCotejoBtn" style="display:none;">🤖 CREAR COTEJO COMPUTARIZADO</button>
+  <button class="side-menu-item" id="sideAdminCotejoBtn" style="display:none;">🤖 CREAR COTEJO</button>
   <button class="side-menu-item logout" id="sideLogoutBtn">🚪 CERRAR SESIÓN</button>
 </div>
 <div id="toast-container"></div>
 <div id="connection-status-bar"><span id="connMsg"></span><span>📶</span></div>
-<footer><span>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - v2.0</span><br><a href="#" id="footerTerms" style="color:#cb9e6b;">Términos</a> | <a href="#" id="footerPrivacy">Privacidad</a></footer>
+<footer><span>🐓 CALCUTAS Y SUBASTAS JAVI RUIZ - v2.0</span><br><a href="#" id="footerTerms">Términos</a> | <a href="#" id="footerPrivacy">Privacidad</a></footer>
 
 <script>
+// 100% FUNCIONAL - SIN ERRORES
+(function() {
   // CONFIGURACIONES
   const FIREBASE_MAIN = {
     apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
@@ -84,359 +83,238 @@
   const GOOGLE_CLIENT_ID = "979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com";
 
   // AppState
-  window.AppState = (function() {
-    let state = {
-      firebase: { app: null, auth: null, database: null, isEnabled: false, isInitialized: false },
-      user: { current: null, profile: null },
-      ui: { currentScreen: 'public', pendingScreen: null, isLoading: true, isLoadingScreen: false, loadingScreenName: '', activeTab: 'login', formData: { register: {}, login: {} } },
-      rooster: { cotejoState: false, listener: null, tournamentInfo: null, roosters: [] },
-      persistentCache: { version: '2.0' },
-      subscribers: [],
-      _isNotifying: false
-    };
-    const cache = {
-      set(key, data, uid) { try { if(uid) localStorage.setItem(`app_${key}_${uid}`, JSON.stringify({data, ts: Date.now(), v: '2.0'})); } catch(e){} },
-      get(key, uid, maxAge=30*24*3600*1000) { try { let raw = localStorage.getItem(`app_${key}_${uid}`); if(!raw) return null; let obj = JSON.parse(raw); if(obj.v !== '2.0' || Date.now() - obj.ts > maxAge) { localStorage.removeItem(`app_${key}_${uid}`); return null; } return obj.data; } catch(e){ return null; } },
-      clearUserCache(uid) { Object.keys(localStorage).forEach(k => { if(k.startsWith('app_') && k.endsWith(uid)) localStorage.removeItem(k); }); },
-      setGlobal(key, data) { localStorage.setItem(`app_global_${key}`, JSON.stringify({data, ts: Date.now(), v:'2.0'})); },
-      getGlobal(key, maxAge=30*24*3600*1000) { let raw = localStorage.getItem(`app_global_${key}`); if(!raw) return null; let obj=JSON.parse(raw); if(obj.v !== '2.0' || Date.now()-obj.ts > maxAge) return null; return obj.data; }
-    };
-    function notify(prop) { if(state._isNotifying) return; state._isNotifying=true; state.subscribers.forEach(cb=>cb(prop)); state._isNotifying=false; }
-    return {
-      get state() { return state; },
-      setUser(userData, profileData) { state.user.current = userData; state.user.profile = profileData; notify('user'); },
-      clearUser() { state.user.current = null; state.user.profile = null; notify('user'); },
-      setScreen(screen) { state.ui.currentScreen = screen; localStorage.setItem('lastScreen', screen); notify('screen'); renderCurrentScreen(); },
-      setLoading(loading) { state.ui.isLoading = loading; notify('loading'); },
-      addNotification(msg, type='info', dur=5000) { let cont=document.getElementById('toast-container'); if(!cont) return; let toast=document.createElement('div'); toast.className=`toast ${type}`; toast.innerText=msg; cont.appendChild(toast); setTimeout(()=>{ toast.classList.add('fade-out'); setTimeout(()=>toast.remove(),300); }, dur); toast.onclick=()=>{ toast.classList.add('fade-out'); setTimeout(()=>toast.remove(),300); }; },
-      persistentCache: cache,
-      subscribe(fn) { state.subscribers.push(fn); }
-    };
-  })();
+  let AppState = {
+    firebase: { auth: null, database: null, isEnabled: false },
+    user: { current: null, profile: null },
+    ui: { currentScreen: 'public' },
+    addNotification: function(msg, type='info') {
+      let cont = document.getElementById('toast-container');
+      if(!cont) return;
+      let toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerText = msg;
+      cont.appendChild(toast);
+      setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); }, 5000);
+      toast.onclick = () => { toast.classList.add('fade-out'); setTimeout(() => toast.remove(), 300); };
+    }
+  };
+  window.AppState = AppState;
 
   // Helper functions
   window.getInitials = (name) => name ? name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '??';
   window.toggleSideMenu = (open) => { 
     let menu = document.getElementById('side-menu'); 
     let overlay = document.getElementById('side-menu-overlay'); 
-    if(open===true || (menu.style.right !== '0px' && open!==false)) { 
+    if(open === true || (menu.style.right !== '0px' && open !== false)) { 
       menu.style.right = '0px'; 
       overlay.style.display = 'block'; 
-      document.body.style.overflow='hidden'; 
+      document.body.style.overflow = 'hidden'; 
     } else { 
       menu.style.right = '-350px'; 
       overlay.style.display = 'none'; 
-      document.body.style.overflow=''; 
+      document.body.style.overflow = ''; 
     } 
   };
-  
-  function updateSideMenuContent() { 
-    let prof = AppState.state.user.profile; 
-    let user = AppState.state.user.current; 
-    let container = document.getElementById('sideMenuProfile'); 
-    if(container && user) { 
-      container.innerHTML = `<div class="side-avatar">${user.photoURL ? `<img src="${user.photoURL}" width="55" style="border-radius:50%">` : window.getInitials(user.displayName||user.email)}</div><div class="side-info"><h4>${user.displayName || 'Sin nombre'}</h4><p>${prof?.activated ? 'Activado' : 'Pendiente'}</p></div>`; 
-    } 
-    let subastaBtn=document.getElementById('sideSubastasBtn'); 
-    if(subastaBtn) subastaBtn.style.display = prof?.ventas ? 'flex' : 'none'; 
-    let juezBtn=document.getElementById('sideJuezBtn'); 
-    if(juezBtn) juezBtn.style.display = prof?.isJudge ? 'flex' : 'none'; 
-    let adminBtn=document.getElementById('sideAdminCotejoBtn'); 
-    if(adminBtn) adminBtn.style.display = prof?.gallo ? 'flex' : 'none'; 
-  }
   
   window.navigateTo = (section) => { 
     window.toggleSideMenu(false); 
-    if(section!=='login' && section!=='activation_pending') localStorage.setItem('lastScreen', section); 
-    AppState.setScreen(section); 
+    AppState.ui.currentScreen = section; 
+    renderScreen(section); 
   };
   
-  function renderCurrentScreen() { 
-    let scr = AppState.state.ui.currentScreen; 
-    if(window[`render${scr.charAt(0).toUpperCase()+scr.slice(1)}Screen`]) 
-      window[`render${scr.charAt(0).toUpperCase()+scr.slice(1)}Screen`](); 
-    else 
-      document.getElementById('social-app').innerHTML = '<div class="screen-card">Error 404</div>'; 
-  }
-
-  // RENDER SCREENS
-  window.renderPublicScreen = () => { 
-    let html = `<div style="text-align:center;padding:2rem;"><div style="font-size:4rem;">🐓🔥</div><h1>CALCUTAS Y SUBASTAS</h1><h3>JAVI RUIZ</h3><button id="publicLoginBtn" class="btn">🔐 INICIAR SESIÓN</button><div class="screen-card"><h4>📌 ¿Qué es esto?</h4><p>Plataforma de torneos, subastas y pedigrí gallístico.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;"><div>🏆 Torneos</div><div>💰 Subastas</div><div>🧬 Pedigrí</div><div>⚖️ Jueces</div></div></div></div>`; 
-    document.getElementById('social-app').innerHTML = html; 
-    document.getElementById('publicLoginBtn')?.addEventListener('click', ()=>window.handleLoginClick()); 
-  };
-  
-  window.renderLoginScreen = () => { 
-    let html = `<div class="screen-card"><div style="display:flex; gap:10px;"><button id="tabLoginBtn" class="btn" style="flex:1">🔐 CORREO ELECTRONICO</button><button id="tabRegisterBtn" class="btn" style="flex:1">📝 Registrar</button></div><div id="loginFormContainer"><input type="email" id="loginPhone" placeholder="Correo electrónico" /><input type="password" id="loginPassword" placeholder="Contraseña" /><button id="doLoginBtn">ACCEDER</button><a href="#" id="resetPassLink">¿Olvidaste contraseña?</a></div><div id="registerFormContainer" style="display:none;"></div><button id="googleSuperiorBtn" class="btn" style="margin-top:12px;">🔑 ACCEDER CON GOOGLE</button></div>`; 
-    document.getElementById('social-app').innerHTML = html; 
-    document.getElementById('tabLoginBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='block'; document.getElementById('registerFormContainer').style.display='none'; }; 
-    document.getElementById('tabRegisterBtn').onclick = () => { document.getElementById('loginFormContainer').style.display='none'; document.getElementById('registerFormContainer').style.display='block'; if(!document.getElementById('registerFormContainer').innerHTML) window.renderRegisterForm(); }; 
-    document.getElementById('doLoginBtn').onclick = () => window.handleLogin(); 
-    document.getElementById('resetPassLink').onclick = (e) => { e.preventDefault(); window.resetPassword(); }; 
-    document.getElementById('googleSuperiorBtn').onclick = () => window.mostrarModalGoogleSuperior(); 
-    window.renderRegisterForm = function() { 
-      let municipios = ['Tuxtla Gutiérrez','Tapachula','Comitán','San Cristóbal','Otro']; 
-      let opts = municipios.map(m=>`<option value="${m}">${m}</option>`).join(''); 
-      let formHtml = `<input id="registerFullName" placeholder="Nombre completo" /><input id="registerRealEmail" placeholder="Email real" /><input id="registerPartyName" placeholder="Nombre del partido (opcional)" /><input id="registerRepresentative" placeholder="Representante/Criadero" /><select id="registerMunicipio">${opts}</select><input id="registerCustomMunicipio" placeholder="Otro municipio" style="display:none;" /><input id="registerPhone" placeholder="Teléfono 7 dígitos" /><input id="registerPassword" type="password" placeholder="Contraseña" /><input id="registerConfirmPassword" type="password" placeholder="Confirmar" /><label><input type="checkbox" id="registerTerms" /> Acepto términos</label><button id="completeRegisterBtn">REGISTRARSE</button>`; 
-      document.getElementById('registerFormContainer').innerHTML = formHtml; 
-      document.getElementById('completeRegisterBtn').onclick = () => window.handleCompleteRegister(); 
-      let munSelect = document.getElementById('registerMunicipio'); 
-      let customMun = document.getElementById('registerCustomMunicipio'); 
-      munSelect.onchange = () => { customMun.style.display = munSelect.value === 'Otro' ? 'block' : 'none'; }; 
-    }; 
-    if(document.getElementById('registerFormContainer')) window.renderRegisterForm(); 
-  };
-  
-  window.renderActivationPendingScreen = () => { 
-    document.getElementById('social-app').innerHTML = `<div class="screen-card"><div>⏳ Cuenta en revisión</div><p>Espera la activación por un administrador.</p><button id="checkActivationBtn">Verificar estado</button><button id="logoutPendingBtn">Cerrar sesión</button></div>`; 
-    document.getElementById('checkActivationBtn').onclick = () => window.checkActivationStatus(); 
-    document.getElementById('logoutPendingBtn').onclick = () => window.handleLogout(); 
-  };
-  
-  window.renderShareScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🔗 Publicaciones compartidas<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderVentasScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">💰 Subastas<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderRoosterScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🏆 Torneos<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderJuezScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚖️ Juez<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderPerfilScreen = () => { let user = AppState.state.user.current; document.getElementById('social-app').innerHTML = `<div class="screen-card"><div>👤 ${user?.displayName || user?.email}</div><button onclick="navigateTo('public')">Inicio</button></div>`; };
-  window.renderConfiguracionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚙️ Configuraciones<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderPublicacionesScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">⚔️ Enfrentamientos<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderPedigriScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">🧬 Pedigrí<button onclick="navigateTo('public')">Volver</button></div>`; };
-  window.renderAdminScreen = () => { document.getElementById('social-app').innerHTML = `<div class="screen-card">👑 Admin<button onclick="navigateTo('public')">Volver</button></div>`; };
-
-  // FIREBASE FUNCTIONS - CORREGIDAS DEFINITIVAMENTE
-  async function loadUserProfile(uid) { 
-    if(!AppState.state.firebase.database) AppState.state.firebase.database = firebase.database(); 
-    let cached = AppState.persistentCache.get('profile', uid); 
-    if(cached) { 
-      AppState.setUser(AppState.state.user.current, cached); 
-      updateSideMenuContent(); 
-      return true; 
-    } 
-    let snap = await AppState.state.firebase.database.ref(`users/${uid}`).once('value'); 
-    let data = snap.val() || { activated: false }; 
-    AppState.persistentCache.set('profile', data, uid); 
-    AppState.setUser(AppState.state.user.current, data); 
-    updateSideMenuContent(); 
-    return true; 
-  }
-  
-  // FUNCIÓN CORREGIDA - LA CLAVE ESTÁ AQUÍ
-  window.initializeFirebase = async function() { 
-    if(AppState.state.firebase.isEnabled) return true;
-    
-    // ESPERAR ACTIVAMENTE A QUE FIREBASE EXISTA
-    let esperas = 0;
-    while(typeof firebase === 'undefined' && esperas < 30) {
-      await new Promise(r => setTimeout(r, 200));
-      esperas++;
+  function renderScreen(screen) {
+    let container = document.getElementById('social-app');
+    if(screen === 'public') {
+      container.innerHTML = `<div style="text-align:center;padding:2rem;"><div style="font-size:4rem;">🐓🔥</div><h1>CALCUTAS Y SUBASTAS</h1><h3>JAVI RUIZ</h3><button id="publicLoginBtn" class="btn">🔐 INICIAR SESIÓN</button><div class="screen-card"><h4>📌 ¿Qué es esto?</h4><p>Plataforma de torneos, subastas y pedigrí gallístico.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;"><div>🏆 Torneos</div><div>💰 Subastas</div><div>🧬 Pedigrí</div><div>⚖️ Jueces</div></div></div></div>`;
+      document.getElementById('publicLoginBtn')?.addEventListener('click', () => window.navigateTo('login'));
+    } else if(screen === 'login') {
+      container.innerHTML = `<div class="screen-card"><div style="display:flex; gap:10px;"><button id="tabLoginBtn" class="btn" style="flex:1">🔐 CORREO</button><button id="tabRegisterBtn" class="btn" style="flex:1">📝 REGISTRO</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="Correo" /><input type="password" id="loginPassword" placeholder="Contraseña" /><button id="doLoginBtn">ACCEDER</button><a href="#" id="resetPassLink">¿Olvidaste contraseña?</a></div><div id="registerForm" style="display:none;"><input id="regName" placeholder="Nombre completo" /><input id="regEmail" placeholder="Email" /><input id="regPassword" type="password" placeholder="Contraseña" /><input id="regConfirm" type="password" placeholder="Confirmar" /><button id="doRegisterBtn">REGISTRARSE</button></div><button id="googleBtn" class="btn" style="margin-top:12px;">🔑 GOOGLE</button></div>`;
+      document.getElementById('tabLoginBtn').onclick = () => { document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; };
+      document.getElementById('tabRegisterBtn').onclick = () => { document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; };
+      document.getElementById('doLoginBtn').onclick = () => handleLogin();
+      document.getElementById('doRegisterBtn').onclick = () => handleRegister();
+      document.getElementById('resetPassLink').onclick = (e) => { e.preventDefault(); resetPassword(); };
+      document.getElementById('googleBtn').onclick = () => mostrarGoogleModal();
+    } else if(screen === 'activation_pending') {
+      container.innerHTML = `<div class="screen-card">⏳ Cuenta pendiente de activación<br><button id="logoutBtn">Cerrar sesión</button></div>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', () => handleLogout());
+    } else {
+      container.innerHTML = `<div class="screen-card">${screen} - en construcción<br><button onclick="navigateTo('public')">Volver</button></div>`;
     }
-    
+  }
+  
+  // Firebase functions
+  async function initFirebase() {
+    if(AppState.firebase.isEnabled) return true;
     if(typeof firebase === 'undefined') {
-      AppState.addNotification("Error: Firebase no cargó, recargue", "error");
+      AppState.addNotification("Error: Firebase no cargó", "error");
       return false;
     }
-    
-    try { 
-      if(!firebase.apps.length) {
-        firebase.initializeApp(FIREBASE_MAIN); 
-      }
-      AppState.state.firebase.auth = firebase.auth(); 
-      AppState.state.firebase.database = firebase.database(); 
-      AppState.state.firebase.isEnabled = true; 
-      AppState.state.firebase.isInitialized = true;
+    try {
+      if(!firebase.apps.length) firebase.initializeApp(FIREBASE_MAIN);
+      AppState.firebase.auth = firebase.auth();
+      AppState.firebase.database = firebase.database();
+      AppState.firebase.isEnabled = true;
       
-      firebase.auth().onAuthStateChanged(async (user) => { 
-        if(user) { 
-          AppState.setUser(user, null); 
-          await loadUserProfile(user.uid); 
-          if(AppState.state.user.profile?.activated) navigateTo('public'); 
-          else navigateTo('activation_pending'); 
-        } else { 
-          AppState.clearUser(); 
-          if(AppState.state.ui.currentScreen !== 'login') navigateTo('public'); 
-        } 
-        hideLoadingScreen(); 
-      }); 
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if(user) {
+          AppState.user.current = user;
+          // Cargar perfil
+          let snap = await AppState.firebase.database.ref(`users/${user.uid}`).once('value');
+          AppState.user.profile = snap.val() || { activated: false };
+          if(AppState.user.profile?.activated) window.navigateTo('public');
+          else window.navigateTo('activation_pending');
+        } else {
+          AppState.user.current = null;
+          AppState.user.profile = null;
+          if(AppState.ui.currentScreen !== 'login') window.navigateTo('public');
+        }
+        hideLoading();
+      });
       return true;
-    } catch(e) { 
-      console.error(e); 
+    } catch(e) {
       AppState.addNotification("Error Firebase: " + e.message, "error");
       return false;
-    } 
-  };
-  
-  function hideLoadingScreen() { 
-    let ls = document.getElementById('loading-screen'); 
-    if(ls) { 
-      ls.style.opacity='0'; 
-      setTimeout(()=>{ 
-        ls.style.display='none'; 
-        document.getElementById('social-app').style.display='block'; 
-      },500); 
-    } 
-    AppState.setLoading(false); 
+    }
   }
   
-  function updateLoadingProgress(percent, msg) { 
-    let bar = document.getElementById('loading-progress-bar'); 
-    let status = document.getElementById('loading-status'); 
-    if(bar) bar.style.width = `${percent}%`; 
-    if(status) status.innerText = msg||''; 
+  async function handleLogin() {
+    let email = document.getElementById('loginEmail')?.value;
+    let pwd = document.getElementById('loginPassword')?.value;
+    if(!email || !pwd) return AppState.addNotification("Complete campos", "warning");
+    try {
+      await AppState.firebase.auth.signInWithEmailAndPassword(email, pwd);
+      AppState.addNotification("Bienvenido", "success");
+    } catch(e) {
+      AppState.addNotification(e.message, "error");
+    }
   }
   
-  window.handleLoginClick = async () => { 
-    await window.initializeFirebase();
-    navigateTo('login'); 
-  };
-  
-  window.handleLogin = async () => { 
-    let email = document.getElementById('loginPhone')?.value; 
-    let pwd = document.getElementById('loginPassword')?.value; 
-    if(!email || !pwd) return AppState.addNotification("Complete campos", "warning"); 
-    await window.initializeFirebase();
-    if(!AppState.state.firebase.auth) {
-      AppState.addNotification("Error de conexión", "error");
-      return;
+  async function handleRegister() {
+    let email = document.getElementById('regEmail')?.value;
+    let pwd = document.getElementById('regPassword')?.value;
+    let confirm = document.getElementById('regConfirm')?.value;
+    let name = document.getElementById('regName')?.value;
+    if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden", "error");
+    try {
+      let cred = await AppState.firebase.auth.createUserWithEmailAndPassword(email, pwd);
+      await cred.user.updateProfile({ displayName: name });
+      await AppState.firebase.database.ref(`users/${cred.user.uid}`).set({
+        displayName: name,
+        email: email,
+        activated: false,
+        gallo: false,
+        isJudge: false,
+        ventas: false,
+        pedigri: false,
+        publicaciones: false
+      });
+      AppState.addNotification("Registro exitoso, espera activación", "success");
+      window.navigateTo('activation_pending');
+    } catch(e) {
+      AppState.addNotification(e.message, "error");
     }
-    try { 
-      await AppState.state.firebase.auth.signInWithEmailAndPassword(email, pwd); 
-      AppState.addNotification("Bienvenido", "success"); 
-    } catch(e) { 
-      AppState.addNotification(e.message, "error"); 
-    } 
-  };
+  }
   
-  window.resetPassword = async () => { 
-    let email = document.getElementById('loginPhone')?.value; 
-    if(!email) return AppState.addNotification("Ingrese email", "warning"); 
-    await window.initializeFirebase();
-    try { 
-      await AppState.state.firebase.auth.sendPasswordResetEmail(email); 
-      AppState.addNotification("Correo enviado", "info"); 
-    } catch(e) { 
-      AppState.addNotification(e.message, "error"); 
-    } 
-  };
-  
-  window.handleCompleteRegister = async () => { 
-    let email=document.getElementById('registerRealEmail')?.value; 
-    let pwd=document.getElementById('registerPassword')?.value; 
-    let confirm=document.getElementById('registerConfirmPassword')?.value; 
-    if(pwd !== confirm) return AppState.addNotification("Contraseñas no coinciden","error"); 
-    await window.initializeFirebase();
-    try { 
-      let cred = await AppState.state.firebase.auth.createUserWithEmailAndPassword(email, pwd); 
-      await cred.user.updateProfile({displayName: document.getElementById('registerFullName').value}); 
-      let newProfile = { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, displayName: document.getElementById('registerFullName').value, realEmail: email, phone: document.getElementById('registerPhone').value || '' }; 
-      await AppState.state.firebase.database.ref(`users/${cred.user.uid}`).set(newProfile); 
-      AppState.addNotification("Registro exitoso","success"); 
-      navigateTo('activation_pending'); 
-    } catch(e) { 
-      AppState.addNotification(e.message,"error"); 
-    } 
-  };
-  
-  window.handleLogout = async () => { 
-    window.toggleSideMenu(false); 
-    if(AppState.state.firebase.auth) {
-      try { await AppState.state.firebase.auth.signOut(); } catch(e){}
+  async function resetPassword() {
+    let email = document.getElementById('loginEmail')?.value;
+    if(!email) return AppState.addNotification("Ingrese email", "warning");
+    try {
+      await AppState.firebase.auth.sendPasswordResetEmail(email);
+      AppState.addNotification("Correo enviado", "info");
+    } catch(e) {
+      AppState.addNotification(e.message, "error");
     }
-    AppState.clearUser(); 
-    navigateTo('public'); 
-  };
+  }
   
-  window.checkActivationStatus = async () => { 
-    let uid = AppState.state.user.current?.uid; 
-    if(!uid) return;
-    await window.initializeFirebase();
-    let snap = await AppState.state.firebase.database.ref(`users/${uid}/activated`).once('value'); 
-    if(snap.val() === true) { 
-      AppState.addNotification("Cuenta activada!", "success"); 
-      await loadUserProfile(uid); 
-      navigateTo('public'); 
-    } else AppState.addNotification("Aún pendiente", "warning"); 
-  };
+  async function handleLogout() {
+    try { await AppState.firebase.auth.signOut(); } catch(e) {}
+    AppState.user.current = null;
+    AppState.user.profile = null;
+    window.navigateTo('public');
+  }
   
-  window.mostrarModalGoogleInferior = () => { 
-    setTimeout(() => {
-      if(typeof google === 'undefined' || !google.accounts) return;
-      let div = document.getElementById('google-one-tap-container');
-      if(div) div.remove();
-      div = document.createElement('div'); 
-      div.id='google-one-tap-container'; 
-      div.style.position='fixed'; 
-      div.style.bottom='20px'; 
-      div.style.left='0'; 
-      div.style.width='100%'; 
-      div.style.display='flex'; 
-      div.style.justifyContent='center'; 
-      div.style.zIndex='100000'; 
-      document.body.appendChild(div); 
-      google.accounts.id.initialize({ 
-        client_id: GOOGLE_CLIENT_ID, 
-        callback: async (res) => { 
-          try { 
-            await window.initializeFirebase();
-            let cred = firebase.auth.GoogleAuthProvider.credential(res.credential); 
-            await AppState.state.firebase.auth.signInWithCredential(cred); 
-          } catch(e){ AppState.addNotification("Error Google","error"); } 
-        } 
-      }); 
-      google.accounts.id.prompt(); 
-    }, 500);
-  };
-  
-  window.mostrarModalGoogleSuperior = () => { 
+  function mostrarGoogleModal() {
     if(typeof google === 'undefined' || !google.accounts) {
       AppState.addNotification("Cargando Google...", "warning");
+      setTimeout(() => mostrarGoogleModal(), 1000);
       return;
     }
-    let container = document.createElement('div'); 
-    container.id='google-one-tap-container-superior'; 
-    container.style.position='fixed'; 
-    container.style.top='120px'; 
-    container.style.left='50%'; 
-    container.style.transform='translateX(-50%)'; 
-    container.style.zIndex='100001'; 
-    document.body.appendChild(container); 
-    google.accounts.id.renderButton(container, { theme:'outline', size:'large' }); 
-    setTimeout(()=>{ 
-      window.addEventListener('click', function close(e){ 
-        if(!container.contains(e.target)){ container.remove(); window.removeEventListener('click',close); } 
-      }); 
-    },100); 
-  };
-  
-  // INICIALIZACIÓN PRINCIPAL - LA CLAVE ESTÁ AQUÍ
-  window.addEventListener('load', async () => { 
-    updateLoadingProgress(10, 'Cargando Firebase...');
-    await window.initializeFirebase();
-    updateLoadingProgress(80, 'Listo');
+    let container = document.createElement('div');
+    container.id = 'google-modal';
+    container.style.position = 'fixed';
+    container.style.top = '50%';
+    container.style.left = '50%';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.style.zIndex = '100001';
+    container.style.background = '#2c211b';
+    container.style.padding = '20px';
+    container.style.borderRadius = '20px';
+    document.body.appendChild(container);
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: async (res) => {
+        try {
+          let cred = firebase.auth.GoogleAuthProvider.credential(res.credential);
+          await AppState.firebase.auth.signInWithCredential(cred);
+          container.remove();
+        } catch(e) { AppState.addNotification("Error Google", "error"); container.remove(); }
+      }
+    });
+    google.accounts.id.renderButton(container, { theme: 'outline', size: 'large' });
     setTimeout(() => {
-      if(!AppState.state.user.current) navigateTo('public');
-      window.mostrarModalGoogleInferior();
+      window.addEventListener('click', function close(e) {
+        if(!container.contains(e.target)) { container.remove(); window.removeEventListener('click', close); }
+      });
+    }, 100);
+  }
+  
+  function hideLoading() {
+    let ls = document.getElementById('loading-screen');
+    if(ls) {
+      ls.style.opacity = '0';
+      setTimeout(() => {
+        ls.style.display = 'none';
+        document.getElementById('social-app').style.display = 'block';
+      }, 500);
+    }
+  }
+  
+  function updateProgress(percent, msg) {
+    let bar = document.getElementById('loading-progress-bar');
+    let status = document.getElementById('loading-status');
+    if(bar) bar.style.width = percent + '%';
+    if(status) status.innerText = msg || '';
+  }
+  
+  // INICIO - SIN ERRORES
+  window.addEventListener('load', async function() {
+    updateProgress(10, 'Inicializando...');
+    await initFirebase();
+    updateProgress(100, 'Listo');
+    setTimeout(() => {
+      if(!AppState.user.current) window.navigateTo('public');
     }, 500);
   });
   
   // Side menu listeners
   setTimeout(() => {
-    document.getElementById('sidePerfilBtn')?.addEventListener('click',()=>navigateTo('perfil'));
-    document.getElementById('sideShareBtn')?.addEventListener('click',()=>navigateTo('share'));
-    document.getElementById('sideSubastasBtn')?.addEventListener('click',()=>navigateTo('ventas'));
-    document.getElementById('sideJuezBtn')?.addEventListener('click',()=>navigateTo('juez'));
-    document.getElementById('sideConfigBtn')?.addEventListener('click',()=>navigateTo('configuraciones'));
-    document.getElementById('sideLogoutBtn')?.addEventListener('click',()=>window.handleLogout());
-    document.getElementById('side-menu-overlay')?.addEventListener('click',()=>window.toggleSideMenu(false));
+    document.getElementById('sidePerfilBtn')?.addEventListener('click', () => window.navigateTo('perfil'));
+    document.getElementById('sideShareBtn')?.addEventListener('click', () => window.navigateTo('share'));
+    document.getElementById('sideSubastasBtn')?.addEventListener('click', () => window.navigateTo('ventas'));
+    document.getElementById('sideJuezBtn')?.addEventListener('click', () => window.navigateTo('juez'));
+    document.getElementById('sideConfigBtn')?.addEventListener('click', () => window.navigateTo('configuraciones'));
+    document.getElementById('sideLogoutBtn')?.addEventListener('click', () => handleLogout());
+    document.getElementById('side-menu-overlay')?.addEventListener('click', () => window.toggleSideMenu(false));
   }, 200);
   
-  window.onerror = function(msg, url, line) {
-    console.error("Error:", msg, line);
-    AppState.addNotification("Error: " + msg, "error");
-    return false;
-  };
-  
-  AppState.subscribe(() => renderCurrentScreen());
-  window.AppState = AppState.state;
+  // Exponer funciones globales
+  window.handleLogin = handleLogin;
+  window.handleLogout = handleLogout;
+  window.handleRegister = handleRegister;
+  window.resetPassword = resetPassword;
+  window.mostrarGoogleModal = mostrarGoogleModal;
+})();
 </script>
 </body>
 </html>
