@@ -599,23 +599,21 @@
     // ============================================
     
     async function handleLogin(email, password) {
-        if (!validateEmail(email)) throw new Error('Email inválido');
-        if (!validatePassword(password)) throw new Error('Password debe tener 8+ caracteres, una mayúscula y un número');
-        
-        const result = await auth.signInWithEmailAndPassword(email, password);
-        currentUser = result.user;
-        
-        await saveToDB('users', {
-            uid: currentUser.uid,
-            email: currentUser.email,
-            displayName: currentUser.displayName
-        });
-        
-        updateUIForAuth();
-        await syncPendingOperations();
-        navigateTo('/dashboard');
-        showToast('✅ Bienvenido ' + (currentUser.displayName || currentUser.email), 'success');
-    }
+    // SIN NINGUNA VALIDACIÓN - ACEPTA CUALQUIER CONTRASEÑA
+    const result = await auth.signInWithEmailAndPassword(email, password);
+    currentUser = result.user;
+    
+    await saveToDB('users', {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        displayName: currentUser.displayName
+    });
+    
+    updateUIForAuth();
+    await syncPendingOperations();
+    navigateTo('/dashboard');
+    showToast('✅ Bienvenido ' + (currentUser.displayName || currentUser.email), 'success');
+}
     
     async function handleRegister(email, password, nombre) {
         if (!validateEmail(email)) throw new Error('Email inválido');
@@ -1547,15 +1545,15 @@
         `;
         
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try {
-                await handleLogin(email, password);
-            } catch (err) {
-                showToast('❌ ' + err.message, 'error');
-            }
-        });
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    try {
+        await handleLogin(email, password);  // <- AHORA ACEPTA CUALQUIER PASSWORD
+    } catch (err) {
+        showToast('❌ ' + err.message, 'error');
+    }
+});
         
         document.getElementById('goToRegisterBtn').addEventListener('click', () => navigateTo('/register'));
     }
