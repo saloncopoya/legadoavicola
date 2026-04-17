@@ -320,12 +320,19 @@
             font-weight: 700;
         }
         
-        .cotejo-table th:nth-child(6),
-        .cotejo-table td:nth-child(6) {
-            background: #4CAF50;
-            color: white;
-            font-weight: 700;
-        }
+        /* Solo el # central (primera celda de ese grupo) */
+.cotejo-table th:nth-child(6),
+.cotejo-table td:first-child + td + td + td + td + td {
+    background: #4CAF50;
+    color: white;
+    font-weight: 700;
+}
+
+/* Asegurar que P2 (la celda siguiente) NO tenga fondo verde */
+.cotejo-table td:nth-child(7) {
+    background: transparent !important;
+    color: inherit;
+}
         
         .bg-calificada {
             background-color: #2196F3 !important;
