@@ -647,49 +647,91 @@
         </div>
     </div>
 </div>
-    
     <!-- PESTAÑA POSICIONES -->
-    <div id="posicionContent" class="tab-content">
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('visual-section-pos')">
-                <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div id="visual-section-pos" class="collapsible-content">
-                <div class="btn-group">
-                    <button class="btn-primary" onclick="descargarTablaComoPDF('posicion')">📄 DESCARGAR POSICIONES (PDF)</button>
-                    <button class="btn-primary" onclick="descargarTablaComoJPG('posicion')">🖼️ DESCARGAR POSICIONES (JPG)</button>
-                </div>
-            </div>
-        </div>
-        <div class="table-container" id="posicionContainer">
-            <div class="no-data">
-                <span>🏆</span>
-                <p>No hay datos de posición</p>
-                <p style="font-size: 12px;">Califica peleas para ver la tabla de posiciones</p>
-            </div>
+<div id="posicionContent" class="tab-content">
+    
+    <!-- TABLA DE POSICIONES (PRIMERO) -->
+    <div class="table-container" id="posicionContainer">
+        <div class="no-data">
+            <span>🏆</span>
+            <p>No hay datos de posición</p>
+            <p style="font-size: 12px;">Califica peleas para ver la tabla de posiciones</p>
         </div>
     </div>
     
-    <!-- PESTAÑA SERIAL (ACUMULADO) -->
-    <div id="serialContent" class="tab-content">
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('visual-section-serial')">
-                <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
-                <span class="toggle-icon">▼</span>
+    <!-- SECCIÓN: VISUALIZACIÓN DE TABLA (AHORA DEBAJO DE LA TABLA) -->
+    <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapsible('visual-section-pos')">
+            <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
+            <span class="toggle-icon" id="visual-pos-toggle-icon">▼</span>
+        </div>
+        <div id="visual-section-pos" class="collapsible-content">
+            <div class="view-controls">
+                <label>🔤 Tamaño de letra:</label>
+                <input type="range" id="fontSizeSliderPos" min="10" max="24" value="14" onchange="cambiarTamañoLetraPos()">
+                <span id="fontSizeValuePos">14px</span>
+                
+                <label>🎨 Tipo de letra:</label>
+                <select id="fontFamilySelectPos" onchange="cambiarTipoLetraPos()">
+                    <option value="'Segoe UI', Roboto, system-ui">Segoe UI</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                </select>
+                
+                <label>📏 Ancho mínimo:</label>
+                <input type="range" id="minWidthSliderPos" min="700" max="1400" value="900" onchange="cambiarAnchoMinimoPos()">
+                <span id="minWidthValuePos">900px</span>
             </div>
-            <div id="visual-section-serial" class="collapsible-content">
-                <div class="btn-group">
-                    <button class="btn-primary" onclick="descargarTablaComoPDF('serial')">📄 DESCARGAR SERIAL (PDF)</button>
-                    <button class="btn-primary" onclick="descargarTablaComoJPG('serial')">🖼️ DESCARGAR SERIAL (JPG)</button>
-                </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="descargarTablaComoPDF('posicion')">📄 DESCARGAR POSICIONES (PDF)</button>
+                <button class="btn-primary" onclick="descargarTablaComoJPG('posicion')">🖼️ DESCARGAR POSICIONES (JPG)</button>
             </div>
         </div>
-        <div class="table-container" id="serialContainer">
-            <div class="no-data">
-                <span>🔗</span>
-                <p>No hay datos de serial</p>
-                <p style="font-size: 12px;">Importa múltiples torneos para ver el acumulado</p>
+    </div>
+</div>
+    
+  <!-- PESTAÑA SERIAL (ACUMULADO) -->
+<div id="serialContent" class="tab-content">
+    
+    <!-- TABLA SERIAL (PRIMERO) -->
+    <div class="table-container" id="serialContainer">
+        <div class="no-data">
+            <span>🔗</span>
+            <p>No hay datos de serial</p>
+            <p style="font-size: 12px;">Importa múltiples torneos para ver el acumulado</p>
+        </div>
+    </div>
+    
+    <!-- SECCIÓN: VISUALIZACIÓN DE TABLA (AHORA DEBAJO DE LA TABLA) -->
+    <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapsible('visual-section-serial')">
+            <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
+            <span class="toggle-icon" id="visual-serial-toggle-icon">▼</span>
+        </div>
+        <div id="visual-section-serial" class="collapsible-content">
+            <div class="view-controls">
+                <label>🔤 Tamaño de letra:</label>
+                <input type="range" id="fontSizeSliderSerial" min="10" max="24" value="14" onchange="cambiarTamañoLetraSerial()">
+                <span id="fontSizeValueSerial">14px</span>
+                
+                <label>🎨 Tipo de letra:</label>
+                <select id="fontFamilySelectSerial" onchange="cambiarTipoLetraSerial()">
+                    <option value="'Segoe UI', Roboto, system-ui">Segoe UI</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                </select>
+                
+                <label>📏 Ancho mínimo:</label>
+                <input type="range" id="minWidthSliderSerial" min="700" max="1400" value="900" onchange="cambiarAnchoMinimoSerial()">
+                <span id="minWidthValueSerial">900px</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="descargarTablaComoPDF('serial')">📄 DESCARGAR SERIAL (PDF)</button>
+                <button class="btn-primary" onclick="descargarTablaComoJPG('serial')">🖼️ DESCARGAR SERIAL (JPG)</button>
             </div>
         </div>
     </div>
