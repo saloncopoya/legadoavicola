@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/manifest.json">
+    <!-- Meta tags para PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Legado Avícola">
+<link rel="apple-touch-icon" href="https://placehold.co/192x192/8B4513/white?text=🐓">
+<meta name="theme-color" content="#8B4513">
+    
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>COTEJO OFFLINE - Legado Avícola</title>
@@ -1573,5 +1582,41 @@
         });
     }
 </script>
+
+
+
+    // ==============================================
+// INSTALACIÓN PWA
+// ==============================================
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'flex';
+    console.log('✅ PWA lista para instalar');
+});
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('✅ Usuario aceptó la instalación');
+            installBtn.style.display = 'none';
+        } else {
+            console.log('❌ Usuario canceló la instalación');
+        }
+        deferredPrompt = null;
+    }
+});
+
+// Detectar si ya está instalada (standalone mode)
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    console.log('📱 App instalada - modo standalone');
+    installBtn.style.display = 'none';
+}
+    
 </body>
 </html>
