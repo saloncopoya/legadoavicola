@@ -1655,7 +1655,6 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
     }
     
     let procesados = 0;
-    let nuevosTorneos = [];
     
     Array.from(files).forEach(file => {
         const reader = new FileReader();
@@ -1770,10 +1769,7 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
         }
         
         const peleas = torneo.resultadosCotejo.peleas;
-// Línea ~970
-console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
 
-// ✅ Sería más seguro:
 if (torneo.infoTorneo) {
     console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
 } else {
@@ -1828,8 +1824,9 @@ if (torneo.infoTorneo) {
     
     console.log(`✅ TOTAL CALIFICACIONES CARGADAS: ${totalCalificaciones}`);
     
-    // Mostrar resumen por torneo
+    // ✅ Validación mejorada
     const torneosConCalif = torneos.filter(t => {
+        if (!t.infoTorneo) return false;
         return Array.from(calificacionesGlobales.keys()).some(key => key.startsWith(t.infoTorneo.id));
     });
     console.log(`📊 Torneos con calificaciones: ${torneosConCalif.length}`);
