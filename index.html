@@ -275,9 +275,68 @@
             margin: 0;
             padding: 0;
         }
- .posicion-table, .serial-table {
-            font-size: 21px;
+
+
+
+
+
+                /* Tamaños de letra personalizados para tablas de Posición y Acumulado */
+        .posicion-table, .serial-table {
+            font-size: 18px;
         }
+        
+        /* Columna PARTIDO - más grande */
+        .posicion-table td:first-child,
+        .posicion-table th:first-child,
+        .serial-table td:first-child,
+        .serial-table th:first-child {
+            font-size: 26px;
+            font-weight: bold;
+        }
+        
+        /* Columna PUNTOS */
+        .posicion-table td:nth-last-child(2),
+        .serial-table td:nth-last-child(2) {
+            font-size: 28px;
+            font-weight: 900;
+        }
+        
+        /* Columna TIEMPO (última columna) */
+        .posicion-table td:last-child,
+        .serial-table td:last-child {
+            font-size: 25px;
+            font-weight: bold;
+        }
+        
+        /* Para la tabla de posición: ajustar también los encabezados */
+        .posicion-table th:first-child {
+            font-size: 26px;
+        }
+        
+        .posicion-table th:nth-last-child(2) {
+            font-size: 28px;
+        }
+        
+        .posicion-table th:last-child {
+            font-size: 25px;
+        }
+        
+        /* Para la tabla de acumulado: ajustar encabezados */
+        .serial-table th:first-child {
+            font-size: 26px;
+        }
+        
+        .serial-table th:nth-last-child(2) {
+            font-size: 28px;
+        }
+        
+        .serial-table th:last-child {
+            font-size: 25px;
+        }
+
+
+
+        
         
         table {
             width: 100%;
