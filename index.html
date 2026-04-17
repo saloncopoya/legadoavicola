@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>OFFLINE.</title>
+    <title>OFFLINE</title>
     <meta name="theme-color" content="#8B4513">
     
     <!-- PWA Manifest -->
@@ -716,16 +716,11 @@
     }
     
     function formatTiempo(segundos) {
-    if (!segundos && segundos !== 0) return '00:00:00';
-    const horas = Math.floor(segundos / 3600);
-    const mins = Math.floor((segundos % 3600) / 60);
-    const segs = segundos % 60;
-    
-    if (horas > 0) {
-        return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+        if (!segundos && segundos !== 0) return '--:--';
+        const mins = Math.floor(segundos / 60);
+        const segs = segundos % 60;
+        return `${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
     }
-    return `00:${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
-}
     
     function timeToSeconds(tiempo) {
         if (!tiempo) return 0;
@@ -804,15 +799,16 @@
     
     const partidoMap = new Map();
     const peleas = torneo.resultadosCotejo.peleas;
+    const gallosPorPartido = torneo.infoTorneo?.config?.gallosPorPartido || 3;
     const puntosConf = torneo.infoTorneo?.puntosConfig || puntosConfig;
     
     peleas.forEach((pelea, index) => {
-        // Buscar calificación en el Map global
+        // 🔥 BUSCAR CALIFICACIÓN EN EL MAP GLOBAL
         const calKey = `${torneo.id}_${index}`;
         let calificacion = calificacionesGlobales.get(calKey);
         
-        // Si no encuentra en el Map, buscar dentro de la pelea
-        if (!calificacion && pelea.calificada === true) {
+        // Si no encuentra, buscar dentro de la pelea
+        if (!calificacion && (pelea.calificada === true || pelea.ganador)) {
             calificacion = {
                 ganador: pelea.ganador,
                 tiempo: pelea.tiempo
@@ -830,7 +826,13 @@
                 partidoMap.set(nombre, {
                     puntos: 0,
                     tiempo: 0,
-                    gallos: []
+                    gallo1_puntos: 0, gallo1_tiempo: 0,
+                    gallo2_puntos: 0, gallo2_tiempo: 0,
+                    gallo3_puntos: 0, gallo3_tiempo: 0,
+                    gallo4_puntos: 0, gallo4_tiempo: 0,
+                    gallo5_puntos: 0, gallo5_tiempo: 0,
+                    gallo6_puntos: 0, gallo6_tiempo: 0,
+                    contadorGallos: 0
                 });
             }
             return partidoMap.get(nombre);
@@ -838,66 +840,59 @@
         
         let tiempoSegundos = timeToSeconds(calificacion.tiempo);
         
-        // Procesar gallo1
         if (g1?.partido) {
             const data = initPartido(g1.partido);
             if (data) {
+                data.contadorGallos++;
+                const numGallo = data.contadorGallos;
                 let puntosGallo = 0;
-                if (calificacion.ganador === 'rojo') {
-                    puntosGallo = puntosConf.ganador;
+                if (calificacion.ganador === 'rojo') puntosGallo = puntosConf.ganador;
+                else if (calificacion.ganador === 'empate') puntosGallo = puntosConf.empate;
+                else puntosGallo = puntosConf.perdedor;
+                
+                data[`gallo${numGallo}_puntos`] = puntosGallo;
+                if (calificacion.ganador === 'rojo' || calificacion.ganador === 'empate') {
+                    data[`gallo${numGallo}_tiempo`] = tiempoSegundos;
                     data.tiempo += tiempoSegundos;
-                } else if (calificacion.ganador === 'empate') {
-                    puntosGallo = puntosConf.empate;
-                    data.tiempo += tiempoSegundos;
-                } else {
-                    puntosGallo = puntosConf.perdedor;
                 }
                 data.puntos += puntosGallo;
-                data.gallos.push({
-                    numero: data.gallos.length + 1,
-                    puntos: puntosGallo,
-                    tiempo: (calificacion.ganador === 'rojo' || calificacion.ganador === 'empate') ? tiempoSegundos : 0
-                });
             }
         }
         
-        // Procesar gallo2
         if (g2?.partido) {
             const data = initPartido(g2.partido);
             if (data) {
+                data.contadorGallos++;
+                const numGallo = data.contadorGallos;
                 let puntosGallo = 0;
-                if (calificacion.ganador === 'verde') {
-                    puntosGallo = puntosConf.ganador;
+                if (calificacion.ganador === 'verde') puntosGallo = puntosConf.ganador;
+                else if (calificacion.ganador === 'empate') puntosGallo = puntosConf.empate;
+                else puntosGallo = puntosConf.perdedor;
+                
+                data[`gallo${numGallo}_puntos`] = puntosGallo;
+                if (calificacion.ganador === 'verde' || calificacion.ganador === 'empate') {
+                    data[`gallo${numGallo}_tiempo`] = tiempoSegundos;
                     data.tiempo += tiempoSegundos;
-                } else if (calificacion.ganador === 'empate') {
-                    puntosGallo = puntosConf.empate;
-                    data.tiempo += tiempoSegundos;
-                } else {
-                    puntosGallo = puntosConf.perdedor;
                 }
                 data.puntos += puntosGallo;
-                data.gallos.push({
-                    numero: data.gallos.length + 1,
-                    puntos: puntosGallo,
-                    tiempo: (calificacion.ganador === 'verde' || calificacion.ganador === 'empate') ? tiempoSegundos : 0
-                });
             }
         }
     });
     
-    // Convertir el mapa a array para ordenar
     let datosPosicion = Array.from(partidoMap.entries()).map(([nombre, data]) => {
-        const resultado = { 
-            nombre, 
-            puntos: data.puntos, 
-            tiempo: data.tiempo,
-            gallos: data.gallos
-        };
-        return resultado;
+        const result = { nombre, puntos: data.puntos, tiempo: data.tiempo };
+        for (let i = 1; i <= data.contadorGallos; i++) {
+            result[`gallo${i}_puntos`] = data[`gallo${i}_puntos`] || 0;
+            result[`gallo${i}_tiempo`] = data[`gallo${i}_tiempo`] || 0;
+        }
+        return result;
     });
     
-    // Ordenar: primero por puntos (mayor a menor), luego por tiempo (menor a mayor)
     datosPosicion.sort((a, b) => {
+        const aIsZero = (a.puntos === 0 && a.tiempo === 0);
+        const bIsZero = (b.puntos === 0 && b.tiempo === 0);
+        if (aIsZero && !bIsZero) return 1;
+        if (!aIsZero && bIsZero) return -1;
         if (a.puntos !== b.puntos) return b.puntos - a.puntos;
         return a.tiempo - b.tiempo;
     });
@@ -1018,9 +1013,6 @@
     const config = torneoActual.infoTorneo?.config || {};
     const registroDetalladoActivo = config.registroDetalladoActivo || false;
     
-    console.log(`📊 Renderizando cotejo para torneo: ${torneoActual.infoTorneo.nombre}`);
-    console.log(`📋 Total peleas: ${peleas.length}`);
-    
     let html = `<table class="cotejo-table" style="width:100%; border-collapse: collapse;">`;
     html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
     html += `<th style="padding: 12px 8px; background: #d32f2f; color: white;">#</th>`;
@@ -1036,16 +1028,14 @@
     html += `<th style="padding: 12px 8px; text-align: center;">DIF</th>`;
     html += `<th style="padding: 12px 8px; text-align: center;">GANADOR</th>`;
     html += `<th style="padding: 12px 8px; text-align: center;">TIEMPO</th>`;
-    html += `</tr></thead><tbody>`;
+    html += `<tr></thead><tbody>`;
     
     peleas.forEach((p, index) => {
-        // 🔥 CLAVE IMPORTANTE: Usar el ID del torneo actual para buscar la calificación
+        // 🔥 CLAVE: Buscar calificación en el Map global usando el ID del torneo
         const calKey = `${torneoActual.id}_${index}`;
-        
-        // Buscar calificación en el Map global
         let calificacion = calificacionesGlobales.get(calKey);
         
-        // Si no encuentra en el Map, buscar dentro de la pelea (para compatibilidad)
+        // Si no encuentra en el Map, buscar directamente en la pelea (por si acaso)
         if (!calificacion && (p.calificada === true || p.ganador)) {
             calificacion = {
                 ganador: p.ganador,
@@ -1055,34 +1045,13 @@
             calificacionesGlobales.set(calKey, calificacion);
         }
         
-        // DEBUG: Mostrar qué calificación se está usando
-        if (calificacion) {
-            console.log(`Pelea ${p.numero}: Ganador=${calificacion.ganador}, Tiempo=${calificacion.tiempo}`);
-        } else {
-            console.log(`Pelea ${p.numero}: SIN CALIFICAR`);
-        }
-        
         const bgColor = calificacion ? 'bg-calificada' : (index % 2 === 0 ? '#ffffff' : '#f9f9f9');
         
-        // Determinar el texto del ganador según la calificación
         let ganadorTexto = '';
-        let ganadorClase = '';
-        
-        if (calificacion) {
-            if (calificacion.ganador === 'rojo') {
-                ganadorTexto = `🔴 ${p.gallo1.partido}`;
-                ganadorClase = 'puntos-ganador';
-            } else if (calificacion.ganador === 'verde') {
-                ganadorTexto = `🟢 ${p.gallo2.partido}`;
-                ganadorClase = 'puntos-ganador';
-            } else if (calificacion.ganador === 'empate') {
-                ganadorTexto = '🤝 TABLA / EMPATE';
-                ganadorClase = 'puntos-empate';
-            }
-        } else {
-            ganadorTexto = '⏳ PENDIENTE';
-            ganadorClase = '';
-        }
+        if (calificacion?.ganador === 'rojo') ganadorTexto = `🔴 ${p.gallo1.partido}`;
+        else if (calificacion?.ganador === 'verde') ganadorTexto = `🟢 ${p.gallo2.partido}`;
+        else if (calificacion?.ganador === 'empate') ganadorTexto = 'TABLA';
+        else ganadorTexto = '⏳ PENDIENTE';
         
         const tiempo = calificacion?.tiempo || '--:--';
         const difClase = p.diferencia <= 20 ? 'diferencia-baja' : 'diferencia-alta';
@@ -1099,7 +1068,7 @@
         html += `<td style="padding: 12px 8px;" class="text-left">${escapeHTML(p.gallo2.partido)}</td>`;
         if (registroDetalladoActivo) html += `<td style="padding: 12px 8px; text-align: center;">${escapeHTML(p.gallo2.color || '-')}</td>`;
         html += `<td style="padding: 12px 8px; text-align: center;" class="${difClase}">${p.diferencia}g</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600; ${ganadorClase ? 'background: ' + (ganadorClase === 'puntos-ganador' ? '#4CAF50' : '#2196F3') + '; color: white;' : ''}">${ganadorTexto}</td>`;
+        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600;">${ganadorTexto}</td>`;
         html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600;">${tiempo}</td>`;
         html += `</tr>`;
     });
@@ -1112,74 +1081,70 @@
     // RENDERIZAR TABLA POSICIONES
     // ==============================================
     function renderizarTablaPosiciones() {
-    const container = document.getElementById('posicionContainer');
-    
-    if (!torneoActual) {
-        container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p></div>`;
-        return;
-    }
-    
-    const datosPosicion = procesarTablaPosicion(torneoActual);
-    const config = torneoActual.infoTorneo?.config || {};
-    const gallosPorPartido = config.gallosPorPartido || 3;
-    const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
-    
-    if (datosPosicion.length === 0) {
-        container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p><p>Califica peleas para ver la tabla</p></div>`;
-        return;
-    }
-    
-    let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
-    html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
-    html += `<th style="padding: 12px 8px; text-align: left;" rowspan="2">Partido</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;" colspan="${gallosPorPartido * 2}"># COMBATES</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;" rowspan="2">Puntos</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;" rowspan="2">Tiempo Total</th>`;
-    html += `<tr>`;
-    html += `<tr style="background: #A0522D;">`;
-    for (let i = 0; i < gallosPorPartido; i++) {
-        html += `<th style="padding: 8px 4px; text-align: center;" colspan="2">Gallo ${i+1}</th>`;
-    }
-    html += `</tr>`;
-    html += `<tr style="background: #CD853F;">`;
-    html += `<th style="padding: 4px 8px;"></th>`;
-    for (let i = 0; i < gallosPorPartido; i++) {
-        html += `<th style="padding: 4px 4px; text-align: center;">Pts</th>`;
-        html += `<th style="padding: 4px 4px; text-align: center;">Tpo</th>`;
-    }
-    html += `<th style="padding: 4px 8px;"></th><th style="padding: 4px 8px;"></th>`;
-    html += `</table></thead><tbody>`;
-    
-    datosPosicion.forEach((item, idx) => {
-        const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
-        html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
-        html += `<td style="padding: 12px 8px; font-weight: 900;">${escapeHTML(item.nombre)}</td>`;
+        const container = document.getElementById('posicionContainer');
         
-        // Mostrar los gallos
-        for (let i = 0; i < gallosPorPartido; i++) {
-            if (i < item.gallos.length) {
-                const gallo = item.gallos[i];
-                let clase = '';
-                if (gallo.puntos === puntosConf.ganador) clase = 'puntos-ganador';
-                else if (gallo.puntos === puntosConf.empate) clase = 'puntos-empate';
-                else if (gallo.puntos === puntosConf.perdedor) clase = 'puntos-perdedor';
-                
-                html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${gallo.puntos}</td>`;
-                html += `<td style="padding: 12px 8px; text-align: center;">${formatTiempo(gallo.tiempo)}</td>`;
-            } else {
-                html += `<td style="padding: 12px 8px; text-align: center;">-</td>`;
-                html += `<td style="padding: 12px 8px; text-align: center;">-</td>`;
-            }
+        if (!torneoActual) {
+            container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p></div>`;
+            return;
         }
         
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
-        html += `<tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
+        const datosPosicion = procesarTablaPosicion(torneoActual);
+        const config = torneoActual.infoTorneo?.config || {};
+        const gallosPorPartido = config.gallosPorPartido || 3;
+        const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
+        
+        if (datosPosicion.length === 0) {
+            container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p><p>Califica peleas para ver la tabla</p></div>`;
+            return;
+        }
+        
+        let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
+        html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
+        html += `<th style="padding: 12px 8px; text-align: left;" rowspan="2">Partido</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;" colspan="${gallosPorPartido * 2}"># COMBATES</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;" rowspan="2">Puntos</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;" rowspan="2">Tiempos</th>`;
+        html += `</tr><tr style="background: #A0522D;">`;
+        for (let i = 0; i < gallosPorPartido; i++) {
+            html += `<th style="padding: 8px 4px; text-align: center;" colspan="2">Gallo ${i+1}</th>`;
+        }
+        html += `</tr><tr style="background: #CD853F;">`;
+        html += `<th style="padding: 4px 8px;"></th>`;
+        for (let i = 0; i < gallosPorPartido; i++) {
+            html += `<th style="padding: 4px 4px; text-align: center;">Pts</th>`;
+            html += `<th style="padding: 4px 4px; text-align: center;">Tpo</th>`;
+        }
+        html += `<th style="padding: 4px 8px;"></th><th style="padding: 4px 8px;"></th></tr></thead><tbody>`;
+        
+        datosPosicion.forEach((item, idx) => {
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+            html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
+            html += `<td style="padding: 12px 8px; font-weight: 900;">${escapeHTML(item.nombre)}</td>`;
+            
+            for (let i = 1; i <= gallosPorPartido; i++) {
+                const puntos = item[`gallo${i}_puntos`];
+                const tiempo = item[`gallo${i}_tiempo`];
+                if (puntos === undefined) {
+                    html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
+                    html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
+                } else {
+                    let clase = '';
+                    if (puntos === puntosConf.ganador) clase = 'puntos-ganador';
+                    else if (puntos === puntosConf.empate) clase = 'puntos-empate';
+                    else if (puntos === puntosConf.perdedor) clase = 'puntos-perdedor';
+                    html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${puntos}</td>`;
+                    html += `<td style="padding: 12px 8px; text-align: center;">${formatTiempo(tiempo)}</td>`;
+                }
+            }
+            
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
     
     // ==============================================
     // RENDERIZAR TABLA SERIAL (ACUMULADO)
@@ -1225,19 +1190,12 @@
     // ACTUALIZAR TODO
     // ==============================================
     function actualizarTodo() {
-    console.log(`🔄 Actualizando todo... Torneo actual: ${torneoActual?.infoTorneo?.nombre || 'NINGUNO'}`);
-    
-    // Renderizar según el torneo actual
-    renderizarTablaCotejo();
-    renderizarTablaPosiciones();
-    renderizarTablaSerial();
-    
-    // Actualizar interfaces
-    actualizarListaTorneosUI();
-    actualizarSelectoresCalificacion();
-    
-    console.log(`✅ Actualización completada`);
-}
+        renderizarTablaCotejo();
+        renderizarTablaPosiciones();
+        renderizarTablaSerial();
+        actualizarListaTorneosUI();
+        actualizarSelectoresCalificacion();
+    }
     
     function actualizarListaTorneosUI() {
         const container = document.getElementById('torneosLista');
@@ -1280,76 +1238,39 @@
     }
     
     function actualizarSelectoresCalificacion() {
-    const select = document.getElementById('torneoSelectCalificacion');
-    if (!select) return;
-    
-    select.innerHTML = '<option value="">-- Seleccionar Torneo --</option>';
-    torneos.forEach((t, idx) => {
-        const calificadas = contarPeleasCalificadas(t);
-        const total = t.resultadosCotejo?.peleas?.length || 0;
-        const selected = (torneoActual && torneoActual.id === t.id) ? 'selected' : '';
-        select.innerHTML += `<option value="${idx}" ${selected}>${escapeHTML(t.infoTorneo.nombre)} (${calificadas}/${total})</option>`;
-    });
-    
-    // Si hay torneos y no hay torneoActual, seleccionar el primero
-    if (torneos.length > 0 && !torneoActual) {
-        torneoActual = torneos[0];
-        select.value = '0';
+        const select = document.getElementById('torneoSelectCalificacion');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Seleccionar Torneo --</option>';
+        torneos.forEach((t, idx) => {
+            const calificadas = contarPeleasCalificadas(t);
+            const total = t.resultadosCotejo?.peleas?.length || 0;
+            select.innerHTML += `<option value="${idx}">${escapeHTML(t.infoTorneo.nombre)} (${calificadas}/${total})</option>`;
+        });
+        
+        if (torneos.length > 0 && !torneoActual) {
+            torneoActual = torneos[0];
+            select.value = '0';
+        } else if (torneoActual) {
+            const idx = torneos.findIndex(t => t.id === torneoActual.id);
+            if (idx !== -1) select.value = idx;
+        }
+        
         actualizarComboboxPeleas();
         renderizarTablaCotejo();
         renderizarTablaPosiciones();
-    } else if (torneoActual) {
-        // Verificar que el torneoActual aún existe en la lista
-        const existe = torneos.some(t => t.id === torneoActual.id);
-        if (!existe && torneos.length > 0) {
-            torneoActual = torneos[0];
-            select.value = '0';
+    }
+    
+    function cambiarTorneoCalificacion() {
+        const select = document.getElementById('torneoSelectCalificacion');
+        const idx = parseInt(select.value);
+        if (!isNaN(idx) && torneos[idx]) {
+            torneoActual = torneos[idx];
             actualizarComboboxPeleas();
             renderizarTablaCotejo();
             renderizarTablaPosiciones();
         }
     }
-}
-    
-    function cambiarTorneoCalificacion() {
-    const select = document.getElementById('torneoSelectCalificacion');
-    const idx = parseInt(select.value);
-    
-    if (!isNaN(idx) && torneos[idx]) {
-        // Actualizar el torneo actual
-        torneoActual = torneos[idx];
-        
-        console.log(`🔄 Cambiando al torneo: ${torneoActual.infoTorneo.nombre}`);
-        console.log(`📊 Calificaciones disponibles: ${calificacionesGlobales.size}`);
-        
-        // Limpiar selección de pelea actual
-        peleaSeleccionada = null;
-        
-        // Actualizar el combobox de peleas
-        actualizarComboboxPeleas();
-        
-        // Ocultar detalles y formularios anteriores
-        const detalleDiv = document.getElementById('detallePelea');
-        const calificacionForm = document.getElementById('calificacionForm');
-        const infoAnterior = document.getElementById('infoAnterior');
-        
-        if (detalleDiv) detalleDiv.style.display = 'none';
-        if (calificacionForm) calificacionForm.style.display = 'none';
-        if (infoAnterior) infoAnterior.style.display = 'none';
-        
-        // 🔥 FORZAR LA ACTUALIZACIÓN DE TODAS LAS TABLAS
-        renderizarTablaCotejo();
-        renderizarTablaPosiciones();
-        
-        // Actualizar la lista de torneos UI
-        actualizarListaTorneosUI();
-        
-        // Mostrar mensaje de confirmación
-        const totalPeleas = torneoActual.resultadosCotejo?.peleas?.length || 0;
-        const calificadas = contarPeleasCalificadas(torneoActual);
-        console.log(`✅ Torneo cambiado: ${calificadas}/${totalPeleas} peleas calificadas`);
-    }
-}
     
     function actualizarComboboxPeleas() {
         const select = document.getElementById('peleaSelect');
