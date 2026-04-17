@@ -533,23 +533,29 @@
 
 
 
-     <!-- Sección colapsable: Calificar Peleas -->
+ <!-- Sección colapsable: Calificar Peleas -->
 <div class="collapsible-section calificacion-flotante">
-            <div class="collapsible-header" onclick="toggleCollapsible('calificacion-section')">
-                <h3><span>🏆</span> CALIFICAR PELEAS</h3>
-                <span class="toggle-icon" id="calificacion-toggle-icon">▼</span>
-            </div>
-            <div id="calificacion-section" class="collapsible-content">
-                <div class="view-controls">
-                    <label>🎯 Seleccionar Torneo:</label>
-                    <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()"></select>
-                </div>
-                <div class="view-controls">
-                    <label>⚡ Seleccionar Pelea:</label>
-                    <select id="peleaSelect" onchange="cambiarPeleaSeleccionada()" style="min-width: 300px;"></select>
-                </div>
-                <div id="detallePelea" style="display: none;"></div>
-                <div id="calificacionForm" style="display: none;">
+    <div class="collapsible-header" onclick="toggleCollapsible('calificacion-section')">
+        <h3>
+            <span>🏆</span> 
+            CALIFICAR PELEAS
+            <span id="torneoActualBadge" style="display: none; font-size: 14px; background: #8B4513; color: white; padding: 4px 12px; border-radius: 20px; margin-left: 12px;"></span>
+        </h3>
+        <span class="toggle-icon" id="calificacion-toggle-icon">▼</span>
+    </div>
+    <div id="calificacion-section" class="collapsible-content">
+        <div class="view-controls">
+            <label>🎯 Seleccionar Torneo:</label>
+            <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()"></select>
+        </div>
+        <div class="view-controls">
+            <label>⚡ Seleccionar Pelea:</label>
+            <select id="peleaSelect" onchange="cambiarPeleaSeleccionada()" style="min-width: 300px;"></select>
+        </div>
+        <div id="detallePelea" style="display: none;"></div>
+        <div id="calificacionForm" style="display: none;">
+
+                    
                     <div style="display: flex; gap: 20px; flex-wrap: wrap; margin: 15px 0;">
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">⏱️ TIEMPO (MM:SS)</label>
@@ -1270,6 +1276,8 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
         actualizarComboboxPeleas();
         renderizarTablaCotejo();
         renderizarTablaPosiciones();
+            actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
     }
     
     function cambiarTorneoCalificacion() {
@@ -1280,8 +1288,37 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
             actualizarComboboxPeleas();
             renderizarTablaCotejo();
             renderizarTablaPosiciones();
+                    actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
         }
     }
+
+
+    // ==============================================
+// ACTUALIZAR BADGE DEL TORNEO ACTUAL EN CABECERA
+// ==============================================
+function actualizarBadgeTorneoActual() {
+    const badge = document.getElementById('torneoActualBadge');
+    if (!badge) return;
+    
+    if (torneoActual && torneoActual.infoTorneo) {
+        const calificadas = contarPeleasCalificadas(torneoActual);
+        const total = torneoActual.resultadosCotejo?.peleas?.length || 0;
+        const nombreTorneo = torneoActual.infoTorneo.nombre || 'Sin nombre';
+        
+        badge.textContent = `${nombreTorneo} - ${calificadas}/${total}`;
+        badge.style.display = 'inline-block';
+        
+        // Cambiar color según progreso
+        if (calificadas === total && total > 0) {
+            badge.style.background = '#28a745'; // Verde cuando está completo
+        } else {
+            badge.style.background = '#8B4513'; // Marrón normal
+        }
+    } else {
+        badge.style.display = 'none';
+    }
+}
     
     function actualizarComboboxPeleas() {
         const select = document.getElementById('peleaSelect');
@@ -1552,7 +1589,10 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
     // 7. NOTIFICAR AL USUARIO
     // ==============================================
     alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
-    
+
+            actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
+        
     // Limpiar referencia
     peleaSeleccionada = null;
 }
@@ -1616,6 +1656,9 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
         document.getElementById('calificacionForm').style.display = 'none';
         document.getElementById('infoAnterior').style.display = 'none';
         peleaSeleccionada = null;
+
+            actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
         
         alert('✅ Calificación eliminada');
     }
@@ -1917,6 +1960,8 @@ function mostrarNotificacionSincronizacion() {
                     
                     actualizarTodo();
                     guardarCalificacionesEnLocalStorage();
+                            actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
                     fileInput.value = '';
                     alert(`✅ ${procesados} torneo(s) importado(s) correctamente\n📊 Total calificaciones cargadas: ${calificacionesGlobales.size}`);
                 }
@@ -2022,6 +2067,8 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
             
             actualizarTodo();
             guardarCalificacionesEnLocalStorage();
+                    actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
         }
     }
     
@@ -2032,6 +2079,8 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
             torneoActual = null;
             actualizarTodo();
             guardarCalificacionesEnLocalStorage();
+                    actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
             document.getElementById('jsonFileInput').value = '';
         }
     }
