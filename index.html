@@ -136,7 +136,7 @@
            ============================================== */
         .main-container {
             margin-top: 0;
-            padding: 20px 16px;
+            padding: 10px 6px;
             width: 100%;
             min-height: calc(100vh - 140px);
             background: #f8f9fa;
@@ -1229,10 +1229,10 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
             html += `<td style="padding: 5px 2px; font-weight: 600;">${escapeHTML(item.nombre)}</td>`;
             html += `<td style="padding: 5px 2px; text-align: center; font-weight: bold;">${item.torneosParticipados}</td>`;
             html += `<td style="padding: 5px 2px; text-align: center; color: #4CAF50; font-weight: bold;">${item.victorias}</td>`;
-            html += `<td style="padding: 5px 2px; text-align: center; color: #FF9800; font-weight: bold;">${item.empates}</td>`;
+            html += `<td style="padding: 5px 2px; text-align: center; color: #2196f3; font-weight: bold;">${item.empates}</td>`;
             html += `<td style="padding: 5px 2px; text-align: center; color: #f44336; font-weight: bold;">${item.derrotas}</td>`;
-            html += `<td style="padding: 5px 2px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
-            html += `<td style="padding: 5px 2px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
+            html += `<td style="padding: 5px 2px; text-align: center; font-weight: 900; background: #e8f5e8;">${item.puntos}</td>`;
+            html += `<td style="padding: 5px 2px; text-align: center; font-weight: 900;">${formatTiempo(item.tiempo)}</td>`;
             html += `</tr>`;
         });
         
