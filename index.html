@@ -1225,12 +1225,19 @@
     // ACTUALIZAR TODO
     // ==============================================
     function actualizarTodo() {
-        renderizarTablaCotejo();
-        renderizarTablaPosiciones();
-        renderizarTablaSerial();
-        actualizarListaTorneosUI();
-        actualizarSelectoresCalificacion();
-    }
+    console.log(`🔄 Actualizando todo... Torneo actual: ${torneoActual?.infoTorneo?.nombre || 'NINGUNO'}`);
+    
+    // Renderizar según el torneo actual
+    renderizarTablaCotejo();
+    renderizarTablaPosiciones();
+    renderizarTablaSerial();
+    
+    // Actualizar interfaces
+    actualizarListaTorneosUI();
+    actualizarSelectoresCalificacion();
+    
+    console.log(`✅ Actualización completada`);
+}
     
     function actualizarListaTorneosUI() {
         const container = document.getElementById('torneosLista');
@@ -1309,16 +1316,19 @@
     const idx = parseInt(select.value);
     
     if (!isNaN(idx) && torneos[idx]) {
-        // 🔥 ACTUALIZAR CORRECTAMENTE EL TORNEO ACTUAL
+        // Actualizar el torneo actual
         torneoActual = torneos[idx];
         
-        // 🔥 LIMPIAR LA SELECCIÓN DE PELEA ACTUAL
+        console.log(`🔄 Cambiando al torneo: ${torneoActual.infoTorneo.nombre}`);
+        console.log(`📊 Calificaciones disponibles: ${calificacionesGlobales.size}`);
+        
+        // Limpiar selección de pelea actual
         peleaSeleccionada = null;
         
-        // 🔥 ACTUALIZAR EL COMBOBOX DE PELEAS
+        // Actualizar el combobox de peleas
         actualizarComboboxPeleas();
         
-        // 🔥 OCULTAR DETALLES Y FORMULARIOS ANTERIORES
+        // Ocultar detalles y formularios anteriores
         const detalleDiv = document.getElementById('detallePelea');
         const calificacionForm = document.getElementById('calificacionForm');
         const infoAnterior = document.getElementById('infoAnterior');
@@ -1327,12 +1337,17 @@
         if (calificacionForm) calificacionForm.style.display = 'none';
         if (infoAnterior) infoAnterior.style.display = 'none';
         
-        // 🔥 RENDERIZAR TODAS LAS TABLAS CON EL NUEVO TORNEO
+        // 🔥 FORZAR LA ACTUALIZACIÓN DE TODAS LAS TABLAS
         renderizarTablaCotejo();
         renderizarTablaPosiciones();
         
-        // 🔥 ACTUALIZAR LA LISTA DE TORNEOS UI
+        // Actualizar la lista de torneos UI
         actualizarListaTorneosUI();
+        
+        // Mostrar mensaje de confirmación
+        const totalPeleas = torneoActual.resultadosCotejo?.peleas?.length || 0;
+        const calificadas = contarPeleasCalificadas(torneoActual);
+        console.log(`✅ Torneo cambiado: ${calificadas}/${totalPeleas} peleas calificadas`);
     }
 }
     
