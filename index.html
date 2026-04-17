@@ -509,7 +509,7 @@
 <!-- BARRA SUPERIOR FIJA -->
 <div class="top-bar">
     <div class="logo">
-        <span>🐓</span> LsdsdEGADO. 
+        <span>🐓</span> LEGADO 
     </div>
     <div class="top-bar-buttons">
         <button id="installBtn" class="btn-icon" style="display: none;" title="Instalar App">📲</button>
@@ -1028,31 +1028,32 @@
     html += `<th style="padding: 12px 8px; text-align: center;">DIF</th>`;
     html += `<th style="padding: 12px 8px; text-align: center;">GANADOR</th>`;
     html += `<th style="padding: 12px 8px; text-align: center;">TIEMPO</th>`;
-    html += `</tr></thead><tbody>`;
+    html += `<tr></thead><tbody>`;
     
     peleas.forEach((p, index) => {
-        // 🔥 CRÍTICO: Usar SOLO los datos de la pelea del JSON importado
-        // NO buscar en calificacionesGlobales para torneos seriales
+        // 🔥 CLAVE: Buscar calificación en el Map global usando el ID del torneo
+        const calKey = `${torneoActual.id}_${index}`;
+        let calificacion = calificacionesGlobales.get(calKey);
         
-        // Determinar si la pelea tiene calificación del JSON original
-        const tieneCalificacion = (p.calificada === true || p.ganador);
-        
-        let ganadorTexto = '';
-        let tiempo = '--:--';
-        
-        if (tieneCalificacion) {
-            // Usar los datos DIRECTOS del JSON importado
-            if (p.ganador === 'rojo') ganadorTexto = `🔴 ${p.gallo1.partido}`;
-            else if (p.ganador === 'verde') ganadorTexto = `🟢 ${p.gallo2.partido}`;
-            else if (p.ganador === 'empate') ganadorTexto = 'TABLA';
-            
-            tiempo = p.tiempo || '--:--';
-        } else {
-            ganadorTexto = '⏳ PENDIENTE';
+        // Si no encuentra en el Map, buscar directamente en la pelea (por si acaso)
+        if (!calificacion && (p.calificada === true || p.ganador)) {
+            calificacion = {
+                ganador: p.ganador,
+                tiempo: p.tiempo || '--:--'
+            };
+            // Guardarla en el Map para futuras referencias
+            calificacionesGlobales.set(calKey, calificacion);
         }
         
-        // Color de fondo basado en si está calificada en el JSON original
-        const bgColor = tieneCalificacion ? 'bg-calificada' : (index % 2 === 0 ? '#ffffff' : '#f9f9f9');
+        const bgColor = calificacion ? 'bg-calificada' : (index % 2 === 0 ? '#ffffff' : '#f9f9f9');
+        
+        let ganadorTexto = '';
+        if (calificacion?.ganador === 'rojo') ganadorTexto = `🔴 ${p.gallo1.partido}`;
+        else if (calificacion?.ganador === 'verde') ganadorTexto = `🟢 ${p.gallo2.partido}`;
+        else if (calificacion?.ganador === 'empate') ganadorTexto = 'TABLA';
+        else ganadorTexto = '⏳ PENDIENTE';
+        
+        const tiempo = calificacion?.tiempo || '--:--';
         const difClase = p.diferencia <= 20 ? 'diferencia-baja' : 'diferencia-alta';
         
         html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
@@ -1312,32 +1313,17 @@
         return;
     }
     
-    // 🔥 NUEVO: Verificar si el torneo es serial (solo lectura)
-    if (torneoActual.esTorneoSerial) {
-        detalleDiv.style.display = 'block';
-        detalleDiv.innerHTML = `
-            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <div style="font-weight: bold; margin-bottom: 10px;">⚠️ TORNEO SERIAL - SOLO LECTURA</div>
-                <div>Este torneo ya tiene resultados definidos. No se pueden modificar las calificaciones.</div>
-                <div style="margin-top: 10px; font-size: 12px;">Los datos mostrados son los originales del archivo importado.</div>
-            </div>
-        `;
-        calificacionForm.style.display = 'none';
-        infoAnterior.style.display = 'none';
-        peleaSeleccionada = null;
-        return;
-    }
-    
     const pelea = torneoActual.resultadosCotejo.peleas[index];
     const calKey = `${torneoActual.id}_${index}`;
     const calificacionExistente = calificacionesGlobales.get(calKey);
     const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
     
+    // 🔥 GUARDAR LA CALIFICACIÓN ACTUAL EN peleaSeleccionada
     peleaSeleccionada = { 
         ...pelea, 
         indice: index, 
         torneoId: torneoActual.id,
-        calificacionActual: calificacionExistente
+        calificacionActual: calificacionExistente  // ← NUEVO: guardar calificación actual
     };
     
     detalleDiv.style.display = 'block';
@@ -1370,6 +1356,7 @@
         else if (calificacionExistente.ganador === 'verde') ganadorTexto = `🟢 ${pelea.gallo2.partido}`;
         else if (calificacionExistente.ganador === 'empate') ganadorTexto = '🤝 TABLA';
         
+        // 🔥 MOSTRAR LA CALIFICACIÓN ACTUAL EN EL MODAL
         infoAnterior.innerHTML = `
             <div style="font-weight:600; margin-bottom:8px;">⚠️ Esta pelea ya fue calificada:</div>
             <div><strong>Ganador:</strong> ${ganadorTexto}</div>
@@ -1670,53 +1657,67 @@
                 // Asignar ID único si no tiene
                 if (!datos.infoTorneo.id) datos.infoTorneo.id = Date.now() + '_' + Math.random();
                 
-                // 🔥 NUEVO: Asegurar que los datos de calificación están en las peleas
-                if (datos.resultadosCotejo && datos.resultadosCotejo.peleas) {
-                    datos.resultadosCotejo.peleas.forEach((pelea, idx) => {
-                        // Si hay calificaciones en un array separado, aplicarlas a las peleas
-                        if (datos.calificaciones && datos.calificaciones[idx]) {
-                            const cal = datos.calificaciones[idx];
-                            pelea.calificada = true;
-                            pelea.ganador = cal.ganador;
-                            pelea.tiempo = cal.tiempo;
-                            pelea.fechaCalificacion = cal.fechaCalificacion;
-                            pelea.timestamp = cal.timestamp;
+                // ==============================================
+                // 🔥 NUEVO: PROCESAR CALIFICACIONES DEL JSON
+                // ==============================================
+                // Las calificaciones vienen en un array separado "calificaciones"
+                if (datos.calificaciones && Array.isArray(datos.calificaciones) && datos.calificaciones.length > 0) {
+                    console.log(`📋 Procesando ${datos.calificaciones.length} calificaciones para ${datos.infoTorneo.nombre}`);
+                    
+                    // Asegurar que exista resultadosCotejo
+                    if (!datos.resultadosCotejo) {
+                        datos.resultadosCotejo = { peleas: [] };
+                    }
+                    
+                    // Para cada calificación, agregar los campos a la pelea correspondiente
+                    datos.calificaciones.forEach(cal => {
+                        const indice = cal.indicePelea;
+                        if (datos.resultadosCotejo.peleas && datos.resultadosCotejo.peleas[indice]) {
+                            // Agregar los campos de calificación DENTRO de la pelea
+                            datos.resultadosCotejo.peleas[indice].calificada = cal.calificada !== undefined ? cal.calificada : true;
+                            datos.resultadosCotejo.peleas[indice].ganador = cal.ganador;
+                            datos.resultadosCotejo.peleas[indice].tiempo = cal.tiempo;
+                            datos.resultadosCotejo.peleas[indice].fechaCalificacion = cal.fechaCalificacion;
+                            datos.resultadosCotejo.peleas[indice].timestamp = cal.timestamp;
+                            datos.resultadosCotejo.peleas[indice].usuarioCalifico = cal.usuarioCalifico;
+                            datos.resultadosCotejo.peleas[indice].usuarioId = cal.usuarioId;
+                            
+                            // También actualizar puntos en gallos si existen
+                            if (cal.gallo1 && cal.gallo1.puntos !== undefined) {
+                                datos.resultadosCotejo.peleas[indice].gallo1.puntos = cal.gallo1.puntos;
+                            }
+                            if (cal.gallo2 && cal.gallo2.puntos !== undefined) {
+                                datos.resultadosCotejo.peleas[indice].gallo2.puntos = cal.gallo2.puntos;
+                            }
                         }
-                        
-                        // 🔥 CRÍTICO: Marcar que este torneo es de solo lectura para la tabla
-                        // Esto evita que se modifiquen los datos mostrados
-                        datos.esTorneoSerial = true;
                     });
                 }
                 
-                // Verificar si ya existe un torneo con el mismo nombre/fecha
-                const existe = torneos.some(t => 
-                    t.infoTorneo.nombre === datos.infoTorneo.nombre && 
-                    t.infoTorneo.fecha === datos.infoTorneo.fecha
-                );
-                
-                if (existe) {
-                    console.warn(`⚠️ El torneo "${datos.infoTorneo.nombre}" ya existe, omitiendo duplicado`);
-                    procesados++;
-                    if (procesados === files.length) {
-                        actualizarTodo();
-                        guardarCalificacionesEnLocalStorage();
-                        fileInput.value = '';
-                        alert(`✅ ${procesados} torneo(s) importado(s) (se omitieron duplicados)`);
-                    }
-                    return;
+                // ==============================================
+                // 🔥 NUEVO: TAMBIÉN VERIFICAR SI LAS CALIFICACIONES YA ESTÁN DENTRO DE LAS PELEAS
+                // ==============================================
+                if (datos.resultadosCotejo && datos.resultadosCotejo.peleas) {
+                    datos.resultadosCotejo.peleas.forEach((pelea, idx) => {
+                        if (pelea.calificada === true || pelea.ganador) {
+                            // La calificación ya está dentro de la pelea, solo asegurar el formato
+                            console.log(`✅ Pelea ${idx + 1} ya tiene calificación: ganador=${pelea.ganador}, tiempo=${pelea.tiempo}`);
+                        }
+                    });
                 }
                 
                 torneos.push(datos);
                 procesados++;
                 
                 if (procesados === files.length) {
-                    // 🔥 NO cargar calificaciones al Map global para torneos seriales
-                    // Solo actualizar la UI
+                    // ==============================================
+                    // 🔥 NUEVO: CARGAR CALIFICACIONES AL Map GLOBAL
+                    // ==============================================
+                    cargarCalificacionesDesdeTorneos();
+                    
                     actualizarTodo();
                     guardarCalificacionesEnLocalStorage();
                     fileInput.value = '';
-                    alert(`✅ ${procesados} torneo(s) importado(s) con sus resultados originales`);
+                    alert(`✅ ${procesados} torneo(s) importado(s) con sus calificaciones`);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -1728,22 +1729,15 @@
         reader.readAsText(file);
     });
 }
+
     function cargarCalificacionesDesdeTorneos() {
-    // 🔥 Esta función ahora SOLO se usa para torneos que necesitan calificación interactiva
-    // NO para los torneos seriales importados que ya tienen resultados
-    
     calificacionesGlobales.clear();
     
     torneos.forEach(torneo => {
-        // Saltar torneos seriales (que ya tienen resultados fijos)
-        if (torneo.esTorneoSerial) {
-            console.log(`📌 Torneo serial detectado: ${torneo.infoTorneo.nombre} - Los resultados son fijos`);
-            return;
-        }
-        
         if (!torneo.resultadosCotejo || !torneo.resultadosCotejo.peleas) return;
         
         torneo.resultadosCotejo.peleas.forEach((pelea, index) => {
+            // Verificar si la pelea tiene calificación (ya sea por campos directos o por el flag calificada)
             if (pelea.calificada === true || pelea.ganador) {
                 const calKey = `${torneo.id}_${index}`;
                 const calificacion = {
@@ -1760,11 +1754,12 @@
                     diferencia: pelea.diferencia
                 };
                 calificacionesGlobales.set(calKey, calificacion);
+                console.log(`📥 Cargada calificación para ${torneo.infoTorneo.nombre} - Pelea ${index + 1}: ${pelea.ganador} - ${pelea.tiempo}`);
             }
         });
     });
     
-    console.log(`✅ Calificaciones interactivas cargadas: ${calificacionesGlobales.size}`);
+    console.log(`✅ Total calificaciones cargadas: ${calificacionesGlobales.size}`);
 }
     
     function eliminarTorneo(idx) {
