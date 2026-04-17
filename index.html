@@ -940,7 +940,7 @@ const calKey = `${torneo.infoTorneo.id}_${index}`;
                 if (g1?.partido) {
                     const data = initPartidoSerial(g1.partido);
                     if (data) {
-                        data.torneosParticipados.add(torneo.id);
+        data.torneosParticipados.add(torneo.infoTorneo.id);
                         if (calificacion.ganador === 'rojo') {
                             data.puntos += puntosConf.ganador;
                             data.tiempo += tiempoSegundos;
@@ -959,7 +959,7 @@ const calKey = `${torneo.infoTorneo.id}_${index}`;
                 if (g2?.partido) {
                     const data = initPartidoSerial(g2.partido);
                     if (data) {
-                        data.torneosParticipados.add(torneo.id);
+        data.torneosParticipados.add(torneo.infoTorneo.id);
                         if (calificacion.ganador === 'verde') {
                             data.puntos += puntosConf.ganador;
                             data.tiempo += tiempoSegundos;
@@ -1254,7 +1254,7 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
             torneoActual = torneos[0];
             select.value = '0';
         } else if (torneoActual) {
-            const idx = torneos.findIndex(t => t.id === torneoActual.id);
+const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.id);
             if (idx !== -1) select.value = idx;
         }
         
@@ -1484,8 +1484,9 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
     // ==============================================
     // 2. ACTUALIZAR LA PELEA DENTRO DEL TORNEO (en la lista de torneos)
     // ==============================================
-    const torneoIndex = torneos.findIndex(t => t.id === torneoId);
-    if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
+const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
+
+        if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
         const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
         pelea.calificada = true;
         pelea.ganador = ganador;
@@ -1559,7 +1560,8 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         calificacionesGlobales.delete(calKey);
         
         // 2. Actualizar la pelea dentro del torneo
-        const torneoIndex = torneos.findIndex(t => t.id === torneoId);
+const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
+
         if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
             const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
             delete pelea.calificada;
