@@ -1299,148 +1299,314 @@
     }
     
     function cambiarPeleaSeleccionada() {
-        const select = document.getElementById('peleaSelect');
-        const index = parseInt(select.value);
-        const detalleDiv = document.getElementById('detallePelea');
-        const calificacionForm = document.getElementById('calificacionForm');
-        const infoAnterior = document.getElementById('infoAnterior');
+    const select = document.getElementById('peleaSelect');
+    const index = parseInt(select.value);
+    const detalleDiv = document.getElementById('detallePelea');
+    const calificacionForm = document.getElementById('calificacionForm');
+    const infoAnterior = document.getElementById('infoAnterior');
+    
+    if (isNaN(index) || !torneoActual) {
+        detalleDiv.style.display = 'none';
+        calificacionForm.style.display = 'none';
+        infoAnterior.style.display = 'none';
+        peleaSeleccionada = null;
+        return;
+    }
+    
+    const pelea = torneoActual.resultadosCotejo.peleas[index];
+    const calKey = `${torneoActual.id}_${index}`;
+    const calificacionExistente = calificacionesGlobales.get(calKey);
+    const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
+    
+    // 🔥 GUARDAR LA CALIFICACIÓN ACTUAL EN peleaSeleccionada
+    peleaSeleccionada = { 
+        ...pelea, 
+        indice: index, 
+        torneoId: torneoActual.id,
+        calificacionActual: calificacionExistente  // ← NUEVO: guardar calificación actual
+    };
+    
+    detalleDiv.style.display = 'block';
+    detalleDiv.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:15px 0;">
+            <div style="background:#ffebee; border-radius:12px; padding:15px; border-left:9px solid #d32f2f;">
+                <div style="font-weight:900; font-size:20px; color:#d32f2f;">${escapeHTML(pelea.gallo1.partido)}</div>
+                <div style="margin-top:10px;">Anillo: <strong>${pelea.gallo1.anillo}</strong></div>
+                <div>Peso: <strong>${pelea.gallo1.peso}g</strong></div>
+                ${pelea.gallo1.representante ? `<div>👤 ${escapeHTML(pelea.gallo1.representante)}</div>` : ''}
+            </div>
+            <div style="background:#e8f5e8; border-radius:12px; padding:15px; border-right:9px solid #4CAF50;">
+                <div style="font-weight:900; font-size:20px; color:#4CAF50;">${escapeHTML(pelea.gallo2.partido)}</div>
+                <div style="margin-top:10px;">Anillo: <strong>${pelea.gallo2.anillo}</strong></div>
+                <div>Peso: <strong>${pelea.gallo2.peso}g</strong></div>
+                ${pelea.gallo2.representante ? `<div>👤 ${escapeHTML(pelea.gallo2.representante)}</div>` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('puntosInfo').innerHTML = `
+        <span>🏆 GANADOR: <strong>${puntosConf.ganador}</strong> pts</span>
+        <span>🤝 EMPATE: <strong>${puntosConf.empate}</strong> pts c/u</span>
+        <span>📉 PERDEDOR: <strong>${puntosConf.perdedor}</strong> pts</span>
+    `;
+    
+    if (calificacionExistente) {
+        let ganadorTexto = '';
+        if (calificacionExistente.ganador === 'rojo') ganadorTexto = `🔴 ${pelea.gallo1.partido}`;
+        else if (calificacionExistente.ganador === 'verde') ganadorTexto = `🟢 ${pelea.gallo2.partido}`;
+        else if (calificacionExistente.ganador === 'empate') ganadorTexto = '🤝 TABLA';
         
-        if (isNaN(index) || !torneoActual) {
-            detalleDiv.style.display = 'none';
-            calificacionForm.style.display = 'none';
-            infoAnterior.style.display = 'none';
-            peleaSeleccionada = null;
-            return;
-        }
-        
-        const pelea = torneoActual.resultadosCotejo.peleas[index];
-        const calKey = `${torneoActual.id}_${index}`;
-        const calificacionExistente = calificacionesGlobales.get(calKey);
-        const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
-        
-        peleaSeleccionada = { ...pelea, indice: index, torneoId: torneoActual.id };
-        
-        detalleDiv.style.display = 'block';
-        detalleDiv.innerHTML = `
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:15px 0;">
-                <div style="background:#ffebee; border-radius:12px; padding:15px; border-left:9px solid #d32f2f;">
-                    <div style="font-weight:900; font-size:20px; color:#d32f2f;">${escapeHTML(pelea.gallo1.partido)}</div>
-                    <div style="margin-top:10px;">Anillo: <strong>${pelea.gallo1.anillo}</strong></div>
-                    <div>Peso: <strong>${pelea.gallo1.peso}g</strong></div>
-                    ${pelea.gallo1.representante ? `<div>👤 ${escapeHTML(pelea.gallo1.representante)}</div>` : ''}
-                </div>
-                <div style="background:#e8f5e8; border-radius:12px; padding:15px; border-right:9px solid #4CAF50;">
-                    <div style="font-weight:900; font-size:20px; color:#4CAF50;">${escapeHTML(pelea.gallo2.partido)}</div>
-                    <div style="margin-top:10px;">Anillo: <strong>${pelea.gallo2.anillo}</strong></div>
-                    <div>Peso: <strong>${pelea.gallo2.peso}g</strong></div>
-                    ${pelea.gallo2.representante ? `<div>👤 ${escapeHTML(pelea.gallo2.representante)}</div>` : ''}
-                </div>
+        // 🔥 MOSTRAR LA CALIFICACIÓN ACTUAL EN EL MODAL
+        infoAnterior.innerHTML = `
+            <div style="font-weight:600; margin-bottom:8px;">⚠️ Esta pelea ya fue calificada:</div>
+            <div><strong>Ganador:</strong> ${ganadorTexto}</div>
+            <div><strong>Tiempo:</strong> ${calificacionExistente.tiempo}</div>
+            <div><strong>Fecha:</strong> ${calificacionExistente.fechaCalificacion || 'desconocida'}</div>
+            <div style="margin-top:10px; display:flex; gap:10px;">
+                <button onclick="confirmarReCalificar()" style="background:#ff9800; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">✏️ VOLVER A CALIFICAR</button>
+                <button onclick="eliminarCalificacion()" style="background:#f44336; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">🗑️ ELIMINAR</button>
             </div>
         `;
-        
-        document.getElementById('puntosInfo').innerHTML = `
-            <span>🏆 GANADOR: <strong>${puntosConf.ganador}</strong> pts</span>
-            <span>🤝 EMPATE: <strong>${puntosConf.empate}</strong> pts c/u</span>
-            <span>📉 PERDEDOR: <strong>${puntosConf.perdedor}</strong> pts</span>
-        `;
-        
-        if (calificacionExistente) {
-            let ganadorTexto = '';
-            if (calificacionExistente.ganador === 'rojo') ganadorTexto = `🔴 ${pelea.gallo1.partido}`;
-            else if (calificacionExistente.ganador === 'verde') ganadorTexto = `🟢 ${pelea.gallo2.partido}`;
-            else if (calificacionExistente.ganador === 'empate') ganadorTexto = '🤝 TABLA';
-            
-            infoAnterior.innerHTML = `
-                <div style="font-weight:600; margin-bottom:8px;">⚠️ Esta pelea ya fue calificada:</div>
-                <div><strong>Ganador:</strong> ${ganadorTexto}</div>
-                <div><strong>Tiempo:</strong> ${calificacionExistente.tiempo}</div>
-                <div style="margin-top:10px; display:flex; gap:10px;">
-                    <button onclick="confirmarReCalificar()" style="background:#ff9800; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">✏️ VOLVER A CALIFICAR</button>
-                    <button onclick="eliminarCalificacion()" style="background:#f44336; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">🗑️ ELIMINAR</button>
-                </div>
-            `;
-            infoAnterior.style.display = 'block';
-            calificacionForm.style.display = 'none';
-        } else {
-            infoAnterior.style.display = 'none';
-            calificacionForm.style.display = 'block';
-            document.getElementById('tiempoInput').value = '';
-            document.getElementById('ganadorSelect').value = '';
-        }
+        infoAnterior.style.display = 'block';
+        calificacionForm.style.display = 'none';
+    } else {
+        infoAnterior.style.display = 'none';
+        calificacionForm.style.display = 'block';
+        document.getElementById('tiempoInput').value = '';
+        document.getElementById('ganadorSelect').value = '';
     }
+}
     
     function confirmarReCalificar() {
-        if (confirm('⚠️ ¿Deseas volver a calificar esta pelea?')) {
-            document.getElementById('infoAnterior').style.display = 'none';
-            document.getElementById('calificacionForm').style.display = 'block';
+    if (!peleaSeleccionada) return;
+    
+    // 🔥 OBTENER LA CALIFICACIÓN ACTUAL
+    const calificacionActual = peleaSeleccionada.calificacionActual;
+    
+    if (confirm('⚠️ ¿Deseas modificar la calificación de esta pelea?')) {
+        // Ocultar el mensaje anterior
+        document.getElementById('infoAnterior').style.display = 'none';
+        
+        // Mostrar el formulario
+        document.getElementById('calificacionForm').style.display = 'block';
+        
+        // 🔥 CARGAR LOS VALORES ACTUALES EN EL FORMULARIO
+        if (calificacionActual) {
+            // Cargar el tiempo actual
+            if (calificacionActual.tiempo) {
+                document.getElementById('tiempoInput').value = calificacionActual.tiempo;
+            } else {
+                document.getElementById('tiempoInput').value = '';
+            }
+            
+            // Cargar el ganador actual
+            if (calificacionActual.ganador) {
+                document.getElementById('ganadorSelect').value = calificacionActual.ganador;
+            } else {
+                document.getElementById('ganadorSelect').value = '';
+            }
+        } else {
+            // Si no hay calificación actual, dejar vacío
             document.getElementById('tiempoInput').value = '';
             document.getElementById('ganadorSelect').value = '';
         }
+        
+        // Enfocar el campo de tiempo
+        document.getElementById('tiempoInput').focus();
     }
+}
     
     function calificarPelea() {
-        if (!peleaSeleccionada) {
-            alert('Selecciona una pelea primero');
-            return;
+    if (!peleaSeleccionada) {
+        alert('Selecciona una pelea primero');
+        return;
+    }
+    
+    const tiempo = document.getElementById('tiempoInput').value.trim();
+    const ganador = document.getElementById('ganadorSelect').value;
+    
+    if (!tiempo) { 
+        alert('Ingresa el tiempo (MM:SS)'); 
+        return; 
+    }
+    if (!/^\d{2}:\d{2}$/.test(tiempo)) { 
+        alert('Formato inválido. Use MM:SS (ej: 05:30)'); 
+        return; 
+    }
+    if (!ganador) { 
+        alert('Selecciona un ganador'); 
+        return; 
+    }
+    
+    const torneoId = peleaSeleccionada.torneoId;
+    const indice = peleaSeleccionada.indice;
+    const calKey = `${torneoId}_${indice}`;
+    const ahora = new Date();
+    
+    // Obtener configuración de puntos del torneo
+    const puntosConf = torneoActual?.infoTorneo?.puntosConfig || puntosConfig;
+    
+    // Calcular puntos según el ganador
+    let puntosGallo1 = 0, puntosGallo2 = 0;
+    if (ganador === 'rojo') {
+        puntosGallo1 = puntosConf.ganador;
+        puntosGallo2 = puntosConf.perdedor;
+    } else if (ganador === 'verde') {
+        puntosGallo1 = puntosConf.perdedor;
+        puntosGallo2 = puntosConf.ganador;
+    } else if (ganador === 'empate') {
+        puntosGallo1 = puntosConf.empate;
+        puntosGallo2 = puntosConf.empate;
+    }
+    
+    // Crear objeto de calificación
+    const calificacion = {
+        indicePelea: indice,
+        calificada: true,
+        ganador: ganador,
+        tiempo: tiempo,
+        fechaCalificacion: ahora.toLocaleString(),
+        timestamp: ahora.getTime(),
+        usuarioCalifico: 'Usuario Offline',
+        usuarioId: 'offline',
+        gallo1: { ...peleaSeleccionada.gallo1, puntos: puntosGallo1 },
+        gallo2: { ...peleaSeleccionada.gallo2, puntos: puntosGallo2 },
+        diferencia: peleaSeleccionada.diferencia
+    };
+    
+    // ==============================================
+    // 1. GUARDAR EN EL MAP GLOBAL
+    // ==============================================
+    calificacionesGlobales.set(calKey, calificacion);
+    
+    // ==============================================
+    // 2. ACTUALIZAR LA PELEA DENTRO DEL TORNEO (en la lista de torneos)
+    // ==============================================
+    const torneoIndex = torneos.findIndex(t => t.id === torneoId);
+    if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
+        const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
+        pelea.calificada = true;
+        pelea.ganador = ganador;
+        pelea.tiempo = tiempo;
+        pelea.fechaCalificacion = calificacion.fechaCalificacion;
+        pelea.timestamp = calificacion.timestamp;
+        pelea.usuarioCalifico = calificacion.usuarioCalifico;
+        pelea.usuarioId = calificacion.usuarioId;
+        if (pelea.gallo1) pelea.gallo1.puntos = puntosGallo1;
+        if (pelea.gallo2) pelea.gallo2.puntos = puntosGallo2;
+    }
+    
+    // ==============================================
+    // 3. ACTUALIZAR torneoActual SI ES EL MISMO
+    // ==============================================
+    if (torneoActual && torneoActual.id === torneoId) {
+        if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
+            const pelea = torneoActual.resultadosCotejo.peleas[indice];
+            pelea.calificada = true;
+            pelea.ganador = ganador;
+            pelea.tiempo = tiempo;
+            pelea.fechaCalificacion = calificacion.fechaCalificacion;
+            pelea.timestamp = calificacion.timestamp;
+            pelea.usuarioCalifico = calificacion.usuarioCalifico;
+            pelea.usuarioId = calificacion.usuarioId;
+            if (pelea.gallo1) pelea.gallo1.puntos = puntosGallo1;
+            if (pelea.gallo2) pelea.gallo2.puntos = puntosGallo2;
+        }
+    }
+    
+    // ==============================================
+    // 4. GUARDAR EN LOCALSTORAGE
+    // ==============================================
+    guardarCalificacionesEnLocalStorage();
+    
+    // ==============================================
+    // 5. ACTUALIZAR TODAS LAS VISTAS
+    // ==============================================
+    actualizarComboboxPeleas();
+    renderizarTablaCotejo();
+    renderizarTablaPosiciones();
+    renderizarTablaSerial();
+    actualizarListaTorneosUI();
+    
+    // ==============================================
+    // 6. LIMPIAR LA SELECCIÓN ACTUAL
+    // ==============================================
+    document.getElementById('peleaSelect').value = '';
+    document.getElementById('detallePelea').style.display = 'none';
+    document.getElementById('calificacionForm').style.display = 'none';
+    document.getElementById('infoAnterior').style.display = 'none';
+    
+    // ==============================================
+    // 7. NOTIFICAR AL USUARIO
+    // ==============================================
+    alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
+    
+    // Limpiar referencia
+    peleaSeleccionada = null;
+}
+    
+    function eliminarCalificacion() {
+    if (!peleaSeleccionada) return;
+    
+    if (confirm('¿Eliminar esta calificación? La pelea quedará pendiente.')) {
+        const torneoId = peleaSeleccionada.torneoId;
+        const indice = peleaSeleccionada.indice;
+        const calKey = `${torneoId}_${indice}`;
+        
+        // 1. Eliminar del Map global
+        calificacionesGlobales.delete(calKey);
+        
+        // 2. Actualizar la pelea dentro del torneo
+        const torneoIndex = torneos.findIndex(t => t.id === torneoId);
+        if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
+            const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
+            delete pelea.calificada;
+            delete pelea.ganador;
+            delete pelea.tiempo;
+            delete pelea.fechaCalificacion;
+            delete pelea.timestamp;
+            delete pelea.usuarioCalifico;
+            delete pelea.usuarioId;
+            if (pelea.gallo1) delete pelea.gallo1.puntos;
+            if (pelea.gallo2) delete pelea.gallo2.puntos;
         }
         
-        const tiempo = document.getElementById('tiempoInput').value.trim();
-        const ganador = document.getElementById('ganadorSelect').value;
+        // 3. Actualizar torneoActual si es el mismo
+        if (torneoActual && torneoActual.id === torneoId) {
+            if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
+                const pelea = torneoActual.resultadosCotejo.peleas[indice];
+                delete pelea.calificada;
+                delete pelea.ganador;
+                delete pelea.tiempo;
+                delete pelea.fechaCalificacion;
+                delete pelea.timestamp;
+                delete pelea.usuarioCalifico;
+                delete pelea.usuarioId;
+                if (pelea.gallo1) delete pelea.gallo1.puntos;
+                if (pelea.gallo2) delete pelea.gallo2.puntos;
+            }
+        }
         
-        if (!tiempo) { alert('Ingresa el tiempo'); return; }
-        if (!/^\d{2}:\d{2}$/.test(tiempo)) { alert('Formato MM:SS'); return; }
-        if (!ganador) { alert('Selecciona un ganador'); return; }
-        
-        const calKey = `${peleaSeleccionada.torneoId}_${peleaSeleccionada.indice}`;
-        const calificacion = {
-            indicePelea: peleaSeleccionada.indice,
-            calificada: true,
-            ganador: ganador,
-            tiempo: tiempo,
-            fechaCalificacion: new Date().toLocaleString(),
-            gallo1: peleaSeleccionada.gallo1,
-            gallo2: peleaSeleccionada.gallo2,
-            diferencia: peleaSeleccionada.diferencia
-        };
-        
-        calificacionesGlobales.set(calKey, calificacion);
+        // 4. Guardar en localStorage
         guardarCalificacionesEnLocalStorage();
         
+        // 5. Actualizar todas las vistas
         actualizarComboboxPeleas();
         renderizarTablaCotejo();
         renderizarTablaPosiciones();
         renderizarTablaSerial();
         actualizarListaTorneosUI();
         
+        // 6. Limpiar selección actual
         document.getElementById('peleaSelect').value = '';
         document.getElementById('detallePelea').style.display = 'none';
         document.getElementById('calificacionForm').style.display = 'none';
         document.getElementById('infoAnterior').style.display = 'none';
+        peleaSeleccionada = null;
         
-        alert(`✅ Pelea #${peleaSeleccionada.numero} calificada`);
+        alert('✅ Calificación eliminada');
     }
-    
-    function eliminarCalificacion() {
-        if (!peleaSeleccionada) return;
-        if (confirm('¿Eliminar esta calificación?')) {
-            const calKey = `${peleaSeleccionada.torneoId}_${peleaSeleccionada.indice}`;
-            calificacionesGlobales.delete(calKey);
-            guardarCalificacionesEnLocalStorage();
-            
-            actualizarComboboxPeleas();
-            renderizarTablaCotejo();
-            renderizarTablaPosiciones();
-            renderizarTablaSerial();
-            actualizarListaTorneosUI();
-            
-            document.getElementById('peleaSelect').value = '';
-            document.getElementById('detallePelea').style.display = 'none';
-            document.getElementById('calificacionForm').style.display = 'none';
-            document.getElementById('infoAnterior').style.display = 'none';
-            
-            alert('✅ Calificación eliminada');
-        }
-    }
+}
     
     function guardarCalificacionesEnLocalStorage() {
         const calArray = Array.from(calificacionesGlobales.entries());
