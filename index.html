@@ -1,1622 +1,833 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="manifest" href="/manifest.json">
-    <!-- Meta tags para PWA -->
-<link rel="manifest" href="/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Legado Avícola">
-<link rel="apple-touch-icon" href="https://placehold.co/192x192/8B4513/white?text=🐓">
-<meta name="theme-color" content="#8B4513">
-    
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>COTEJO OFFLINE - Legado Avícola</title>
-    <meta name="theme-color" content="#8B4513">
-    
+    <title>Sistema de Cotejo Offline</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-        
+
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        
-        /* BARRA SUPERIOR */
-        .top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 16px;
-            height: 60px;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(139,69,19,0.2);
-        }
-        
-        .logo {
-            font-size: 20px;
-            font-weight: 800;
-            color: #8B4513;
-        }
-        
-        .logo span {
-            font-size: 24px;
-        }
-        
-        .btn-icon {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #f0f2f5;
-            border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-icon:hover {
-            background: #e4e6e9;
-            transform: scale(1.02);
-        }
-        
-        /* PESTAÑAS */
-        .tabs {
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            padding: 12px 16px;
-            background: #f8f9fa;
-            z-index: 999;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            max-width: 180px;
-            padding: 10px 16px;
-            border: 1.5px solid #8B4513;
-            border-radius: 40px;
-            background: white;
-            color: #8B4513;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .tab-btn.active {
-            background: #8B4513;
-            color: white;
-            box-shadow: 0 4px 12px rgba(139,69,19,0.3);
-        }
-        
-        .tab-btn span:first-child {
-            font-size: 18px;
-        }
-        
-        /* CONTENEDOR PRINCIPAL */
-        .main-container {
-            padding-top: 130px;
-            padding-left: 12px;
-            padding-right: 12px;
+            color: #1a1a1a;
             padding-bottom: 20px;
+        }
+
+        /* Contenedor principal */
+        .app-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 16px;
         }
-        
-        .tab-content {
+
+        /* Pestañas */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.2s ease;
+            color: #555;
+        }
+        .tab-button.active {
+            background: #8B4513;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tab-pane {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
-        
-        .tab-content.active {
+        .tab-pane.active {
             display: block;
         }
-        
-        /* SECCIÓN DE IMPORTACIÓN */
-        .import-section {
+
+        /* Tarjetas y Contenedores */
+        .card {
             background: white;
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
         }
-        
-        .import-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 10px;
+            border-bottom: 2px solid #8B4513;
+            padding-bottom: 10px;
         }
-        
-        .import-header h3 {
-            color: #8B4513;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .card-header h2, .card-header h3 {
+            margin: 0;
+            color: #333;
         }
-        
-        .file-input-wrapper {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .file-input-wrapper input {
-            flex: 2;
-            min-width: 200px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        .btn-primary {
+
+        /* Botones */
+        button {
             background: #8B4513;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-primary:hover {
-            background: #A0522D;
-            transform: translateY(-1px);
-        }
-        
-        .btn-primary:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-secondary {
-            background: #f0f2f5;
-            color: #333;
-            border: 1px solid #ddd;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-        }
-        
-        .preview-info {
-            background: #f0f8ff;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
+            transition: all 0.2s ease;
             font-size: 14px;
-            border-left: 4px solid #2196F3;
         }
-        
-        .preview-info.show {
-            display: block;
-        }
-        
-        .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .preview-item {
-            background: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-        
-        .preview-item strong {
-            color: #8B4513;
-        }
-        
-        /* SECCIÓN DE CALIFICACIÓN */
-        .calificacion-section {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-top: 4px solid #FFD700;
-        }
-        
-        .calificacion-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .calificacion-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 18px;
-        }
-        
-        .pelea-select {
-            flex: 2;
-            min-width: 250px;
-            padding: 12px;
-            border: 2px solid #8B4513;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            background: white;
-        }
-        
-        .calificacion-form {
-            display: none;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        
-        .calificacion-form.show {
-            display: block;
-        }
-        
-        .tiempo-input {
-            width: 150px;
-            padding: 14px;
-            border: 2px solid #8B4513;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: 700;
-            text-align: center;
-            font-family: monospace;
-        }
-        
-        .ganador-select {
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: #6c757d; }
+        .btn-success { background: #28a745; }
+        .btn-danger { background: #dc3545; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-outline { background: transparent; border: 1px solid #8B4513; color: #8B4513; }
+
+        /* Formularios */
+        input, select, textarea {
             width: 100%;
-            padding: 14px;
-            border: 2px solid #FFD700;
+            padding: 12px;
+            border: 1px solid #ced4da;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-        
-        .form-row {
+        input:focus, select:focus {
+            border-color: #8B4513;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        }
+        .form-group {
             margin-bottom: 15px;
         }
-        
-        .form-row label {
+        label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
-            color: #555;
+            color: #495057;
         }
-        
-        .puntos-info {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-around;
-            margin: 15px 0;
-            font-size: 14px;
-        }
-        
-        .btn-calificar {
-            width: 100%;
-            background: #FFD700;
-            color: #333;
-            border: none;
-            padding: 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        
-        .info-anterior {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .info-anterior.show {
-            display: block;
-        }
-        
-        .mensaje-todas {
-            background: #4CAF50;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .mensaje-todas.show {
-            display: block;
-        }
-        
-        /* TABLAS */
-        .table-wrapper {
+
+        /* Tablas Responsivas */
+        .table-responsive {
             overflow-x: auto;
-            background: white;
-            border-radius: 12px;
-            padding: 1px;
-            margin-top: 20px;
+            width: 100%;
         }
-        
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            min-width: 800px;
+            font-size: 14px;
+            min-width: 600px;
         }
-        
-        @media (min-width: 768px) {
-            table {
-                font-size: 14px;
-            }
-        }
-        
-        th {
+        th, td {
             padding: 12px 8px;
-            text-align: center;
-            font-weight: 700;
-        }
-        
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        
-        .cotejo-table th:first-child,
-        .cotejo-table td:first-child {
-            background: #d32f2f;
-            color: white;
-            font-weight: 700;
-        }
-        
-        .cotejo-table th:nth-child(6),
-        .cotejo-table td:nth-child(6) {
-            background: #4CAF50;
-            color: white;
-            font-weight: 700;
-        }
-        
-        .text-left {
             text-align: left;
+            border-bottom: 1px solid #dee2e6;
         }
-        
-        .bg-calificada {
-            background-color: #2196F3 !important;
-            color: white;
-        }
-        
-        .diferencia-baja {
-            color: #4CAF50;
+        th {
+            background-color: #f8f9fa;
             font-weight: 700;
+            color: #495057;
         }
+        /* Estilos para la tabla de cotejo (similar a la pantalla pública) */
+        .cotejo-table th:first-child, .cotejo-table td:first-child { background: #d32f2f; color: white; }
+        .cotejo-table th:nth-child(6), .cotejo-table td:nth-child(6) { background: #4CAF50; color: white; }
         
-        .diferencia-alta {
-            color: #f44336;
-            font-weight: 700;
+        /* Grids y Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
-        
-        .posicion-table th {
-            background: #8B4513;
-            color: white;
-        }
-        
-        .puntos-ganador {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .puntos-empate {
-            background: #2196F3;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .puntos-perdedor {
-            background: #f44336;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 60px;
-            color: #999;
-        }
-        
-        .no-data span {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 16px;
-        }
-        
-        /* MODAL */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
+        .flex-between {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
+
+        /* Utilidades */
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 10px; }
+        .mb-2 { margin-bottom: 10px; }
+        .hidden { display: none; }
         
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 400px;
-            padding: 24px;
-            text-align: center;
-            animation: slideUp 0.3s ease;
+        /* Animación */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
         }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-        /* SPINNER */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #8B4513;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* BADGE */
-        .badge {
-            background: #4CAF50;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-        
-        /* ESTADO OFFLINE */
-        .offline-badge {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: #f44336;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            z-index: 1000;
-            display: none;
-        }
-        
-        .offline-badge.show {
-            display: block;
-        }
-        
-        /* RESPONSIVE */
-        @media (max-width: 640px) {
-            .tab-btn {
-                padding: 8px 12px;
-                font-size: 11px;
-            }
-            
-            .tab-btn span:first-child {
-                font-size: 14px;
-            }
-            
-            .main-container {
-                padding-top: 120px;
-                padding-left: 8px;
-                padding-right: 8px;
-            }
-            
-            .import-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .file-input-wrapper {
-                flex-direction: column;
-            }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container { padding: 10px; }
+            .card { padding: 15px; }
+            th, td { padding: 8px 4px; font-size: 12px; }
+            button { padding: 8px 16px; font-size: 13px; }
         }
     </style>
 </head>
 <body>
-
-<!-- BARRA SUPERIOR -->
-<div class="top-bar">
-    <div class="logo">
-        <span>🐓</span> LEGADO AVÍCOLA
-    </div>
-    <button class="btn-icon" onclick="mostrarInfoModal()" title="Información">ⓘ</button>
-</div>
-
-<!-- PESTAÑAS -->
-<div class="tabs">
-    <button class="tab-btn active" onclick="cambiarPestana('cotejo')">
-        <span>⚡</span> COTEJO
-    </button>
-    <button class="tab-btn" onclick="cambiarPestana('posicion')">
-        <span>🏆</span> POSICIONES
-    </button>
-</div>
-
-<!-- CONTENEDOR PRINCIPAL -->
-<div class="main-container">
-    
-    <!-- SECCIÓN IMPORTACIÓN -->
-    <div class="import-section">
-        <div class="import-header">
-            <h3>
-                <span>📥</span> IMPORTAR TORNEO
-                <span class="badge" id="torneo-status">SIN DATOS</span>
-            </h3>
-            <div class="file-input-wrapper">
-                <input type="file" id="jsonFileInput" accept=".json">
-                <button class="btn-primary" id="importBtn" onclick="importarJSON()">📤 IMPORTAR</button>
-                <button class="btn-secondary" onclick="limpiarDatos()">🗑️ LIMPIAR</button>
+    <div class="app-container">
+        <!-- Header con opciones de importar/exportar -->
+        <div class="flex-between" style="margin-bottom: 20px;">
+            <h1 style="color: #8B4513;">🐓 COTEJO OFFLINE</h1>
+            <div style="display: flex; gap: 10px;">
+                <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                <button id="import-btn" class="btn-outline">📂 Importar Torneo</button>
+                <button id="export-btn" class="btn-outline">💾 Exportar Torneo</button>
+                <button id="new-tournament-btn" class="btn-success">✨ Nuevo Torneo</button>
             </div>
         </div>
-        <div id="previewInfo" class="preview-info">
-            <strong>📄 Archivo cargado:</strong> <span id="previewFileName"></span>
-            <div class="preview-grid">
-                <div class="preview-item"><strong>🏆 Torneo:</strong> <span id="previewTorneo">-</span></div>
-                <div class="preview-item"><strong>📅 Fecha:</strong> <span id="previewFecha">-</span></div>
-                <div class="preview-item"><strong>🐓 Gallos:</strong> <span id="previewGallos">-</span></div>
-                <div class="preview-item"><strong>⚡ Peleas:</strong> <span id="previewPeleas">-</span></div>
-                <div class="preview-item"><strong>✅ Calificadas:</strong> <span id="previewCalificadas">-</span></div>
+
+        <!-- Pestañas -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="registro-tab">📝 Registro de Gallos</button>
+            <button class="tab-button" data-tab="cotejo-tab">⚡ Cotejo</button>
+            <button class="tab-button" data-tab="posiciones-tab">🏆 Posiciones</button>
+        </div>
+
+        <!-- Panel de Registro -->
+        <div id="registro-tab" class="tab-pane active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Registrar Nuevo Partido</h2>
+                    <div>
+                        <span>⚙️ Gallos por Partido: </span>
+                        <input type="number" id="gallos-por-partido" min="1" max="6" value="3" style="width: 70px; display: inline-block;">
+                    </div>
+                </div>
+                <div id="registro-form" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>🏷️ Nombre del Partido *</label>
+                        <input type="text" id="partido-nombre" placeholder="Ej: QUINTA EL SAUCE" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>👤 Representante / Dueño</label>
+                        <input type="text" id="partido-representante" placeholder="Opcional" autocomplete="off">
+                    </div>
+                    <div id="gallos-container"></div>
+                    <button id="registrar-partido-btn" class="btn-success" style="width: 100%; margin-top: 10px;">✅ REGISTRAR PARTIDO</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>📜 Listado de Gallos Registrados</h3>
+                    <span id="contador-gallos">Total: 0 gallos</span>
+                </div>
+                <div class="table-responsive">
+                    <table id="tabla-registro">
+                        <thead>
+                            <tr>
+                                <th>Anillo</th><th>Peso (g)</th><th>Partido</th><th>Representante</th><th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="registro-tbody">
+                            <tr><td colspan="5" class="text-center">No hay gallos registrados</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Cotejo -->
+        <div id="cotejo-tab" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚡ Generar Cotejo</h2>
+                    <div>
+                        <select id="cotejo-modo" style="width: auto; display: inline-block;">
+                            <option value="INTELIGENTE">🤖 Inteligente (Menor Diferencia)</option>
+                            <option value="ASCENDENTE">⬆️ Ascendente (Menor a Mayor Peso)</option>
+                            <option value="DESCENDENTE">⬇️ Descendente (Mayor a Menor Peso)</option>
+                            <option value="ALEATORIO">🎲 Aleatorio</option>
+                        </select>
+                        <button id="generar-cotejo-btn" class="btn-success">⚡ COTEJAR AHORA</button>
+                    </div>
+                </div>
+                <div id="cotejo-resultados">
+                    <div class="text-center" style="padding: 40px;">Presiona "COTEJAR AHORA" para generar las peleas.</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>🏅 Calificar Peleas</h3>
+                    <div class="flex-between" style="gap: 10px;">
+                        <select id="pelea-selector" style="flex: 1;"></select>
+                        <button id="limpiar-calificacion-btn" class="btn-secondary">Limpiar Selección</button>
+                    </div>
+                </div>
+                <div id="calificacion-form" style="display: none;">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>⏱️ Tiempo (MM:SS)</label>
+                            <input type="text" id="tiempo-pelea" placeholder="Ej: 02:30" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>🏆 Ganador</label>
+                            <select id="ganador-pelea">
+                                <option value="">-- Seleccionar --</option>
+                                <option value="rojo">🔴 Cinta Roja</option>
+                                <option value="verde">🟢 Cinta Verde</option>
+                                <option value="empate">🤝 Empate / Tabla</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="calificar-btn" class="btn-success" style="width: 100%;">⭐ CALIFICAR PELEA</button>
+                </div>
+                <div id="calificacion-info" class="text-center" style="margin-top: 15px; color: #6c757d;"></div>
+            </div>
+        </div>
+
+        <!-- Panel de Posiciones -->
+        <div id="posiciones-tab" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <h2>🏆 Tabla de Posiciones</h2>
+                    <span id="config-puntos-info">Puntos: G(2) | E(1) | P(0)</span>
+                </div>
+                <div class="table-responsive">
+                    <table id="tabla-posiciones">
+                        <thead>
+                            <tr><th>Partido</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Pts</th><th>Tiempo</th></tr>
+                        </thead>
+                        <tbody id="posiciones-tbody">
+                            <tr><td colspan="7" class="text-center">No hay peleas calificadas</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- SECCIÓN CALIFICACIÓN (solo visible si hay torneo) -->
-    <div id="calificacionSection" class="calificacion-section" style="display: none;">
-        <div class="calificacion-header">
-            <h3>
-                <span>🏆</span> CALIFICAR PELEAS
-                <span id="calificacionCount" class="badge">0/0</span>
-            </h3>
-            <select id="peleaSelect" class="pelea-select" onchange="cambiarPeleaSeleccionada()">
-                <option value="">-- Selecciona una pelea --</option>
-            </select>
-        </div>
+    <script>
+        // ==============================================
+        // SISTEMA OFFLINE COMPLETO - CACHE FIRCH
+        // ==============================================
         
-        <!-- Detalle de la pelea seleccionada -->
-        <div id="detallePelea" style="display: none;">
-            <div id="detallePeleaContent"></div>
-        </div>
+        // --- Variables Globales ---
+        let torneoData = {
+            info: {
+                id: 'offline_' + Date.now(),
+                nombre: 'Torneo Sin Nombre',
+                fecha: new Date().toLocaleDateString('es-MX'),
+                lugar: 'Offline',
+                pesoMin: 1100,
+                pesoMax: 2600,
+                config: { gallosPorPartido: 3, registroDetallado: false },
+                puntosConfig: { ganador: 2, empate: 1, perdedor: 0 }
+            },
+            registroPartidos: [], // { anillo, peso, partido, representante, matchId }
+            resultadosCotejo: null, // { peleas: [], noEmparejados: [], metricas: {} }
+            calificaciones: [] // Array de objetos de calificación
+        };
         
-        <!-- Formulario de calificación -->
-        <div id="calificacionForm" class="calificacion-form">
-            <div class="form-row">
-                <label>⏱️ TIEMPO (MM:SS)</label>
-                <input type="text" id="tiempoInput" class="tiempo-input" placeholder="00:00" maxlength="5" oninput="formatearTiempo(this)">
-            </div>
-            <div class="form-row">
-                <label>🏆 GANADOR</label>
-                <select id="ganadorSelect" class="ganador-select">
-                    <option value="">-- Selecciona --</option>
-                    <option value="rojo">🔴 CINTA ROJA</option>
-                    <option value="verde">🟢 CINTA VERDE</option>
-                    <option value="empate">🤝 EMPATE / TABLA</option>
-                </select>
-            </div>
-            <div class="puntos-info" id="puntosInfo"></div>
-            <button class="btn-calificar" onclick="calificarPelea()">⚡ CALIFICAR PELEA</button>
-        </div>
+        let currentGallosPorPartido = 3;
         
-        <!-- Información de calificación anterior -->
-        <div id="infoAnterior" class="info-anterior"></div>
-        
-        <!-- Mensaje de todas calificadas -->
-        <div id="mensajeTodas" class="mensaje-todas">
-            ✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!
-        </div>
-    </div>
-
-    <!-- TABLA COTEJO -->
-    <div id="cotejoContent" class="tab-content active">
-        <div class="table-wrapper" id="cotejoContainer">
-            <div class="no-data">
-                <span>📭</span>
-                <p>No hay datos de cotejo</p>
-                <p style="font-size: 12px;">Importa un archivo JSON para comenzar</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- TABLA POSICIONES -->
-    <div id="posicionContent" class="tab-content">
-        <div class="table-wrapper" id="posicionContainer">
-            <div class="no-data">
-                <span>🏆</span>
-                <p>No hay datos de posición</p>
-                <p style="font-size: 12px;">Importa un archivo JSON para comenzar</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Badge offline -->
-<div id="offlineBadge" class="offline-badge">📴 MODO OFFLINE</div>
-
-<script>
-    // ==============================================
-    // VARIABLES GLOBALES
-    // ==============================================
-    let torneoData = null;           // Datos completos del torneo importado
-    let calificaciones = new Map();  // Mapa de calificaciones por índice de pelea
-    let peleaSeleccionada = null;    // Pelea actualmente seleccionada
-    let puntosConfig = { ganador: 2, empate: 1, perdedor: 0 };
-    
-    // ==============================================
-    // FUNCIONES DE UTILIDAD
-    // ==============================================
-    
-    function escapeHTML(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-    
-    function formatTiempo(segundos) {
-        if (!segundos && segundos !== 0) return '--:--';
-        const mins = Math.floor(segundos / 60);
-        const segs = segundos % 60;
-        return `${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
-    }
-    
-    function timeToSeconds(tiempo) {
-        if (!tiempo) return 0;
-        const partes = tiempo.split(':');
-        return (parseInt(partes[0]) * 60) + (parseInt(partes[1]) || 0);
-    }
-    
-    function formatearTiempo(input) {
-        let valor = input.value.replace(/[^0-9]/g, '');
-        if (valor.length > 4) valor = valor.slice(0, 4);
-        if (valor.length >= 3) {
-            valor = valor.slice(0, 2) + ':' + valor.slice(2, 4);
-        } else if (valor.length === 2) {
-            valor = valor + ':';
-        }
-        input.value = valor;
-    }
-    
-    // ==============================================
-    // PROCESAR TABLA DE POSICIÓN
-    // ==============================================
-    function procesarTablaPosicion() {
-        if (!torneoData || !torneoData.resultadosCotejo || !torneoData.resultadosCotejo.peleas) {
-            return [];
+        // --- Helper Functions ---
+        function saveToLocalStorage() {
+            localStorage.setItem('torneoOfflineData', JSON.stringify(torneoData));
+            updateCounters();
         }
         
-        const partidoMap = new Map();
-        const peleas = torneoData.resultadosCotejo.peleas;
-        const gallosPorPartido = torneoData.infoTorneo?.config?.gallosPorPartido || 3;
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('torneoOfflineData');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Merge para asegurar estructura
+                    torneoData = {
+                        info: { ...torneoData.info, ...parsed.info },
+                        registroPartidos: parsed.registroPartidos || [],
+                        resultadosCotejo: parsed.resultadosCotejo || null,
+                        calificaciones: parsed.calificaciones || []
+                    };
+                    currentGallosPorPartido = torneoData.info.config.gallosPorPartido || 3;
+                    document.getElementById('gallos-por-partido').value = currentGallosPorPartido;
+                    updatePuntosConfigDisplay();
+                } catch(e) { console.error("Error cargando data", e); }
+            }
+            renderRegistroTabla();
+            renderCotejoResultados();
+            renderPosicionesTabla();
+            updateCounters();
+        }
         
-        peleas.forEach((pelea, index) => {
-            const calificacion = calificaciones.get(index);
-            if (!calificacion) return;
+        function updateCounters() {
+            document.getElementById('contador-gallos').innerText = `Total: ${torneoData.registroPartidos.length} gallos`;
+        }
+        
+        function updatePuntosConfigDisplay() {
+            const pc = torneoData.info.puntosConfig;
+            document.getElementById('config-puntos-info').innerHTML = `Puntos: G(${pc.ganador}) | E(${pc.empate}) | P(${pc.perdedor})`;
+        }
+        
+        // --- Lógica de Registro ---
+        function renderRegistroFormulario() {
+            const container = document.getElementById('gallos-container');
+            const num = currentGallosPorPartido;
+            let html = '';
+            for (let i = 1; i <= num; i++) {
+                html += `
+                    <div class="grid-2" style="margin-bottom: 10px;">
+                        <input type="text" id="anillo-${i}" placeholder="Anillo ${i} (Ej: 001)" maxlength="4">
+                        <input type="number" id="peso-${i}" placeholder="Peso ${i} (g)" min="0">
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+        
+        window.registrarPartido = function() {
+            const nombrePartido = document.getElementById('partido-nombre').value.trim();
+            if (!nombrePartido) { alert("El nombre del partido es obligatorio"); return; }
             
-            const g1 = pelea.gallo1;
-            const g2 = pelea.gallo2;
+            const representante = document.getElementById('partido-representante').value.trim();
+            const gallos = [];
+            let error = false;
             
-            const initPartido = (nombre) => {
-                if (!nombre) return null;
-                if (!partidoMap.has(nombre)) {
-                    partidoMap.set(nombre, {
-                        puntos: 0,
-                        tiempo: 0,
-                        gallo1_puntos: 0,
-                        gallo1_tiempo: 0,
-                        gallo2_puntos: 0,
-                        gallo2_tiempo: 0,
-                        gallo3_puntos: 0,
-                        gallo3_tiempo: 0,
-                        gallo4_puntos: 0,
-                        gallo4_tiempo: 0,
-                        gallo5_puntos: 0,
-                        gallo5_tiempo: 0,
-                        gallo6_puntos: 0,
-                        gallo6_tiempo: 0,
-                        contadorGallos: 0
-                    });
+            for (let i = 1; i <= currentGallosPorPartido; i++) {
+                const anillo = document.getElementById(`anillo-${i}`).value.trim();
+                const peso = parseInt(document.getElementById(`peso-${i}`).value, 10);
+                if (!anillo) { alert(`El anillo del gallo ${i} es obligatorio`); error = true; break; }
+                if (isNaN(peso) || peso < 0) { alert(`El peso del gallo ${i} debe ser un número válido`); error = true; break; }
+                if (peso > 0 && (peso < torneoData.info.pesoMin || peso > torneoData.info.pesoMax)) {
+                    alert(`Peso ${peso}g fuera del rango permitido (${torneoData.info.pesoMin}-${torneoData.info.pesoMax}g)`);
+                    error = true; break;
                 }
-                return partidoMap.get(nombre);
+                gallos.push({ anillo: anillo.padStart(3, '0'), peso, partido: nombrePartido, representante });
+            }
+            if (error) return;
+            
+            // Validar anillos duplicados en el torneo
+            for (const g of gallos) {
+                if (torneoData.registroPartidos.some(ex => ex.anillo === g.anillo)) {
+                    alert(`El anillo ${g.anillo} ya está registrado en otro partido.`);
+                    return;
+                }
+            }
+            
+            // Agregar gallos
+            torneoData.registroPartidos.push(...gallos);
+            // Si hay cotejo previo, invalidarlo porque cambiaron los datos
+            if (torneoData.resultadosCotejo) {
+                torneoData.resultadosCotejo = null;
+                torneoData.calificaciones = [];
+                alert("Los datos de registro han cambiado. El cotejo previo ha sido invalidado.");
+            }
+            saveToLocalStorage();
+            
+            // Limpiar formulario
+            document.getElementById('partido-nombre').value = '';
+            document.getElementById('partido-representante').value = '';
+            for (let i = 1; i <= currentGallosPorPartido; i++) {
+                document.getElementById(`anillo-${i}`).value = '';
+                document.getElementById(`peso-${i}`).value = '';
+            }
+            renderRegistroTabla();
+            renderCotejoResultados();
+            renderPosicionesTabla();
+        };
+        
+        function renderRegistroTabla() {
+            const tbody = document.getElementById('registro-tbody');
+            if (!torneoData.registroPartidos.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay gallos registrados</td></tr>';
+                return;
+            }
+            let html = '';
+            torneoData.registroPartidos.sort((a,b) => parseInt(a.anillo) - parseInt(b.anillo)).forEach(g => {
+                html += `<tr>
+                    <td>${g.anillo}</td>
+                    <td>${g.peso > 0 ? g.peso : 'PENDIENTE'}</td>
+                    <td>${escapeHtml(g.partido)}</td>
+                    <td>${escapeHtml(g.representante) || '-'}</td>
+                    <td><button class="btn-danger" style="padding: 4px 8px;" onclick="eliminarGallo('${g.anillo}')">🗑️</button></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+        
+        window.eliminarGallo = (anillo) => {
+            if (confirm(`¿Eliminar gallo con anillo ${anillo}?`)) {
+                torneoData.registroPartidos = torneoData.registroPartidos.filter(g => g.anillo !== anillo);
+                if (torneoData.resultadosCotejo) torneoData.resultadosCotejo = null;
+                torneoData.calificaciones = [];
+                saveToLocalStorage();
+                renderRegistroTabla();
+                renderCotejoResultados();
+                renderPosicionesTabla();
+            }
+        };
+        
+        // --- Lógica de Cotejo (Algoritmo de emparejamiento) ---
+        function generarCotejo() {
+            const gallosValidos = torneoData.registroPartidos.filter(g => g.peso > 0);
+            if (gallosValidos.length < 2) {
+                alert("Se necesitan al menos 2 gallos con peso registrado para cotejar.");
+                return;
+            }
+            const modo = document.getElementById('cotejo-modo').value;
+            let peleas = [];
+            let noEmparejados = [];
+            let gallosTrabajo = [...gallosValidos];
+            
+            // Ordenar según modo
+            switch(modo) {
+                case 'ASCENDENTE': gallosTrabajo.sort((a,b) => a.peso - b.peso); break;
+                case 'DESCENDENTE': gallosTrabajo.sort((a,b) => b.peso - a.peso); break;
+                case 'ALEATORIO': gallosTrabajo.sort(() => Math.random() - 0.5); break;
+                default: // INTELIGENTE: orden ascendente para mejor emparejamiento
+                    gallosTrabajo.sort((a,b) => a.peso - b.peso);
+                    break;
+            }
+            
+            const usados = new Set();
+            for (let i = 0; i < gallosTrabajo.length; i++) {
+                if (usados.has(gallosTrabajo[i].anillo)) continue;
+                let mejorPareja = null;
+                let menorDif = Infinity;
+                for (let j = i+1; j < gallosTrabajo.length; j++) {
+                    if (usados.has(gallosTrabajo[j].anillo)) continue;
+                    // Restricciones: mismo partido o mismo representante no pueden pelearse
+                    if (gallosTrabajo[i].partido === gallosTrabajo[j].partido) continue;
+                    if (gallosTrabajo[i].representante && gallosTrabajo[j].representante && 
+                        gallosTrabajo[i].representante === gallosTrabajo[j].representante) continue;
+                    
+                    const dif = Math.abs(gallosTrabajo[i].peso - gallosTrabajo[j].peso);
+                    if (dif < menorDif) {
+                        menorDif = dif;
+                        mejorPareja = gallosTrabajo[j];
+                    }
+                }
+                if (mejorPareja) {
+                    peleas.push({
+                        numero: peleas.length + 1,
+                        gallo1: { ...gallosTrabajo[i] },
+                        gallo2: { ...mejorPareja },
+                        diferencia: Math.abs(gallosTrabajo[i].peso - mejorPareja.peso)
+                    });
+                    usados.add(gallosTrabajo[i].anillo);
+                    usados.add(mejorPareja.anillo);
+                } else {
+                    noEmparejados.push({ gallo: { ...gallosTrabajo[i] }, motivo: { mensaje: "No se encontró pareja compatible" } });
+                }
+            }
+            
+            // Ordenar peleas para minimizar conflictos (simple)
+            peleas.sort((a,b) => a.diferencia - b.diferencia);
+            peleas.forEach((p, idx) => p.numero = idx + 1);
+            
+            torneoData.resultadosCotejo = {
+                modo: modo,
+                peleas: peleas,
+                noEmparejados: noEmparejados,
+                metricas: {
+                    totalGallos: gallosValidos.length,
+                    peleasGeneradas: peleas.length,
+                    noEmparejados: noEmparejados.length
+                }
+            };
+            torneoData.calificaciones = []; // Reset calificaciones al generar nuevo cotejo
+            saveToLocalStorage();
+            renderCotejoResultados();
+            renderPosicionesTabla();
+            alert(`Cotejo generado: ${peleas.length} peleas, ${noEmparejados.length} gallos sin pareja.`);
+        }
+        
+        function renderCotejoResultados() {
+            const container = document.getElementById('cotejo-resultados');
+            if (!torneoData.resultadosCotejo || torneoData.resultadosCotejo.peleas.length === 0) {
+                container.innerHTML = `<div class="text-center" style="padding: 40px;">Presiona "COTEJAR AHORA" para generar las peleas.</div>`;
+                document.getElementById('pelea-selector').innerHTML = '<option>No hay peleas generadas</option>';
+                document.getElementById('calificacion-form').style.display = 'none';
+                return;
+            }
+            
+            const peleas = torneoData.resultadosCotejo.peleas;
+            const noEmp = torneoData.resultadosCotejo.noEmparejados;
+            
+            // Renderizar tabla de cotejo
+            let html = `<div class="table-responsive"><table class="cotejo-table" style="min-width: 800px;">
+                <thead><tr>
+                    <th>#</th><th>Cinta Roja</th><th>A1</th><th>P1</th><th>#</th><th>P2</th><th>A2</th><th>Cinta Verde</th><th>DIF</th><th>Ganador</th><th>Tiempo</th>
+                </tr></thead><tbody>`;
+            peleas.forEach(p => {
+                const calif = torneoData.calificaciones.find(c => c.indicePelea === p.numero - 1);
+                let ganadorText = '⚡ Pendiente';
+                let tiempoText = '--:--';
+                if (calif) {
+                    if (calif.ganador === 'rojo') ganadorText = `🔴 ${p.gallo1.partido}`;
+                    else if (calif.ganador === 'verde') ganadorText = `🟢 ${p.gallo2.partido}`;
+                    else if (calif.ganador === 'empate') ganadorText = '🤝 Empate';
+                    tiempoText = calif.tiempo;
+                }
+                html += `<tr>
+                    <td>${p.numero}</td>
+                    <td>${escapeHtml(p.gallo1.partido)}</td>
+                    <td>${p.gallo1.anillo}</td>
+                    <td>${p.gallo1.peso}g</td>
+                    <td>${p.numero}</td>
+                    <td>${p.gallo2.peso}g</td>
+                    <td>${p.gallo2.anillo}</td>
+                    <td>${escapeHtml(p.gallo2.partido)}</td>
+                    <td>${p.diferencia}g</td>
+                    <td>${ganadorText}</td>
+                    <td>${tiempoText}</td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+            
+            if (noEmp.length) {
+                html += `<div style="margin-top: 20px; background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <strong>⚠️ Gallos No Emparejados:</strong><br>${noEmp.map(n => `${n.gallo.anillo} - ${n.gallo.partido} (${n.gallo.peso}g): ${n.motivo.mensaje}`).join('<br>')}
+                </div>`;
+            }
+            container.innerHTML = html;
+            
+            // Actualizar selector de peleas para calificación
+            let selectHtml = '<option value="">-- Seleccione una pelea para calificar --</option>';
+            peleas.forEach((p, idx) => {
+                const isCalificada = torneoData.calificaciones.some(c => c.indicePelea === idx);
+                const estado = isCalificada ? '✅' : '⚡';
+                selectHtml += `<option value="${idx}">${estado} Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido}</option>`;
+            });
+            document.getElementById('pelea-selector').innerHTML = selectHtml;
+        }
+        
+        // --- Calificación de Peleas ---
+        let currentSelectedPeleaIndex = null;
+        
+        window.onPeleaSelect = function() {
+            const select = document.getElementById('pelea-selector');
+            const idx = parseInt(select.value, 10);
+            if (isNaN(idx)) {
+                document.getElementById('calificacion-form').style.display = 'none';
+                currentSelectedPeleaIndex = null;
+                return;
+            }
+            currentSelectedPeleaIndex = idx;
+            const pelea = torneoData.resultadosCotejo.peleas[idx];
+            const califExistente = torneoData.calificaciones.find(c => c.indicePelea === idx);
+            
+            document.getElementById('calificacion-form').style.display = 'block';
+            if (califExistente) {
+                document.getElementById('tiempo-pelea').value = califExistente.tiempo;
+                document.getElementById('ganador-pelea').value = califExistente.ganador;
+                document.getElementById('calificacion-info').innerHTML = `<span style="color: #28a745;">✅ Ya calificada por ${califExistente.usuarioCalifico || 'sistema'} el ${califExistente.fechaCalificacion}</span>`;
+            } else {
+                document.getElementById('tiempo-pelea').value = '';
+                document.getElementById('ganador-pelea').value = '';
+                document.getElementById('calificacion-info').innerHTML = '';
+            }
+        };
+        
+        window.calificarPelea = function() {
+            if (currentSelectedPeleaIndex === null) { alert("Seleccione una pelea primero"); return; }
+            const tiempo = document.getElementById('tiempo-pelea').value.trim();
+            const ganador = document.getElementById('ganador-pelea').value;
+            if (!tiempo || !/^\d{2}:\d{2}$/.test(tiempo)) { alert("Ingrese un tiempo válido en formato MM:SS"); return; }
+            if (!ganador) { alert("Seleccione un ganador"); return; }
+            
+            const pelea = torneoData.resultadosCotejo.peleas[currentSelectedPeleaIndex];
+            const calificacion = {
+                indicePelea: currentSelectedPeleaIndex,
+                calificada: true,
+                diferencia: pelea.diferencia,
+                fechaCalificacion: new Date().toLocaleString(),
+                gallo1: { ...pelea.gallo1, puntos: 0 },
+                gallo2: { ...pelea.gallo2, puntos: 0 },
+                ganador: ganador,
+                numero: pelea.numero,
+                tiempo: tiempo,
+                timestamp: Date.now(),
+                usuarioCalifico: "Administrador Offline"
             };
             
-            let tiempoSegundos = timeToSeconds(calificacion.tiempo);
-            
-            // Procesar gallo 1
-            if (g1?.partido) {
-                const data = initPartido(g1.partido);
-                if (data) {
-                    data.contadorGallos++;
-                    const numGallo = data.contadorGallos;
-                    
-                    let puntosGallo = 0;
-                    if (calificacion.ganador === 'rojo') {
-                        puntosGallo = puntosConfig.ganador;
-                    } else if (calificacion.ganador === 'empate') {
-                        puntosGallo = puntosConfig.empate;
-                    } else {
-                        puntosGallo = puntosConfig.perdedor;
-                    }
-                    
-                    data[`gallo${numGallo}_puntos`] = puntosGallo;
-                    
-                    if (calificacion.ganador === 'rojo' || calificacion.ganador === 'empate') {
-                        data[`gallo${numGallo}_tiempo`] = tiempoSegundos;
-                        data.tiempo += tiempoSegundos;
-                    } else {
-                        data[`gallo${numGallo}_tiempo`] = 0;
-                    }
-                    
-                    data.puntos += puntosGallo;
-                }
+            // Asignar puntos según configuración
+            const pc = torneoData.info.puntosConfig;
+            if (ganador === 'rojo') {
+                calificacion.gallo1.puntos = pc.ganador;
+                calificacion.gallo2.puntos = pc.perdedor;
+            } else if (ganador === 'verde') {
+                calificacion.gallo1.puntos = pc.perdedor;
+                calificacion.gallo2.puntos = pc.ganador;
+            } else { // empate
+                calificacion.gallo1.puntos = pc.empate;
+                calificacion.gallo2.puntos = pc.empate;
             }
             
-            // Procesar gallo 2
-            if (g2?.partido) {
-                const data = initPartido(g2.partido);
-                if (data) {
-                    data.contadorGallos++;
-                    const numGallo = data.contadorGallos;
-                    
-                    let puntosGallo = 0;
-                    if (calificacion.ganador === 'verde') {
-                        puntosGallo = puntosConfig.ganador;
-                    } else if (calificacion.ganador === 'empate') {
-                        puntosGallo = puntosConfig.empate;
-                    } else {
-                        puntosGallo = puntosConfig.perdedor;
-                    }
-                    
-                    data[`gallo${numGallo}_puntos`] = puntosGallo;
-                    
-                    if (calificacion.ganador === 'verde' || calificacion.ganador === 'empate') {
-                        data[`gallo${numGallo}_tiempo`] = tiempoSegundos;
-                        data.tiempo += tiempoSegundos;
-                    } else {
-                        data[`gallo${numGallo}_tiempo`] = 0;
-                    }
-                    
-                    data.puntos += puntosGallo;
-                }
-            }
-        });
-        
-        let datosPosicion = Array.from(partidoMap.entries()).map(([nombre, data]) => {
-            const result = { nombre, puntos: data.puntos, tiempo: data.tiempo };
-            for (let i = 1; i <= data.contadorGallos; i++) {
-                result[`gallo${i}_puntos`] = data[`gallo${i}_puntos`] || 0;
-                result[`gallo${i}_tiempo`] = data[`gallo${i}_tiempo`] || 0;
-            }
-            return result;
-        });
-        
-        // Ordenar: puntos mayor a menor, tiempo menor a mayor
-        datosPosicion.sort((a, b) => {
-            const aIsZero = (a.puntos === 0 && a.tiempo === 0);
-            const bIsZero = (b.puntos === 0 && b.tiempo === 0);
-            if (aIsZero && !bIsZero) return 1;
-            if (!aIsZero && bIsZero) return -1;
-            if (a.puntos !== b.puntos) return b.puntos - a.puntos;
-            return a.tiempo - b.tiempo;
-        });
-        
-        return datosPosicion;
-    }
-    
-    // ==============================================
-    // RENDERIZAR TABLA COTEJO
-    // ==============================================
-    function renderizarTablaCotejo() {
-        const container = document.getElementById('cotejoContainer');
-        
-        if (!torneoData || !torneoData.resultadosCotejo || !torneoData.resultadosCotejo.peleas || torneoData.resultadosCotejo.peleas.length === 0) {
-            container.innerHTML = `
-                <div class="no-data">
-                    <span>⚡</span>
-                    <p>No hay datos de cotejo</p>
-                    <p style="font-size: 12px;">Importa un archivo JSON con resultados de cotejo</p>
-                </div>
-            `;
-            return;
-        }
-        
-        const peleas = torneoData.resultadosCotejo.peleas;
-        const config = torneoData.infoTorneo?.config || {};
-        const registroDetalladoActivo = config.registroDetalladoActivo || false;
-        
-        let html = `
-            <table class="cotejo-table" style="width:100%; border-collapse: collapse; border: 1px solid #e0e0e0;">
-                <thead>
-                    <tr style="border-top: 2px solid black; border-bottom: 2px solid black;">
-                        <th style="padding: 12px 8px; background: #d32f2f; color: white; min-width: 15px;">#</th>
-                        <th style="padding: 12px 8px; text-align: left;">CINTA ROJA</th>
-                        ${registroDetalladoActivo ? '<th style="padding: 12px 8px; text-align: center;">COLOR</th>' : ''}
-                        <th style="padding: 12px 8px; text-align: center;">A1</th>
-                        <th style="padding: 12px 8px; text-align: center;">P1</th>
-                        <th style="padding: 12px 8px; background: #4CAF50; color: white; min-width: 15px;">#</th>
-                        <th style="padding: 12px 8px; text-align: center;">P2</th>
-                        <th style="padding: 12px 8px; text-align: center;">A2</th>
-                        <th style="padding: 12px 8px; text-align: left;">CINTA VERDE</th>
-                        ${registroDetalladoActivo ? '<th style="padding: 12px 8px; text-align: center;">COLOR</th>' : ''}
-                        <th style="padding: 12px 8px; text-align: center;">DIF</th>
-                        <th style="padding: 12px 8px; text-align: center;">GANADOR</th>
-                        <th style="padding: 12px 8px; text-align: center;">TIEMPO</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-        
-        peleas.forEach((p, index) => {
-            const calificacion = calificaciones.get(index);
-            const bgColor = calificacion ? 'bg-calificada' : '';
-            const ganador = calificacion?.ganador;
-            const tiempo = calificacion?.tiempo || '--:--';
-            
-            let ganadorTexto = '';
-            if (ganador === 'rojo') ganadorTexto = `🔴 ${p.gallo1.partido}`;
-            else if (ganador === 'verde') ganadorTexto = `🟢 ${p.gallo2.partido}`;
-            else if (ganador === 'empate') ganadorTexto = 'TABLA';
-            else ganadorTexto = '⏳ PENDIENTE';
-            
-            const difClase = p.diferencia <= 20 ? 'diferencia-baja' : 'diferencia-alta';
-            
-            html += `
-                <tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor === 'bg-calificada' ? '#2196F3' : (index % 2 === 0 ? '#ffffff' : '#f9f9f9')};">
-                    <td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #d32f2f; color: white;">${p.numero}</td>
-                    <td style="padding: 12px 8px;" class="text-left">${escapeHTML(p.gallo1.partido)}</td>
-                    ${registroDetalladoActivo ? `<td style="padding: 12px 8px; text-align: center;">${escapeHTML(p.gallo1.color || '-')}</td>` : ''}
-                    <td style="padding: 12px 8px; text-align: center;">${p.gallo1.anillo}</td>
-                    <td style="padding: 12px 8px; text-align: center;">${p.gallo1.peso}g</td>
-                    <td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #4CAF50; color: white;">${p.numero}</td>
-                    <td style="padding: 12px 8px; text-align: center;">${p.gallo2.peso}g</td>
-                    <td style="padding: 12px 8px; text-align: center;">${p.gallo2.anillo}</td>
-                    <td style="padding: 12px 8px;" class="text-left">${escapeHTML(p.gallo2.partido)}</td>
-                    ${registroDetalladoActivo ? `<td style="padding: 12px 8px; text-align: center;">${escapeHTML(p.gallo2.color || '-')}</td>` : ''}
-                    <td style="padding: 12px 8px; text-align: center;" class="${difClase}">${p.diferencia}g</td>
-                    <td style="padding: 12px 8px; text-align: center; font-weight: 600;">${ganadorTexto}</td>
-                    <td style="padding: 12px 8px; text-align: center; font-weight: 600;">${tiempo}</td>
-                </tr>
-            `;
-        });
-        
-        html += `</tbody></table>`;
-        
-        // Agregar indicador de deslizamiento
-        html += `
-            <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; padding: 8px 0;">
-                <div style="display: flex; align-items: center; gap: 4px; color: #8B4513;">
-                    <span style="font-size: 18px; opacity: 0.7;">←</span>
-                    <span style="font-size: 22px;">👆</span>
-                    <span style="font-size: 18px; opacity: 0.7;">→</span>
-                </div>
-                <span style="color: #5a6268; font-size: 13px;">DESLIZA HORIZONTALMENTE</span>
-                <div style="display: flex; align-items: center; gap: 4px; color: #8B4513;">
-                    <span style="font-size: 18px; opacity: 0.7;">←</span>
-                    <span style="font-size: 22px;">👇</span>
-                    <span style="font-size: 18px; opacity: 0.7;">→</span>
-                </div>
-            </div>
-        `;
-        
-        container.innerHTML = html;
-    }
-    
-    // ==============================================
-    // RENDERIZAR TABLA POSICIONES
-    // ==============================================
-    function renderizarTablaPosiciones() {
-        const container = document.getElementById('posicionContainer');
-        const datosPosicion = procesarTablaPosicion();
-        const config = torneoData?.infoTorneo?.config || {};
-        const gallosPorPartido = config.gallosPorPartido || 3;
-        
-        if (datosPosicion.length === 0) {
-            container.innerHTML = `
-                <div class="no-data">
-                    <span>🏆</span>
-                    <p>No hay datos de posición</p>
-                    <p style="font-size: 12px;">Califica peleas para ver la tabla de posiciones</p>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = `
-            <div style="overflow-x: auto;">
-                <table class="posicion-table" style="width:100%; border-collapse: collapse; border: 1px solid #e0e0e0;">
-                    <thead>
-                        <tr style="border-top: 2px solid black; border-bottom: 2px solid black;">
-                            <th style="padding: 12px 8px; text-align: left;" rowspan="2">Partido</th>
-                            <th style="padding: 12px 8px; text-align: center;" colspan="${gallosPorPartido * 2}"># COMBATES</th>
-                            <th style="padding: 4px 4px; text-align: center;" rowspan="2">Puntos</th>
-                            <th style="padding: 4px 4px; text-align: center;" rowspan="2">Tiempos</th>
-                        </tr>
-                        <tr style="background: #A0522D;">
-                            ${Array.from({ length: gallosPorPartido }, (_, i) => `
-                                <th style="padding: 8px 4px; text-align: center;" colspan="2">Gallo ${i+1}</th>
-                            `).join('')}
-                         </tr>
-                        <tr style="background: #CD853F;">
-                            <th style="padding: 4px 8px;"></th>
-                            ${Array.from({ length: gallosPorPartido }, () => `
-                                <th style="padding: 4px 4px; text-align: center;">Pts</th>
-                                <th style="padding: 4px 4px; text-align: center;">Tpo</th>
-                            `).join('')}
-                            <th style="padding: 4px 8px;"></th>
-                            <th style="padding: 4px 8px;"></th>
-                         </tr>
-                    </thead>
-                    <tbody>
-        `;
-        
-        datosPosicion.forEach((item, index) => {
-            const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
-            
-            html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
-            html += `<td style="padding: 12px 8px; font-weight: 900;">${escapeHTML(item.nombre)}</td>`;
-            
-            for (let i = 1; i <= gallosPorPartido; i++) {
-                const puntos = item[`gallo${i}_puntos`];
-                const tiempo = item[`gallo${i}_tiempo`];
-                
-                if (puntos === undefined) {
-                    html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
-                    html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
-                } else {
-                    let clasePuntos = '';
-                    if (puntos === puntosConfig.ganador) clasePuntos = 'puntos-ganador';
-                    else if (puntos === puntosConfig.empate) clasePuntos = 'puntos-empate';
-                    else if (puntos === puntosConfig.perdedor) clasePuntos = 'puntos-perdedor';
-                    
-                    html += `<td style="padding: 12px 8px; text-align: center;" class="${clasePuntos}">${puntos}</td>`;
-                    html += `<td style="padding: 12px 8px; text-align: center;">${formatTiempo(tiempo)}</td>`;
-                }
-            }
-            
-            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
-            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
-            html += `</tr>`;
-        });
-        
-        html += `</tbody></table></div>`;
-        container.innerHTML = html;
-    }
-    
-    // ==============================================
-    // ACTUALIZAR COMBOBOX DE PELEAS
-    // ==============================================
-    function actualizarComboboxPeleas() {
-        const select = document.getElementById('peleaSelect');
-        const calificacionCount = document.getElementById('calificacionCount');
-        
-        if (!torneoData || !torneoData.resultadosCotejo || !torneoData.resultadosCotejo.peleas) {
-            select.innerHTML = '<option value="">-- No hay peleas --</option>';
-            if (calificacionCount) calificacionCount.textContent = '0/0';
-            return;
-        }
-        
-        const peleas = torneoData.resultadosCotejo.peleas;
-        const calificadas = calificaciones.size;
-        
-        if (calificacionCount) calificacionCount.textContent = `${calificadas}/${peleas.length}`;
-        
-        let opciones = '<option value="">-- Selecciona una pelea --</option>';
-        
-        // Separar calificadas y no calificadas
-        const noCalificadas = [];
-        const siCalificadas = [];
-        
-        peleas.forEach((p, index) => {
-            const calificada = calificaciones.has(index);
-            const texto = `Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido}`;
-            const estilo = calificada ? 'style="background:#e8f5e8; font-weight:bold;"' : '';
-            
-            if (calificada) {
-                siCalificadas.push(`<option value="${index}" ${estilo}>${texto} ✓ (CALIFICADA)</option>`);
-            } else {
-                noCalificadas.push(`<option value="${index}" ${estilo}>${texto}</option>`);
-            }
-        });
-        
-        opciones += noCalificadas.join('');
-        opciones += siCalificadas.join('');
-        select.innerHTML = opciones;
-        
-        // Mostrar/ocultar mensaje de todas calificadas
-        const mensajeTodas = document.getElementById('mensajeTodas');
-        if (mensajeTodas) {
-            if (calificadas === peleas.length && peleas.length > 0) {
-                mensajeTodas.classList.add('show');
-            } else {
-                mensajeTodas.classList.remove('show');
-            }
-        }
-    }
-    
-    // ==============================================
-    // CAMBIAR PELEA SELECCIONADA
-    // ==============================================
-    function cambiarPeleaSeleccionada() {
-        const select = document.getElementById('peleaSelect');
-        const index = parseInt(select.value);
-        const detalleDiv = document.getElementById('detallePelea');
-        const calificacionForm = document.getElementById('calificacionForm');
-        const infoAnterior = document.getElementById('infoAnterior');
-        
-        if (isNaN(index)) {
-            detalleDiv.style.display = 'none';
-            calificacionForm.classList.remove('show');
-            infoAnterior.classList.remove('show');
-            peleaSeleccionada = null;
-            return;
-        }
-        
-        const peleas = torneoData.resultadosCotejo.peleas;
-        const pelea = peleas[index];
-        const calificacionExistente = calificaciones.get(index);
-        
-        peleaSeleccionada = { ...pelea, indice: index };
-        
-        // Mostrar detalle de la pelea
-        detalleDiv.style.display = 'block';
-        document.getElementById('detallePeleaContent').innerHTML = `
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:15px;">
-                <div style="background:#ffebee; border-radius:12px; padding:15px; border-left:9px solid #d32f2f;">
-                    <div style="font-weight:900; font-size:20px; color:#d32f2f;">${escapeHTML(pelea.gallo1.partido)}</div>
-                    <div style="margin-top:10px;">
-                        <div>Anillo: <strong>${pelea.gallo1.anillo}</strong></div>
-                        <div>Peso: <strong>${pelea.gallo1.peso}g</strong></div>
-                        ${pelea.gallo1.color ? `<div>Color: <strong>${pelea.gallo1.color}</strong></div>` : ''}
-                        ${pelea.gallo1.representante ? `<div>👤 <strong>${escapeHTML(pelea.gallo1.representante)}</strong></div>` : ''}
-                    </div>
-                </div>
-                <div style="background:#e8f5e8; border-radius:12px; padding:15px; border-right:9px solid #4CAF50;">
-                    <div style="font-weight:900; font-size:20px; color:#4CAF50;">${escapeHTML(pelea.gallo2.partido)}</div>
-                    <div style="margin-top:10px;">
-                        <div>Anillo: <strong>${pelea.gallo2.anillo}</strong></div>
-                        <div>Peso: <strong>${pelea.gallo2.peso}g</strong></div>
-                        ${pelea.gallo2.color ? `<div>Color: <strong>${pelea.gallo2.color}</strong></div>` : ''}
-                        ${pelea.gallo2.representante ? `<div>👤 <strong>${escapeHTML(pelea.gallo2.representante)}</strong></div>` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Actualizar puntos info
-        document.getElementById('puntosInfo').innerHTML = `
-            <span>🏆 GANADOR: <strong>${puntosConfig.ganador}</strong> pts</span>
-            <span>🤝 EMPATE: <strong>${puntosConfig.empate}</strong> pts c/u</span>
-            <span>📉 PERDEDOR: <strong>${puntosConfig.perdedor}</strong> pts</span>
-        `;
-        
-        if (calificacionExistente) {
-            // Mostrar información de calificación anterior
-            let ganadorTexto = '';
-            if (calificacionExistente.ganador === 'rojo') ganadorTexto = `🔴 ${pelea.gallo1.partido}`;
-            else if (calificacionExistente.ganador === 'verde') ganadorTexto = `🟢 ${pelea.gallo2.partido}`;
-            else if (calificacionExistente.ganador === 'empate') ganadorTexto = '🤝 TABLA';
-            
-            infoAnterior.innerHTML = `
-                <div style="font-weight:600; margin-bottom:8px;">⚠️ Esta pelea ya fue calificada:</div>
-                <div><strong>Ganador:</strong> ${ganadorTexto}</div>
-                <div><strong>Tiempo:</strong> ${calificacionExistente.tiempo}</div>
-                <div style="margin-top:10px; display:flex; gap:10px;">
-                    <button onclick="confirmarReCalificar()" style="flex:1; background:#ff9800; color:white; border:none; padding:10px; border-radius:6px; font-weight:600; cursor:pointer;">✏️ VOLVER A CALIFICAR</button>
-                    <button onclick="eliminarCalificacion()" style="flex:1; background:#f44336; color:white; border:none; padding:10px; border-radius:6px; font-weight:600; cursor:pointer;">🗑️ ELIMINAR</button>
-                    <button onclick="limpiarSeleccion()" style="flex:1; background:#f0f0f0; border:none; padding:10px; border-radius:6px; cursor:pointer;">❌ CANCELAR</button>
-                </div>
-            `;
-            infoAnterior.classList.add('show');
-            calificacionForm.classList.remove('show');
-        } else {
-            infoAnterior.classList.remove('show');
-            calificacionForm.classList.add('show');
-            document.getElementById('tiempoInput').value = '';
-            document.getElementById('ganadorSelect').value = '';
-        }
-    }
-    
-    function limpiarSeleccion() {
-        const select = document.getElementById('peleaSelect');
-        select.value = '';
-        cambiarPeleaSeleccionada();
-    }
-    
-    function confirmarReCalificar() {
-        if (confirm('⚠️ ¿Deseas volver a calificar esta pelea?')) {
-            const infoAnterior = document.getElementById('infoAnterior');
-            const calificacionForm = document.getElementById('calificacionForm');
-            infoAnterior.classList.remove('show');
-            calificacionForm.classList.add('show');
-            document.getElementById('tiempoInput').value = '';
-            document.getElementById('ganadorSelect').value = '';
-        } else {
-            limpiarSeleccion();
-        }
-    }
-    
-    // ==============================================
-    // CALIFICAR PELEA
-    // ==============================================
-    function calificarPelea() {
-        if (!peleaSeleccionada) {
-            alert('Selecciona una pelea primero');
-            return;
-        }
-        
-        const tiempo = document.getElementById('tiempoInput').value.trim();
-        const ganador = document.getElementById('ganadorSelect').value;
-        
-        if (!tiempo) {
-            alert('Ingresa el tiempo de la pelea (MM:SS)');
-            return;
-        }
-        if (!/^\d{2}:\d{2}$/.test(tiempo)) {
-            alert('Formato de tiempo inválido. Use MM:SS');
-            return;
-        }
-        if (!ganador) {
-            alert('Selecciona un ganador');
-            return;
-        }
-        
-        const pelea = peleaSeleccionada;
-        const index = peleaSeleccionada.indice;
-        
-        // Crear calificación
-        const calificacion = {
-            indicePelea: index,
-            calificada: true,
-            ganador: ganador,
-            tiempo: tiempo,
-            fechaCalificacion: new Date().toLocaleString(),
-            gallo1: pelea.gallo1,
-            gallo2: pelea.gallo2,
-            diferencia: pelea.diferencia
+            // Eliminar calificación anterior si existe
+            torneoData.calificaciones = torneoData.calificaciones.filter(c => c.indicePelea !== currentSelectedPeleaIndex);
+            torneoData.calificaciones.push(calificacion);
+            saveToLocalStorage();
+            renderCotejoResultados();
+            renderPosicionesTabla();
+            onPeleaSelect(); // Refrescar selector
+            alert("Calificación guardada exitosamente");
         };
         
-        // Guardar
-        calificaciones.set(index, calificacion);
-        
-        // Guardar en localStorage
-        guardarCalificacionesEnLocalStorage();
-        
-        // Actualizar UI
-        actualizarComboboxPeleas();
-        renderizarTablaCotejo();
-        renderizarTablaPosiciones();
-        
-        // Limpiar selección
-        limpiarSeleccion();
-        
-        // Notificar
-        const calificadas = calificaciones.size;
-        const total = torneoData.resultadosCotejo.peleas.length;
-        alert(`✅ Pelea #${pelea.numero} calificada (${calificadas}/${total})`);
-        
-        if (calificadas === total) {
-            alert('🎉 ¡TODAS LAS PELEAS FUERON CALIFICADAS!');
-        }
-    }
-    
-    // ==============================================
-    // ELIMINAR CALIFICACIÓN
-    // ==============================================
-    function eliminarCalificacion() {
-        if (!peleaSeleccionada) return;
-        
-        if (confirm('¿Eliminar esta calificación?')) {
-            const index = peleaSeleccionada.indice;
-            calificaciones.delete(index);
-            guardarCalificacionesEnLocalStorage();
-            
-            actualizarComboboxPeleas();
-            renderizarTablaCotejo();
-            renderizarTablaPosiciones();
-            limpiarSeleccion();
-            
-            alert('✅ Calificación eliminada');
-        }
-    }
-    
-    // ==============================================
-    // GUARDAR CALIFICACIONES EN LOCALSTORAGE
-    // ==============================================
-    function guardarCalificacionesEnLocalStorage() {
-        if (!torneoData) return;
-        
-        const calificacionesArray = Array.from(calificaciones.entries());
-        const dataToSave = {
-            torneoId: torneoData.infoTorneo?.id || 'default',
-            calificaciones: calificacionesArray,
-            puntosConfig: puntosConfig
+        window.limpiarSeleccionCalificacion = function() {
+            document.getElementById('pelea-selector').value = '';
+            document.getElementById('calificacion-form').style.display = 'none';
+            currentSelectedPeleaIndex = null;
         };
         
-        localStorage.setItem('cotejoOffline_calificaciones', JSON.stringify(dataToSave));
-        console.log('💾 Calificaciones guardadas en localStorage');
-    }
-    
-    // ==============================================
-    // CARGAR CALIFICACIONES DE LOCALSTORAGE
-    // ==============================================
-    function cargarCalificacionesDeLocalStorage(torneoId) {
-        const saved = localStorage.getItem('cotejoOffline_calificaciones');
-        if (!saved) return false;
-        
-        try {
-            const data = JSON.parse(saved);
-            if (data.torneoId === torneoId) {
-                calificaciones.clear();
-                data.calificaciones.forEach(([index, cal]) => {
-                    calificaciones.set(parseInt(index), cal);
-                });
-                if (data.puntosConfig) {
-                    puntosConfig = data.puntosConfig;
-                }
-                console.log(`📦 Calificaciones cargadas: ${calificaciones.size}`);
-                return true;
+        // --- Tabla de Posiciones (Cálculo dinámico) ---
+        function renderPosicionesTabla() {
+            if (!torneoData.resultadosCotejo || torneoData.calificaciones.length === 0) {
+                document.getElementById('posiciones-tbody').innerHTML = '<tr><td colspan="7" class="text-center">No hay peleas calificadas</td></tr>';
+                return;
             }
-        } catch (e) {
-            console.error('Error cargando calificaciones:', e);
-        }
-        return false;
-    }
-    
-    // ==============================================
-    // IMPORTAR JSON
-    // ==============================================
-    function importarJSON() {
-        const fileInput = document.getElementById('jsonFileInput');
-        const file = fileInput.files[0];
-        
-        if (!file) {
-            alert('Selecciona un archivo JSON primero');
-            return;
-        }
-        
-        const previewDiv = document.getElementById('previewInfo');
-        const previewFileName = document.getElementById('previewFileName');
-        const previewTorneo = document.getElementById('previewTorneo');
-        const previewFecha = document.getElementById('previewFecha');
-        const previewGallos = document.getElementById('previewGallos');
-        const previewPeleas = document.getElementById('previewPeleas');
-        const previewCalificadas = document.getElementById('previewCalificadas');
-        const calificacionSection = document.getElementById('calificacionSection');
-        const torneoStatus = document.getElementById('torneo-status');
-        
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            try {
-                const datos = JSON.parse(e.target.result);
-                
-                // Validar estructura
-                if (!datos.infoTorneo) {
-                    throw new Error('El archivo no tiene la estructura esperada');
-                }
-                
-                torneoData = datos;
-                
-                // Configurar puntos
-                if (datos.infoTorneo.puntosConfig) {
-                    puntosConfig = datos.infoTorneo.puntosConfig;
-                }
-                
-                // Cargar calificaciones existentes del JSON
-                calificaciones.clear();
-                if (datos.calificaciones && Array.isArray(datos.calificaciones)) {
-                    datos.calificaciones.forEach(cal => {
-                        if (cal.indicePelea !== undefined) {
-                            calificaciones.set(cal.indicePelea, cal);
-                        }
-                    });
-                }
-                
-                // También intentar cargar de localStorage para este torneo
-                cargarCalificacionesDeLocalStorage(datos.infoTorneo.id);
-                
-                // Actualizar preview
-                previewFileName.textContent = file.name;
-                previewTorneo.textContent = datos.infoTorneo.nombre || 'No disponible';
-                previewFecha.textContent = datos.infoTorneo.fecha || 'No disponible';
-                previewGallos.textContent = datos.registroPartidos?.length || 0;
-                previewPeleas.textContent = datos.resultadosCotejo?.peleas?.length || 0;
-                previewCalificadas.textContent = calificaciones.size;
-                previewDiv.classList.add('show');
-                
-                // Mostrar sección de calificación
-                calificacionSection.style.display = 'block';
-                torneoStatus.textContent = 'TORNEO CARGADO';
-                torneoStatus.style.background = '#28a745';
-                
-                // Actualizar combobox de peleas
-                actualizarComboboxPeleas();
-                
-                // Renderizar tablas
-                renderizarTablaCotejo();
-                renderizarTablaPosiciones();
-                
-                // Guardar en localStorage
-                localStorage.setItem('cotejoOffline_datos', JSON.stringify(datos));
-                
-                alert(`✅ Torneo "${datos.infoTorneo.nombre}" importado correctamente`);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al leer el archivo: ' + error.message);
-            }
-        };
-        
-        reader.onerror = function() {
-            alert('Error al leer el archivo');
-        };
-        
-        reader.readAsText(file);
-    }
-    
-    // ==============================================
-    // LIMPIAR DATOS
-    // ==============================================
-    function limpiarDatos() {
-        if (confirm('¿Eliminar todos los datos del torneo y calificaciones?')) {
-            torneoData = null;
-            calificaciones.clear();
-            localStorage.removeItem('cotejoOffline_datos');
-            localStorage.removeItem('cotejoOffline_calificaciones');
             
-            document.getElementById('previewInfo').classList.remove('show');
-            document.getElementById('calificacionSection').style.display = 'none';
-            document.getElementById('torneo-status').textContent = 'SIN DATOS';
-            document.getElementById('torneo-status').style.background = '#4CAF50';
-            document.getElementById('jsonFileInput').value = '';
-            
-            renderizarTablaCotejo();
-            renderizarTablaPosiciones();
-            
-            alert('🧹 Datos eliminados');
-        }
-    }
-    
-    // ==============================================
-    // CAMBIAR PESTAÑA
-    // ==============================================
-    function cambiarPestana(pestana) {
-        const cotejoContent = document.getElementById('cotejoContent');
-        const posicionContent = document.getElementById('posicionContent');
-        const tabs = document.querySelectorAll('.tab-btn');
-        
-        tabs.forEach(btn => btn.classList.remove('active'));
-        
-        if (pestana === 'cotejo') {
-            cotejoContent.classList.add('active');
-            posicionContent.classList.remove('active');
-            tabs[0].classList.add('active');
-            renderizarTablaCotejo();
-        } else {
-            cotejoContent.classList.remove('active');
-            posicionContent.classList.add('active');
-            tabs[1].classList.add('active');
-            renderizarTablaPosiciones();
-        }
-    }
-    
-    // ==============================================
-    // MODAL INFORMACIÓN
-    // ==============================================
-    function mostrarInfoModal() {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div style="font-size: 48px; margin-bottom: 16px;">🐓</div>
-                <h3 style="color: #8B4513; margin-bottom: 10px;">COTEJO OFFLINE</h3>
-                <p style="color: #666; margin-bottom: 15px;">Versión 1.0 - Legado Avícola</p>
-                <p style="font-size: 13px; color: #888; margin-bottom: 20px;">
-                    Importa un archivo JSON exportado desde el panel de administración.<br>
-                    Califica las peleas y las tablas se actualizarán automáticamente.<br>
-                    <strong>100% OFFLINE</strong> - Funciona sin internet.
-                </p>
-                <button onclick="this.closest('.modal-overlay').remove()" style="width:100%; background:#8B4513; color:white; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer;">ENTENDIDO</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-    }
-    
-    // ==============================================
-    // CARGAR DATOS GUARDADOS AL INICIAR
-    // ==============================================
-    function cargarDatosGuardados() {
-        const saved = localStorage.getItem('cotejoOffline_datos');
-        if (saved) {
-            try {
-                const datos = JSON.parse(saved);
-                torneoData = datos;
+            const partidosMap = new Map();
+            torneoData.calificaciones.forEach(cal => {
+                const g1 = cal.gallo1;
+                const g2 = cal.gallo2;
+                if (!partidosMap.has(g1.partido)) partidosMap.set(g1.partido, { nombre: g1.partido, g:0, e:0, p:0, pts:0, tiempo:0 });
+                if (!partidosMap.has(g2.partido)) partidosMap.set(g2.partido, { nombre: g2.partido, g:0, e:0, p:0, pts:0, tiempo:0 });
                 
-                if (datos.infoTorneo.puntosConfig) {
-                    puntosConfig = datos.infoTorneo.puntosConfig;
+                const data1 = partidosMap.get(g1.partido);
+                const data2 = partidosMap.get(g2.partido);
+                
+                data1.pts += g1.puntos;
+                data2.pts += g2.puntos;
+                if (cal.ganador === 'rojo') { data1.g++; data2.p++; }
+                else if (cal.ganador === 'verde') { data1.p++; data2.g++; }
+                else { data1.e++; data2.e++; }
+                
+                if (cal.tiempo) {
+                    const [mins, secs] = cal.tiempo.split(':').map(Number);
+                    const totalSeg = mins * 60 + secs;
+                    data1.tiempo += totalSeg;
+                    data2.tiempo += totalSeg;
                 }
-                
-                cargarCalificacionesDeLocalStorage(datos.infoTorneo.id);
-                
-                document.getElementById('previewFileName').textContent = 'Datos guardados localmente';
-                document.getElementById('previewTorneo').textContent = datos.infoTorneo.nombre || 'No disponible';
-                document.getElementById('previewFecha').textContent = datos.infoTorneo.fecha || 'No disponible';
-                document.getElementById('previewGallos').textContent = datos.registroPartidos?.length || 0;
-                document.getElementById('previewPeleas').textContent = datos.resultadosCotejo?.peleas?.length || 0;
-                document.getElementById('previewCalificadas').textContent = calificaciones.size;
-                document.getElementById('previewInfo').classList.add('show');
-                document.getElementById('calificacionSection').style.display = 'block';
-                document.getElementById('torneo-status').textContent = 'TORNEO CARGADO';
-                document.getElementById('torneo-status').style.background = '#28a745';
-                
-                actualizarComboboxPeleas();
-                renderizarTablaCotejo();
-                renderizarTablaPosiciones();
-                
-                console.log('📦 Datos cargados desde localStorage');
-            } catch (e) {
-                console.error('Error cargando datos guardados:', e);
-            }
+            });
+            
+            let tabla = Array.from(partidosMap.values());
+            tabla.sort((a,b) => {
+                if (a.pts !== b.pts) return b.pts - a.pts;
+                return a.tiempo - b.tiempo;
+            });
+            
+            let html = '';
+            tabla.forEach(t => {
+                const tiempoFormateado = `${Math.floor(t.tiempo / 60)}:${(t.tiempo % 60).toString().padStart(2,'0')}`;
+                html += `<tr>
+                    <td>${escapeHtml(t.nombre)}</td>
+                    <td>${t.g + t.e + t.p}</td>
+                    <td>${t.g}</td>
+                    <td>${t.e}</td>
+                    <td>${t.p}</td>
+                    <td><strong>${t.pts}</strong></td>
+                    <td>${tiempoFormateado}</td>
+                </tr>`;
+            });
+            document.getElementById('posiciones-tbody').innerHTML = html;
         }
-    }
-    
-    // ==============================================
-    // DETECTAR MODO OFFLINE
-    // ==============================================
-    function actualizarEstadoOffline() {
-        const badge = document.getElementById('offlineBadge');
-        if (!navigator.onLine) {
-            badge.classList.add('show');
-        } else {
-            badge.classList.remove('show');
+        
+        // --- Importar / Exportar ---
+        function exportTorneo() {
+            const dataStr = JSON.stringify(torneoData, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${torneoData.info.nombre.replace(/\s/g, '_')}_export.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
-    }
-    
-    window.addEventListener('online', actualizarEstadoOffline);
-    window.addEventListener('offline', actualizarEstadoOffline);
-    
-    // Inicializar
-    cargarDatosGuardados();
-    actualizarEstadoOffline();
-    
-    // Exponer funciones globales
-    window.cambiarPestana = cambiarPestana;
-    window.importarJSON = importarJSON;
-    window.limpiarDatos = limpiarDatos;
-    window.cambiarPeleaSeleccionada = cambiarPeleaSeleccionada;
-    window.calificarPelea = calificarPelea;
-    window.eliminarCalificacion = eliminarCalificacion;
-    window.confirmarReCalificar = confirmarReCalificar;
-    window.limpiarSeleccion = limpiarSeleccion;
-    window.formatearTiempo = formatearTiempo;
-    window.mostrarInfoModal = mostrarInfoModal;
-</script>
-
-<!-- Registrar Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(function(registration) {
-            console.log('✅ Service Worker registrado:', registration.scope);
-        }).catch(function(error) {
-            console.log('❌ Service Worker falló:', error);
-        });
-    }
-</script>
-
-
-
-    // ==============================================
-// INSTALACIÓN PWA
-// ==============================================
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'flex';
-    console.log('✅ PWA lista para instalar');
-});
-
-installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('✅ Usuario aceptó la instalación');
-            installBtn.style.display = 'none';
-        } else {
-            console.log('❌ Usuario canceló la instalación');
+        
+        function importTorneo(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.registroPartidos && imported.info) {
+                        torneoData = imported;
+                        currentGallosPorPartido = torneoData.info.config.gallosPorPartido || 3;
+                        document.getElementById('gallos-por-partido').value = currentGallosPorPartido;
+                        saveToLocalStorage();
+                        renderRegistroFormulario();
+                        renderRegistroTabla();
+                        renderCotejoResultados();
+                        renderPosicionesTabla();
+                        alert("Torneo importado exitosamente");
+                    } else {
+                        alert("Archivo JSON inválido");
+                    }
+                } catch(err) { alert("Error al leer el archivo"); }
+            };
+            reader.readAsText(file);
         }
-        deferredPrompt = null;
-    }
-});
-
-// Detectar si ya está instalada (standalone mode)
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-    console.log('📱 App instalada - modo standalone');
-    installBtn.style.display = 'none';
-}
-    
+        
+        // --- Configuración y Eventos Iniciales ---
+        function init() {
+            loadFromLocalStorage();
+            renderRegistroFormulario();
+            
+            document.getElementById('gallos-por-partido').addEventListener('change', (e) => {
+                currentGallosPorPartido = parseInt(e.target.value, 10);
+                torneoData.info.config.gallosPorPartido = currentGallosPorPartido;
+                saveToLocalStorage();
+                renderRegistroFormulario();
+            });
+            
+            document.getElementById('registrar-partido-btn').onclick = registrarPartido;
+            document.getElementById('generar-cotejo-btn').onclick = generarCotejo;
+            document.getElementById('pelea-selector').onchange = onPeleaSelect;
+            document.getElementById('calificar-btn').onclick = calificarPelea;
+            document.getElementById('limpiar-calificacion-btn').onclick = limpiarSeleccionCalificacion;
+            document.getElementById('export-btn').onclick = exportTorneo;
+            document.getElementById('import-btn').onclick = () => document.getElementById('import-file-input').click();
+            document.getElementById('import-file-input').onchange = (e) => {
+                if (e.target.files.length) importTorneo(e.target.files[0]);
+                e.target.value = '';
+            };
+            document.getElementById('new-tournament-btn').onclick = () => {
+                if (confirm("¿Crear nuevo torneo? Se perderán los datos no guardados.")) {
+                    localStorage.removeItem('torneoOfflineData');
+                    location.reload();
+                }
+            };
+            
+            // Pestañas
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const tabId = btn.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                };
+            });
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+        
+        init();
+    </script>
 </body>
 </html>
