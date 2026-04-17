@@ -1101,19 +1101,19 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         const difClase = p.diferencia <= 20 ? 'diferencia-baja' : 'diferencia-alta';
         
         html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #d32f2f; color: white;">${p.numero}</td>`;
-        html += `<td style="padding: 12px 8px;" class="text-left">${escapeHTML(p.gallo1.partido)}</td>`;
-        if (registroDetalladoActivo) html += `<td style="padding: 12px 8px; text-align: center;">${escapeHTML(p.gallo1.color || '-')}</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center;">${p.gallo1.anillo}</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center;">${p.gallo1.peso}g</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #4CAF50; color: white;">${p.numero}</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center;">${p.gallo2.peso}g</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center;">${p.gallo2.anillo}</td>`;
-        html += `<td style="padding: 12px 8px;" class="text-left">${escapeHTML(p.gallo2.partido)}</td>`;
-        if (registroDetalladoActivo) html += `<td style="padding: 12px 8px; text-align: center;">${escapeHTML(p.gallo2.color || '-')}</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center;" class="${difClase}">${p.diferencia}g</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600;">${ganadorTexto}</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600;">${tiempo}</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center; font-weight: 700; background: #d32f2f; color: white;">${p.numero}</td>`;
+        html += `<td style="padding: 7px 3px;" class="text-left">${escapeHTML(p.gallo1.partido)}</td>`;
+        if (registroDetalladoActivo) html += `<td style="padding: 7px 3px; text-align: center;">${escapeHTML(p.gallo1.color || '-')}</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center;">${p.gallo1.anillo}</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center;">${p.gallo1.peso}g</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center; font-weight: 700; background: #4CAF50; color: white;">${p.numero}</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center;">${p.gallo2.peso}g</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center;">${p.gallo2.anillo}</td>`;
+        html += `<td style="padding: 7px 3px;" class="text-left">${escapeHTML(p.gallo2.partido)}</td>`;
+        if (registroDetalladoActivo) html += `<td style="padding: 7px 3px; text-align: center;">${escapeHTML(p.gallo2.color || '-')}</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center;" class="${difClase}">${p.diferencia}g</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center; font-weight: 600;">${ganadorTexto}</td>`;
+        html += `<td style="padding: 7px 3px; text-align: center; font-weight: 600;">${tiempo}</td>`;
         html += `</tr>`;
     });
     
