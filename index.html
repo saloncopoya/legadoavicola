@@ -509,7 +509,7 @@
 <!-- BARRA SUPERIOR FIJA -->
 <div class="top-bar">
     <div class="logo">
-        <span>🐓</span>aSLEGADO 
+        <span>🐓</span>LEGADO1 
     </div>
     <div class="top-bar-buttons">
         <button id="installBtn" class="btn-icon" style="display: none;" title="Instalar App">📲</button>
@@ -2214,6 +2214,8 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     cargarPreferenciasVisuales();
     actualizarTodo();
     actualizarEstadoOffline();
+    actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+
     
     // PWA Installation
     let deferredPrompt;
