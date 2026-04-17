@@ -2,7 +2,8 @@ const CACHE_NAME = 'cotejo-offline-v2';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/offline.html'
+    '/offline.html',
+    '/manifest.json'
 ];
 
 // Instalar Service Worker
@@ -11,7 +12,7 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('📦 Archivos cacheados');
+                console.log('📦 Archivos cacheados:', urlsToCache);
                 return cache.addAll(urlsToCache);
             })
     );
