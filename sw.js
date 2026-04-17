@@ -1,53 +1,59 @@
-const CACHE_NAME = 'galloslive-v3';
+const CACHE_NAME = 'cotejo-offline-v1';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/offline.html',
-    '/manifest.json'
+    '/offline.html'
 ];
 
+// Instalar Service Worker
 self.addEventListener('install', event => {
+    console.log('⚡ Service Worker instalando...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('📦 Archivos cacheados');
+                return cache.addAll(urlsToCache);
+            })
     );
     self.skipWaiting();
 });
 
-self.addEventListener('fetch', event => {
-    // No cachear Firebase
-    if (event.request.url.includes('firebaseio.com') ||
-        event.request.url.includes('googleapis.com')) {
-        event.respondWith(fetch(event.request));
-        return;
-    }
-
-    event.respondWith(
-        caches.match(event.request).then(cached => {
-            const fetchPromise = fetch(event.request)
-                .then(networkResponse => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, networkResponse.clone());
-                        });
+// Activar Service Worker
+self.addEventListener('activate', event => {
+    console.log('✅ Service Worker activado');
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cache => {
+                    if (cache !== CACHE_NAME) {
+                        console.log('🧹 Eliminando cache antiguo:', cache);
+                        return caches.delete(cache);
                     }
-                    return networkResponse;
                 })
-                .catch(() => {
-                    if (cached) return cached;
+            );
+        })
+    );
+    self.clients.claim();
+});
+
+// Interceptar peticiones
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request).catch(() => {
                     if (event.request.mode === 'navigate') {
                         return caches.match('/offline.html');
                     }
+                    return new Response('Contenido no disponible offline', {
+                        status: 503,
+                        statusText: 'Offline',
+                        headers: new Headers({ 'Content-Type': 'text/plain' })
+                    });
                 });
-            return cached || fetchPromise;
-        })
+            })
     );
-});
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(keys => Promise.all(
-            keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-        ))
-    );
-    self.clients.claim();
 });
