@@ -58,7 +58,7 @@
         {"src": "https://placehold.co/720x1280/8B4513/white?text=Calificar+Peleas", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow", "label": "Calificación de peleas"}
     ],
 
-    "launch_handler": {"client_mode": ["focus-existing", "navigate-existing", "auto"]},
+"launch_handler": {"client_mode": "new-client"},
     "handle_links": "preferred",
     
     "share_target": {
