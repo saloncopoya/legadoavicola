@@ -716,11 +716,19 @@
     }
     
    function formatTiempo(segundos) {
-    if (!segundos && segundos !== 0) return '--:--:--';
+    if (!segundos && segundos !== 0) return '--:--';
+    
     const horas = Math.floor(segundos / 3600);
     const minutos = Math.floor((segundos % 3600) / 60);
     const segs = segundos % 60;
-    return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+    
+    // Si hay horas (1 hora o más), mostrar HH:MM:SS
+    if (horas > 0) {
+        return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+    }
+    
+    // Si es menos de 1 hora, mostrar MM:SS
+    return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
 }
     
     function timeToSeconds(tiempo) {
