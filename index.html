@@ -804,7 +804,8 @@
     
     peleas.forEach((pelea, index) => {
         // 🔥 BUSCAR CALIFICACIÓN EN EL MAP GLOBAL
-        const calKey = `${torneo.id}_${index}`;
+        const calKey = `${torneo.infoTorneo.id}_${index}`;
+
         let calificacion = calificacionesGlobales.get(calKey);
         
         // Si no encuentra, buscar dentro de la pelea
@@ -912,7 +913,7 @@
             const puntosConf = torneo.infoTorneo?.puntosConfig || puntosConfig;
             
             peleas.forEach((pelea, index) => {
-                const calKey = `${torneo.id}_${index}`;
+const calKey = `${torneo.infoTorneo.id}_${index}`;
                 const calificacion = calificacionesGlobales.get(calKey);
                 if (!calificacion) return;
                 
@@ -1228,14 +1229,15 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         container.innerHTML = html;
     }
     
-    function contarPeleasCalificadas(torneo) {
-        if (!torneo.resultadosCotejo?.peleas) return 0;
-        let count = 0;
-        torneo.resultadosCotejo.peleas.forEach((_, idx) => {
-            if (calificacionesGlobales.has(`${torneo.id}_${idx}`)) count++;
-        });
-        return count;
-    }
+   function contarPeleasCalificadas(torneo) {
+    if (!torneo.resultadosCotejo?.peleas) return 0;
+    let count = 0;
+    torneo.resultadosCotejo.peleas.forEach((_, idx) => {
+        // ✅ CORREGIDO: Usar infoTorneo.id
+        if (calificacionesGlobales.has(`${torneo.infoTorneo.id}_${idx}`)) count++;
+    });
+    return count;
+}
     
     function actualizarSelectoresCalificacion() {
         const select = document.getElementById('torneoSelectCalificacion');
@@ -1283,7 +1285,7 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         let opciones = '<option value="">-- Selecciona una pelea --</option>';
         
         peleas.forEach((p, index) => {
-            const calKey = `${torneoActual.id}_${index}`;
+        const calKey = `${torneoActual.infoTorneo.id}_${index}`;
             const calificada = calificacionesGlobales.has(calKey);
             const estilo = calificada ? 'style="background:#e8f5e8; font-weight:bold;"' : '';
             opciones += `<option value="${index}" ${estilo}>Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido} ${calificada ? '✓' : ''}</option>`;
@@ -1314,7 +1316,7 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
     }
     
     const pelea = torneoActual.resultadosCotejo.peleas[index];
-    const calKey = `${torneoActual.id}_${index}`;
+    const calKey = `${torneoActual.infoTorneo.id}_${index}`;
     const calificacionExistente = calificacionesGlobales.get(calKey);
     const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
     
@@ -1322,7 +1324,7 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
     peleaSeleccionada = { 
         ...pelea, 
         indice: index, 
-        torneoId: torneoActual.id,
+        torneoId: torneoActual.infoTorneo.id,  // ✅ CORREGIDO
         calificacionActual: calificacionExistente  // ← NUEVO: guardar calificación actual
     };
     
@@ -1615,24 +1617,29 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
     }
     
     function cargarCalificacionesDeLocalStorage() {
-        const savedCal = localStorage.getItem('cotejoOffline_calificaciones');
-        if (savedCal) {
-            try {
-                const calArray = JSON.parse(savedCal);
-                calificacionesGlobales.clear();
-                calArray.forEach(([key, val]) => calificacionesGlobales.set(key, val));
-            } catch(e) {}
-        }
-        
-        const savedTorneos = localStorage.getItem('cotejoOffline_torneos');
-        if (savedTorneos) {
-            try {
-                torneos = JSON.parse(savedTorneos);
-                if (torneos.length > 0) torneoActual = torneos[0];
-            } catch(e) {}
-        }
+    const savedCal = localStorage.getItem('cotejoOffline_calificaciones');
+    if (savedCal) {
+        try {
+            const calArray = JSON.parse(savedCal);
+            calificacionesGlobales.clear();
+            calArray.forEach(([key, val]) => calificacionesGlobales.set(key, val));
+        } catch(e) { console.error('Error cargando calificaciones:', e); }
     }
     
+    const savedTorneos = localStorage.getItem('cotejoOffline_torneos');
+    if (savedTorneos) {
+        try {
+            torneos = JSON.parse(savedTorneos);
+            if (torneos.length > 0) {
+                torneoActual = torneos[0];
+                // ✅ IMPORTANTE: Reconstruir calificaciones desde torneos si es necesario
+                if (calificacionesGlobales.size === 0) {
+                    cargarCalificacionesDesdeTorneos();
+                }
+            }
+        } catch(e) { console.error('Error cargando torneos:', e); }
+    }
+}
     // ==============================================
     // IMPORTAR JSONs (MÚLTIPLES)
     // ==============================================
@@ -1821,7 +1828,7 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
     
     function eliminarTorneo(idx) {
         if (confirm(`¿Eliminar torneo "${torneos[idx].infoTorneo.nombre}"?`)) {
-            const torneoId = torneos[idx].id;
+        const torneoId = torneos[idx].infoTorneo.id;
             // Eliminar calificaciones asociadas
             for (let key of calificacionesGlobales.keys()) {
                 if (key.startsWith(torneoId + '_')) calificacionesGlobales.delete(key);
