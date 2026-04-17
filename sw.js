@@ -1,79 +1,60 @@
-// sw.js - Service Worker para cache firch y modo offline
-const CACHE_NAME = 'cotejo-offline-v1';
+const CACHE_NAME = 'cotejo-offline-v2';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/offline.html'
+    '/offline.html',
+    '/manifest.json'
 ];
 
-// Instalación: guardar archivos esenciales en caché
+// Instalar Service Worker
 self.addEventListener('install', event => {
-    console.log('[SW] Instalando...');
+    console.log('⚡ Service Worker instalando...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('[SW] Archivos cacheados');
+                console.log('📦 Archivos cacheados:', urlsToCache);
                 return cache.addAll(urlsToCache);
             })
-            .catch(err => console.error('[SW] Error en instalación:', err))
     );
-    self.skipWaiting(); // Activar inmediatamente
+    self.skipWaiting();
 });
 
-// Activación: limpiar cachés antiguas
+// Activar Service Worker
 self.addEventListener('activate', event => {
-    console.log('[SW] Activando...');
+    console.log('✅ Service Worker activado');
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cache => {
                     if (cache !== CACHE_NAME) {
-                        console.log('[SW] Eliminando caché antigua:', cache);
+                        console.log('🧹 Eliminando cache antiguo:', cache);
                         return caches.delete(cache);
                     }
                 })
             );
         })
     );
-    self.clients.claim(); // Tomar control inmediato
+    self.clients.claim();
 });
 
-// Fetch: servir desde caché o red, con fallback a offline.html
+// Interceptar peticiones
 self.addEventListener('fetch', event => {
-    const requestUrl = new URL(event.request.url);
-    
-    // Solo manejar peticiones GET y de nuestro origen
-    if (event.request.method !== 'GET') return;
-    
-    // Si es una petición a la raíz o a index.html, servir desde caché primero
-    if (requestUrl.pathname === '/' || requestUrl.pathname === '/index.html') {
-        event.respondWith(
-            caches.match('/index.html').then(response => {
-                return response || fetch(event.request).catch(() => caches.match('/offline.html'));
-            })
-        );
-        return;
-    }
-    
-    // Para otros archivos estáticos: estrategia "stale-while-revalidate"
     event.respondWith(
-        caches.match(event.request).then(cachedResponse => {
-            const fetchPromise = fetch(event.request).then(networkResponse => {
-                // Actualizar caché con la nueva respuesta
-                if (networkResponse && networkResponse.status === 200) {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, responseToCache);
-                    });
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    return response;
                 }
-                return networkResponse;
-            }).catch(() => {
-                // Si falla la red y no hay caché, mostrar offline.html
-                if (cachedResponse) return cachedResponse;
-                return caches.match('/offline.html');
-            });
-            
-            return cachedResponse || fetchPromise;
-        })
+                return fetch(event.request).catch(() => {
+                    if (event.request.mode === 'navigate') {
+                        return caches.match('/offline.html');
+                    }
+                    return new Response('Contenido no disponible offline', {
+                        status: 503,
+                        statusText: 'Offline',
+                        headers: new Headers({ 'Content-Type': 'text/plain' })
+                    });
+                });
+            })
     );
 });
