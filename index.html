@@ -1502,7 +1502,7 @@ const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
     // ==============================================
     // 3. ACTUALIZAR torneoActual SI ES EL MISMO
     // ==============================================
-    if (torneoActual && torneoActual.id === torneoId) {
+if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
         if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
             const pelea = torneoActual.resultadosCotejo.peleas[indice];
             pelea.calificada = true;
@@ -1576,7 +1576,7 @@ const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
         }
         
         // 3. Actualizar torneoActual si es el mismo
-        if (torneoActual && torneoActual.id === torneoId) {
+if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
             if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
                 const pelea = torneoActual.resultadosCotejo.peleas[indice];
                 delete pelea.calificada;
@@ -1770,8 +1770,16 @@ const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
         }
         
         const peleas = torneo.resultadosCotejo.peleas;
-        console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
-        
+// Línea ~970
+console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
+
+// ✅ Sería más seguro:
+if (torneo.infoTorneo) {
+    console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
+} else {
+    console.warn('Torneo sin infoTorneo:', torneo);
+    return;
+}        
         peleas.forEach((pelea, index) => {
             // 🔥 BUSCAR CALIFICACIÓN EN VARIOS LUGARES
             let tieneCalificacion = false;
@@ -1837,7 +1845,7 @@ const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
             }
             torneos.splice(idx, 1);
             if (torneos.length === 0) torneoActual = null;
-            else if (torneoActual && torneoActual.id === torneoId) torneoActual = torneos[0];
+else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual = torneos[0];
             
             actualizarTodo();
             guardarCalificacionesEnLocalStorage();
