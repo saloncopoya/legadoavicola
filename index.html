@@ -1137,12 +1137,16 @@
                 html += `<td style="padding: 12px 8px; text-align: center;"><\/td>`;
                 html += `<td style="padding: 12px 8px; text-align: center;"><\/td>`;
             } else {
+                // Determinar la clase según el puntaje (para PTS y TPO mismo color)
                 let clase = '';
                 if (puntos === puntosConf.ganador) clase = 'puntos-ganador';
                 else if (puntos === puntosConf.empate) clase = 'puntos-empate';
                 else if (puntos === puntosConf.perdedor) clase = 'puntos-perdedor';
+                
+                // Celda PTS con el color
                 html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${puntos}<\/td>`;
-                html += `<td style="padding: 12px 8px; text-align: center;">${formatTiempo(tiempo)}<\/td>`;
+                // Celda TPO con EL MISMO COLOR
+                html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${formatTiempo(tiempo)}<\/td>`;
             }
         }
         
