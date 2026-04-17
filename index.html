@@ -1018,6 +1018,9 @@
     const config = torneoActual.infoTorneo?.config || {};
     const registroDetalladoActivo = config.registroDetalladoActivo || false;
     
+    console.log(`📊 Renderizando cotejo para torneo: ${torneoActual.infoTorneo.nombre}`);
+    console.log(`📋 Total peleas: ${peleas.length}`);
+    
     let html = `<table class="cotejo-table" style="width:100%; border-collapse: collapse;">`;
     html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
     html += `<th style="padding: 12px 8px; background: #d32f2f; color: white;">#</th>`;
@@ -1033,14 +1036,16 @@
     html += `<th style="padding: 12px 8px; text-align: center;">DIF</th>`;
     html += `<th style="padding: 12px 8px; text-align: center;">GANADOR</th>`;
     html += `<th style="padding: 12px 8px; text-align: center;">TIEMPO</th>`;
-    html += `<tr></thead><tbody>`;
+    html += `</tr></thead><tbody>`;
     
     peleas.forEach((p, index) => {
-        // 🔥 CLAVE: Buscar calificación en el Map global usando el ID del torneo
+        // 🔥 CLAVE IMPORTANTE: Usar el ID del torneo actual para buscar la calificación
         const calKey = `${torneoActual.id}_${index}`;
+        
+        // Buscar calificación en el Map global
         let calificacion = calificacionesGlobales.get(calKey);
         
-        // Si no encuentra en el Map, buscar directamente en la pelea (por si acaso)
+        // Si no encuentra en el Map, buscar dentro de la pelea (para compatibilidad)
         if (!calificacion && (p.calificada === true || p.ganador)) {
             calificacion = {
                 ganador: p.ganador,
@@ -1050,13 +1055,34 @@
             calificacionesGlobales.set(calKey, calificacion);
         }
         
+        // DEBUG: Mostrar qué calificación se está usando
+        if (calificacion) {
+            console.log(`Pelea ${p.numero}: Ganador=${calificacion.ganador}, Tiempo=${calificacion.tiempo}`);
+        } else {
+            console.log(`Pelea ${p.numero}: SIN CALIFICAR`);
+        }
+        
         const bgColor = calificacion ? 'bg-calificada' : (index % 2 === 0 ? '#ffffff' : '#f9f9f9');
         
+        // Determinar el texto del ganador según la calificación
         let ganadorTexto = '';
-        if (calificacion?.ganador === 'rojo') ganadorTexto = `🔴 ${p.gallo1.partido}`;
-        else if (calificacion?.ganador === 'verde') ganadorTexto = `🟢 ${p.gallo2.partido}`;
-        else if (calificacion?.ganador === 'empate') ganadorTexto = 'TABLA';
-        else ganadorTexto = '⏳ PENDIENTE';
+        let ganadorClase = '';
+        
+        if (calificacion) {
+            if (calificacion.ganador === 'rojo') {
+                ganadorTexto = `🔴 ${p.gallo1.partido}`;
+                ganadorClase = 'puntos-ganador';
+            } else if (calificacion.ganador === 'verde') {
+                ganadorTexto = `🟢 ${p.gallo2.partido}`;
+                ganadorClase = 'puntos-ganador';
+            } else if (calificacion.ganador === 'empate') {
+                ganadorTexto = '🤝 TABLA / EMPATE';
+                ganadorClase = 'puntos-empate';
+            }
+        } else {
+            ganadorTexto = '⏳ PENDIENTE';
+            ganadorClase = '';
+        }
         
         const tiempo = calificacion?.tiempo || '--:--';
         const difClase = p.diferencia <= 20 ? 'diferencia-baja' : 'diferencia-alta';
@@ -1073,7 +1099,7 @@
         html += `<td style="padding: 12px 8px;" class="text-left">${escapeHTML(p.gallo2.partido)}</td>`;
         if (registroDetalladoActivo) html += `<td style="padding: 12px 8px; text-align: center;">${escapeHTML(p.gallo2.color || '-')}</td>`;
         html += `<td style="padding: 12px 8px; text-align: center;" class="${difClase}">${p.diferencia}g</td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600;">${ganadorTexto}</td>`;
+        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600; ${ganadorClase ? 'background: ' + (ganadorClase === 'puntos-ganador' ? '#4CAF50' : '#2196F3') + '; color: white;' : ''}">${ganadorTexto}</td>`;
         html += `<td style="padding: 12px 8px; text-align: center; font-weight: 600;">${tiempo}</td>`;
         html += `</tr>`;
     });
