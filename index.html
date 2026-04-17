@@ -588,6 +588,16 @@
 
     <!-- PESTAÑA COTEJO -->
     <div id="cotejoContent" class="tab-content active">
+
+  <!-- Tabla de Cotejo -->
+        <div class="table-container" id="cotejoContainer">
+            <div class="no-data">
+                <span>⚡</span>
+                <p>No hay datos de cotejo</p>
+                <p style="font-size: 12px;">Importa uno o más archivos JSON para comenzar</p>
+            </div>
+        </div>
+        
         <!-- Sección colapsable: Importar Torneos -->
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
@@ -641,18 +651,21 @@
             </div>
         </div>
         
-        <!-- Tabla de Cotejo -->
-        <div class="table-container" id="cotejoContainer">
-            <div class="no-data">
-                <span>⚡</span>
-                <p>No hay datos de cotejo</p>
-                <p style="font-size: 12px;">Importa uno o más archivos JSON para comenzar</p>
-            </div>
-        </div>
+      
     </div>
     
     <!-- PESTAÑA POSICIONES -->
     <div id="posicionContent" class="tab-content">
+
+
+         <div class="table-container" id="posicionContainer">
+            <div class="no-data">
+                <span>🏆</span>
+                <p>No hay datos de posición</p>
+                <p style="font-size: 12px;">Califica peleas para ver la tabla de posiciones</p>
+            </div>
+        </div>
+        
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('visual-section-pos')">
                 <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
@@ -665,17 +678,20 @@
                 </div>
             </div>
         </div>
-        <div class="table-container" id="posicionContainer">
-            <div class="no-data">
-                <span>🏆</span>
-                <p>No hay datos de posición</p>
-                <p style="font-size: 12px;">Califica peleas para ver la tabla de posiciones</p>
-            </div>
-        </div>
+       
     </div>
     
     <!-- PESTAÑA SERIAL (ACUMULADO) -->
     <div id="serialContent" class="tab-content">
+
+
+        <div class="table-container" id="serialContainer">
+            <div class="no-data">
+                <span>🔗</span>
+                <p>No hay datos de serial</p>
+                <p style="font-size: 12px;">Importa múltiples torneos para ver el acumulado</p>
+            </div>
+        </div>
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('visual-section-serial')">
                 <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
@@ -688,13 +704,7 @@
                 </div>
             </div>
         </div>
-        <div class="table-container" id="serialContainer">
-            <div class="no-data">
-                <span>🔗</span>
-                <p>No hay datos de serial</p>
-                <p style="font-size: 12px;">Importa múltiples torneos para ver el acumulado</p>
-            </div>
-        </div>
+        
     </div>
 </div>
 
