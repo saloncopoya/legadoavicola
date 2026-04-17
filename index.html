@@ -369,6 +369,23 @@
             color: white;
             font-weight: bold;
         }
+     .tiempo-ganador {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .tiempo-empate {
+            background: #2196F3;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .tiempo-perdedor {
+            background: #f44336;
+            color: white;
+            font-weight: bold;
+        }
         
         /* Tabla Serial (Acumulado) */
         .serial-table th {
@@ -1159,12 +1176,22 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
                     html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
                     html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
                 } else {
-                    let clase = '';
-                    if (puntos === puntosConf.ganador) clase = 'puntos-ganador';
-                    else if (puntos === puntosConf.empate) clase = 'puntos-empate';
-                    else if (puntos === puntosConf.perdedor) clase = 'puntos-perdedor';
-                    html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${puntos}</td>`;
-                    html += `<td style="padding: 12px 8px; text-align: center;">${formatTiempo(tiempo)}</td>`;
+                    let clasePuntos = '';
+                    let claseTiempo = '';
+                    if (puntos === puntosConf.ganador) {
+                        clasePuntos = 'puntos-ganador';
+                        claseTiempo = 'tiempo-ganador';
+                    }
+                    else if (puntos === puntosConf.empate) {
+                        clasePuntos = 'puntos-empate';
+                        claseTiempo = 'tiempo-empate';
+                    }
+                    else if (puntos === puntosConf.perdedor) {
+                        clasePuntos = 'puntos-perdedor';
+                        claseTiempo = 'tiempo-perdedor';
+                    }
+                    html += `<td style="padding: 12px 8px; text-align: center;" class="${clasePuntos}">${puntos}</td>`;
+                    html += `<td style="padding: 12px 8px; text-align: center;" class="${claseTiempo}">${formatTiempo(tiempo)}</td>`;
                 }
             }
             
