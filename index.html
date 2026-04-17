@@ -320,13 +320,12 @@
             font-weight: 700;
         }
         
-        /* Solo el # central (primera celda de ese grupo) */
-.cotejo-table th:nth-child(6),
-.cotejo-table td:nth-child(6) {
-    background: #4CAF50;
-    color: white;
-    font-weight: 700;
-}
+        .cotejo-table th:nth-child(6),
+        .cotejo-table td:nth-child(6) {
+            background: #4CAF50;
+            color: white;
+            font-weight: 700;
+        }
         
         .bg-calificada {
             background-color: #2196F3 !important;
@@ -717,15 +716,11 @@
     }
     
     function formatTiempo(segundos) {
-    if (!segundos && segundos !== 0) return '00:00';
-    const horas = Math.floor(segundos / 3600);
-    const mins = Math.floor((segundos % 3600) / 60);
-    const segs = segundos % 60;
-    if (horas > 0) {
-        return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+        if (!segundos && segundos !== 0) return '--:--';
+        const mins = Math.floor(segundos / 60);
+        const segs = segundos % 60;
+        return `${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
     }
-    return `${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
-}
     
     function timeToSeconds(tiempo) {
         if (!tiempo) return 0;
@@ -908,103 +903,100 @@
     // PROCESAR TABLA SERIAL (ACUMULADO DE TODOS LOS TORNEOS)
     // ==============================================
     function procesarTablaSerial() {
-    const serialMap = new Map();
-    
-    torneos.forEach(torneo => {
-        if (!torneo.resultadosCotejo || !torneo.resultadosCotejo.peleas) return;
+        const serialMap = new Map();
         
-        const peleas = torneo.resultadosCotejo.peleas;
-        const puntosConf = torneo.infoTorneo?.puntosConfig || puntosConfig;
-        
-        peleas.forEach((pelea, index) => {
-            const calKey = `${torneo.id}_${index}`;
-            const calificacion = calificacionesGlobales.get(calKey);
-            if (!calificacion) return;
+        torneos.forEach(torneo => {
+            if (!torneo.resultadosCotejo || !torneo.resultadosCotejo.peleas) return;
             
-            const g1 = pelea.gallo1;
-            const g2 = pelea.gallo2;
+            const peleas = torneo.resultadosCotejo.peleas;
+            const puntosConf = torneo.infoTorneo?.puntosConfig || puntosConfig;
             
-            const initPartidoSerial = (nombre) => {
-                if (!nombre) return null;
-                if (!serialMap.has(nombre)) {
-                    serialMap.set(nombre, {
-                        puntos: 0,
-                        tiempo: 0,
-                        victorias: 0,
-                        empates: 0,
-                        derrotas: 0,
-                        torneosParticipados: new Set()
-                    });
-                }
-                return serialMap.get(nombre);
-            };
-            
-            let tiempoSegundos = timeToSeconds(calificacion.tiempo);
-            
-            // Procesar gallo 1 (Rojo)
-            if (g1?.partido) {
-                const data = initPartidoSerial(g1.partido);
-                if (data) {
-                    data.torneosParticipados.add(torneo.id);
-                    if (calificacion.ganador === 'rojo') {
-                        data.puntos += puntosConf.ganador;
-                        data.tiempo += tiempoSegundos;
-                        data.victorias++;
-                    } else if (calificacion.ganador === 'verde') {
-                        data.puntos += puntosConf.perdedor;
-                        data.derrotas++;
-                    } else if (calificacion.ganador === 'empate') {
-                        data.puntos += puntosConf.empate;
-                        data.tiempo += tiempoSegundos;
-                        data.empates++;
+            peleas.forEach((pelea, index) => {
+                const calKey = `${torneo.id}_${index}`;
+                const calificacion = calificacionesGlobales.get(calKey);
+                if (!calificacion) return;
+                
+                const g1 = pelea.gallo1;
+                const g2 = pelea.gallo2;
+                
+                const initPartidoSerial = (nombre) => {
+                    if (!nombre) return null;
+                    if (!serialMap.has(nombre)) {
+                        serialMap.set(nombre, {
+                            puntos: 0,
+                            tiempo: 0,
+                            victorias: 0,
+                            empates: 0,
+                            derrotas: 0,
+                            torneosParticipados: new Set()
+                        });
+                    }
+                    return serialMap.get(nombre);
+                };
+                
+                let tiempoSegundos = timeToSeconds(calificacion.tiempo);
+                
+                if (g1?.partido) {
+                    const data = initPartidoSerial(g1.partido);
+                    if (data) {
+                        data.torneosParticipados.add(torneo.id);
+                        if (calificacion.ganador === 'rojo') {
+                            data.puntos += puntosConf.ganador;
+                            data.tiempo += tiempoSegundos;
+                            data.victorias++;
+                        } else if (calificacion.ganador === 'verde') {
+                            data.puntos += puntosConf.perdedor;
+                            data.derrotas++;
+                        } else if (calificacion.ganador === 'empate') {
+                            data.puntos += puntosConf.empate;
+                            data.tiempo += tiempoSegundos;
+                            data.empates++;
+                        }
                     }
                 }
-            }
-            
-            // Procesar gallo 2 (Verde)
-            if (g2?.partido) {
-                const data = initPartidoSerial(g2.partido);
-                if (data) {
-                    data.torneosParticipados.add(torneo.id);
-                    if (calificacion.ganador === 'verde') {
-                        data.puntos += puntosConf.ganador;
-                        data.tiempo += tiempoSegundos;
-                        data.victorias++;
-                    } else if (calificacion.ganador === 'rojo') {
-                        data.puntos += puntosConf.perdedor;
-                        data.derrotas++;
-                    } else if (calificacion.ganador === 'empate') {
-                        data.puntos += puntosConf.empate;
-                        data.tiempo += tiempoSegundos;
-                        data.empates++;
+                
+                if (g2?.partido) {
+                    const data = initPartidoSerial(g2.partido);
+                    if (data) {
+                        data.torneosParticipados.add(torneo.id);
+                        if (calificacion.ganador === 'verde') {
+                            data.puntos += puntosConf.ganador;
+                            data.tiempo += tiempoSegundos;
+                            data.victorias++;
+                        } else if (calificacion.ganador === 'rojo') {
+                            data.puntos += puntosConf.perdedor;
+                            data.derrotas++;
+                        } else if (calificacion.ganador === 'empate') {
+                            data.puntos += puntosConf.empate;
+                            data.tiempo += tiempoSegundos;
+                            data.empates++;
+                        }
                     }
                 }
-            }
+            });
         });
-    });
-    
-    let datosSerial = Array.from(serialMap.entries()).map(([nombre, data]) => ({
-        nombre: nombre,
-        puntos: data.puntos,
-        tiempo: data.tiempo,
-        victorias: data.victorias,
-        empates: data.empates,
-        derrotas: data.derrotas,
-        torneosParticipados: data.torneosParticipados.size
-    }));
-    
-    // Ordenar: puntos mayor a menor, tiempo menor a mayor
-    datosSerial.sort((a, b) => {
-        const aIsZero = (a.puntos === 0 && a.tiempo === 0);
-        const bIsZero = (b.puntos === 0 && b.tiempo === 0);
-        if (aIsZero && !bIsZero) return 1;
-        if (!aIsZero && bIsZero) return -1;
-        if (a.puntos !== b.puntos) return b.puntos - a.puntos;
-        return a.tiempo - b.tiempo;
-    });
-    
-    return datosSerial;
-}
+        
+        let datosSerial = Array.from(serialMap.entries()).map(([nombre, data]) => ({
+            nombre,
+            puntos: data.puntos,
+            tiempo: data.tiempo,
+            victorias: data.victorias,
+            empates: data.empates,
+            derrotas: data.derrotas,
+            torneosParticipados: data.torneosParticipados.size
+        }));
+        
+        datosSerial.sort((a, b) => {
+            const aIsZero = (a.puntos === 0 && a.tiempo === 0);
+            const bIsZero = (b.puntos === 0 && b.tiempo === 0);
+            if (aIsZero && !bIsZero) return 1;
+            if (!aIsZero && bIsZero) return -1;
+            if (a.puntos !== b.puntos) return b.puntos - a.puntos;
+            return a.tiempo - b.tiempo;
+        });
+        
+        return datosSerial;
+    }
     
     // ==============================================
     // RENDERIZAR TABLA COTEJO
@@ -1089,146 +1081,110 @@
     // RENDERIZAR TABLA POSICIONES
     // ==============================================
     function renderizarTablaPosiciones() {
-    const container = document.getElementById('posicionContainer');
-    
-    if (!torneoActual) {
-        container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p></div>`;
-        return;
-    }
-    
-    const datosPosicion = procesarTablaPosicion(torneoActual);
-    const config = torneoActual.infoTorneo?.config || {};
-    const gallosPorPartido = config.gallosPorPartido || 3;
-    const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
-    
-    if (datosPosicion.length === 0) {
-        container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p><p>Califica peleas para ver la tabla</p></div>`;
-        return;
-    }
-    
-    let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
-    
-    // CABECERA PRINCIPAL
-    html += `<thead>`;
-    html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
-    html += `<th style="padding: 12px 8px; text-align: center; width: 50px; background: #8B4513; color: white;">#</th>`;
-    html += `<th style="padding: 12px 8px; text-align: left; background: #8B4513; color: white;">Partido</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center; background: #8B4513; color: white;" colspan="${gallosPorPartido * 2}"># COMBATES</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center; background: #8B4513; color: white;" rowspan="2">Puntos</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center; background: #8B4513; color: white;" rowspan="2">Tiempos</th>`;
-    html += `</tr>`;
-    
-    // FILA DE SUBTÍTULOS DE GALLOS
-    html += `<tr style="background: #A0522D;">`;
-    html += `<th style="padding: 8px 4px; background: #A0522D; color: white;"></th>`;
-    html += `<th style="padding: 8px 4px; background: #A0522D; color: white;"></th>`;
-    for (let i = 0; i < gallosPorPartido; i++) {
-        html += `<th style="padding: 8px 4px; text-align: center; background: #A0522D; color: white;" colspan="2">Gallo ${i+1}</th>`;
-    }
-    html += `<th style="padding: 8px 4px; background: #A0522D; color: white;"></th>`;
-    html += `<th style="padding: 8px 4px; background: #A0522D; color: white;"></th>`;
-    html += `</tr>`;
-    
-    // FILA DE PTS / TPO
-    html += `<tr style="background: #CD853F;">`;
-    html += `<th style="padding: 4px 8px; background: #CD853F; color: white;"></th>`;
-    html += `<th style="padding: 4px 8px; background: #CD853F; color: white;"></th>`;
-    for (let i = 0; i < gallosPorPartido; i++) {
-        html += `<th style="padding: 4px 4px; text-align: center; background: #CD853F; color: white;">Pts</th>`;
-        html += `<th style="padding: 4px 4px; text-align: center; background: #CD853F; color: white;">Tpo</th>`;
-    }
-    html += `<th style="padding: 4px 8px; background: #CD853F; color: white;"></th>`;
-    html += `<th style="padding: 4px 8px; background: #CD853F; color: white;"></th>`;
-    html += `</tr></thead><tbody>`;
-    
-    // CUERPO DE LA TABLA
-    datosPosicion.forEach((item, idx) => {
-        const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
-        html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
+        const container = document.getElementById('posicionContainer');
         
-        // # consecutivo
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${idx + 1}<\/td>`;
-        
-        // Nombre del partido
-        html += `<td style="padding: 12px 8px; font-weight: 900; text-align: left;">${escapeHTML(item.nombre)}<\/td>`;
-        
-        // Pts y Tpo de cada gallo
-        for (let i = 1; i <= gallosPorPartido; i++) {
-            const puntos = item[`gallo${i}_puntos`];
-            const tiempo = item[`gallo${i}_tiempo`];
-            
-            if (puntos === undefined || puntos === null) {
-                // Sin datos
-                html += `<td style="padding: 12px 8px; text-align: center;"><\/td>`;
-                html += `<td style="padding: 12px 8px; text-align: center;"><\/td>`;
-            } else {
-                // Determinar la clase según el puntaje
-                let clase = '';
-                if (puntos === puntosConf.ganador) clase = 'puntos-ganador';
-                else if (puntos === puntosConf.empate) clase = 'puntos-empate';
-                else if (puntos === puntosConf.perdedor) clase = 'puntos-perdedor';
-                
-                // Celda PTS con color
-                html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${puntos}<\/td>`;
-                // Celda TPO con EL MISMO COLOR
-                html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${formatTiempo(tiempo)}<\/td>`;
-            }
+        if (!torneoActual) {
+            container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p></div>`;
+            return;
         }
         
-        // Puntos totales del partido
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}<\/td>`;
+        const datosPosicion = procesarTablaPosicion(torneoActual);
+        const config = torneoActual.infoTorneo?.config || {};
+        const gallosPorPartido = config.gallosPorPartido || 3;
+        const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
         
-        // Tiempo total del partido
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}<\/td>`;
+        if (datosPosicion.length === 0) {
+            container.innerHTML = `<div class="no-data"><span>🏆</span><p>No hay datos de posición</p><p>Califica peleas para ver la tabla</p></div>`;
+            return;
+        }
         
-        html += `</tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
+        let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
+        html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
+        html += `<th style="padding: 12px 8px; text-align: left;" rowspan="2">Partido</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;" colspan="${gallosPorPartido * 2}"># COMBATES</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;" rowspan="2">Puntos</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;" rowspan="2">Tiempos</th>`;
+        html += `</tr><tr style="background: #A0522D;">`;
+        for (let i = 0; i < gallosPorPartido; i++) {
+            html += `<th style="padding: 8px 4px; text-align: center;" colspan="2">Gallo ${i+1}</th>`;
+        }
+        html += `</tr><tr style="background: #CD853F;">`;
+        html += `<th style="padding: 4px 8px;"></th>`;
+        for (let i = 0; i < gallosPorPartido; i++) {
+            html += `<th style="padding: 4px 4px; text-align: center;">Pts</th>`;
+            html += `<th style="padding: 4px 4px; text-align: center;">Tpo</th>`;
+        }
+        html += `<th style="padding: 4px 8px;"></th><th style="padding: 4px 8px;"></th></tr></thead><tbody>`;
+        
+        datosPosicion.forEach((item, idx) => {
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+            html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
+            html += `<td style="padding: 12px 8px; font-weight: 900;">${escapeHTML(item.nombre)}</td>`;
+            
+            for (let i = 1; i <= gallosPorPartido; i++) {
+                const puntos = item[`gallo${i}_puntos`];
+                const tiempo = item[`gallo${i}_tiempo`];
+                if (puntos === undefined) {
+                    html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
+                    html += `<td style="padding: 12px 8px; text-align: center;"></td>`;
+                } else {
+                    let clase = '';
+                    if (puntos === puntosConf.ganador) clase = 'puntos-ganador';
+                    else if (puntos === puntosConf.empate) clase = 'puntos-empate';
+                    else if (puntos === puntosConf.perdedor) clase = 'puntos-perdedor';
+                    html += `<td style="padding: 12px 8px; text-align: center;" class="${clase}">${puntos}</td>`;
+                    html += `<td style="padding: 12px 8px; text-align: center;">${formatTiempo(tiempo)}</td>`;
+                }
+            }
+            
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
     
     // ==============================================
     // RENDERIZAR TABLA SERIAL (ACUMULADO)
     // ==============================================
     function renderizarTablaSerial() {
-    const container = document.getElementById('serialContainer');
-    const datosSerial = procesarTablaSerial();
-    
-    if (datosSerial.length === 0 || torneos.length < 2) {
-        container.innerHTML = `<div class="no-data"><span>🔗</span><p>No hay datos de serial</p><p>Importa al menos 2 torneos para ver el acumulado</p></div>`;
-        return;
+        const container = document.getElementById('serialContainer');
+        const datosSerial = procesarTablaSerial();
+        
+        if (datosSerial.length === 0 || torneos.length < 2) {
+            container.innerHTML = `<div class="no-data"><span>🔗</span><p>No hay datos de serial</p><p>Importa al menos 2 torneos para ver el acumulado</p></div>`;
+            return;
+        }
+        
+        let html = `<table class="serial-table" style="width:100%; border-collapse: collapse;">`;
+        html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black; background: #2E7D32; color: white;">`;
+        html += `<th style="padding: 12px 8px; text-align: left;">Partido</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;">Torneos</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;">Victorias</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;">Empates</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;">Derrotas</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;">Total Puntos</th>`;
+        html += `<th style="padding: 12px 8px; text-align: center;">Tiempo Total</th>`;
+        html += `</tr></thead><tbody>`;
+        
+        datosSerial.forEach((item, idx) => {
+            const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+            html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
+            html += `<td style="padding: 12px 8px; font-weight: 600;">${escapeHTML(item.nombre)}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: bold;">${item.torneosParticipados}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; color: #4CAF50; font-weight: bold;">${item.victorias}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; color: #FF9800; font-weight: bold;">${item.empates}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; color: #f44336; font-weight: bold;">${item.derrotas}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
+            html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
     }
-    
-    let html = `<table class="serial-table" style="width:100%; border-collapse: collapse;">`;
-    html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black; background: #2E7D32; color: white;">`;
-    html += `<th style="padding: 12px 8px; text-align: center; width: 50px;">#</th>`;
-    html += `<th style="padding: 12px 8px; text-align: left;">Partido</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;">Torneos</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;">Victorias</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;">Empates</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;">Derrotas</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;">Total Puntos</th>`;
-    html += `<th style="padding: 12px 8px; text-align: center;">Tiempo Total</th>`;
-    html += `</tr></thead><tbody>`;
-    
-    datosSerial.forEach((item, idx) => {
-        const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
-        html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${idx + 1}</td>`;
-        html += `<td style="padding: 12px 8px; font-weight: 600; text-align: left;">${escapeHTML(item.nombre)}<\/td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: bold;">${item.torneosParticipados}<\/td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; color: #4CAF50; font-weight: bold;">${item.victorias}<\/td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; color: #FF9800; font-weight: bold;">${item.empates}<\/td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; color: #f44336; font-weight: bold;">${item.derrotas}<\/td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}<\/td>`;
-        html += `<td style="padding: 12px 8px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}<\/td>`;
-        html += `</tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
     
     // ==============================================
     // ACTUALIZAR TODO
@@ -1600,7 +1556,7 @@
         // 1. Eliminar del Map global
         calificacionesGlobales.delete(calKey);
         
-        // 2. Actualizar la pelea dentro del torneo en la lista de torneos
+        // 2. Actualizar la pelea dentro del torneo
         const torneoIndex = torneos.findIndex(t => t.id === torneoId);
         if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
             const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
