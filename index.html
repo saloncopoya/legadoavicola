@@ -584,70 +584,69 @@
 <!-- CONTENEDOR PRINCIPAL -->
 <div class="main-container">
     
-    <!-- PESTAÑA COTEJO -->
-    <div id="cotejoContent" class="tab-content active">
-        <!-- Sección colapsable: Importar Torneos -->
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
-                <h3><span>📥</span> IMPORTAR TORNEOS</h3>
-                <span class="toggle-icon" id="import-toggle-icon">▼</span>
-            </div>
-            <div id="import-section" class="collapsible-content">
-                <div class="file-input-group">
-                    <input type="file" id="jsonFileInput" accept=".json" multiple>
-                    <button class="btn-primary" onclick="importarJSONs()">📤 IMPORTAR SELECCIONADOS</button>
-                    <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ LIMPIAR TODO</button>
-                </div>
-                <div id="torneosLista" style="margin-top: 15px;"></div>
-                <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                    <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
-                </div>
-            </div>
+  <!-- PESTAÑA COTEJO -->
+<div id="cotejoContent" class="tab-content active">
+    
+    <!-- TABLA DE COTEJO (AHORA PRIMERO) -->
+    <div class="table-container" id="cotejoContainer">
+        <div class="no-data">
+            <span>⚡</span>
+            <p>No hay datos de cotejo</p>
+            <p style="font-size: 12px;">Importa uno o más archivos JSON para comenzar</p>
         </div>
-        
-       
-        
-        <!-- Controles de visualización para la tabla -->
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('visual-section')">
-                <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
-                <span class="toggle-icon" id="visual-toggle-icon">▼</span>
-            </div>
-            <div id="visual-section" class="collapsible-content">
-                <div class="view-controls">
-                    <label>🔤 Tamaño de letra:</label>
-                    <input type="range" id="fontSizeSlider" min="10" max="24" value="14" onchange="cambiarTamañoLetra()">
-                    <span id="fontSizeValue">14px</span>
-                    
-                    <label>🎨 Tipo de letra:</label>
-                    <select id="fontFamilySelect" onchange="cambiarTipoLetra()">
-                        <option value="'Segoe UI', Roboto, system-ui">Segoe UI</option>
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="'Courier New', monospace">Courier New</option>
-                        <option value="Georgia, serif">Georgia</option>
-                        <option value="'Times New Roman', serif">Times New Roman</option>
-                    </select>
-                    
-                    <label>📏 Ancho mínimo:</label>
-                    <input type="range" id="minWidthSlider" min="700" max="1400" value="900" onchange="cambiarAnchoMinimo()">
-                    <span id="minWidthValue">900px</span>
-                </div>
-                <div class="btn-group">
-                    <button class="btn-primary" onclick="descargarTablaComoPDF('cotejo')">📄 DESCARGAR COTEJO (PDF)</button>
-                    <button class="btn-primary" onclick="descargarTablaComoJPG('cotejo')">🖼️ DESCARGAR COTEJO (JPG)</button>
-                </div>
-            </div>
+    </div>
+    
+    <!-- SECCIÓN: IMPORTAR TORNEOS (AHORA DESPUÉS DE LA TABLA) -->
+    <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
+            <h3><span>📥</span> IMPORTAR TORNEOS</h3>
+            <span class="toggle-icon" id="import-toggle-icon">▼</span>
         </div>
-        
-        <!-- Tabla de Cotejo -->
-        <div class="table-container" id="cotejoContainer">
-            <div class="no-data">
-                <span>⚡</span>
-                <p>No hay datos de cotejo</p>
-                <p style="font-size: 12px;">Importa uno o más archivos JSON para comenzar</p>
+        <div id="import-section" class="collapsible-content">
+            <div class="file-input-group">
+                <input type="file" id="jsonFileInput" accept=".json" multiple>
+                <button class="btn-primary" onclick="importarJSONs()">📤 IMPORTAR SELECCIONADOS</button>
+                <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ LIMPIAR TODO</button>
+            </div>
+            <div id="torneosLista" style="margin-top: 15px;"></div>
+            <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
             </div>
         </div>
     </div>
+    
+    <!-- SECCIÓN: VISUALIZACIÓN DE TABLA (AHORA DESPUÉS DE IMPORTAR) -->
+    <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapsible('visual-section')">
+            <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
+            <span class="toggle-icon" id="visual-toggle-icon">▼</span>
+        </div>
+        <div id="visual-section" class="collapsible-content">
+            <div class="view-controls">
+                <label>🔤 Tamaño de letra:</label>
+                <input type="range" id="fontSizeSlider" min="10" max="24" value="14" onchange="cambiarTamañoLetra()">
+                <span id="fontSizeValue">14px</span>
+                
+                <label>🎨 Tipo de letra:</label>
+                <select id="fontFamilySelect" onchange="cambiarTipoLetra()">
+                    <option value="'Segoe UI', Roboto, system-ui">Segoe UI</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                </select>
+                
+                <label>📏 Ancho mínimo:</label>
+                <input type="range" id="minWidthSlider" min="700" max="1400" value="900" onchange="cambiarAnchoMinimo()">
+                <span id="minWidthValue">900px</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="descargarTablaComoPDF('cotejo')">📄 DESCARGAR COTEJO (PDF)</button>
+                <button class="btn-primary" onclick="descargarTablaComoJPG('cotejo')">🖼️ DESCARGAR COTEJO (JPG)</button>
+            </div>
+        </div>
+    </div>
+</div>
     
     <!-- PESTAÑA POSICIONES -->
     <div id="posicionContent" class="tab-content">
