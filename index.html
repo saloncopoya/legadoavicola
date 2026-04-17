@@ -1622,10 +1622,23 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
 }
     
     function guardarCalificacionesEnLocalStorage() {
-        const calArray = Array.from(calificacionesGlobales.entries());
-        localStorage.setItem('cotejoOffline_calificaciones', JSON.stringify(calArray));
-        localStorage.setItem('cotejoOffline_torneos', JSON.stringify(torneos));
+    const calArray = Array.from(calificacionesGlobales.entries());
+    localStorage.setItem('cotejoOffline_calificaciones', JSON.stringify(calArray));
+    localStorage.setItem('cotejoOffline_torneos', JSON.stringify(torneos));
+    
+    // 🔥 FORZAR un evento storage manual para la misma ventana (opcional)
+    // Esto asegura que incluso en la misma ventana se comporta igual
+    if (typeof window.dispatchEvent === 'function') {
+        const event = new StorageEvent('storage', {
+            key: 'cotejoOffline_calificaciones',
+            newValue: JSON.stringify(calArray),
+            oldValue: null,
+            storageArea: localStorage
+        });
+        window.dispatchEvent(event);
     }
+}
+    
     
     function cargarCalificacionesDeLocalStorage() {
     const savedCal = localStorage.getItem('cotejoOffline_calificaciones');
@@ -1650,6 +1663,160 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
             }
         } catch(e) { console.error('Error cargando torneos:', e); }
     }
+}
+
+
+
+    // ==============================================
+// SINCRONIZACIÓN ENTRE PESTAÑAS (MULTI-VENTANA)
+// ==============================================
+
+// Función que se ejecuta cuando otra pestaña modifica localStorage
+window.addEventListener('storage', function(event) {
+    console.log('📡 Cambio detectado en localStorage:', event.key);
+    
+    if (event.key === 'cotejoOffline_calificaciones') {
+        console.log('🔄 Sincronizando calificaciones desde otra ventana...');
+        
+        // Recargar calificaciones desde localStorage
+        try {
+            const nuevasCalificaciones = JSON.parse(event.newValue);
+            if (nuevasCalificaciones) {
+                calificacionesGlobales.clear();
+                nuevasCalificaciones.forEach(([key, val]) => {
+                    calificacionesGlobales.set(key, val);
+                });
+                console.log(`✅ Calificaciones sincronizadas: ${calificacionesGlobales.size}`);
+            }
+        } catch(e) {
+            console.error('Error sincronizando calificaciones:', e);
+        }
+        
+        // Actualizar todas las tablas
+        actualizarTodasLasTablasMultiVentana();
+    }
+    
+    if (event.key === 'cotejoOffline_torneos') {
+        console.log('🔄 Sincronizando torneos desde otra ventana...');
+        
+        // Recargar torneos desde localStorage
+        try {
+            const nuevosTorneos = JSON.parse(event.newValue);
+            if (nuevosTorneos) {
+                torneos = nuevosTorneos;
+                
+                // Mantener el torneoActual si es posible
+                if (torneoActual && torneos.length > 0) {
+                    const torneoEncontrado = torneos.find(t => t.infoTorneo.id === torneoActual.infoTorneo.id);
+                    if (torneoEncontrado) {
+                        torneoActual = torneoEncontrado;
+                    } else {
+                        torneoActual = torneos[0];
+                    }
+                }
+                console.log(`✅ Torneos sincronizados: ${torneos.length}`);
+            }
+        } catch(e) {
+            console.error('Error sincronizando torneos:', e);
+        }
+        
+        // Actualizar todas las tablas
+        actualizarTodasLasTablasMultiVentana();
+    }
+});
+
+// Función centralizada para actualizar TODO en multi-ventana
+function actualizarTodasLasTablasMultiVentana() {
+    console.log('🔄 Actualizando interfaz por cambio desde otra ventana...');
+    
+    // Actualizar selector de torneos
+    actualizarSelectoresCalificacion();
+    
+    // Actualizar combobox de peleas si hay torneo actual
+    if (torneoActual) {
+        actualizarComboboxPeleas();
+    }
+    
+    // Actualizar todas las tablas
+    renderizarTablaCotejo();
+    renderizarTablaPosiciones();
+    renderizarTablaSerial();
+    
+    // Actualizar lista de torneos en UI
+    actualizarListaTorneosUI();
+    
+    // Si hay una pelea seleccionada actualmente, recargar su información
+    if (peleaSeleccionada && torneoActual) {
+        const calKey = `${torneoActual.infoTorneo.id}_${peleaSeleccionada.indice}`;
+        const nuevaCalificacion = calificacionesGlobales.get(calKey);
+        if (nuevaCalificacion) {
+            // Actualizar la información mostrada
+            const infoAnterior = document.getElementById('infoAnterior');
+            const calificacionForm = document.getElementById('calificacionForm');
+            
+            if (nuevaCalificacion) {
+                const pelea = torneoActual.resultadosCotejo.peleas[peleaSeleccionada.indice];
+                let ganadorTexto = '';
+                if (nuevaCalificacion.ganador === 'rojo') ganadorTexto = `🔴 ${pelea.gallo1.partido}`;
+                else if (nuevaCalificacion.ganador === 'verde') ganadorTexto = `🟢 ${pelea.gallo2.partido}`;
+                else if (nuevaCalificacion.ganador === 'empate') ganadorTexto = '🤝 TABLA';
+                
+                if (infoAnterior) {
+                    infoAnterior.innerHTML = `
+                        <div style="font-weight:600; margin-bottom:8px;">⚠️ Esta pelea ya fue calificada (sincronizado):</div>
+                        <div><strong>Ganador:</strong> ${ganadorTexto}</div>
+                        <div><strong>Tiempo:</strong> ${nuevaCalificacion.tiempo}</div>
+                        <div><strong>Fecha:</strong> ${nuevaCalificacion.fechaCalificacion || 'desconocida'}</div>
+                        <div style="margin-top:10px; display:flex; gap:10px;">
+                            <button onclick="confirmarReCalificar()" style="background:#ff9800; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">✏️ VOLVER A CALIFICAR</button>
+                            <button onclick="eliminarCalificacion()" style="background:#f44336; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">🗑️ ELIMINAR</button>
+                        </div>
+                    `;
+                    infoAnterior.style.display = 'block';
+                    if (calificacionForm) calificacionForm.style.display = 'none';
+                }
+            }
+        }
+    }
+    
+    // Mostrar notificación visual opcional (opcional)
+    mostrarNotificacionSincronizacion();
+}
+
+// Notificación visual opcional para que el usuario sepa que hubo cambios
+let notificacionTimeout;
+function mostrarNotificacionSincronizacion() {
+    // Crear o obtener elemento de notificación
+    let notif = document.getElementById('sincronizacionNotificacion');
+    if (!notif) {
+        notif = document.createElement('div');
+        notif.id = 'sincronizacionNotificacion';
+        notif.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        `;
+        notif.innerHTML = '🔄 Datos sincronizados desde otra ventana';
+        document.body.appendChild(notif);
+    }
+    
+    // Mostrar notificación
+    clearTimeout(notificacionTimeout);
+    notif.style.opacity = '1';
+    notificacionTimeout = setTimeout(() => {
+        notif.style.opacity = '0';
+    }, 2000);
 }
     // ==============================================
     // IMPORTAR JSONs (MÚLTIPLES)
