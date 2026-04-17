@@ -519,31 +519,10 @@
     </button>
 </div>
 
-<!-- CONTENEDOR PRINCIPAL -->
-<div class="main-container">
-    
-    <!-- PESTAÑA COTEJO -->
-    <div id="cotejoContent" class="tab-content active">
-        <!-- Sección colapsable: Importar Torneos -->
-        <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
-                <h3><span>📥</span> IMPORTAR TORNEOS</h3>
-                <span class="toggle-icon" id="import-toggle-icon">▼</span>
-            </div>
-            <div id="import-section" class="collapsible-content">
-                <div class="file-input-group">
-                    <input type="file" id="jsonFileInput" accept=".json" multiple>
-                    <button class="btn-primary" onclick="importarJSONs()">📤 IMPORTAR SELECCIONADOS</button>
-                    <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ LIMPIAR TODO</button>
-                </div>
-                <div id="torneosLista" style="margin-top: 15px;"></div>
-                <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                    <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sección colapsable: Calificar Peleas -->
+
+
+
+     <!-- Sección colapsable: Calificar Peleas -->
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('calificacion-section')">
                 <h3><span>🏆</span> CALIFICAR PELEAS</h3>
@@ -582,6 +561,34 @@
                 <div id="mensajeTodas" style="display: none; background: #4CAF50; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 15px;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
             </div>
         </div>
+
+
+    
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="main-container">
+    
+    <!-- PESTAÑA COTEJO -->
+    <div id="cotejoContent" class="tab-content active">
+        <!-- Sección colapsable: Importar Torneos -->
+        <div class="collapsible-section">
+            <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
+                <h3><span>📥</span> IMPORTAR TORNEOS</h3>
+                <span class="toggle-icon" id="import-toggle-icon">▼</span>
+            </div>
+            <div id="import-section" class="collapsible-content">
+                <div class="file-input-group">
+                    <input type="file" id="jsonFileInput" accept=".json" multiple>
+                    <button class="btn-primary" onclick="importarJSONs()">📤 IMPORTAR SELECCIONADOS</button>
+                    <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ LIMPIAR TODO</button>
+                </div>
+                <div id="torneosLista" style="margin-top: 15px;"></div>
+                <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
+                </div>
+            </div>
+        </div>
+        
+       
         
         <!-- Controles de visualización para la tabla -->
         <div class="collapsible-section">
