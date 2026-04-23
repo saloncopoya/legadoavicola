@@ -583,13 +583,37 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin: 0;
 }
+
+
+        /* Estilos para TOP 3 */
+#topThreeSectionGlobal {
+    background: linear-gradient(135deg, #FFD700, #FFC107);
+}
+.top-card {
+    transition: transform 0.2s;
+}
+.top-card:hover {
+    transform: translateY(-5px);
+}
+        
     </style>
 </head>
 <body>
 
 
 
+<!-- ===== SECCIÓN AMARILLA TOP 3 ===== -->
+<div style="background: #FFD700; padding: 20px; text-align: center; margin: 0; border-bottom: 3px solid #E6B800;" id="topThreeSectionGlobal">
+    <h2 style="margin: 0 0 15px 0; color: #7A5C00;">⚡ TOP 3 PELEAS MÁS RÁPIDAS (SOLO GANADORES) ⚡</h2>
+    <div id="top3CardsGlobal" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+        <div style="background: white; padding: 15px 25px; border-radius: 15px; min-width: 200px;">
+            <div style="font-size: 24px;">🥇</div>
+            <div style="font-weight: bold;">Cargando...</div>
+        </div>
+    </div>
+</div>
 
+    
 
 
  <!-- Sección colapsable: Calificar Peleas -->
@@ -1395,6 +1419,103 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
         }
     }
 
+
+        // ==============================================
+    // FUNCIÓN TOP 3 MÁS RÁPIDAS
+    // ==============================================
+    function actualizarTop3Rapidas() {
+        const container = document.getElementById('top3CardsGlobal');
+        if (!container) return;
+        
+        // Recolectar todas las peleas calificadas con GANADOR (no empate)
+        let peleasCalificadas = [];
+        
+        torneos.forEach(torneo => {
+            if (!torneo.resultadosCotejo?.peleas) return;
+            
+            const peleas = torneo.resultadosCotejo.peleas;
+            peleas.forEach((pelea, index) => {
+                const calKey = `${torneo.infoTorneo.id}_${index}`;
+                const cal = calificacionesGlobales.get(calKey);
+                
+                // Solo incluir si está calificada, NO es empate, y tiene tiempo
+                if (cal && cal.ganador !== 'empate' && cal.tiempo) {
+                    // Convertir tiempo MM:SS a segundos para ordenar
+                    const partes = cal.tiempo.split(':');
+                    const segundos = parseInt(partes[0]) * 60 + parseInt(partes[1]);
+                    
+                    // Determinar nombre del ganador
+                    let nombreGanador = '';
+                    if (cal.ganador === 'rojo') {
+                        nombreGanador = pelea.gallo1?.partido || 'Desconocido';
+                    } else if (cal.ganador === 'verde') {
+                        nombreGanador = pelea.gallo2?.partido || 'Desconocido';
+                    }
+                    
+                    peleasCalificadas.push({
+                        numeroPelea: pelea.numero || (index + 1),
+                        ganador: nombreGanador,
+                        tiempo: cal.tiempo,
+                        segundos: segundos,
+                        torneoNombre: torneo.infoTorneo?.nombre || 'Torneo'
+                    });
+                }
+            });
+        });
+        
+        // Ordenar por tiempo (menor a mayor) y tomar top 3
+        peleasCalificadas.sort((a, b) => a.segundos - b.segundos);
+        const top3 = peleasCalificadas.slice(0, 3);
+        
+        // Medallas y colores
+        const medallas = ['🥇', '🥈', '🥉'];
+        const coloresBorde = ['#FFD700', '#C0C0C0', '#CD7F32'];
+        
+        if (top3.length === 0) {
+            container.innerHTML = `<div style="background: white; padding: 20px; border-radius: 15px;">Aún no hay peleas calificadas con ganador</div>`;
+            return;
+        }
+        
+        let html = '';
+        top3.forEach((pelea, idx) => {
+            html += `
+                <div class="top-card" style="background: white; padding: 15px 25px; border-radius: 15px; min-width: 200px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border-left: 6px solid ${coloresBorde[idx]}; text-align: center;">
+                    <div style="font-size: 32px;">${medallas[idx]}</div>
+                    <div style="font-size: 14px; color: #888;"># Pelea ${pelea.numeroPelea}</div>
+                    <div style="font-size: 20px; font-weight: bold; margin: 8px 0;">${pelea.ganador}</div>
+                    <div style="font-size: 18px; color: #E6A017; font-weight: bold;">⏱️ ${pelea.tiempo}</div>
+                    <div style="font-size: 11px; color: #999; margin-top: 5px;">${pelea.torneoNombre}</div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Modificar la función actualizarTodo para que también actualice el TOP 3
+    const actualizarTodoOriginal = actualizarTodo;
+    actualizarTodo = function() {
+        actualizarTodoOriginal();
+        actualizarTop3Rapidas();
+    };
+    
+    // También actualizar después de calificar
+    const calificarPeleaOriginal = calificarPelea;
+    calificarPelea = function() {
+        calificarPeleaOriginal();
+        actualizarTop3Rapidas();
+    };
+    
+    // También actualizar después de eliminar calificación
+    const eliminarCalificacionOriginal = eliminarCalificacion;
+    eliminarCalificacion = function() {
+        eliminarCalificacionOriginal();
+        actualizarTop3Rapidas();
+    };
+    
+    // Llamar una vez al inicio
+    setTimeout(() => actualizarTop3Rapidas(), 500);
+    
 
     // ==============================================
 // ACTUALIZAR BADGE DEL TORNEO ACTUAL EN CABECERA
