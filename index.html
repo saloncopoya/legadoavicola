@@ -1615,16 +1615,14 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
                 const p = top4[i];
                 html += `
                     <div class="top4-card" style="background: white; border-radius: 10px; padding: 6px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-                        <div style="font-size: 24px; font-weight: bold; color: ${coloresNum[i]};">${i+1}</div>
-                        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 4px 0; white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
-                        <div style="font-size: 10px; color: #E6A017; font-weight: 600;">⏱️ ${p.tiempo}</div>
+                        <div style="font-size: 25px; font-weight: 800; text-transform: uppercase; margin: 4px 0; white-space: normal; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
+                        <div style="font-size: 25px; color: #E6A017; font-weight: 600;">⏱️ ${p.tiempo}</div>
                     </div>
                 `;
             } else {
                 html += `
                     <div class="top4-card" style="background: #fafafa; border-radius: 10px; padding: 6px 4px; text-align: center; border: 1px dashed #ddd;">
-                        <div style="font-size: 24px; font-weight: bold; color: ${coloresNum[i]};">${i+1}</div>
-                        <div style="font-size: 10px; color: #bbb;">---</div>
+                        <div style="font-size: 25px; color: #bbb;">---</div>
                     </div>
                 `;
             }
