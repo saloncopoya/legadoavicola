@@ -1614,9 +1614,9 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
             if (top4[i]) {
                 const p = top4[i];
                 html += `
-                    <div class="top4-card" style="background: white; border-radius: 10px; padding: 6px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-                        <div style="font-size: 25px; font-weight: 800; text-transform: uppercase; margin: 4px 0; white-space: normal; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
-                        <div style="font-size: 25px; color: #E6A017; font-weight: 600;">⏱️ ${p.tiempo}</div>
+                    <div class="top4-card" style="background: white; border-radius: 50px; padding: 1px 1px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 22px; font-weight: 800; text-transform: uppercase; margin: 4px 0; white-space: normal; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
+                        <div style="font-size: 33px; color: #E6A017; font-weight: 900;">⏱️ ${p.tiempo}</div>
                     </div>
                 `;
             } else {
