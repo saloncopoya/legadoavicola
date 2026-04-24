@@ -1450,6 +1450,8 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         renderizarTablaSerial();
         actualizarListaTorneosUI();
         actualizarSelectoresCalificacion();
+            actualizarTop4Rapidas();  // 🔥 AGREGAR ESTA LÍNEA
+
     }
     
     function actualizarListaTorneosUI() {
@@ -2034,6 +2036,7 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
     
     
     function cargarCalificacionesDeLocalStorage() {
+
     const savedCal = localStorage.getItem('cotejoOffline_calificaciones');
     if (savedCal) {
         try {
@@ -2056,6 +2059,8 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
             }
         } catch(e) { console.error('Error cargando torneos:', e); }
     }
+            setTimeout(() => actualizarTop4Rapidas(), 500);
+
 }
 
 
