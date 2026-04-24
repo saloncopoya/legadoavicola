@@ -1944,6 +1944,8 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
 
             actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 
+            actualizarTop4Rapidas();
+
         
     // Limpiar referencia
     peleaSeleccionada = null;
@@ -2013,6 +2015,8 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
 
         
         alert('✅ Calificación eliminada');
+            actualizarTop4Rapidas();
+
     }
 }
     
@@ -2314,6 +2318,8 @@ function mostrarNotificacionSincronizacion() {
                     }
                     
                     actualizarTodo();
+                    actualizarTop4Rapidas();
+
                     guardarCalificacionesEnLocalStorage();
                             actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 
@@ -2570,6 +2576,7 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     actualizarTodo();
     actualizarEstadoOffline();
     actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
+setTimeout(() => actualizarTop4Rapidas(), 300);
 
     
     // PWA Installation
