@@ -685,8 +685,8 @@
     <div class="collapsible-header" onclick="toggleCollapsible('calificacion-section')">
         <h3>
             <span>🏆</span> 
-            CALIFICAR:
-            <span id="torneoActualBadge" style="display: none; font-size: 29px; background: #8B4513; color: white; padding: 4px 12px; border-radius: 20px; margin-left: 12px;"></span>
+            CALIFICAR PELEA:
+            <span id="torneoActualBadge" style="display: none; font-size: 13px; background: #8B4513; color: white; padding: 4px 12px; border-radius: 20px; margin-left: 12px;"></span>
         </h3>
         <span class="toggle-icon" id="calificacion-toggle-icon">▼</span>
     </div>
@@ -739,11 +739,7 @@
     </div>
     
     <!-- Título MÁS RÁPIDAS TOP 4 -->
-    <div style="text-align: center; margin: 10px 0 8px 0;">
-        <span style="font-size: 16px; font-weight: 800; color: #5D3A00; background: rgba(0,0,0,0.05); padding: 4px 16px; border-radius: 20px;">⚡ MÁS RÁPIDAS TOP 4 ⚡</span>
-    </div>
-    
-    <!-- CONTENEDOR DE 4 COLUMNAS EN UNA SOLA FILA -->
+<!-- CONTENEDOR DE 4 COLUMNAS EN UNA SOLA FILA -->
     <div id="top4CardsContainer" style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; margin-top: 5px;">
         <!-- Tarjeta 1 -->
         <div class="top4-card" style="background: white; border-radius: 10px; padding: 8px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
@@ -1543,7 +1539,7 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
             const club = info.club || '';
             
             torneoInfoDiv.innerHTML = `
-                <div style="font-size: 20px; font-weight: 900; color: #5D3A00; letter-spacing: -0.5px;">${nombreTorneo.toUpperCase()}</div>
+                <div style="font-size: 40px; font-weight: 900; color: #5D3A00; letter-spacing: -0.5px;">${nombreTorneo.toUpperCase()}</div>
                 <div style="font-size: 13px; font-weight: 600; color: #7A5C00;">${responsable} ${ciudad ? '· ' + ciudad : ''} ${club ? '· ' + club : ''}</div>
             `;
         } else {
