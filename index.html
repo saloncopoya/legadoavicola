@@ -667,30 +667,65 @@
         font-size: 11px;
     }
 }   
+
+
+        /* Para que en móvil se vea bien */
+@media (max-width: 500px) {
+    #top4CardsContainer {
+        gap: 6px !important;
+    }
+    .top4-card div:first-child {
+        font-size: 18px !important;
+    }
+    .top4-card div:nth-child(2) {
+        font-size: 9px !important;
+    }
+}
     </style>
 </head>
 <body>
 
 
 
-<!-- ===== SECCIÓN AMARILLA TOP 3 - RESPONSIVA UNA FILA ===== -->
-<div style="background: linear-gradient(135deg, #FFD700, #FFC107); padding: 8px 12px; border-bottom: 3px solid #E6B800;" id="topThreeSectionGlobal">
-    <h2 style="margin: 0 0 6px 0; font-size: 14px; color: #7A5C00; text-align: center;">⚡ TOP 3 MÁS RÁPIDAS (SOLO GANADORES) ⚡</h2>
-    <div id="top3CardsGlobal" style="display: flex; flex-direction: row; justify-content: center; gap: 12px; flex-wrap: nowrap; overflow-x: auto;">
-        <div class="top-card" style="flex: 1; background: white; border-radius: 12px; padding: 8px 6px; text-align: center;">
-            <div class="medalla">🥇</div>
-            <div class="fight-num">Cargando...</div>
+<!-- ===== SECCIÓN AMARILLA TOP 4 - ESTILO COMO EN LA IMAGEN ===== -->
+<div style="background: #FFD700; padding: 12px 16px; border-bottom: 3px solid #E6B800; font-family: 'Segoe UI', Arial, sans-serif;" id="topFourSectionGlobal">
+    
+    <!-- Título del Torneo (se actualiza dinámicamente) -->
+    <div id="torneoInfoTop" style="text-align: center; margin-bottom: 8px;">
+        <div style="font-size: 18px; font-weight: 800; color: #5D3A00;">CARGANDO TORNEO...</div>
+    </div>
+    
+    <!-- Título MÁS RÁPIDAS TOP 4 -->
+    <div style="text-align: center; margin: 10px 0 8px 0;">
+        <span style="font-size: 16px; font-weight: 800; color: #5D3A00; background: rgba(0,0,0,0.05); padding: 4px 16px; border-radius: 20px;">⚡ MÁS RÁPIDAS TOP 4 ⚡</span>
+    </div>
+    
+    <!-- CONTENEDOR DE 4 COLUMNAS EN UNA SOLA FILA -->
+    <div id="top4CardsContainer" style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; margin-top: 5px;">
+        <!-- Tarjeta 1 -->
+        <div class="top4-card" style="background: white; border-radius: 10px; padding: 8px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+            <div style="font-size: 22px; font-weight: bold; color: #E6A017;">1</div>
+            <div style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Cargando...</div>
         </div>
-        <div class="top-card" style="flex: 1; background: white; border-radius: 12px; padding: 8px 6px; text-align: center;">
-            <div class="medalla">🥈</div>
-            <div class="fight-num">Cargando...</div>
+        <!-- Tarjeta 2 -->
+        <div class="top4-card" style="background: white; border-radius: 10px; padding: 8px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+            <div style="font-size: 22px; font-weight: bold; color: #C0C0C0;">2</div>
+            <div style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Cargando...</div>
         </div>
-        <div class="top-card" style="flex: 1; background: white; border-radius: 12px; padding: 8px 6px; text-align: center;">
-            <div class="medalla">🥉</div>
-            <div class="fight-num">Cargando...</div>
+        <!-- Tarjeta 3 -->
+        <div class="top4-card" style="background: white; border-radius: 10px; padding: 8px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+            <div style="font-size: 22px; font-weight: bold; color: #CD7F32;">3</div>
+            <div style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Cargando...</div>
+        </div>
+        <!-- Tarjeta 4 -->
+        <div class="top4-card" style="background: white; border-radius: 10px; padding: 8px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+            <div style="font-size: 22px; font-weight: bold; color: #555;">4</div>
+            <div style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Cargando...</div>
         </div>
     </div>
 </div>
+
+    
 
 
     
@@ -1497,29 +1532,49 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
         }
     }
 
+
+
+        // ==============================================
+    // FUNCIÓN TOP 4 MÁS RÁPIDAS (CON INFO DEL TORNEO ACTUAL)
     // ==============================================
-    // FUNCIÓN TOP 3 MÁS RÁPIDAS
-    // ==============================================
-    function actualizarTop3Rapidas() {
-        const container = document.getElementById('top3CardsGlobal');
+    function actualizarTop4Rapidas() {
+        const container = document.getElementById('top4CardsContainer');
+        const torneoInfoDiv = document.getElementById('torneoInfoTop');
         if (!container) return;
         
-        // Recolectar todas las peleas calificadas con GANADOR (no empate)
+        // ========== 1. ACTUALIZAR INFO DEL TORNEO ACTUAL ==========
+        if (torneoActual && torneoActual.infoTorneo) {
+            const info = torneoActual.infoTorneo;
+            const nombreTorneo = info.nombre || 'TORNEO SIN NOMBRE';
+            const responsable = info.responsable || '';
+            const ciudad = info.ciudad || '';
+            const club = info.club || '';
+            
+            torneoInfoDiv.innerHTML = `
+                <div style="font-size: 20px; font-weight: 900; color: #5D3A00; letter-spacing: -0.5px;">${nombreTorneo.toUpperCase()}</div>
+                <div style="font-size: 13px; font-weight: 600; color: #7A5C00;">${responsable} ${ciudad ? '· ' + ciudad : ''} ${club ? '· ' + club : ''}</div>
+            `;
+        } else {
+            torneoInfoDiv.innerHTML = `<div style="font-size: 16px; font-weight: 800; color: #5D3A00;">SELECCIONA UN TORNEO</div>`;
+        }
+        
+        // ========== 2. RECOLECTAR PELEAS CALIFICADAS (SOLO GANADORES) ==========
         let peleasCalificadas = [];
         
-        torneos.forEach(torneo => {
-            if (!torneo.resultadosCotejo?.peleas) return;
-            
-            const peleas = torneo.resultadosCotejo.peleas;
+        // Solo del torneo ACTUAL (como en tu imagen)
+        if (torneoActual && torneoActual.resultadosCotejo?.peleas) {
+            const peleas = torneoActual.resultadosCotejo.peleas;
             peleas.forEach((pelea, index) => {
-                const calKey = `${torneo.infoTorneo.id}_${index}`;
+                const calKey = `${torneoActual.infoTorneo.id}_${index}`;
                 const cal = calificacionesGlobales.get(calKey);
                 
                 // Solo incluir si está calificada, NO es empate, y tiene tiempo
                 if (cal && cal.ganador !== 'empate' && cal.tiempo) {
-                    // Convertir tiempo MM:SS a segundos para ordenar
+                    // Convertir tiempo MM:SS a segundos
                     const partes = cal.tiempo.split(':');
-                    const segundos = parseInt(partes[0]) * 60 + parseInt(partes[1]);
+                    const minutos = parseInt(partes[0]);
+                    const segundos = parseInt(partes[1]);
+                    const totalSegundos = (minutos * 60) + segundos;
                     
                     // Determinar nombre del ganador
                     let nombreGanador = '';
@@ -1533,65 +1588,62 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
                         numeroPelea: pelea.numero || (index + 1),
                         ganador: nombreGanador,
                         tiempo: cal.tiempo,
-                        segundos: segundos,
-                        torneoNombre: torneo.infoTorneo?.nombre || 'Torneo'
+                        segundos: totalSegundos
                     });
                 }
             });
-        });
+        }
         
-        // Ordenar por tiempo (menor a mayor) y tomar top 3
+        // Ordenar por tiempo (menor a mayor) y tomar top 4
         peleasCalificadas.sort((a, b) => a.segundos - b.segundos);
-        const top3 = peleasCalificadas.slice(0, 3);
+        const top4 = peleasCalificadas.slice(0, 4);
         
-        // Medallas y colores
-        const medallas = ['🥇', '🥈', '🥉'];
-        const coloresBorde = ['#FFD700', '#C0C0C0', '#CD7F32'];
+        // Colores de números
+        const coloresNum = ['#E6A017', '#C0C0C0', '#CD7F32', '#555'];
         
-        if (top3.length === 0) {
-            container.innerHTML = `<div style="background: white; padding: 20px; border-radius: 15px;">Aún no hay peleas calificadas con ganador</div>`;
+        if (top4.length === 0) {
+            // Mostrar mensaje en las 4 tarjetas
+            let emptyHtml = '';
+            for (let i = 0; i < 4; i++) {
+                emptyHtml += `
+                    <div class="top4-card" style="background: #f5f5f5; border-radius: 10px; padding: 8px 4px; text-align: center;">
+                        <div style="font-size: 22px; font-weight: bold; color: ${coloresNum[i]};">${i+1}</div>
+                        <div style="font-size: 10px; color: #999;">SIN DATOS</div>
+                    </div>
+                `;
+            }
+            container.innerHTML = emptyHtml;
             return;
         }
         
+        // Generar las 4 tarjetas (si faltan, se rellenan con vacío)
         let html = '';
-        top3.forEach((pelea, idx) => {
-            html += `
-                <div class="top-card" style="background: white; padding: 15px 25px; border-radius: 15px; min-width: 200px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border-left: 6px solid ${coloresBorde[idx]}; text-align: center;">
-                    <div style="font-size: 32px;">${medallas[idx]}</div>
-                    <div style="font-size: 14px; color: #888;"># Pelea ${pelea.numeroPelea}</div>
-                    <div style="font-size: 20px; font-weight: bold; margin: 8px 0;">${pelea.ganador}</div>
-                    <div style="font-size: 18px; color: #E6A017; font-weight: bold;">⏱️ ${pelea.tiempo}</div>
-                    <div style="font-size: 11px; color: #999; margin-top: 5px;">${pelea.torneoNombre}</div>
-                </div>
-            `;
-        });
+        for (let i = 0; i < 4; i++) {
+            if (top4[i]) {
+                const p = top4[i];
+                html += `
+                    <div class="top4-card" style="background: white; border-radius: 10px; padding: 6px 4px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 24px; font-weight: bold; color: ${coloresNum[i]};">${i+1}</div>
+                        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 4px 0; white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
+                        <div style="font-size: 10px; color: #E6A017; font-weight: 600;">⏱️ ${p.tiempo}</div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="top4-card" style="background: #fafafa; border-radius: 10px; padding: 6px 4px; text-align: center; border: 1px dashed #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: ${coloresNum[i]};">${i+1}</div>
+                        <div style="font-size: 10px; color: #bbb;">---</div>
+                    </div>
+                `;
+            }
+        }
         
         container.innerHTML = html;
     }
+
+
+
     
-    // Modificar la función actualizarTodo para que también actualice el TOP 3
-    const actualizarTodoOriginal = actualizarTodo;
-    actualizarTodo = function() {
-        actualizarTodoOriginal();
-        actualizarTop3Rapidas();
-    };
-    
-    // También actualizar después de calificar
-    const calificarPeleaOriginal = calificarPelea;
-    calificarPelea = function() {
-        calificarPeleaOriginal();
-        actualizarTop3Rapidas();
-    };
-    
-    // También actualizar después de eliminar calificación
-    const eliminarCalificacionOriginal = eliminarCalificacion;
-    eliminarCalificacion = function() {
-        eliminarCalificacionOriginal();
-        actualizarTop3Rapidas();
-    };
-    
-    // Llamar una vez al inicio
-    setTimeout(() => actualizarTop3Rapidas(), 500);
     // ==============================================
 // ACTUALIZAR BADGE DEL TORNEO ACTUAL EN CABECERA
 // ==============================================
