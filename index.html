@@ -2440,6 +2440,23 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
             guardarCalificacionesEnLocalStorage();
                     actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 
+                    // Mostrar el selector de archivos SOLO si ya no quedan torneos
+        if (torneos.length === 0) {
+            const fileInputGroup = document.getElementById('fileInputGroup');
+            const importarBtn = document.getElementById('importarBtn');
+            const fileInput = document.getElementById('jsonFileInput');
+            
+            if (fileInputGroup) {
+                fileInputGroup.style.display = 'flex';  // Mostrar selector
+            }
+            if (importarBtn) {
+                importarBtn.style.display = 'none';     // Ocultar botón (sin archivos)
+            }
+            if (fileInput) {
+                fileInput.value = '';                   // Limpiar input
+            }
+        }
+            
         }
     }
     
