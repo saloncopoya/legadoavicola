@@ -691,10 +691,7 @@
         <span class="toggle-icon" id="calificacion-toggle-icon">▼</span>
     </div>
     <div id="calificacion-section" class="collapsible-content">
-        <div class="view-controls">
-            <label>🎯 Seleccionar Torneo:</label>
-            <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()"></select>
-        </div>
+      
         <div class="view-controls">
             <label>⚡ Seleccionar Pelea:</label>
             <select id="peleaSelect" onchange="cambiarPeleaSeleccionada()" style="min-width: 300px;"></select>
@@ -779,11 +776,19 @@
                 <span class="toggle-icon" id="import-toggle-icon">▼</span>
             </div>
             <div id="import-section" class="collapsible-content">
-                <div class="file-input-group">
-                    <input type="file" id="jsonFileInput" accept=".json" multiple>
-                    <button class="btn-primary" onclick="importarJSONs()">📤 IMPORTAR SELECCIONADOS</button>
-                    <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
-                </div>
+              <div class="file-input-group" id="fileInputGroup">
+    <input type="file" id="jsonFileInput" accept=".json" multiple onchange="verificarArchivosSeleccionados()">
+    <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR SELECCIONADOS</button>
+    <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
+</div>
+
+
+                        <!-- Selector de Torneo  -->
+        <div class="view-controls" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+            <label>🎯 SELECCIONAR TORNEO PARA CALIFICAR:</label>
+            <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()" style="min-width: 250px; padding: 8px; margin-left: 10px;"></select>
+        </div>
+                
                 <div id="torneosLista" style="margin-top: 15px;"></div>
                 <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
                     <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
@@ -1629,7 +1634,19 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
 
 
 
+    // ==============================================
+// FUNCIÓN PARA VERIFICAR ARCHIVOS SELECCIONADOS
+// ==============================================
+function verificarArchivosSeleccionados() {
+    const fileInput = document.getElementById('jsonFileInput');
+    const importarBtn = document.getElementById('importarBtn');
     
+    if (fileInput.files.length > 0) {
+        importarBtn.style.display = 'block';  // Mostrar botón si hay archivos
+    } else {
+        importarBtn.style.display = 'none';   // Ocultar botón si no hay archivos
+    }
+}
     // ==============================================
 // ACTUALIZAR BADGE DEL TORNEO ACTUAL EN CABECERA
 // ==============================================
@@ -2307,6 +2324,15 @@ function mostrarNotificacionSincronizacion() {
                     guardarCalificacionesEnLocalStorage();
                             actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 
+
+                    // Ocultar el selector de archivos y el botón después de importar
+const fileInputGroup = document.getElementById('fileInputGroup');
+const importarBtn = document.getElementById('importarBtn');
+if (torneos.length > 0) {
+    fileInputGroup.style.display = 'none';  // Ocultar todo el grupo de archivos
+    importarBtn.style.display = 'none';     // Asegurar que el botón también se oculte
+}
+                    
                     fileInput.value = '';
                     alert(`✅ ${procesados} torneo(s) importado(s) correctamente\n📊 Total calificaciones cargadas: ${calificacionesGlobales.size}`);
                 }
@@ -2417,18 +2443,33 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
         }
     }
     
-    function limpiarTodosLosTorneos() {
-        if (confirm('¿Eliminar TODOS los torneos y calificaciones?')) {
-            torneos = [];
-            calificacionesGlobales.clear();
-            torneoActual = null;
-            actualizarTodo();
-            guardarCalificacionesEnLocalStorage();
-                    actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
-
-            document.getElementById('jsonFileInput').value = '';
+   function limpiarTodosLosTorneos() {
+    if (confirm('¿Eliminar TODOS los torneos y calificaciones?')) {
+        torneos = [];
+        calificacionesGlobales.clear();
+        torneoActual = null;
+        actualizarTodo();
+        guardarCalificacionesEnLocalStorage();
+        actualizarBadgeTorneoActual();
+        
+        // 🔥 NUEVO: Mostrar nuevamente el selector de archivos después de borrar
+        const fileInputGroup = document.getElementById('fileInputGroup');
+        const importarBtn = document.getElementById('importarBtn');
+        
+        // Mostrar el grupo completo de archivos
+        if (fileInputGroup) {
+            fileInputGroup.style.display = 'flex';
         }
+        
+        // Ocultar el botón de importar hasta que seleccione nuevos archivos
+        if (importarBtn) {
+            importarBtn.style.display = 'none';
+        }
+        
+        // ✅ ESTA LÍNEA SE MANTIENE - Limpia el input de archivos
+        document.getElementById('jsonFileInput').value = '';
     }
+}
     
     // ==============================================
     // DESCARGAS (PDF y JPG)
@@ -2562,6 +2603,19 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 setTimeout(() => actualizarTop4Rapidas(), 300);
 
+    // Verificar al cargar la página si ya hay torneos para ocultar el selector
+setTimeout(() => {
+    if (torneos.length > 0) {
+        const fileInputGroup = document.getElementById('fileInputGroup');
+        if (fileInputGroup) fileInputGroup.style.display = 'none';
+    } else {
+        const fileInputGroup = document.getElementById('fileInputGroup');
+        if (fileInputGroup) fileInputGroup.style.display = 'flex';
+        const importarBtn = document.getElementById('importarBtn');
+        if (importarBtn) importarBtn.style.display = 'none';
+    }
+}, 100);
+    
     
     // PWA Installation
     let deferredPrompt;
