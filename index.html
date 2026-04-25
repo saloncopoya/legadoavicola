@@ -290,7 +290,7 @@
         .posicion-table th:first-child,
         .serial-table td:first-child,
         .serial-table th:first-child {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: bold;
             font-weight: 900;
         }
@@ -783,9 +783,7 @@
     <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR SELECCIONADOS</button>
 </div>
 
- <div style="margin-bottom: 15px;">
-        <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
-    </div>
+
                 
                 
                   <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
@@ -796,6 +794,11 @@
         </div>
                     <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
                 </div>
+
+
+                 <div style="margin-bottom: 15px;">
+        <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
+    </div>
                 
                 <div id="torneosLista" style="margin-top: 15px;"></div>
               
@@ -2537,64 +2540,119 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     // DESCARGAS (PDF y JPG)
     // ==============================================
     async function descargarTablaComoPDF(tipo) {
-        const container = tipo === 'cotejo' ? document.getElementById('cotejoContainer') :
-                          tipo === 'posicion' ? document.getElementById('posicionContainer') :
-                          document.getElementById('serialContainer');
-        
-        if (!container || container.querySelector('.no-data')) {
-            alert('No hay datos para descargar');
-            return;
-        }
-        
-        const { jsPDF } = window.jspdf;
-        const element = container.cloneNode(true);
-        element.style.width = '100%';
-        element.style.background = 'white';
-        document.body.appendChild(element);
-        
-        try {
-            const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`tabla_${tipo}.pdf`);
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al generar PDF');
-        }
-        document.body.removeChild(element);
+    const container = tipo === 'cotejo' ? document.getElementById('cotejoContainer') :
+                      tipo === 'posicion' ? document.getElementById('posicionContainer') :
+                      document.getElementById('serialContainer');
+    
+    if (!container || container.querySelector('.no-data')) {
+        alert('No hay datos para descargar');
+        return;
     }
     
-    async function descargarTablaComoJPG(tipo) {
-        const container = tipo === 'cotejo' ? document.getElementById('cotejoContainer') :
-                          tipo === 'posicion' ? document.getElementById('posicionContainer') :
-                          document.getElementById('serialContainer');
-        
-        if (!container || container.querySelector('.no-data')) {
-            alert('No hay datos para descargar');
-            return;
-        }
-        
-        const element = container.cloneNode(true);
-        element.style.width = '100%';
-        element.style.background = 'white';
-        document.body.appendChild(element);
-        
-        try {
-            const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
-            const link = document.createElement('a');
-            link.download = `tabla_${tipo}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al generar imagen');
-        }
-        document.body.removeChild(element);
+    const { jsPDF } = window.jspdf;
+    const element = container.cloneNode(true);
+    element.style.width = '100%';
+    element.style.background = 'white';
+    
+    // ===== CREAR WRAPPER CON SECCIÓN AMARILLA + PIE =====
+    const wrapper = document.createElement('div');
+    wrapper.style.background = 'white';
+    wrapper.style.padding = '20px';
+    wrapper.style.width = '100%';
+    
+    // Agregar sección amarilla (TOP 4)
+    const topSection = document.querySelector('#topFourSectionGlobal');
+    if (topSection) wrapper.appendChild(topSection.cloneNode(true));
+    
+    // Agregar tabla
+    wrapper.appendChild(element);
+    
+    // Agregar pie de página
+    const footer = document.createElement('div');
+    footer.style.textAlign = 'center';
+    footer.style.marginTop = '20px';
+    footer.style.padding = '10px';
+    footer.style.fontSize = '12px';
+    footer.style.fontWeight = 'bold';
+    footer.style.color = '#8B4513';
+    footer.style.borderTop = '2px solid #8B4513';
+    footer.innerHTML = 'Sistema LEGADO AVICOLA  9611150394';
+    wrapper.appendChild(footer);
+    // =================================================
+    
+    document.body.appendChild(wrapper);
+    
+    try {
+        const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`tabla_${tipo}.pdf`);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al generar PDF');
     }
+    document.body.removeChild(wrapper);
+}
+
+
+    async function descargarTablaComoJPG(tipo) {
+    const container = tipo === 'cotejo' ? document.getElementById('cotejoContainer') :
+                      tipo === 'posicion' ? document.getElementById('posicionContainer') :
+                      document.getElementById('serialContainer');
+    
+    if (!container || container.querySelector('.no-data')) {
+        alert('No hay datos para descargar');
+        return;
+    }
+    
+    const element = container.cloneNode(true);
+    element.style.width = '100%';
+    element.style.background = 'white';
+    
+    // ===== CREAR WRAPPER CON SECCIÓN AMARILLA + PIE =====
+    const wrapper = document.createElement('div');
+    wrapper.style.background = 'white';
+    wrapper.style.padding = '20px';
+    wrapper.style.width = '100%';
+    
+    // Agregar sección amarilla (TOP 4)
+    const topSection = document.querySelector('#topFourSectionGlobal');
+    if (topSection) wrapper.appendChild(topSection.cloneNode(true));
+    
+    // Agregar tabla
+    wrapper.appendChild(element);
+    
+    // Agregar pie de página
+    const footer = document.createElement('div');
+    footer.style.textAlign = 'center';
+    footer.style.marginTop = '20px';
+    footer.style.padding = '10px';
+    footer.style.fontSize = '12px';
+    footer.style.fontWeight = 'bold';
+    footer.style.color = '#8B4513';
+    footer.style.borderTop = '2px solid #8B4513';
+    footer.innerHTML = 'Sistema LEGADO AVICOLA  9611150394';
+    wrapper.appendChild(footer);
+    // =================================================
+    
+    document.body.appendChild(wrapper);
+    
+    try {
+        const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff' });
+        const link = document.createElement('a');
+        link.download = `tabla_${tipo}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al generar imagen');
+    }
+    document.body.removeChild(wrapper);
+}
     
     // ==============================================
     // COLLAPSIBLES
