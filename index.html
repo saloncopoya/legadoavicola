@@ -707,12 +707,12 @@
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">🏆 GANADOR</label>
-                            <select id="ganadorSelect" style="padding: 12px; font-size: 14px; border: 2px solid #FFD700; border-radius: 8px; min-width: 200px;">
-                                <option value="">-- Selecciona --</option>
-                                <option value="rojo">🔴 CINTA ROJA</option>
-                                <option value="verde">🟢 CINTA VERDE</option>
-                                <option value="empate">🤝 EMPATE / TABLA</option>
-                            </select>
+                          <select id="ganadorSelect" style="padding: 12px; font-size: 14px; border: 2px solid #FFD700; border-radius: 8px; min-width: 200px;">
+    <option value="">-- Selecciona --</option>
+    <option id="opcionRojo" value="rojo"></option>
+    <option id="opcionVerde" value="verde"></option>
+    <option value="empate">🤝 TABLA / EMPATE </option>
+</select>
                         </div>
                     </div>
                     <div id="puntosInfo" style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 15px 0; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px;"></div>
@@ -1674,30 +1674,52 @@ function actualizarBadgeTorneoActual() {
 }
     
     function actualizarComboboxPeleas() {
-        const select = document.getElementById('peleaSelect');
-        if (!torneoActual || !torneoActual.resultadosCotejo?.peleas) {
-            select.innerHTML = '<option value="">-- No hay peleas --</option>';
-            return;
-        }
-        
-        const peleas = torneoActual.resultadosCotejo.peleas;
-        let opciones = '<option value="">-- Selecciona una pelea --</option>';
-        
-        peleas.forEach((p, index) => {
-        const calKey = `${torneoActual.infoTorneo.id}_${index}`;
-            const calificada = calificacionesGlobales.has(calKey);
-            const estilo = calificada ? 'style="background:#e8f5e8; font-weight:bold;"' : '';
-            opciones += `<option value="${index}" ${estilo}>Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido} ${calificada ? '✓' : ''}</option>`;
-        });
-        select.innerHTML = opciones;
-        
-        const calificadas = contarPeleasCalificadas(torneoActual);
-        const total = peleas.length;
-        const mensajeTodas = document.getElementById('mensajeTodas');
-        if (mensajeTodas) {
-            mensajeTodas.style.display = (calificadas === total && total > 0) ? 'block' : 'none';
+    const select = document.getElementById('peleaSelect');
+    if (!torneoActual || !torneoActual.resultadosCotejo?.peleas) {
+        select.innerHTML = '<option value="">-- No hay peleas --</option>';
+        return;
+    }
+    
+    const peleas = torneoActual.resultadosCotejo.peleas;
+    
+    // Separar peleas calificadas y no calificadas
+    let noCalificadas = [];
+    let calificadasLista = [];
+    
+    for (let i = 0; i < peleas.length; i++) {
+        const calKey = `${torneoActual.infoTorneo.id}_${i}`;
+        if (calificacionesGlobales.has(calKey)) {
+            calificadasLista.push(i);
+        } else {
+            noCalificadas.push(i);
         }
     }
+    
+    // Ordenar los índices
+    noCalificadas.sort((a, b) => a - b);
+    calificadasLista.sort((a, b) => a - b);
+    
+    // Unir: primero no calificadas, luego calificadas
+    const indicesOrdenados = [...noCalificadas, ...calificadasLista];
+    
+    let opciones = '<option value="">-- Selecciona una pelea --</option>';
+    
+    indicesOrdenados.forEach((index) => {
+        const p = peleas[index];
+        const calKey = `${torneoActual.infoTorneo.id}_${index}`;
+        const calificada = calificacionesGlobales.has(calKey);
+        const estilo = calificada ? 'style="background:#e8f5e8; font-weight:bold;"' : '';
+        opciones += `<option value="${index}" ${estilo}>Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido} ${calificada ? '✓' : ''}</option>`;
+    });
+    select.innerHTML = opciones;
+    
+    const calificadas = contarPeleasCalificadas(torneoActual);
+    const total = peleas.length;
+    const mensajeTodas = document.getElementById('mensajeTodas');
+    if (mensajeTodas) {
+        mensajeTodas.style.display = (calificadas === total && total > 0) ? 'block' : 'none';
+    }
+}
     
     function cambiarPeleaSeleccionada() {
     const select = document.getElementById('peleaSelect');
@@ -1744,10 +1766,22 @@ function actualizarBadgeTorneoActual() {
             </div>
         </div>
     `;
+
+
+            // Actualizar el combobox de ganador con los nombres de los partidos
+    const opcionRojo = document.getElementById('opcionRojo');
+    const opcionVerde = document.getElementById('opcionVerde');
     
+    if (opcionRojo) {
+        opcionRojo.textContent = `🔴 ${pelea.gallo1.partido}`;
+    }
+    if (opcionVerde) {
+        opcionVerde.textContent = `🟢 ${pelea.gallo2.partido}`;
+    }
+        
     document.getElementById('puntosInfo').innerHTML = `
         <span>🏆 GANADOR: <strong>${puntosConf.ganador}</strong> pts</span>
-        <span>🤝 EMPATE: <strong>${puntosConf.empate}</strong> pts c/u</span>
+        <span>🤝 TABLA: <strong>${puntosConf.empate}</strong> pts c/u</span>
         <span>📉 PERDEDOR: <strong>${puntosConf.perdedor}</strong> pts</span>
     `;
     
@@ -1941,15 +1975,22 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
     // ==============================================
     // 7. NOTIFICAR AL USUARIO
     // ==============================================
-    alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
 
-            actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
-
+            actualizarBadgeTorneoActual(); 
             actualizarTop4Rapidas();
 
+            // Colapsar la sección de calificación automáticamente
+    const calificacionSection = document.getElementById('calificacion-section');
+    const toggleIcon = document.getElementById('calificacion-toggle-icon');
+    if (calificacionSection && calificacionSection.classList.contains('show')) {
+        calificacionSection.classList.remove('show');
+        if (toggleIcon) toggleIcon.innerHTML = '▼';
+    }
         
     // Limpiar referencia
     peleaSeleccionada = null;
+
+            alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
 }
     
     function eliminarCalificacion() {
