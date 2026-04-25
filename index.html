@@ -779,18 +779,21 @@
               <div class="file-input-group" id="fileInputGroup">
     <input type="file" id="jsonFileInput" accept=".json" multiple onchange="verificarArchivosSeleccionados()">
     <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR SELECCIONADOS</button>
-    <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
 </div>
 
-
-                        <!-- Selector de Torneo  -->
+ <div style="margin-bottom: 15px;">
+        <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
+    </div>
+                
+                
+                
+                <div id="torneosLista" style="margin-top: 15px;"></div>
+                <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <!-- Selector de Torneo  -->
         <div class="view-controls" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
             <label>🎯 SELECCIONAR TORNEO PARA CALIFICAR:</label>
             <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()" style="min-width: 250px; padding: 8px; margin-left: 10px;"></select>
         </div>
-                
-                <div id="torneosLista" style="margin-top: 15px;"></div>
-                <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
                     <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
                 </div>
             </div>
