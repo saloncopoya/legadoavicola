@@ -1076,14 +1076,20 @@
             const snapshot = await adminDb.ref(`COTEJOS/${usuarioUID}`).once('value');
             const cotejosData = snapshot.val();
             
-            if (!cotejosData) {
-                console.log('No hay cotejos para este usuario');
-                torneosFirebaseCargados = true;
-                if (torneos.length === 0) {
-                    document.getElementById('cotejoContainer').innerHTML = `<div class="no-data"><span>📭</span><p>No tienes cotejos creados</p></div>`;
-                }
-                return;
-            }
+          if (!cotejosData) {
+    console.log('No hay cotejos para este usuario online');
+    torneosFirebaseCargados = true;
+    
+    // ✅ SI HAY TORNEOS LOCALES (importados JSON), MOSTRARLOS
+    if (torneos.length > 0) {
+        console.log(`📁 Mostrando ${torneos.length} torneo(s) locales (importados JSON)`);
+        actualizarTodo();  // ← ESTA LÍNEA RENDERIZA LA TABLA
+    } else {
+        document.getElementById('cotejoContainer').innerHTML = `<div class="no-data"><span>📭</span><p>No tienes cotejos online.</p></div>`;
+    }
+    return;
+}
+            
             
             // Convertir objeto de Firebase a array de torneos
             const torneosArray = [];
