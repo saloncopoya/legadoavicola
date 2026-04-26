@@ -2448,7 +2448,10 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
         renderizarTablaPosiciones();
         renderizarTablaSerial();
         actualizarListaTorneosUI();
-        
+         actualizarBadgeTorneoActual();  // ← ESTA FALTA
+    actualizarTop4Rapidas();        // ← ESTA FALTA
+    actualizarSelectoresCalificacion();  // ← ESTA TAMBIÉN
+    
         // 6. Limpiar selección actual
         document.getElementById('peleaSelect').value = '';
         document.getElementById('detallePelea').style.display = 'none';
