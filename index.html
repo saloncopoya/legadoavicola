@@ -1860,15 +1860,20 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
     // ==============================================
     // ACTUALIZAR TODO
     // ==============================================
-    function actualizarTodo() {
-        renderizarTablaCotejo();
-        renderizarTablaPosiciones();
-        renderizarTablaSerial();
-        actualizarListaTorneosUI();
-        actualizarSelectoresCalificacion();
-            actualizarTop4Rapidas();  // 🔥 AGREGAR ESTA LÍNEA
-
-    }
+  function actualizarTodo() {
+    console.log('🔄 ACTUALIZANDO TODO EL SISTEMA...');
+    console.log('Calificaciones en mapa:', calificacionesGlobales.size);
+    
+    renderizarTablaCotejo();      // Actualiza tabla COTEJO
+    renderizarTablaPosiciones();   // Actualiza tabla POSICIONES
+    renderizarTablaSerial();       // Actualiza tabla ACUMULADO
+    actualizarListaTorneosUI();    // Actualiza lista de torneos
+    actualizarSelectoresCalificacion();  // Actualiza selectores
+    actualizarTop4Rapidas();       // Actualiza TOP 4
+    actualizarBadgeTorneoActual(); // Actualiza badge
+    
+    console.log('✅ ACTUALIZACIÓN COMPLETADA');
+}
     
     function actualizarListaTorneosUI() {
         const container = document.getElementById('torneosLista');
@@ -2625,7 +2630,9 @@ window.addEventListener('storage', function(event) {
                 nuevasCalificaciones.forEach(([key, val]) => {
                     calificacionesGlobales.set(key, val);
                 });
+                
                 console.log(`✅ Calificaciones sincronizadas: ${calificacionesGlobales.size}`);
+         
             }
         } catch(e) {
             console.error('Error sincronizando calificaciones:', e);
@@ -2633,8 +2640,7 @@ window.addEventListener('storage', function(event) {
 
          //  FORZAR ACTUALIZACIÓN COMPLETA
         actualizarTodo();
-        renderizarTablaCotejo();  // Doble seguridad
-        
+    
         // Actualizar todas las tablas
         actualizarTodasLasTablasMultiVentana();
     }
@@ -2662,7 +2668,8 @@ window.addEventListener('storage', function(event) {
         } catch(e) {
             console.error('Error sincronizando torneos:', e);
         }
-        
+                actualizarTodo();
+
         // Actualizar todas las tablas
         actualizarTodasLasTablasMultiVentana();
     }
