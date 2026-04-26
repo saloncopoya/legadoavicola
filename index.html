@@ -3039,16 +3039,6 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     // ==============================================
     function toggleCollapsible(id) {
 
-             if (modoOnline && usuarioUID) {
-        // ✅ Usar la base de datos PRINCIPAL (galloslivebadge)
-        const mainDb = firebase.database();
-        const snapshot = await mainDb.ref(`users/${usuarioUID}/cotejo`).once('value');
-        if (snapshot.val() !== true) {
-            alert('❌  CONTACTA CON EL ADMINISTRADOR 9611150394.');
-            return;
-        }
-    }
-
 
 
         
