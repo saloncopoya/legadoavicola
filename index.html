@@ -2299,8 +2299,8 @@ async function calificarPelea() {
     // ==============================================
     // 2. ACTUALIZAR LA PELEA DENTRO DEL TORNEO (en la lista de torneos)
     // ==============================================
-const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
-
+const torneoIndex = torneos.findIndex(t => t.cotejoOriginalId === torneoId);
+    
         if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
         const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
         pelea.calificada = true;
@@ -2317,8 +2317,8 @@ const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
     // ==============================================
     // 3. ACTUALIZAR torneoActual SI ES EL MISMO
     // ==============================================
-if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
-        if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
+if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
+    if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
             const pelea = torneoActual.resultadosCotejo.peleas[indice];
             pelea.calificada = true;
             pelea.ganador = ganador;
@@ -2370,6 +2370,16 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
     }
 
 
+    // ✅ MOSTRAR NOTIFICACIÓN ANTES DE LIMPIAR
+    let mensajeGanador = '';
+    if (ganador === 'rojo') mensajeGanador = peleaSeleccionada.gallo1.partido;
+    else if (ganador === 'verde') mensajeGanador = peleaSeleccionada.gallo2.partido;
+    else mensajeGanador = 'EMPATE';
+    
+    alert(`✅ Pelea #${peleaSeleccionada.numero} - Ganador: ${mensajeGanador} - Tiempo: ${tiempo}`);
+
+    
+
      
     // Limpiar referencia xx
     peleaSeleccionada = null;
@@ -2393,8 +2403,8 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
         }
         
         // 2. Actualizar la pelea dentro del torneo
-const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
-
+const torneoIndex = torneos.findIndex(t => t.cotejoOriginalId === torneoId);
+        
         if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
             const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
             delete pelea.calificada;
@@ -2409,8 +2419,8 @@ const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
         }
         
         // 3. Actualizar torneoActual si es el mismo
-if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
-            if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
+if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
+    if (torneoActual.resultadosCotejo && torneoActual.resultadosCotejo.peleas[indice]) {
                 const pelea = torneoActual.resultadosCotejo.peleas[indice];
                 delete pelea.calificada;
                 delete pelea.ganador;
