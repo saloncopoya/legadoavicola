@@ -781,7 +781,8 @@
         <!-- Sección colapsable: Importar Torneos -->
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
-                <h3><span>📥</span>TORNEOS</h3>
+                <h3><span>📥</span>TORNEOS <span id="userEmailSpan" style="font-size: 14px; color: #8B4513; display: none;"></span>
+ </h3>
                 <span class="toggle-icon" id="import-toggle-icon">▼</span>
             </div>
             <div id="import-section" class="collapsible-content">
@@ -809,14 +810,7 @@
                 
                 <div id="torneosLista" style="margin-top: 15px;"></div>
 
-
-
-                        <button id="loginBtn" class="btn-icon" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
-        <button id="logoutBtn" class="btn-icon" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
-        <span id="userEmailSpan" style="font-size: 12px; color: #8B4513; display: none;"></span>
-
-
-                
+ 
             </div>
         </div>
         
@@ -938,6 +932,9 @@
         <span>🔗</span> SERIAL (ACUMULADO)
     </button>
             <button id="installBtn" class="tab-btn"  style="display: none;" title="Instalar App">📲 INSTALAR</button>
+  <button id="loginBtn" class="btn-icon" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
+        <button id="logoutBtn" class="btn-icon" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
+    
 </div>
 
 
