@@ -2436,6 +2436,11 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
         
         // 4. Guardar en localStorage
         guardarCalificacionesEnLocalStorage();
+
+          console.log('===== VERIFICACIÓN PRE-ELIMINACIÓN =====');
+        console.log('Pelea eliminada - Índice:', indice);
+        console.log('¿Existe en calificacionesGlobales?', calificacionesGlobales.has(calKey));
+        console.log('torneoActual.resultadosCotejo.peleas[' + indice + '].calificada:', torneoActual?.resultadosCotejo?.peleas[indice]?.calificada);
         
         // 5. Actualizar todas las vistas
         actualizarComboboxPeleas();
@@ -2453,9 +2458,7 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
 
             actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 
-        
-        alert('✅ Calificación eliminada');
-            actualizarTop4Rapidas();
+                actualizarTop4Rapidas();
 
     }
 }
