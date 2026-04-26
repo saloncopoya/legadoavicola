@@ -1088,7 +1088,13 @@
             // Convertir objeto de Firebase a array de torneos
             const torneosArray = [];
             for (const [cotejoId, cotejoData] of Object.entries(cotejosData)) {
+                 // ✅ IGNORAR NODOS CON ID "undefined"
+    if (cotejoId === 'undefined' || !cotejoId) {
+        console.warn('⚠️ Ignorando cotejo con ID inválido:', cotejoId);
+        continue;
+    }
                 console.log(`🔍 Procesando cotejoId: ${cotejoId}`, cotejoData);
+
                 
                 // Extraer información del torneo desde el cotejo
                 const torneoId = cotejoData.torneoId || cotejoId.replace('cotejo_', '');
@@ -1199,6 +1205,19 @@ const indexExistente = torneos.findIndex(t => t.cotejoOriginalId === torneoFireb
         }
         
         try {
+
+             // ==============================================
+            // VALIDAR QUE EL COTEJO EXISTA EN FIREBASE
+            // ==============================================
+            const cotejoRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}`);
+            const snapshot = await cotejoRef.once('value');
+            
+            if (!snapshot.exists()) {
+                console.log(`⚠️ El cotejo ${torneoId} NO existe en Firebase. No se guarda la calificación.`);
+                console.log(`📌 Este torneo es solo LOCAL. Las calificaciones quedan en localStorage.`);
+                return false;
+            }
+            
             // Ruta exacta según tu estructura: TORNEOS/{uid}/{torneoId}/resultadosCotejo/peleas/{indice}
 const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indicePelea}`);
             
@@ -1233,6 +1252,19 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
         if (!modoOnline || !usuarioUID) return false;
         
         try {
+
+
+            // ==============================================
+            // VALIDAR QUE EL COTEJO EXISTA EN FIREBASE
+            // ==============================================
+            const cotejoRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}`);
+            const snapshot = await cotejoRef.once('value');
+            
+            if (!snapshot.exists()) {
+                console.log(`⚠️ El cotejo ${torneoId} NO existe en Firebase. No se elimina nada.`);
+                return false;
+            }
+            
 const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indicePelea}`);
             
             // Eliminar los campos de calificación
@@ -2326,9 +2358,19 @@ async function calificarPelea() {
     // ==============================================
     calificacionesGlobales.set(calKey, calificacion);
 
-            // 🔥 GUARDAR EN FIREBASE SI ESTÁ ONLINE
+                // 🔥 GUARDAR EN FIREBASE SOLO SI EL TORNEO EXISTE EN LA NUBE
     if (modoOnline && usuarioUID) {
-        await guardarCalificacionEnFirebase(torneoId, indice, calificacion);
+        // Verificar si el cotejo existe en Firebase
+        const cotejoRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}`);
+        const snapshot = await cotejoRef.once('value');
+        
+        if (snapshot.exists()) {
+            await guardarCalificacionEnFirebase(torneoId, indice, calificacion);
+            console.log(`✅ Torneo existe en Firebase, calificación guardada en la nube`);
+        } else {
+            console.log(`⚠️ Torneo "${torneoActual?.infoTorneo?.nombre}" NO existe en Firebase.`);
+            console.log(`📌 Calificación guardada SOLO en localStorage (modo local/offline).`);
+        }
     }
         
     // ==============================================
