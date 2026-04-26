@@ -1666,7 +1666,7 @@ function actualizarBadgeTorneoActual() {
         const total = torneoActual.resultadosCotejo?.peleas?.length || 0;
         const nombreTorneo = torneoActual.infoTorneo.nombre || 'Sin nombre';
         
-        badge.textContent = `${nombreTorneo} - ${calificadas}/${total}`;
+        badge.textContent = `${calificadas}/${total}`;
         badge.style.display = 'inline-block';
         
         // Cambiar color según progreso
