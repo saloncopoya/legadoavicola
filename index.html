@@ -792,7 +792,7 @@
 
 
                 
-  <span id="userEmailSpan" style="font-size: 16px; font-weight: bold; color:red; display: none;"></span>
+  <span id="userEmailSpan" style="font-size: 20px; font-weight: bold; color:red; display: none;"></span>
 
                 
                   <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
@@ -1002,7 +1002,7 @@
             // Si no tiene displayName, tomar la parte antes del @ del email
             nombreUsuario = usuarioActual.email.split('@')[0];
         }
-        userEmailSpan.textContent = `👤 ${nombreUsuario}`;
+        userEmailSpan.textContent = `Cuenta: 👤 ${nombreUsuario}`;
         } else {
             loginBtn.style.display = navigator.onLine ? 'flex' : 'none';
             logoutBtn.style.display = 'none';
