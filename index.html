@@ -2218,10 +2218,12 @@ function actualizarBadgeTorneoActual() {
 async function calificarPelea() {
 
 
-     if (modoOnline && usuarioUID) {
-        const snapshot = await adminDb.ref(`users/${usuarioUID}/cotejo`).once('value');
+        if (modoOnline && usuarioUID) {
+        // ✅ Usar la base de datos PRINCIPAL (galloslivebadge)
+        const mainDb = firebase.database();
+        const snapshot = await mainDb.ref(`users/${usuarioUID}/cotejo`).once('value');
         if (snapshot.val() !== true) {
-            alert('❌ No tienes permiso CONTACTA CON EL ADMINISTRADOR 9611150394.');
+            alert('❌ CONTACTA CON EL ADMINISTRADOR 9611150394.');
             return;
         }
     }
@@ -3037,8 +3039,10 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     // ==============================================
     function toggleCollapsible(id) {
 
-          if (modoOnline && usuarioUID) {
-        const snapshot = await adminDb.ref(`users/${usuarioUID}/cotejo`).once('value');
+             if (modoOnline && usuarioUID) {
+        // ✅ Usar la base de datos PRINCIPAL (galloslivebadge)
+        const mainDb = firebase.database();
+        const snapshot = await mainDb.ref(`users/${usuarioUID}/cotejo`).once('value');
         if (snapshot.val() !== true) {
             alert('❌  CONTACTA CON EL ADMINISTRADOR 9611150394.');
             return;
