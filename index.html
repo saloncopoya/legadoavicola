@@ -2370,16 +2370,8 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
     }
 
 
-     // ✅ MOSTRAR NOTIFICACIÓN ANTES DE LIMPIAR
-    let mensajeGanador = '';
-    if (ganador === 'rojo') mensajeGanador = peleaSeleccionada.gallo1.partido;
-    else if (ganador === 'verde') mensajeGanador = peleaSeleccionada.gallo2.partido;
-    else mensajeGanador = 'EMPATE';
-    
-    alert(`✅ Pelea #${peleaSeleccionada.numero} - Ganador: ${mensajeGanador} - Tiempo: ${tiempo}`);
-
-    
-    // Limpiar referencia
+     
+    // Limpiar referencia xx
     peleaSeleccionada = null;
 
 }
