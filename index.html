@@ -184,7 +184,7 @@
         .collapsible-header h3 {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 1px;
             color: #8B4513;
             font-size: 18px;
         }
@@ -693,8 +693,8 @@
         <h3>
             <span>🏆</span> 
             CALIFICAR:
-            <span id="torneoActualBadge" style="display: none; font-size: 13px; background: #8B4513; color: white; padding: 4px 12px; border-radius: 20px; margin-left: 12px;"></span>
-            <span style="font-size: 12px; background:red; color: white; padding: 4px 12px; border-radius: 20px; margin-left: 12px;">COTEJO COMPUTARIZADO - 961 115 03 94</span>
+            <span id="torneoActualBadge" style="display: none; font-size: 13px; background: #8B4513; color: white; padding: 4px 6px; border-radius: 20px; margin-left: 3px;"></span>
+            <span style="font-size: 12px; background:red; color: white; padding: 4px 6px; border-radius: 20px; margin-left: 3px;">COTEJO COMPUTARIZADO - 961 115 03 94</span>
         </h3>
         <span class="toggle-icon" id="calificacion-toggle-icon">▼</span>
     </div>
@@ -781,8 +781,7 @@
         <!-- Sección colapsable: Importar Torneos -->
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
-                <h3><span>📥</span>TORNEOS <span id="userEmailSpan" style="font-size: 14px; color: #8B4513; display: none;"></span>
- </h3>
+                <h3><span>📥</span>TORNEOS </h3>
                 <span class="toggle-icon" id="import-toggle-icon">▼</span>
             </div>
             <div id="import-section" class="collapsible-content">
@@ -795,7 +794,10 @@
                 
                 
                   <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                            <!-- Selector de Torneo  -->
+
+                      <span id="userEmailSpan" style="font-size: 16px; color: #8B4513; display: none;"></span>
+                      
+                      <!-- Selector de Torneo  -->
         <div class="view-controls" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
             <label>🎯 SELECCIONAR TORNEO PARA CALIFICAR:</label>
             <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()" style="min-width: 250px; padding: 8px; margin-left: 10px;"></select>
@@ -932,8 +934,8 @@
         <span>🔗</span> ACUMULADO
     </button>
             <button id="installBtn" class="tab-btn"  style="display: none;" title="Instalar App">📲</button>
-  <button id="loginBtn" class="btn-icon" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
-        <button id="logoutBtn" class="btn-icon" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
+  <button id="loginBtn" class="tab-btn" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
+        <button id="logoutBtn" class="tab-btn" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
     
 </div>
 
