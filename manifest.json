@@ -16,16 +16,8 @@
     "version": "2.0.0",
     
     "icons": [
-        {"src": "https://placehold.co/48x48/8B4513/white?text=🐓", "sizes": "48x48", "type": "image/png", "purpose": "any"},
-        {"src": "https://placehold.co/72x72/8B4513/white?text=🐓", "sizes": "72x72", "type": "image/png", "purpose": "any"},
-        {"src": "https://placehold.co/96x96/8B4513/white?text=🐓", "sizes": "96x96", "type": "image/png", "purpose": "any"},
-        {"src": "https://placehold.co/128x128/8B4513/white?text=🐓", "sizes": "128x128", "type": "image/png", "purpose": "any"},
-        {"src": "https://placehold.co/144x144/8B4513/white?text=🐓", "sizes": "144x144", "type": "image/png", "purpose": "any"},
-        {"src": "https://placehold.co/152x152/8B4513/white?text=🐓", "sizes": "152x152", "type": "image/png", "purpose": "any"},
-        {"src": "https://placehold.co/192x192/8B4513/white?text=🐓", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-        {"src": "https://placehold.co/256x256/8B4513/white?text=🐓", "sizes": "256x256", "type": "image/png", "purpose": "any maskable"},
-        {"src": "https://placehold.co/384x384/8B4513/white?text=🐓", "sizes": "384x384", "type": "image/png", "purpose": "any maskable"},
-        {"src": "https://placehold.co/512x512/8B4513/white?text=🐓", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+        {"src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi0T3uNTRD3YcwGAC4QM6ZJg_ylxluOI6yCOVTW4yf1hhgK4qP6rl8aF1INqcVBJ-2ph5U9w-FV67mUY8sGGheW7AQ3x00fZz3SyG7Kt0b3sxGE0G3G578DgZAWW8-Z-GWXCSK_6Iyoe0QP41AMCBfdKtwqxs0aXjVoAvqYV7_oxBBvuUW18I5Az01uDBup/s1024/abrir.jpg", "sizes": "48x48", "type": "image/png", "purpose": "any"},
+               {"src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi0T3uNTRD3YcwGAC4QM6ZJg_ylxluOI6yCOVTW4yf1hhgK4qP6rl8aF1INqcVBJ-2ph5U9w-FV67mUY8sGGheW7AQ3x00fZz3SyG7Kt0b3sxGE0G3G578DgZAWW8-Z-GWXCSK_6Iyoe0QP41AMCBfdKtwqxs0aXjVoAvqYV7_oxBBvuUW18I5Az01uDBup/s1024/abrir.jpg", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
     ],
 
     "shortcuts": [
