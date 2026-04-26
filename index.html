@@ -1197,7 +1197,7 @@
         
         try {
             // Ruta exacta según tu estructura: TORNEOS/{uid}/{torneoId}/resultadosCotejo/peleas/{indice}
-            const peleaRef = adminDb.ref(`TORNEOS/${usuarioUID}/${torneoId}/resultadosCotejo/peleas/${indicePelea}`);
+const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indicePelea}`);
             
             const datosAGuardar = {
                 calificada: true,
@@ -1234,7 +1234,7 @@
         if (!modoOnline || !usuarioUID) return false;
         
         try {
-            const peleaRef = adminDb.ref(`TORNEOS/${usuarioUID}/${torneoId}/resultadosCotejo/peleas/${indicePelea}`);
+const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indicePelea}`);
             
             // Eliminar los campos de calificación
             await peleaRef.update({
