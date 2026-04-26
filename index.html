@@ -2459,11 +2459,9 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
             actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 
                 actualizarTop4Rapidas();
- setTimeout(() => {
-            renderizarTablaCotejo();
-            renderizarTablaPosiciones();
-            renderizarTablaSerial();
-        }, 50);
+
+                actualizarTodo();
+
         
     }
 }
