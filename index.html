@@ -2089,7 +2089,7 @@ function actualizarBadgeTorneoActual() {
         mensajeTodas.style.display = (calificadas === total && total > 0) ? 'block' : 'none';
     }
 }
-    
+
     function cambiarPeleaSeleccionada() {
     const select = document.getElementById('peleaSelect');
     const index = parseInt(select.value);
@@ -2110,13 +2110,43 @@ function actualizarBadgeTorneoActual() {
     const calificacionExistente = calificacionesGlobales.get(calKey);
     const puntosConf = torneoActual.infoTorneo?.puntosConfig || puntosConfig;
     
-    // 🔥 GUARDAR LA CALIFICACIÓN ACTUAL EN peleaSeleccionada
+    // ==============================================
+    // ✅ VALIDACIÓN PARA QUE NUNCA SEA undefined
+    // ==============================================
+    let torneoIdValido = torneoActual.cotejoOriginalId;
+    
+    // Si cotejoOriginalId es undefined, null, o el string "undefined"
+    if (!torneoIdValido || torneoIdValido === 'undefined' || torneoIdValido === 'null') {
+        console.warn('⚠️ cotejoOriginalId es inválido:', torneoIdValido);
+        
+        // Intentar usar infoTorneo.id (viene de JSON importado)
+        if (torneoActual.infoTorneo?.id && torneoActual.infoTorneo.id !== 'undefined') {
+            torneoIdValido = torneoActual.infoTorneo.id;
+            console.log('✅ Usando infoTorneo.id como respaldo:', torneoIdValido);
+            
+            // Sincronizar para futuras veces
+            torneoActual.cotejoOriginalId = torneoIdValido;
+        } else {
+            // Crear un ID nuevo si no hay ninguno
+            torneoIdValido = 'cotejo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            console.log('🆕 Creando nuevo ID porque no había ninguno:', torneoIdValido);
+            
+            // Asignarlo al torneo actual
+            torneoActual.cotejoOriginalId = torneoIdValido;
+            if (!torneoActual.infoTorneo) torneoActual.infoTorneo = {};
+            torneoActual.infoTorneo.id = torneoIdValido;
+            
+            // Guardar el cambio para que persista
+            guardarCalificacionesEnLocalStorage();
+        }
+    }
+    
+    // 🔥 AHORA SÍ, USA EL ID VÁLIDO
     peleaSeleccionada = { 
         ...pelea, 
         indice: index, 
-            torneoId: torneoActual.cotejoOriginalId,  // ✅ USA EL ID CORRECTO DE FIREBASE
-
-        calificacionActual: calificacionExistente  // ← NUEVO: guardar calificación actual
+        torneoId: torneoIdValido,  // ← NUNCA undefined
+        calificacionActual: calificacionExistente
     };
     
     detalleDiv.style.display = 'block';
@@ -2137,8 +2167,7 @@ function actualizarBadgeTorneoActual() {
         </div>
     `;
 
-
-            // Actualizar el combobox de ganador con los nombres de los partidos
+    // Actualizar el combobox de ganador con los nombres de los partidos
     const opcionRojo = document.getElementById('opcionRojo');
     const opcionVerde = document.getElementById('opcionVerde');
     
@@ -2161,7 +2190,6 @@ function actualizarBadgeTorneoActual() {
         else if (calificacionExistente.ganador === 'verde') ganadorTexto = `🟢 ${pelea.gallo2.partido}`;
         else if (calificacionExistente.ganador === 'empate') ganadorTexto = '🤝 TABLA';
         
-        // 🔥 MOSTRAR LA CALIFICACIÓN ACTUAL EN EL MODAL
         infoAnterior.innerHTML = `
             <div style="font-weight:600; margin-bottom:8px;">⚠️ Esta pelea ya fue calificada:</div>
             <div><strong>Ganador:</strong> ${ganadorTexto}</div>
@@ -2181,6 +2209,7 @@ function actualizarBadgeTorneoActual() {
         document.getElementById('ganadorSelect').value = '';
     }
 }
+    
     
     function confirmarReCalificar() {
     if (!peleaSeleccionada) return;
