@@ -1209,16 +1209,12 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
                 fechaCalificacion: calificacion.fechaCalificacion,
                 timestamp: calificacion.timestamp,
                 usuarioCalifico: calificacion.usuarioCalifico,
-                usuarioId: usuarioUID
+                usuarioId: usuarioUID,
+                gallo1_puntos: calificacion.gallo1?.puntos || 0,
+                gallo2_puntos: calificacion.gallo2?.puntos || 0
             };
             
-            // También guardar puntos en gallos si existen
-            if (calificacion.gallo1?.puntos !== undefined) {
-                datosAGuardar.gallo1 = { puntos: calificacion.gallo1.puntos };
-            }
-            if (calificacion.gallo2?.puntos !== undefined) {
-                datosAGuardar.gallo2 = { puntos: calificacion.gallo2.puntos };
-            }
+           
             
             await peleaRef.update(datosAGuardar);
             console.log(`✅ Calificación guardada en Firebase: ${torneoId}/${indicePelea}`);
@@ -1240,7 +1236,7 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
 const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indicePelea}`);
             
             // Eliminar los campos de calificación
-            await peleaRef.update({
+              await peleaRef.update({
                 calificada: null,
                 ganador: null,
                 tiempo: null,
@@ -1248,8 +1244,10 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
                 timestamp: null,
                 usuarioCalifico: null,
                 usuarioId: null,
-                gallo1: null,
-                gallo2: null
+                gallo1_puntos: null,
+                gallo2_puntos: null,
+                observaciones: null,
+                vallin: null
             });
             
             console.log(`✅ Calificación eliminada en Firebase: ${torneoId}/${indicePelea}`);
