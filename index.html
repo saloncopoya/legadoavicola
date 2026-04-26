@@ -1151,7 +1151,7 @@
             
             // MEZCLAR con torneos locales (no reemplazar)
             for (const torneoFirebase of torneosArray) {
-                const indexExistente = torneos.findIndex(t => t.infoTorneo?.id === torneoFirebase.infoTorneo?.id);
+const indexExistente = torneos.findIndex(t => t.cotejoOriginalId === torneoFirebase.cotejoOriginalId);
                 if (indexExistente !== -1) {
                     // Actualizar el existente
                     torneos[indexExistente] = torneoFirebase;
@@ -1605,6 +1605,12 @@ const calKey = `${torneo.infoTorneo.id}_${index}`;
     // RENDERIZAR TABLA COTEJO
     // ==============================================
     function renderizarTablaCotejo() {
+
+        console.log('🔄 Renderizando tabla cotejo...');
+    console.log('torneoActual:', torneoActual?.infoTorneo?.nombre);
+    console.log('Peleas:', torneoActual?.resultadosCotejo?.peleas?.length);
+    console.log('Calificaciones en mapa:', calificacionesGlobales.size);
+        
     const container = document.getElementById('cotejoContainer');
     
     if (!torneoActual || !torneoActual.resultadosCotejo || !torneoActual.resultadosCotejo.peleas || torneoActual.resultadosCotejo.peleas.length === 0) {
@@ -2369,18 +2375,12 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
         if (toggleIcon) toggleIcon.innerHTML = '▼';
     }
 
-
-    // ✅ MOSTRAR NOTIFICACIÓN ANTES DE LIMPIAR
-    let mensajeGanador = '';
-    if (ganador === 'rojo') mensajeGanador = peleaSeleccionada.gallo1.partido;
-    else if (ganador === 'verde') mensajeGanador = peleaSeleccionada.gallo2.partido;
-    else mensajeGanador = 'EMPATE';
+  console.log('===== VERIFICACIÓN POST-CALIFICACIÓN =====');
+    console.log('Pelea calificada - Índice:', indice);
+    console.log('¿Existe en calificacionesGlobales?', calificacionesGlobales.has(calKey));
+    console.log('torneoActual.resultadosCotejo.peleas[' + indice + '].calificada:', torneoActual?.resultadosCotejo?.peleas[indice]?.calificada);
+    console.log('torneoActual.resultadosCotejo.peleas[' + indice + '].ganador:', torneoActual?.resultadosCotejo?.peleas[indice]?.ganador);
     
-    alert(`✅ Pelea #${peleaSeleccionada.numero} - Ganador: ${mensajeGanador} - Tiempo: ${tiempo}`);
-
-    
-
-     
     // Limpiar referencia xx
     peleaSeleccionada = null;
 
