@@ -2108,7 +2108,8 @@ function actualizarBadgeTorneoActual() {
     peleaSeleccionada = { 
         ...pelea, 
         indice: index, 
-        torneoId: torneoActual.infoTorneo.id,  // ✅ CORREGIDO
+            torneoId: torneoActual.cotejoOriginalId,  // ✅ USA EL ID CORRECTO DE FIREBASE
+
         calificacionActual: calificacionExistente  // ← NUEVO: guardar calificación actual
     };
     
