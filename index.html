@@ -1083,8 +1083,10 @@
     // ✅ SI HAY TORNEOS LOCALES (importados JSON), MOSTRARLOS
     if (torneos.length > 0) {
         console.log(`📁 Mostrando ${torneos.length} torneo(s) locales (importados JSON)`);
+              alert(`📁 ${torneos.length} torneo(s) local(es) cargado(s) desde archivos JSON.`); 
         actualizarTodo();  // ← ESTA LÍNEA RENDERIZA LA TABLA
     } else {
+          alert('📭 No tienes torneos creados. Importa un archivo para comenzar o regresa despues.');
         document.getElementById('cotejoContainer').innerHTML = `<div class="no-data"><span>📭</span><p>No tienes cotejos online.</p></div>`;
     }
     return;
@@ -1182,6 +1184,9 @@ const indexExistente = torneos.findIndex(t => t.cotejoOriginalId === torneoFireb
             
             torneosFirebaseCargados = true;
             actualizarTodo();
+
+            alert(`☁️ ${torneosArray.length} torneo(s) cargado(s) desde la nube.`);
+
             
             // Guardar en localStorage para offline
             guardarCalificacionesEnLocalStorage();
