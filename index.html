@@ -792,10 +792,10 @@
 
 
                 
+  <span id="userEmailSpan" style="font-size: 16px; font-weight: bold; color:red; display: none;"></span>
+
                 
                   <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-
-                      <span id="userEmailSpan" style="font-size: 16px; color: #8B4513; display: none;"></span>
                       
                       <!-- Selector de Torneo  -->
         <div class="view-controls" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
@@ -996,7 +996,13 @@
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'flex';
             userEmailSpan.style.display = 'inline';
-            userEmailSpan.textContent = `👤 ${usuarioActual.email}`;
+ //  OBTENER NOMBRE DEL USUARIO (displayName o email)
+        let nombreUsuario = usuarioActual.displayName;
+        if (!nombreUsuario || nombreUsuario === 'null' || nombreUsuario === '') {
+            // Si no tiene displayName, tomar la parte antes del @ del email
+            nombreUsuario = usuarioActual.email.split('@')[0];
+        }
+        userEmailSpan.textContent = `👤 ${nombreUsuario}`;
         } else {
             loginBtn.style.display = navigator.onLine ? 'flex' : 'none';
             logoutBtn.style.display = 'none';
