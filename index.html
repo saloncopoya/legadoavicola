@@ -16,6 +16,42 @@
     <!-- Librerías para PDF e imagen -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+        <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+
+        // ==============================================
+    // CONFIGURACIÓN DE FIREBASE
+    // ==============================================
+    const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+        authDomain: "galloslivebadge.firebaseapp.com",
+        databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+        projectId: "galloslivebadge",
+        messagingSenderId: "979482928760",
+        appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
+    };
+
+    const FIREBASE_ADMIN_CONFIG = {
+        apiKey: "AIzaSyBMON_hBlUJfE-_L6qrt8MEP6JZrculRcs",
+        authDomain: "premiumcotejosgallistico-59e76.firebaseapp.com",
+        databaseURL: "https://premiumcotejosgallistico-59e76-default-rtdb.firebaseio.com",
+        projectId: "premiumcotejosgallistico-59e76",
+        storageBucket: "premiumcotejosgallistico-59e76.firebasestorage.app",
+        messagingSenderId: "785051078042",
+        appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
+    };
+
+    // Inicializar Firebase (app principal para auth)
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    const auth = firebase.auth();
+    const adminDb = firebase.initializeApp(FIREBASE_ADMIN_CONFIG, 'admin').database();
     
     <style>
         * {
@@ -801,7 +837,15 @@
     </div>
                 
                 <div id="torneosLista" style="margin-top: 15px;"></div>
-              
+
+
+
+                        <button id="loginBtn" class="btn-icon" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
+        <button id="logoutBtn" class="btn-icon" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
+        <span id="userEmailSpan" style="font-size: 12px; color: #8B4513; display: none;"></span>
+
+
+                
             </div>
         </div>
         
@@ -930,6 +974,299 @@
 <div id="offlineBadge" class="offline-badge">📴 MODO OFFLINE</div>
 
 <script>
+
+
+        // ==============================================
+    // VARIABLES DE FIREBASE Y SESIÓN
+    // ==============================================
+    let usuarioActual = null;           // Usuario autenticado
+    let modoOnline = false;             // Si está sincronizado con Firebase
+    let torneosFirebaseCargados = false; // Si ya se cargaron los torneos desde Firebase
+    let usuarioUID = null;              // UID del usuario autenticado
+
+    // ==============================================
+    // FUNCIONES DE UI PARA SESIÓN
+    // ==============================================
+    function actualizarBotonesSesion() {
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userEmailSpan = document.getElementById('userEmailSpan');
+        
+        if (usuarioActual && modoOnline) {
+            loginBtn.style.display = 'none';
+            logoutBtn.style.display = 'flex';
+            userEmailSpan.style.display = 'inline';
+            userEmailSpan.textContent = `👤 ${usuarioActual.email}`;
+        } else {
+            loginBtn.style.display = navigator.onLine ? 'flex' : 'none';
+            logoutBtn.style.display = 'none';
+            userEmailSpan.style.display = 'none';
+        }
+    }
+
+    function mostrarLoginModal() {
+        document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    function cerrarModalLogin() {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+    }
+
+    async function iniciarSesion() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            alert('Ingresa correo y contraseña');
+            return;
+        }
+        
+        try {
+            const credencial = await auth.signInWithEmailAndPassword(email, password);
+            usuarioActual = credencial.user;
+            usuarioUID = usuarioActual.uid;
+            modoOnline = true;
+            
+            cerrarModalLogin();
+            alert(`✅ Bienvenido ${usuarioActual.email}`);
+            
+            // Cargar torneos desde Firebase
+            await cargarTorneosDesdeFirebase();
+            
+            actualizarBotonesSesion();
+        } catch (error) {
+            alert('Error al iniciar sesión: ' + error.message);
+        }
+    }
+
+    async function cerrarSesion() {
+        if (confirm('¿Cerrar sesión? Los torneos locales seguirán disponibles.')) {
+            await auth.signOut();
+            usuarioActual = null;
+            usuarioUID = null;
+            modoOnline = false;
+            torneosFirebaseCargados = false;
+            
+            // No borrar torneos locales, solo salir del modo online
+            actualizarBotonesSesion();
+            alert('Sesión cerrada. Modo offline activo.');
+        }
+    }
+
+    // ==============================================
+    // CARGAR TORNEOS DESDE FIREBASE
+    // ==============================================
+    async function cargarTorneosDesdeFirebase() {
+        if (!usuarioUID) {
+            console.log('No hay usuario autenticado');
+            return;
+        }
+        
+        // Mostrar loading
+        const container = document.getElementById('cotejoContainer');
+        if (container) {
+            container.innerHTML = `<div class="no-data"><span>🔄</span><p>Cargando torneos desde la nube...</p></div>`;
+        }
+        
+        try {
+            // Leer nodo: TORNEOS/{uid}
+            const snapshot = await adminDb.ref(`TORNEOS/${usuarioUID}`).once('value');
+            const torneosData = snapshot.val();
+            
+            if (!torneosData) {
+                console.log('No hay torneos para este usuario');
+                torneosFirebaseCargados = true;
+                if (torneos.length === 0) {
+                    document.getElementById('cotejoContainer').innerHTML = `<div class="no-data"><span>📭</span><p>No tienes torneos creados</p><p>Importa archivos JSON o créalos desde la web</p></div>`;
+                }
+                return;
+            }
+            
+            // Convertir objeto de Firebase a array de torneos
+            const torneosArray = [];
+            for (const [torneoId, torneoData] of Object.entries(torneosData)) {
+                // Agregar el ID al objeto
+                const torneoCompleto = {
+                    ...torneoData,
+                    infoTorneo: {
+                        ...torneoData.infoTorneo,
+                        id: torneoId
+                    }
+                };
+                
+                // Asegurar que existe resultadosCotejo
+                if (!torneoCompleto.resultadosCotejo) {
+                    torneoCompleto.resultadosCotejo = { peleas: [] };
+                }
+                
+                torneosArray.push(torneoCompleto);
+            }
+            
+            // MEZCLAR con torneos locales (no reemplazar, combinar)
+            // Primero, mantener torneos locales que no estén en Firebase
+            const torneosLocalesIds = new Set(torneos.map(t => t.infoTorneo?.id));
+            const torneosFirebaseIds = new Set(torneosArray.map(t => t.infoTorneo?.id));
+            
+            // Torneos locales se mantienen, Firebase se agrega o actualiza
+            for (const torneoFirebase of torneosArray) {
+                const indexExistente = torneos.findIndex(t => t.infoTorneo?.id === torneoFirebase.infoTorneo?.id);
+                if (indexExistente !== -1) {
+                    // Actualizar el existente (preservando calificaciones locales si las hay)
+                    const torneoLocal = torneos[indexExistente];
+                    // Si el torneo local tiene calificaciones que Firebase no tiene, preservarlas
+                    if (torneoLocal.resultadosCotejo?.peleas) {
+                        torneoLocal.resultadosCotejo.peleas.forEach((peleaLocal, idx) => {
+                            if (peleaLocal.calificada && (!torneoFirebase.resultadosCotejo?.peleas[idx] || !torneoFirebase.resultadosCotejo.peleas[idx].calificada)) {
+                                // Preservar calificación local
+                                if (torneoFirebase.resultadosCotejo?.peleas[idx]) {
+                                    torneoFirebase.resultadosCotejo.peleas[idx].calificada = peleaLocal.calificada;
+                                    torneoFirebase.resultadosCotejo.peleas[idx].ganador = peleaLocal.ganador;
+                                    torneoFirebase.resultadosCotejo.peleas[idx].tiempo = peleaLocal.tiempo;
+                                }
+                            }
+                        });
+                    }
+                    torneos[indexExistente] = torneoFirebase;
+                } else {
+                    torneos.push(torneoFirebase);
+                }
+            }
+            
+            // Recargar calificaciones desde los torneos actualizados
+            cargarCalificacionesDesdeTorneos();
+            
+            // Actualizar torneoActual si es necesario
+            if (!torneoActual && torneos.length > 0) {
+                torneoActual = torneos[0];
+            } else if (torneoActual) {
+                // Verificar que el torneoActual sigue existiendo
+                const sigueExistiendo = torneos.some(t => t.infoTorneo?.id === torneoActual.infoTorneo?.id);
+                if (!sigueExistiendo && torneos.length > 0) {
+                    torneoActual = torneos[0];
+                }
+            }
+            
+            torneosFirebaseCargados = true;
+            actualizarTodo();
+            
+            // Guardar en localStorage para offline
+            guardarCalificacionesEnLocalStorage();
+            
+            // Ocultar el selector de archivos si ya hay torneos
+            const fileInputGroup = document.getElementById('fileInputGroup');
+            if (fileInputGroup && torneos.length > 0) {
+                fileInputGroup.style.display = 'none';
+            }
+            
+            console.log(`✅ Cargados ${torneosArray.length} torneos desde Firebase`);
+            
+        } catch (error) {
+            console.error('Error cargando torneos desde Firebase:', error);
+            alert('Error al cargar torneos: ' + error.message);
+        }
+    }
+
+    // ==============================================
+    // GUARDAR CALIFICACIÓN EN FIREBASE
+    // ==============================================
+    async function guardarCalificacionEnFirebase(torneoId, indicePelea, calificacion) {
+        if (!modoOnline || !usuarioUID) {
+            console.log('Modo offline, no se guarda en Firebase');
+            return false;
+        }
+        
+        try {
+            // Ruta exacta según tu estructura: TORNEOS/{uid}/{torneoId}/resultadosCotejo/peleas/{indice}
+            const peleaRef = adminDb.ref(`TORNEOS/${usuarioUID}/${torneoId}/resultadosCotejo/peleas/${indicePelea}`);
+            
+            const datosAGuardar = {
+                calificada: true,
+                ganador: calificacion.ganador,
+                tiempo: calificacion.tiempo,
+                fechaCalificacion: calificacion.fechaCalificacion,
+                timestamp: calificacion.timestamp,
+                usuarioCalifico: calificacion.usuarioCalifico,
+                usuarioId: usuarioUID
+            };
+            
+            // También guardar puntos en gallos si existen
+            if (calificacion.gallo1?.puntos !== undefined) {
+                datosAGuardar.gallo1 = { puntos: calificacion.gallo1.puntos };
+            }
+            if (calificacion.gallo2?.puntos !== undefined) {
+                datosAGuardar.gallo2 = { puntos: calificacion.gallo2.puntos };
+            }
+            
+            await peleaRef.update(datosAGuardar);
+            console.log(`✅ Calificación guardada en Firebase: ${torneoId}/${indicePelea}`);
+            return true;
+            
+        } catch (error) {
+            console.error('Error guardando en Firebase:', error);
+            return false;
+        }
+    }
+
+    // ==============================================
+    // ELIMINAR CALIFICACIÓN EN FIREBASE
+    // ==============================================
+    async function eliminarCalificacionEnFirebase(torneoId, indicePelea) {
+        if (!modoOnline || !usuarioUID) return false;
+        
+        try {
+            const peleaRef = adminDb.ref(`TORNEOS/${usuarioUID}/${torneoId}/resultadosCotejo/peleas/${indicePelea}`);
+            
+            // Eliminar los campos de calificación
+            await peleaRef.update({
+                calificada: null,
+                ganador: null,
+                tiempo: null,
+                fechaCalificacion: null,
+                timestamp: null,
+                usuarioCalifico: null,
+                usuarioId: null,
+                gallo1: null,
+                gallo2: null
+            });
+            
+            console.log(`✅ Calificación eliminada en Firebase: ${torneoId}/${indicePelea}`);
+            return true;
+            
+        } catch (error) {
+            console.error('Error eliminando en Firebase:', error);
+            return false;
+        }
+    }
+
+    // ==============================================
+    // MONITOR DE CONEXIÓN
+    // ==============================================
+    window.addEventListener('online', async () => {
+        console.log('🟢 Conexión recuperada');
+        const badge = document.getElementById('offlineBadge');
+        if (badge) badge.classList.remove('show');
+        
+        // Si hay usuario logueado, reconectar y sincronizar
+        if (usuarioActual && !modoOnline) {
+            modoOnline = true;
+            await cargarTorneosDesdeFirebase();
+            actualizarBotonesSesion();
+        } else if (!usuarioActual) {
+            actualizarBotonesSesion(); // Mostrar botón de login si estaba offline
+        }
+    });
+    
+    window.addEventListener('offline', () => {
+        console.log('🔴 Sin conexión - Modo offline activo');
+        const badge = document.getElementById('offlineBadge');
+        if (badge) badge.classList.add('show');
+        modoOnline = false;
+        actualizarBotonesSesion();
+    });
+
+    
     // ==============================================
     // VARIABLES GLOBALES
     // ==============================================
@@ -1858,7 +2195,7 @@ function actualizarBadgeTorneoActual() {
     }
 }
     
-    function calificarPelea() {
+async function calificarPelea() {
     if (!peleaSeleccionada) {
         alert('Selecciona una pelea primero');
         return;
@@ -1920,7 +2257,12 @@ function actualizarBadgeTorneoActual() {
     // 1. GUARDAR EN EL MAP GLOBAL
     // ==============================================
     calificacionesGlobales.set(calKey, calificacion);
-    
+
+            // 🔥 GUARDAR EN FIREBASE SI ESTÁ ONLINE
+    if (modoOnline && usuarioUID) {
+        await guardarCalificacionEnFirebase(torneoId, indice, calificacion);
+    }
+        
     // ==============================================
     // 2. ACTUALIZAR LA PELEA DENTRO DEL TORNEO (en la lista de torneos)
     // ==============================================
@@ -2000,8 +2342,8 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
             alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
 }
     
-    function eliminarCalificacion() {
-    if (!peleaSeleccionada) return;
+    async function eliminarCalificacion() {
+        if (!peleaSeleccionada) return;
     
     if (confirm('¿Eliminar esta calificación? La pelea quedará pendiente.')) {
         const torneoId = peleaSeleccionada.torneoId;
@@ -2010,6 +2352,11 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
         
         // 1. Eliminar del Map global
         calificacionesGlobales.delete(calKey);
+
+                // 🔥 ELIMINAR EN FIREBASE SI ESTÁ ONLINE
+        if (modoOnline && usuarioUID) {
+            await eliminarCalificacionEnFirebase(torneoId, indice);
+        }
         
         // 2. Actualizar la pelea dentro del torneo
 const torneoIndex = torneos.findIndex(t => t.infoTorneo.id === torneoId);
@@ -2725,6 +3072,30 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     cargarPreferenciasVisuales();
     actualizarTodo();
     actualizarEstadoOffline();
+
+
+        // Verificar si hay sesión guardada
+    auth.onAuthStateChanged(async (user) => {
+        if (user && navigator.onLine) {
+            usuarioActual = user;
+            usuarioUID = user.uid;
+            modoOnline = true;
+            actualizarBotonesSesion();
+            await cargarTorneosDesdeFirebase();
+        } else if (user && !navigator.onLine) {
+            usuarioActual = user;
+            usuarioUID = user.uid;
+            modoOnline = false;
+            actualizarBotonesSesion();
+            alert('📴 Estás offline. Los torneos locales están disponibles.');
+        } else {
+            // Usuario no logueado, solo modo offline
+            modoOnline = false;
+            actualizarBotonesSesion();
+        }
+    });
+
+    
     actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
 setTimeout(() => actualizarTop4Rapidas(), 300);
 
@@ -2788,5 +3159,18 @@ setTimeout(() => {
         navigator.serviceWorker.register('/sw.js').then(reg => console.log('✅ SW registrado:', reg.scope)).catch(err => console.log('❌ SW error:', err));
     }
 </script>
+
+
+
+    <!-- MODAL DE LOGIN -->
+<div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 30px; max-width: 400px; width: 90%;">
+        <h3 style="color: #8B4513; margin-bottom: 20px;">🔐 Iniciar Sesión</h3>
+        <input type="email" id="loginEmail" placeholder="Correo electrónico" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
+        <input type="password" id="loginPassword" placeholder="Contraseña" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
+        <button onclick="iniciarSesion()" style="background: #8B4513; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer;">INICIAR SESIÓN</button>
+        <button onclick="cerrarModalLogin()" style="margin-top: 10px; background: #ccc; color: #333; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer;">CANCELAR</button>
+    </div>
+</div>
 </body>
 </html>
