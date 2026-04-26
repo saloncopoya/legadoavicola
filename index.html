@@ -2368,11 +2368,12 @@ if (torneoActual && torneoActual.infoTorneo.id === torneoId) {
         calificacionSection.classList.remove('show');
         if (toggleIcon) toggleIcon.innerHTML = '▼';
     }
-        
+
+    alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
+
     // Limpiar referencia
     peleaSeleccionada = null;
 
-            alert(`✅ Pelea #${peleaSeleccionada.numero} calificada como "${ganador}" en ${tiempo}`);
 }
     
     async function eliminarCalificacion() {
