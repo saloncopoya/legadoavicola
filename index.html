@@ -1081,9 +1081,20 @@
             return;
         }
 
+
+        
          //  Borrar todos los torneos importados localmente (JSON)
-    torneos = []
-            calificacionesGlobales.clear();
+ console.log('🗑️ Limpiando torneos locales antes de cargar desde la nube...'); 
+    // 1. Borrar de la memoria
+    torneos = [];
+    calificacionesGlobales.clear();
+    torneoActual = null;
+    // 2. Borrar del localStorage para que no reaparezcan al recargar
+    localStorage.removeItem('cotejoOffline_torneos');
+    localStorage.removeItem('cotejoOffline_calificaciones');
+    console.log('✅ Torneos locales eliminados completamente');
+
+        
 
         
         // Mostrar loading
@@ -1093,25 +1104,22 @@
         }
         
         try {
-            // ✅ LEER DESDE COTEJOS (no desde TORNEOS)
+            //  LEER DESDE COTEJOS
             const snapshot = await adminDb.ref(`COTEJOS/${usuarioUID}`).once('value');
             const cotejosData = snapshot.val();
             
-          if (!cotejosData) {
-    console.log('No hay cotejos para este usuario online');
-    torneosFirebaseCargados = true;
-    
-    // ✅ SI HAY TORNEOS LOCALES (importados JSON), MOSTRARLOS
-    if (torneos.length > 0) {
-        console.log(`📁 Mostrando ${torneos.length} torneo(s) locales (importados JSON)`);
-              alert(`📁 ${torneos.length} torneo(s) local(es) cargado(s) desde archivos JSON.`); 
-        actualizarTodo();  // ← ESTA LÍNEA RENDERIZA LA TABLA
-    } else {
-          alert('📭 No tienes torneos creados. Importa un archivo para comenzar o regresa despues.');
-        document.getElementById('cotejoContainer').innerHTML = `<div class="no-data"><span>📭</span><p>No tienes cotejos online.</p></div>`;
-    }
-    return;
-}
+         if (!cotejosData) {
+            console.log('No hay cotejos para este usuario online');
+            torneosFirebaseCargados = true;
+            
+            // Como ya borramos los torneos locales, ahora no hay nada que mostrar
+            alert('📭 No tienes torneos guardados en la nube. Puedes importar archivos JSON o calificar peleas nuevas.');
+            document.getElementById('cotejoContainer').innerHTML = `<div class="no-data"><span>📭</span><p>No tienes cotejos online.</p><p>Importa archivos JSON para comenzar</p></div>`;
+            
+            // 🔥 ACTUALIZAR TODO AQUÍ TAMBIÉN (para que se vea vacío)
+            actualizarTodo();
+            return;
+        }
             
             
             // Convertir objeto de Firebase a array de torneos
@@ -1223,6 +1231,8 @@ const indexExistente = torneos.findIndex(t => t.cotejoOriginalId === torneoFireb
         } catch (error) {
             console.error('Error cargando cotejos desde Firebase:', error);
             alert('Error al cargar cotejos: ' + error.message);
+                    actualizarTodo();
+
         }
     }
 
