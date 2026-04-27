@@ -127,6 +127,21 @@
             align-items: center;
             gap: 4px;
         }
+
+            .tab-btn2 {
+            padding: 4px 5px;
+            border: 2px solid #8B4513;
+            border-radius: 40px;
+            background: white;
+            color: #8B4513;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         
         .tab-btn.active {
             background: #8B4513;
@@ -795,18 +810,20 @@
                 
   <span id="userEmailSpan" style="font-size: 20px; font-weight: bold; color:red; display: none;"></span>
 
-                <button id="cerrarSesionArchivosBtn" class="tab-btn" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">IMPORTAR ARCHIVOS .JSON (CERRAR SESION) </button>
+                <button id="cerrarSesionArchivosBtn" class="tab-btn2" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">CERRAR SESION </button>
+                  <button id="loginBtn" class="tab-btn2" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐 INICIAR SESION</button>
+
                 
                   <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                      
+
+                                          <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
+
                       <!-- Selector de Torneo  -->
         <div class="view-controls" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
             <label>🎯 SELECCIONAR TORNEO PARA CALIFICAR:</label>
             <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()" style="min-width: 250px; padding: 8px; margin-left: 10px;"></select>
         </div>
-
                       
-                    <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
                         <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
                   </div>
 
@@ -935,11 +952,11 @@
         <span>🏆</span> POSICIONES
     </button>
     <button id="serialTabBtn" class="tab-btn" onclick="cambiarPestana('serial')" style="display: none;">
-        <span>🔗</span> ACUMULADO
+        <span>🔗</span> T. ACUMULADO
     </button>
-            <button id="installBtn" class="tab-btn"  style="display: none;" title="Instalar App">📲</button>
-  <button id="loginBtn" class="tab-btn" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
-        <button id="logoutBtn" class="tab-btn" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
+            <button id="installBtn" class="tab-btn2"   style="display: none;" title="Instalar App">📲</button>
+  <button id="loginBtn" class="tab-btn2" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
+        <button id="logoutBtn" class="tab-btn2"  onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
     
 </div>
 
