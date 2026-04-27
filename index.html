@@ -692,6 +692,143 @@
 
 
 
+
+
+
+                /* ==============================================
+           MODO OSCURO (DARK MODE)
+           ============================================== */
+        body.dark-mode {
+            background: #121212 !important;
+        }
+
+        body.dark-mode .top-bar,
+        body.dark-mode .collapsible-section,
+        body.dark-mode .collapsible-header,
+        body.dark-mode .table-container,
+        body.dark-mode .view-controls,
+        body.dark-mode .btn-secondary,
+        body.dark-mode .modal-content,
+        body.dark-mode #calificacion-section,
+        body.dark-mode .top4-card {
+            background: #1e1e1e !important;
+            border-color: #333 !important;
+        }
+
+        body.dark-mode .top-bar {
+            border-bottom-color: #FFD700 !important;
+        }
+
+        body.dark-mode .logo,
+        body.dark-mode .collapsible-header h3,
+        body.dark-mode .view-controls label,
+        body.dark-mode .no-data p {
+            color: #f0f0f0 !important;
+        }
+
+        /* Tablas en modo oscuro */
+        body.dark-mode table,
+        body.dark-mode th,
+        body.dark-mode td {
+            background-color: #1e1e1e !important;
+            color: #f0f0f0 !important;
+            border-color: #444 !important;
+        }
+
+        body.dark-mode th {
+            background: #2c2c2c !important;
+        }
+
+        /* Encabezados específicos de tablas (mantener colores base pero adaptados) */
+        body.dark-mode .cotejo-table th:first-child,
+        body.dark-mode .cotejo-table td:first-child {
+            background: #b71c1c !important;
+            color: white !important;
+        }
+
+        body.dark-mode .cotejo-table th:nth-child(6) {
+            background: #2e7d32 !important;
+            color: white !important;
+        }
+
+        body.dark-mode .posicion-table th {
+            background: #5d2e0d !important;
+            color: white !important;
+        }
+
+        body.dark-mode .serial-table th {
+            background: #1b5e20 !important;
+            color: white !important;
+        }
+
+        /* Badges y puntos en oscuro */
+        body.dark-mode .badge {
+            background: #444 !important;
+            color: #ddd !important;
+        }
+
+        body.dark-mode .puntos-ganador,
+        body.dark-mode .tiempo-ganador {
+            background: #2e7d32 !important;
+        }
+        body.dark-mode .puntos-empate,
+        body.dark-mode .tiempo-empate {
+            background: #1565c0 !important;
+        }
+        body.dark-mode .puntos-perdedor,
+        body.dark-mode .tiempo-perdedor {
+            background: #c62828 !important;
+        }
+
+        /* Inputs y selects en oscuro */
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode button:not(.btn-primary):not(.btn-icon) {
+            background-color: #2c2c2c !important;
+            color: #f0f0f0 !important;
+            border-color: #555 !important;
+        }
+        
+        body.dark-mode .btn-primary {
+            background: #FFD700 !important;
+            color: #1e1e1e !important;
+        }
+        
+        body.dark-mode .btn-primary:hover {
+            background: #FFC107 !important;
+        }
+        
+        body.dark-mode .btn-icon {
+            background: #2c2c2c !important;
+            color: #FFD700 !important;
+        }
+
+        body.dark-mode .btn-icon:hover {
+            background: #3d3d3d !important;
+        }
+
+        /* Sección amarilla y top4 en oscuro */
+        body.dark-mode #topFourSectionGlobal {
+            background: #FFD700 !important;
+        }
+        body.dark-mode #topFourSectionGlobal div,
+        body.dark-mode #topFourSectionGlobal .top4-card {
+            background: #1e1e1e !important;
+            color: #f0f0f0 !important;
+            border-color: #FFD700 !important;
+        }
+        body.dark-mode #torneoInfoTop div:first-child {
+            color: #1e1e1e !important;
+        }
+
+        /* Scrollbar en modo oscuro */
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: #FFD700;
+        }
+
     </style>
 </head>
 <body>
@@ -1014,6 +1151,9 @@
             <div id="visual-section" class="collapsible-content">
 
 
+                <button class="btn-icon" id="darkModeToggleBtn" onclick="toggleDarkMode()">🌙</button>
+
+                
 <button class="btn-primary"  onclick="window.open('/', '_blank', 'width=' + (screen.width * 0.5) + ',height=' + screen.height + ',toolbar=no,location=no,menubar=no,scrollbars=no')">VENTANA MULTIPLE</button>
                 
                 <div class="view-controls">
@@ -3409,6 +3549,38 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
         document.body.appendChild(modal);
         modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
+
+        // ==============================================
+    // FUNCIONES PARA MODO OSCURO / CLARO
+    // ==============================================
+    function toggleDarkMode() {
+        const body = document.body;
+        const toggleBtn = document.getElementById('darkModeToggleBtn');
+        
+        if (body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+            if (toggleBtn) toggleBtn.innerHTML = '🌙';
+        } else {
+            body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+            if (toggleBtn) toggleBtn.innerHTML = '☀️';
+        }
+    }
+
+    function cargarTemaGuardado() {
+        const temaGuardado = localStorage.getItem('theme');
+        const toggleBtn = document.getElementById('darkModeToggleBtn');
+        
+        if (temaGuardado === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (toggleBtn) toggleBtn.innerHTML = '☀️';
+        } else {
+            document.body.classList.remove('dark-mode');
+            if (toggleBtn) toggleBtn.innerHTML = '🌙';
+        }
+    }
+
     
     // ==============================================
     // INICIALIZACIÓN
@@ -3486,6 +3658,8 @@ setTimeout(() => {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
         installBtn.style.display = 'none';
     }
+
+     cargarTemaGuardado();
     
     // Exponer funciones globales
     window.cambiarPestana = cambiarPestana;
