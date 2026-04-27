@@ -108,7 +108,6 @@
             gap: 16px;
             justify-content: center;
             padding: 12px 24px;
-            background: #f8f9fa;
             z-index: 999;
             border-bottom: 1px solid #e9ecef;
         }
@@ -161,7 +160,6 @@
             padding: 10px 6px;
             width: 100%;
             min-height: calc(100vh - 140px);
-            background: #f8f9fa;
         }
         
         .tab-content {
@@ -731,8 +729,8 @@
         body.dark-mode th,
         body.dark-mode td {
             background-color: #1e1e1e !important;
-            color: #f0f0f0 !important;
-            border-color: #444 !important;
+            color: #ffffff !important;
+            border-color: #ffd700 !important;
         }
 
         body.dark-mode th {
@@ -818,7 +816,7 @@
             border-color: #FFD700 !important;
         }
         body.dark-mode #torneoInfoTop div:first-child {
-            color: #1e1e1e !important;
+            color: #FFD700 !important;
         }
 
         /* Scrollbar en modo oscuro */
@@ -1151,7 +1149,6 @@
             <div id="visual-section" class="collapsible-content">
 
 
-                <button class="btn-icon" id="darkModeToggleBtn" onclick="toggleDarkMode()">🌙</button>
 
                 
 <button class="btn-primary"  onclick="window.open('/', '_blank', 'width=' + (screen.width * 0.5) + ',height=' + screen.height + ',toolbar=no,location=no,menubar=no,scrollbars=no')">VENTANA MULTIPLE</button>
@@ -1177,6 +1174,8 @@
                 <div class="btn-group">
                     <button class="btn-primary" onclick="descargarTablaComoPDF('cotejo')">📄 DESCARGAR COTEJO (PDF)</button>
                     <button class="btn-primary" onclick="descargarTablaComoJPG('cotejo')">🖼️ DESCARGAR COTEJO (JPG)</button>
+                                <button class="btn-icon" id="darkModeToggleBtn" onclick="toggleDarkMode()">MODO: 🌙</button>
+
                 </div>
             </div>
         </div>
@@ -3560,11 +3559,11 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
         if (body.classList.contains('dark-mode')) {
             body.classList.remove('dark-mode');
             localStorage.setItem('theme', 'light');
-            if (toggleBtn) toggleBtn.innerHTML = '🌙';
+            if (toggleBtn) toggleBtn.innerHTML = 'MODO: 🌙';
         } else {
             body.classList.add('dark-mode');
             localStorage.setItem('theme', 'dark');
-            if (toggleBtn) toggleBtn.innerHTML = '☀️';
+            if (toggleBtn) toggleBtn.innerHTML = 'MODO: ☀️';
         }
     }
 
@@ -3574,10 +3573,10 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
         
         if (temaGuardado === 'dark') {
             document.body.classList.add('dark-mode');
-            if (toggleBtn) toggleBtn.innerHTML = '☀️';
+            if (toggleBtn) toggleBtn.innerHTML = 'MODO: ☀️';
         } else {
             document.body.classList.remove('dark-mode');
-            if (toggleBtn) toggleBtn.innerHTML = '🌙';
+            if (toggleBtn) toggleBtn.innerHTML = 'MODO: 🌙';
         }
     }
 
