@@ -785,6 +785,7 @@
                 <span class="toggle-icon" id="import-toggle-icon">▼</span>
             </div>
             <div id="import-section" class="collapsible-content">
+                
               <div class="file-input-group" id="fileInputGroup">
     <input type="file" id="jsonFileInput" accept=".json" multiple onchange="verificarArchivosSeleccionados()">
     <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR SELECCIONADOS</button>
@@ -794,6 +795,7 @@
                 
   <span id="userEmailSpan" style="font-size: 20px; font-weight: bold; color:red; display: none;"></span>
 
+                <button id="cerrarSesionArchivosBtn" class="tab-btn" onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪 CERRAR SESIÓN (IMPORTAR ARCHIVOS .JSON) </button>
                 
                   <div id="previewInfo" style="display: none; background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
                       
@@ -802,6 +804,8 @@
             <label>🎯 SELECCIONAR TORNEO PARA CALIFICAR:</label>
             <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()" style="min-width: 250px; padding: 8px; margin-left: 10px;"></select>
         </div>
+
+                      
                     <strong>✅ Torneos cargados:</strong> <span id="torneosCount">0</span>
                         <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
                   </div>
@@ -996,6 +1000,9 @@
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'flex';
             userEmailSpan.style.display = 'inline';
+             if (fileInputGroup) fileInputGroup.style.display = 'none'; 
+                    if (cerrarSesionArchivosBtn) cerrarSesionArchivosBtn.style.display = 'flex';
+
  //  OBTENER NOMBRE DEL USUARIO (displayName o email)
         let nombreUsuario = usuarioActual.displayName;
         if (!nombreUsuario || nombreUsuario === 'null' || nombreUsuario === '') {
@@ -1007,6 +1014,9 @@
             loginBtn.style.display = navigator.onLine ? 'flex' : 'none';
             logoutBtn.style.display = 'none';
             userEmailSpan.style.display = 'none';
+            if (fileInputGroup) fileInputGroup.style.display = 'flex';
+  if (cerrarSesionArchivosBtn) cerrarSesionArchivosBtn.style.display = 'none';
+
         }
     }
 
@@ -1070,6 +1080,11 @@
             console.log('No hay usuario autenticado');
             return;
         }
+
+         //  Borrar todos los torneos importados localmente (JSON)
+    torneos = []
+            calificacionesGlobales.clear();
+
         
         // Mostrar loading
         const container = document.getElementById('cotejoContainer');
