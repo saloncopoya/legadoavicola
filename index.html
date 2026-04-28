@@ -959,7 +959,7 @@
             </div>
             <div id="import-section" class="collapsible-content">
                 
-              <div class="file-input-group" id="fileInputGroup">
+              <div class="file-input-group" id="fileInputGroup" style="display: none;">
     <input type="file" id="jsonFileInput" accept=".json" multiple onchange="verificarArchivosSeleccionados()">
     <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR SELECCIONADOS</button>
 </div>
@@ -3589,8 +3589,11 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
             
             actualizarTodo();
             guardarCalificacionesEnLocalStorage();
-                    actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
-
+                    actualizarBadgeTorneoActual(); 
+renderizarTablaPosiciones();
+        renderizarTablaSerial();
+        actualizarComboboxPeleas();
+            
                     // Mostrar el selector de archivos SOLO si ya no quedan torneos
         if (torneos.length === 0) {
             const fileInputGroup = document.getElementById('fileInputGroup');
@@ -3619,6 +3622,10 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
         actualizarTodo();
         guardarCalificacionesEnLocalStorage();
         actualizarBadgeTorneoActual();
+        renderizarTablaCotejo();
+        renderizarTablaPosiciones();
+        renderizarTablaSerial();
+        actualizarComboboxPeleas();
         
         // 🔥 NUEVO: Mostrar nuevamente el selector de archivos después de borrar
         const fileInputGroup = document.getElementById('fileInputGroup');
