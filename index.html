@@ -962,12 +962,10 @@ font-size: 1.7em;
                 
                 <span class="toggle-icon" id="import-toggle-icon">▼</span>
             </div>
-            <div id="import-section" class="collapsible-content">
-                
-              <div class="file-input-group" id="fileInputGroup" style="display: none;">
-    <input type="file" id="jsonFileInput" accept=".json" multiple onchange="verificarArchivosSeleccionados()">
-    <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR SELECCIONADOS</button>
-</div>
+           
+            <div id="import-section" class="collapsible-content">  
+           
+               
 
 
                 
@@ -996,7 +994,11 @@ font-size: 1.7em;
                 
                 <div id="torneosLista" style="margin-top: 15px;"></div>
 
- 
+  <div class="file-input-group" id="fileInputGroup" style="display: none;">
+    <input type="file" id="jsonFileInput" accept=".json" multiple onchange="verificarArchivosSeleccionados()">
+    <button class="btn-primary" id="importarBtn" onclick="importarJSONs()" style="display: none;">📤 IMPORTAR TORNEOS SELECCIONADOS</button>
+</div>
+                
             </div>
         </div>
         
