@@ -3677,6 +3677,18 @@ setTimeout(() => {
     if (torneos.length > 0) {
         const fileInputGroup = document.getElementById('fileInputGroup');
         if (fileInputGroup) fileInputGroup.style.display = 'none';
+
+          // MOSTRAR secciones cuando HAY torneos
+         const calificacionSection = document.getElementById('calificacion-section');
+        const calificacionHeader = document.querySelector('.calificacion-flotante');
+        const topFourSection = document.getElementById('topFourSectionGlobal');
+        const visualSection = document.getElementById('visual-section');
+        const visualSectionParent = document.querySelector('.collapsible-section:has(#visual-section)');
+        
+        if (calificacionHeader) calificacionHeader.style.display = 'block';
+        if (topFourSection) topFourSection.style.display = 'block';
+        if (visualSectionParent) visualSectionParent.style.display = 'block';
+        
     } else {
         // Solo mostrar selector si NO estás online con sesión
         if (!(modoOnline && usuarioActual)) {
@@ -3688,6 +3700,15 @@ setTimeout(() => {
             const fileInputGroup = document.getElementById('fileInputGroup');
             if (fileInputGroup) fileInputGroup.style.display = 'none';
         }
+
+        //  OCULTAR secciones cuando NO hay torneos
+        const calificacionHeader = document.querySelector('.calificacion-flotante');
+        const topFourSection = document.getElementById('topFourSectionGlobal');
+        const visualSectionParent = document.querySelector('.collapsible-section:has(#visual-section)');
+        
+        if (calificacionHeader) calificacionHeader.style.display = 'none';
+        if (topFourSection) topFourSection.style.display = 'none';
+        if (visualSectionParent) visualSectionParent.style.display = 'none';
     }
 }, 100);
     
