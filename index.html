@@ -1117,8 +1117,8 @@
         <span>🔗</span> T. ACUMULADO
     </button>
             <button id="installBtn" class="tab-btn2"   style="display: none;" title="Instalar App">📲</button>
-  <button id="loginBtn" class="tab-btn2" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
-        <button id="logoutBtn" class="tab-btn2"  onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
+<button id="loginBtnBottom" class="tab-btn2" onclick="mostrarLoginModal()" title="Iniciar sesión" style="display: none;">🔐</button>
+    <button id="logoutBtn" class="tab-btn2"  onclick="cerrarSesion()" title="Cerrar sesión" style="display: none;">🚪</button>
 </div>
 
 
@@ -1171,11 +1171,14 @@
     // ==============================================
     function actualizarBotonesSesion() {
         const loginBtn = document.getElementById('loginBtn');
+            const loginBtnBottom = document.getElementById('loginBtnBottom');
+
         const logoutBtn = document.getElementById('logoutBtn');
         const userEmailSpan = document.getElementById('userEmailSpan');
         
         if (usuarioActual && modoOnline) {
             loginBtn.style.display = 'none';
+            loginBtnBottom.style.display = 'none';
             logoutBtn.style.display = 'flex';
             userEmailSpan.style.display = 'inline';
              if (fileInputGroup) fileInputGroup.style.display = 'none'; 
@@ -1191,6 +1194,7 @@
         userEmailSpan.textContent = `Cuenta: 👤 ${nombreUsuario}`;
         } else {
             loginBtn.style.display = navigator.onLine ? 'flex' : 'none';
+            loginBtnBottom.style.display = navigator.onLine ? 'flex' : 'none';
             logoutBtn.style.display = 'none';
             userEmailSpan.style.display = 'none';
             if (fileInputGroup) fileInputGroup.style.display = 'flex';
@@ -3719,9 +3723,15 @@ setTimeout(() => actualizarTop4Rapidas(), 300);
 
     // Verificar al cargar la página si ya hay torneos para ocultar el selector
 setTimeout(() => {
+            const posicionTabBtn = document.querySelector('.tab-btn[onclick="cambiarPestana(\'posicion\')"]');
+
     if (torneos.length > 0) {
-        const fileInputGroup = document.getElementById('fileInputGroup');
+           const fileInputGroup = document.getElementById('fileInputGroup');
+        const importarBtn = document.getElementById('importarBtn');
+
+        if (posicionTabBtn) posicionTabBtn.style.display = 'flex';
         if (fileInputGroup) fileInputGroup.style.display = 'none';
+        if (importarBtn) importarBtn.style.display = 'none';
 
           // MOSTRAR secciones cuando HAY torneos
          const calificacionSection = document.getElementById('calificacion-section');
@@ -3747,6 +3757,8 @@ setTimeout(() => {
         }
 
         //  OCULTAR secciones cuando NO hay torneos
+                if (posicionTabBtn) posicionTabBtn.style.display = 'none';
+
         const calificacionHeader = document.querySelector('.calificacion-flotante');
         const topFourSection = document.getElementById('topFourSectionGlobal');
         const visualSectionParent = document.querySelector('.collapsible-section:has(#visual-section)');
