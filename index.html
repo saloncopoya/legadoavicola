@@ -1201,8 +1201,44 @@
     }
 
     function mostrarLoginModal() {
+    // 🔥 PRIMERO PREGUNTAR SI HAY TORNEOS LOCALES
+    const hayTorneosLocales = torneos.length > 0;
+    
+    if (hayTorneosLocales) {
+        const confirmar = confirm(
+            '═══════════════════════════════════\n' +
+            '⚠️  SE DETECTARON TORNEOS LOCALES\n' +
+            '═══════════════════════════════════\n\n' +
+            '¿Deseas ELIMINAR los torneos locales\n' +
+            'para poder iniciar sesión?\n\n' +
+            '✓ ACEPTAR → Eliminar locales y continuar\n' +
+            '✗ CANCELAR → Mantener locales y NO iniciar sesión\n\n' +
+            '═══════════════════════════════════'
+        );
+        
+        if (confirmar) {
+            // Usuario ACEPTA: Eliminar torneos locales
+            console.log('🗑️ Usuario aceptó eliminar torneos locales');
+            torneos = [];
+            calificacionesGlobales.clear();
+            torneoActual = null;
+            localStorage.removeItem('cotejoOffline_torneos');
+            localStorage.removeItem('cotejoOffline_calificaciones');
+            console.log('✅ Torneos locales eliminados');
+            
+            // Mostrar modal de login
+            document.getElementById('loginModal').style.display = 'flex';
+        } else {
+            // Usuario CANCELA: No hacer nada, no mostrar modal
+            console.log('📁 Usuario decide mantener torneos locales, no se inicia sesión');
+            alert('⚠️ Para iniciar sesión debes eliminar los torneos locales.\n\nContinuas en modo OFFLINE.');
+            return;
+        }
+    } else {
+        // No hay torneos locales, mostrar modal directamente
         document.getElementById('loginModal').style.display = 'flex';
     }
+}
 
     function cerrarModalLogin() {
         document.getElementById('loginModal').style.display = 'none';
@@ -1211,7 +1247,7 @@
     }
 
 
-    async function iniciarSesion() {
+   async function iniciarSesion() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
@@ -1224,65 +1260,19 @@
         const credencial = await auth.signInWithEmailAndPassword(email, password);
         usuarioActual = credencial.user;
         usuarioUID = usuarioActual.uid;
+        modoOnline = true;
         
         cerrarModalLogin();
+        alert(`✅ Bienvenido ${usuarioActual.email}`);
         
-        // ==============================================
-        // 🔥 PREGUNTAR SI ELIMINAR TORNEOS LOCALES
-        // ==============================================
-        const hayTorneosLocales = torneos.length > 0;
+        // Cargar torneos desde Firebase
+        await cargarTorneosDesdeFirebase();
         
-        if (hayTorneosLocales) {
-            const confirmar = confirm(
-                '═══════════════════════════════════\n' +
-                '⚠️  SE DETECTARON TORNEOS LOCALES\n' +
-                '═══════════════════════════════════\n\n' +
-                '¿Deseas ELIMINAR los torneos locales\n' +
-                'y cargar los de la NUBE?\n\n' +
-                '✓ ACEPTAR → Eliminar locales y continuar\n' +
-                '✗ CANCELAR → Mantener locales y cerrar sesión\n\n' +
-                '═══════════════════════════════════'
-            );
-            
-            if (confirmar) {
-                // Usuario ACEPTA: Eliminar torneos locales
-                console.log('🗑️ Usuario aceptó eliminar torneos locales');
-                torneos = [];
-                calificacionesGlobales.clear();
-                torneoActual = null;
-                localStorage.removeItem('cotejoOffline_torneos');
-                localStorage.removeItem('cotejoOffline_calificaciones');
-                console.log('✅ Torneos locales eliminados');
-                
-                // Continuar con modo online
-                modoOnline = true;
-                alert(`✅ Bienvenido ${usuarioActual.email}`);
-                await cargarTorneosDesdeFirebase();
-                actualizarBotonesSesion();
-            } else {
-                // Usuario CANCELA: Mantener torneos locales, cerrar sesión
-                console.log('📁 Usuario decide mantener torneos locales, cerrando sesión...');
-                await auth.signOut();
-                usuarioActual = null;
-                usuarioUID = null;
-                modoOnline = false;
-                actualizarBotonesSesion();
-                alert('⚠️ Sesión cerrada. Continuas en modo OFFLINE con tus torneos locales.');
-                return; // Salir, no continuar
-            }
-        } else {
-            // No hay torneos locales, continuar normalmente
-            modoOnline = true;
-            alert(`✅ Bienvenido ${usuarioActual.email}`);
-            await cargarTorneosDesdeFirebase();
-            actualizarBotonesSesion();
-        }
-        
+        actualizarBotonesSesion();
     } catch (error) {
         alert('Error al iniciar sesión: ' + error.message);
     }
 }
-    
 
     function desconectarFirebaseTiempoReal() {
     if (firebaseListenerActivo && usuarioUID) {
@@ -3636,13 +3626,13 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     if (!navigator.onLine) {
         badge.classList.add('show');
         if (estadoSpan) {
-            estadoSpan.innerHTML = 'MODO OFFLINE 📴 SIN INTERNET';
+            estadoSpan.innerHTML = ' 📴 SIN INTERNET';
             estadoSpan.style.color = '#f44336';
         }
     } else {
         badge.classList.remove('show');
         if (estadoSpan) {
-            estadoSpan.innerHTML = 'MODO ONLINE ✅ CONECTADO A INTERNET';
+            estadoSpan.innerHTML = ' ✅ CONECTADO A INTERNET';
             estadoSpan.style.color = '#4CAF50';
         }
     }
