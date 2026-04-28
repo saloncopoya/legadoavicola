@@ -1719,6 +1719,62 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
         }
     }
 
+
+    async function sincronizarCalificacionesOffline() {
+    if (!modoOnline || !usuarioUID) return;
+    
+    console.log('🔄 Sincronizando calificaciones offline pendientes...');
+    
+    // Guardar calificaciones actuales antes de recargar
+    const calificacionesBackup = new Map(calificacionesGlobales);
+    const torneosBackup = JSON.parse(JSON.stringify(torneos));
+    
+    try {
+        // Recargar desde Firebase
+        await cargarTorneosDesdeFirebase();
+        
+        // Comparar y restaurar calificaciones offline que no existen en Firebase
+        let calificacionesRestauradas = 0;
+        
+        for (let [key, calValue] of calificacionesBackup) {
+            if (!calificacionesGlobales.has(key)) {
+                // Esta calificación offline NO existe en Firebase, restaurarla
+                calificacionesGlobales.set(key, calValue);
+                
+                // Extraer torneoId e indice de la key (formato: "torneoId_indice")
+                const [torneoId, indice] = key.split('_');
+                
+                // Guardar en Firebase
+                if (torneoId && indice !== undefined) {
+                    await guardarCalificacionEnFirebase(torneoId, parseInt(indice), calValue);
+                    calificacionesRestauradas++;
+                }
+            }
+        }
+        
+        console.log(`✅ ${calificacionesRestauradas} calificaciones offline restauradas a Firebase`);
+        
+        // Actualizar torneos locales con los datos sincronizados
+        guardarCalificacionesEnLocalStorage();
+        actualizarTodo();
+        
+        if (calificacionesRestauradas > 0) {
+            alert(`✅ ${calificacionesRestauradas} calificaciones offline fueron sincronizadas con la nube`);
+        }
+        
+    } catch (error) {
+        console.error('Error sincronizando calificaciones offline:', error);
+        // Restaurar backup si algo falla
+        calificacionesGlobales.clear();
+        for (let [key, value] of calificacionesBackup) {
+            calificacionesGlobales.set(key, value);
+        }
+        torneos = torneosBackup;
+    }
+}
+
+    
+
     // ==============================================
     // MONITOR DE CONEXIÓN
     // ==============================================
@@ -1730,7 +1786,8 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
         // Si hay usuario logueado, reconectar y sincronizar
         if (usuarioActual && !modoOnline) {
             modoOnline = true;
-            await cargarTorneosDesdeFirebase();
+            await sincronizarCalificacionesOffline(); 
+           // await cargarTorneosDesdeFirebase(); YA NO POR QUE SE CAMBIO POR SINCRONIZAR CAIFICACIONESOFFLINE
             actualizarBotonesSesion();
         } else if (!usuarioActual) {
             actualizarBotonesSesion(); // Mostrar botón de login si estaba offline
@@ -2184,7 +2241,7 @@ const calKey = `${torneo.infoTorneo.id}_${index}`;
     const container = document.getElementById('cotejoContainer');
     
     if (!torneoActual || !torneoActual.resultadosCotejo || !torneoActual.resultadosCotejo.peleas || torneoActual.resultadosCotejo.peleas.length === 0) {
-        container.innerHTML = `<div class="no-data"><span>⚡</span><p>No hay datos de cotejo</p><p>Selecciona un torneo en la sección de calificación</p></div>`;
+        container.innerHTML = `<div class="no-data"><p>No hay datos de cotejo</p></div>`;
         return;
     }
     
@@ -3133,9 +3190,11 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
         renderizarTablaPosiciones();
         renderizarTablaSerial();
         actualizarListaTorneosUI();
-    actualizarSelectoresCalificacion();  // ← ESTA TAMBIÉN
-
+    actualizarSelectoresCalificacion();  
         actualizarTodo();
+            actualizarBadgeTorneoActual();  
+    actualizarTop4Rapidas(); 
+        actualizarComboboxPeleas();
         
         // 6. Limpiar selección actual
         document.getElementById('peleaSelect').value = '';
@@ -3144,12 +3203,6 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
         document.getElementById('infoAnterior').style.display = 'none';
         peleaSeleccionada = null;
 
-            actualizarBadgeTorneoActual(); // 🔥 AGREGAR ESTA LÍNEA
-  actualizarBadgeTorneoActual();  // ← ESTA FALTA
-    actualizarTop4Rapidas(); 
-
-                actualizarTodo();
-        actualizarComboboxPeleas();
 
 
            //  ELIMINAR EN FIREBASE SI ESTÁ ONLINE
