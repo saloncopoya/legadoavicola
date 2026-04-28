@@ -1494,6 +1494,11 @@ firebaseListenerActivo = adminDb.ref(`COTEJOS/${usuarioUID}`).on('value', async 
                     torneoLocal.resultadosCotejo.peleas[idx].tiempo = peleaFB.tiempo;
                 }
             } else {
+                  const calKey = `${cotejoId}_${idx}`;
+    if (calificacionesGlobales.has(calKey)) {
+        calificacionesGlobales.delete(calKey);
+        console.log(`🗑️ ELIMINADA Pelea ${idx+1} de calificacionesGlobales`);
+    }
                 // Asegurar que la pelea NO tenga calificación
                 if (torneoLocal.resultadosCotejo?.peleas[idx]) {
                     delete torneoLocal.resultadosCotejo.peleas[idx].calificada;
@@ -2820,18 +2825,7 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
         // 1. Eliminar del Map global
         calificacionesGlobales.delete(calKey);
 
-                //  ELIMINAR EN FIREBASE SI ESTÁ ONLINE
-        if (modoOnline && usuarioUID) {
-            await eliminarCalificacionEnFirebase(torneoId, indice);
-            actualizarComboboxPeleas();
-renderizarTablaCotejo();
-renderizarTablaPosiciones();
-renderizarTablaSerial();
-actualizarListaTorneosUI();
-actualizarBadgeTorneoActual();
-actualizarTop4Rapidas();
-            
-        }
+             
         
         // 2. Actualizar la pelea dentro del torneo
 const torneoIndex = torneos.findIndex(t => t.cotejoOriginalId === torneoId);
@@ -2896,6 +2890,21 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
 
                 actualizarTodo();
         actualizarComboboxPeleas();
+
+
+           //  ELIMINAR EN FIREBASE SI ESTÁ ONLINE
+        if (modoOnline && usuarioUID) {
+            await eliminarCalificacionEnFirebase(torneoId, indice);
+            actualizarComboboxPeleas();
+renderizarTablaCotejo();
+renderizarTablaPosiciones();
+renderizarTablaSerial();
+actualizarListaTorneosUI();
+actualizarBadgeTorneoActual();
+actualizarTop4Rapidas();
+                        actualizarSelectoresCalificacion();
+
+        }
         
     }
 }
