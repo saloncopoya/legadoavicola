@@ -981,7 +981,7 @@
             <select id="torneoSelectCalificacion" onchange="cambiarTorneoCalificacion()" style="min-width: 250px; padding: 8px; margin-left: 10px;"></select>
         </div>
                       
-                        <button class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
+                        <button id="borrarTodoBtn" class="btn-secondary" onclick="limpiarTodosLosTorneos()">🗑️ BORRAR TODO</button>
                   </div>
 
 
@@ -1179,6 +1179,7 @@
             userEmailSpan.style.display = 'inline';
              if (fileInputGroup) fileInputGroup.style.display = 'none'; 
                     if (cerrarSesionArchivosBtn) cerrarSesionArchivosBtn.style.display = 'flex';
+        if (borrarTodoBtn) borrarTodoBtn.style.display = 'none';
 
  //  OBTENER NOMBRE DEL USUARIO (displayName o email)
         let nombreUsuario = usuarioActual.displayName;
@@ -1193,6 +1194,7 @@
             userEmailSpan.style.display = 'none';
             if (fileInputGroup) fileInputGroup.style.display = 'flex';
   if (cerrarSesionArchivosBtn) cerrarSesionArchivosBtn.style.display = 'none';
+        if (borrarTodoBtn) borrarTodoBtn.style.display = 'inline-block';
 
         }
     }
