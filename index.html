@@ -1276,7 +1276,10 @@ font-size: 1.7em;
             localStorage.removeItem('cotejoOffline_torneos');
             localStorage.removeItem('cotejoOffline_calificaciones');
             console.log('✅ Torneos locales eliminados');
-            
+              actualizarTodo();
+    renderizarTablaCotejo();
+    renderizarTablaPosiciones();
+    renderizarTablaSerial();
             // Mostrar modal de login
             document.getElementById('loginModal').style.display = 'flex';
         } else {
