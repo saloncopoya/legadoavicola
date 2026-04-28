@@ -3678,10 +3678,16 @@ setTimeout(() => {
         const fileInputGroup = document.getElementById('fileInputGroup');
         if (fileInputGroup) fileInputGroup.style.display = 'none';
     } else {
-        const fileInputGroup = document.getElementById('fileInputGroup');
-        if (fileInputGroup) fileInputGroup.style.display = 'flex';
-        const importarBtn = document.getElementById('importarBtn');
-        if (importarBtn) importarBtn.style.display = 'none';
+        // Solo mostrar selector si NO estás online con sesión
+        if (!(modoOnline && usuarioActual)) {
+            const fileInputGroup = document.getElementById('fileInputGroup');
+            if (fileInputGroup) fileInputGroup.style.display = 'flex';
+            const importarBtn = document.getElementById('importarBtn');
+            if (importarBtn) importarBtn.style.display = 'none';
+        } else {
+            const fileInputGroup = document.getElementById('fileInputGroup');
+            if (fileInputGroup) fileInputGroup.style.display = 'none';
+        }
     }
 }, 100);
     
