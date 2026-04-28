@@ -2238,8 +2238,11 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
 setTimeout(() => {
     if (torneos.length > 0) {
         const fileInputGroup = document.getElementById('fileInputGroup');
-        if (fileInputGroup) fileInputGroup.style.display = 'none';
+                const importarBtn = document.getElementById('importarBtn');
 
+        if (fileInputGroup) fileInputGroup.style.display = 'none';
+ if (importarBtn) importarBtn.style.display = 'none'
+        
           // MOSTRAR secciones cuando HAY torneos
          const calificacionSection = document.getElementById('calificacion-section');
         const calificacionHeader = document.querySelector('.calificacion-flotante');
