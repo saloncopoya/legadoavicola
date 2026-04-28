@@ -1034,7 +1034,7 @@
                     </select>
                     
                     <label>📏 Ancho mínimo:</label>
-                    <input type="range" id="minWidthSlider" min="300" max="1400" value="900" onchange="cambiarAnchoMinimo()">
+                    <input type="range" id="minWidthSlider" min="100" max="1400" value="900" onchange="cambiarAnchoMinimo()">
                     <span id="minWidthValue">900px</span>
                 </div>
                 <div class="btn-group">
@@ -1082,12 +1082,13 @@
             </select>
             
             <label>📏 Ancho mínimo:</label>
-            <input type="range" id="minWidthSliderPosicion" min="300" max="1400" value="900" onchange="cambiarAnchoMinimoPosicion()">
+            <input type="range" id="minWidthSliderPosicion" min="100" max="1400" value="900" onchange="cambiarAnchoMinimoPosicion()">
             <span id="minWidthValuePosicion">900px</span>
         </div>
         <div class="btn-group">
             <button class="btn-primary" onclick="descargarTablaComoPDF('posicion')">📄 DESCARGAR POSICIONES (PDF)</button>
             <button class="btn-primary" onclick="descargarTablaComoJPG('posicion')">🖼️ DESCARGAR POSICIONES (JPG)</button>
+      <button class="btn-icon" id="darkModeToggleBtnPosicion" onclick="toggleDarkMode()">🌙 MODO</button>
         </div>
     </div>
 </div>
@@ -1129,12 +1130,13 @@
             </select>
             
             <label>📏 Ancho mínimo:</label>
-            <input type="range" id="minWidthSliderSerial" min="300" max="1400" value="900" onchange="cambiarAnchoMinimoSerial()">
+            <input type="range" id="minWidthSliderSerial" min="100" max="1400" value="900" onchange="cambiarAnchoMinimoSerial()">
             <span id="minWidthValueSerial">900px</span>
         </div>
         <div class="btn-group">
             <button class="btn-primary" onclick="descargarTablaComoPDF('serial')">📄 DESCARGAR SERIAL (PDF)</button>
             <button class="btn-primary" onclick="descargarTablaComoJPG('serial')">🖼️ DESCARGAR SERIAL (JPG)</button>
+        <button class="btn-icon" id="darkModeToggleBtnPosicion" onclick="toggleDarkMode()">🌙 MODO</button>
         </div>
     </div>
 </div>
@@ -2488,7 +2490,7 @@ if (posicionTabBtn) posicionTabBtn.style.display = 'flex';
                     <strong>${escapeHTML(t.infoTorneo.nombre)}</strong>
                     <span style="font-size: 11px; color: #666;">${t.infoTorneo.fecha}</span>
                     <span class="badge" style="background: ${peleasCalificadas === totalPeleas && totalPeleas > 0 ? '#28a745' : '#ff9800'}">${peleasCalificadas}/${totalPeleas}</span>
-                    <button onclick="eliminarTorneo(${idx})" style="background: none; border: none; cursor: pointer; color: #dc3545; font-size: 16px;">🗑️</button>
+                   ${(usuarioActual && modoOnline) ? '' : ' <button onclick="eliminarTorneo(${idx})" style="background: none; border: none; cursor: pointer; color: #dc3545; font-size: 16px;">🗑️</button>'}
                 </div>
             `;
         });
