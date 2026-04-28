@@ -1009,7 +1009,7 @@
         <!-- Controles de visualización para la tabla -->
         <div class="collapsible-section" id="seccionVisualizacion">
             <div class="collapsible-header" onclick="toggleCollapsible('visual-section')">
-                <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
+                <h3><span>👁️</span> CONFIGURAR VISUALIZACIÓN COTEJO</h3>
                 <span class="toggle-icon" id="visual-toggle-icon">▼</span>
             </div>
             <div id="visual-section" class="collapsible-content">
@@ -1062,17 +1062,36 @@
         </div>
         
         <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('visual-section-pos')">
-                <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div id="visual-section-pos" class="collapsible-content">
-                <div class="btn-group">
-                    <button class="btn-primary" onclick="descargarTablaComoPDF('posicion')">📄 DESCARGAR POSICIONES (PDF)</button>
-                    <button class="btn-primary" onclick="descargarTablaComoJPG('posicion')">🖼️ DESCARGAR POSICIONES (JPG)</button>
-                </div>
-            </div>
+    <div class="collapsible-header" onclick="toggleCollapsible('visual-section-pos')">
+        <h3><span>👁️</span>CONFIGUAR VISUALIZACIÓN - TABLA POSICIONES</h3>
+        <span class="toggle-icon">▼</span>
+    </div>
+    <div id="visual-section-pos" class="collapsible-content">
+        <div class="view-controls">
+            <label>🔤 Tamaño de letra:</label>
+            <input type="range" id="fontSizeSliderPosicion" min="7" max="24" value="14" onchange="cambiarTamañoLetraPosicion()">
+            <span id="fontSizeValuePosicion">14px</span>
+            
+            <label>🎨 Tipo de letra:</label>
+            <select id="fontFamilySelectPosicion" onchange="cambiarTipoLetraPosicion()">
+                <option value="'Segoe UI', Roboto, system-ui">Segoe UI</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Courier New', monospace">Courier New</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+            </select>
+            
+            <label>📏 Ancho mínimo:</label>
+            <input type="range" id="minWidthSliderPosicion" min="300" max="1400" value="900" onchange="cambiarAnchoMinimoPosicion()">
+            <span id="minWidthValuePosicion">900px</span>
         </div>
+        <div class="btn-group">
+            <button class="btn-primary" onclick="descargarTablaComoPDF('posicion')">📄 DESCARGAR POSICIONES (PDF)</button>
+            <button class="btn-primary" onclick="descargarTablaComoJPG('posicion')">🖼️ DESCARGAR POSICIONES (JPG)</button>
+        </div>
+    </div>
+</div>
+        
        
     </div>
     
@@ -1087,18 +1106,38 @@
                 <p style="font-size: 12px;">Importa múltiples torneos para ver el acumulado</p>
             </div>
         </div>
+      
+
         <div class="collapsible-section">
-            <div class="collapsible-header" onclick="toggleCollapsible('visual-section-serial')">
-                <h3><span>👁️</span> VISUALIZACIÓN DE TABLA</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div id="visual-section-serial" class="collapsible-content">
-                <div class="btn-group">
-                    <button class="btn-primary" onclick="descargarTablaComoPDF('serial')">📄 DESCARGAR SERIAL (PDF)</button>
-                    <button class="btn-primary" onclick="descargarTablaComoJPG('serial')">🖼️ DESCARGAR SERIAL (JPG)</button>
-                </div>
-            </div>
+    <div class="collapsible-header" onclick="toggleCollapsible('visual-section-serial')">
+        <h3><span>👁️</span> VISUALIZACIÓN - TABLA ACUMULADO</h3>
+        <span class="toggle-icon">▼</span>
+    </div>
+    <div id="visual-section-serial" class="collapsible-content">
+        <div class="view-controls">
+            <label>🔤 Tamaño de letra:</label>
+            <input type="range" id="fontSizeSliderSerial" min="7" max="24" value="14" onchange="cambiarTamañoLetraSerial()">
+            <span id="fontSizeValueSerial">14px</span>
+            
+            <label>🎨 Tipo de letra:</label>
+            <select id="fontFamilySelectSerial" onchange="cambiarTipoLetraSerial()">
+                <option value="'Segoe UI', Roboto, system-ui">Segoe UI</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Courier New', monospace">Courier New</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+            </select>
+            
+            <label>📏 Ancho mínimo:</label>
+            <input type="range" id="minWidthSliderSerial" min="300" max="1400" value="900" onchange="cambiarAnchoMinimoSerial()">
+            <span id="minWidthValueSerial">900px</span>
         </div>
+        <div class="btn-group">
+            <button class="btn-primary" onclick="descargarTablaComoPDF('serial')">📄 DESCARGAR SERIAL (PDF)</button>
+            <button class="btn-primary" onclick="descargarTablaComoJPG('serial')">🖼️ DESCARGAR SERIAL (JPG)</button>
+        </div>
+    </div>
+</div>
         
     </div>
 </div>
@@ -1175,6 +1214,12 @@
 
         const logoutBtn = document.getElementById('logoutBtn');
         const userEmailSpan = document.getElementById('userEmailSpan');
+
+        //  Usas fileInputGroup, cerrarSesionArchivosBtn y borrarTodoBtn pero NO están declaradas en esa funci
+    const fileInputGroup = document.getElementById('fileInputGroup');
+    const cerrarSesionArchivosBtn = document.getElementById('cerrarSesionArchivosBtn');
+    const borrarTodoBtn = document.getElementById('borrarTodoBtn');
+        
         
         if (usuarioActual && modoOnline) {
             loginBtn.style.display = 'none';
@@ -1768,6 +1813,70 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
         });
         localStorage.setItem('tablaFontFamily', font);
     }
+
+    // ==============================================
+// FUNCIONES PARA TABLA POSICIONES
+// ==============================================
+function cambiarTamañoLetraPosicion() {
+    const size = document.getElementById('fontSizeSliderPosicion').value;
+    document.getElementById('fontSizeValuePosicion').textContent = size + 'px';
+    const tablaPosicion = document.querySelector('#posicionContainer table');
+    if (tablaPosicion) {
+        tablaPosicion.style.fontSize = size + 'px';
+    }
+    localStorage.setItem('tablaPosicionFontSize', size);
+}
+
+function cambiarTipoLetraPosicion() {
+    const font = document.getElementById('fontFamilySelectPosicion').value;
+    const tablaPosicion = document.querySelector('#posicionContainer table');
+    if (tablaPosicion) {
+        tablaPosicion.style.fontFamily = font;
+    }
+    localStorage.setItem('tablaPosicionFontFamily', font);
+}
+
+function cambiarAnchoMinimoPosicion() {
+    const width = document.getElementById('minWidthSliderPosicion').value;
+    document.getElementById('minWidthValuePosicion').textContent = width + 'px';
+    const tablaPosicion = document.querySelector('#posicionContainer table');
+    if (tablaPosicion) {
+        tablaPosicion.style.minWidth = width + 'px';
+    }
+    localStorage.setItem('tablaPosicionMinWidth', width);
+}
+
+// ==============================================
+// FUNCIONES PARA TABLA ACUMULADO (SERIAL)
+// ==============================================
+function cambiarTamañoLetraSerial() {
+    const size = document.getElementById('fontSizeSliderSerial').value;
+    document.getElementById('fontSizeValueSerial').textContent = size + 'px';
+    const tablaSerial = document.querySelector('#serialContainer table');
+    if (tablaSerial) {
+        tablaSerial.style.fontSize = size + 'px';
+    }
+    localStorage.setItem('tablaSerialFontSize', size);
+}
+
+function cambiarTipoLetraSerial() {
+    const font = document.getElementById('fontFamilySelectSerial').value;
+    const tablaSerial = document.querySelector('#serialContainer table');
+    if (tablaSerial) {
+        tablaSerial.style.fontFamily = font;
+    }
+    localStorage.setItem('tablaSerialFontFamily', font);
+}
+
+function cambiarAnchoMinimoSerial() {
+    const width = document.getElementById('minWidthSliderSerial').value;
+    document.getElementById('minWidthValueSerial').textContent = width + 'px';
+    const tablaSerial = document.querySelector('#serialContainer table');
+    if (tablaSerial) {
+        tablaSerial.style.minWidth = width + 'px';
+    }
+    localStorage.setItem('tablaSerialMinWidth', width);
+}
     
     function cambiarAnchoMinimo() {
         const width = document.getElementById('minWidthSlider').value;
@@ -1779,30 +1888,75 @@ const peleaRef = adminDb.ref(`COTEJOS/${usuarioUID}/${torneoId}/peleas/${indiceP
     }
     
     function cargarPreferenciasVisuales() {
-        const savedFontSize = localStorage.getItem('tablaFontSize');
-        if (savedFontSize) {
-            document.getElementById('fontSizeSlider').value = savedFontSize;
-            document.getElementById('fontSizeValue').textContent = savedFontSize + 'px';
-            document.querySelectorAll('table').forEach(table => {
-                table.style.fontSize = savedFontSize + 'px';
-            });
-        }
-        const savedFontFamily = localStorage.getItem('tablaFontFamily');
-        if (savedFontFamily) {
-            document.getElementById('fontFamilySelect').value = savedFontFamily;
-            document.querySelectorAll('table').forEach(table => {
-                table.style.fontFamily = savedFontFamily;
-            });
-        }
-        const savedMinWidth = localStorage.getItem('tablaMinWidth');
-        if (savedMinWidth) {
-            document.getElementById('minWidthSlider').value = savedMinWidth;
-            document.getElementById('minWidthValue').textContent = savedMinWidth + 'px';
-            document.querySelectorAll('table').forEach(table => {
-                table.style.minWidth = savedMinWidth + 'px';
-            });
-        }
+    // ===== PREFERENCIAS PARA TABLA COTEJO =====
+    const savedFontSize = localStorage.getItem('tablaFontSize');
+    if (savedFontSize) {
+        document.getElementById('fontSizeSlider').value = savedFontSize;
+        document.getElementById('fontSizeValue').textContent = savedFontSize + 'px';
+        document.querySelectorAll('#cotejoContainer table').forEach(table => {
+            table.style.fontSize = savedFontSize + 'px';
+        });
     }
+    const savedFontFamily = localStorage.getItem('tablaFontFamily');
+    if (savedFontFamily) {
+        document.getElementById('fontFamilySelect').value = savedFontFamily;
+        document.querySelectorAll('#cotejoContainer table').forEach(table => {
+            table.style.fontFamily = savedFontFamily;
+        });
+    }
+    const savedMinWidth = localStorage.getItem('tablaMinWidth');
+    if (savedMinWidth) {
+        document.getElementById('minWidthSlider').value = savedMinWidth;
+        document.getElementById('minWidthValue').textContent = savedMinWidth + 'px';
+        document.querySelectorAll('#cotejoContainer table').forEach(table => {
+            table.style.minWidth = savedMinWidth + 'px';
+        });
+    }
+    
+    // ===== PREFERENCIAS PARA TABLA POSICIONES =====
+    const savedFontSizePos = localStorage.getItem('tablaPosicionFontSize');
+    if (savedFontSizePos) {
+        document.getElementById('fontSizeSliderPosicion').value = savedFontSizePos;
+        document.getElementById('fontSizeValuePosicion').textContent = savedFontSizePos + 'px';
+        const tablaPos = document.querySelector('#posicionContainer table');
+        if (tablaPos) tablaPos.style.fontSize = savedFontSizePos + 'px';
+    }
+    const savedFontFamilyPos = localStorage.getItem('tablaPosicionFontFamily');
+    if (savedFontFamilyPos) {
+        document.getElementById('fontFamilySelectPosicion').value = savedFontFamilyPos;
+        const tablaPos = document.querySelector('#posicionContainer table');
+        if (tablaPos) tablaPos.style.fontFamily = savedFontFamilyPos;
+    }
+    const savedMinWidthPos = localStorage.getItem('tablaPosicionMinWidth');
+    if (savedMinWidthPos) {
+        document.getElementById('minWidthSliderPosicion').value = savedMinWidthPos;
+        document.getElementById('minWidthValuePosicion').textContent = savedMinWidthPos + 'px';
+        const tablaPos = document.querySelector('#posicionContainer table');
+        if (tablaPos) tablaPos.style.minWidth = savedMinWidthPos + 'px';
+    }
+    
+    // ===== PREFERENCIAS PARA TABLA ACUMULADO =====
+    const savedFontSizeSer = localStorage.getItem('tablaSerialFontSize');
+    if (savedFontSizeSer) {
+        document.getElementById('fontSizeSliderSerial').value = savedFontSizeSer;
+        document.getElementById('fontSizeValueSerial').textContent = savedFontSizeSer + 'px';
+        const tablaSer = document.querySelector('#serialContainer table');
+        if (tablaSer) tablaSer.style.fontSize = savedFontSizeSer + 'px';
+    }
+    const savedFontFamilySer = localStorage.getItem('tablaSerialFontFamily');
+    if (savedFontFamilySer) {
+        document.getElementById('fontFamilySelectSerial').value = savedFontFamilySer;
+        const tablaSer = document.querySelector('#serialContainer table');
+        if (tablaSer) tablaSer.style.fontFamily = savedFontFamilySer;
+    }
+    const savedMinWidthSer = localStorage.getItem('tablaSerialMinWidth');
+    if (savedMinWidthSer) {
+        document.getElementById('minWidthSliderSerial').value = savedMinWidthSer;
+        document.getElementById('minWidthValueSerial').textContent = savedMinWidthSer + 'px';
+        const tablaSer = document.querySelector('#serialContainer table');
+        if (tablaSer) tablaSer.style.minWidth = savedMinWidthSer + 'px';
+    }
+}
     
     // ==============================================
     // PROCESAR TABLA DE POSICIÓN (por torneo)
@@ -2174,6 +2328,18 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         
         html += `</tbody></table>`;
         container.innerHTML = html;
+
+
+        // Aplicar estilos guardados a la tabla de posiciones
+const savedFontSize = localStorage.getItem('tablaPosicionFontSize');
+const savedFontFamily = localStorage.getItem('tablaPosicionFontFamily');
+const savedMinWidth = localStorage.getItem('tablaPosicionMinWidth');
+const nuevaTabla = container.querySelector('table');
+if (nuevaTabla) {
+    if (savedFontSize) nuevaTabla.style.fontSize = savedFontSize + 'px';
+    if (savedFontFamily) nuevaTabla.style.fontFamily = savedFontFamily;
+    if (savedMinWidth) nuevaTabla.style.minWidth = savedMinWidth + 'px';
+}
     }
     
     // ==============================================
@@ -2217,6 +2383,17 @@ const calKey = `${torneoActual.infoTorneo.id}_${index}`;  // Usar infoTorneo.id
         
         html += `</tbody></table>`;
         container.innerHTML = html;
+
+        // Aplicar estilos guardados a la tabla de acumulado
+const savedFontSize = localStorage.getItem('tablaSerialFontSize');
+const savedFontFamily = localStorage.getItem('tablaSerialFontFamily');
+const savedMinWidth = localStorage.getItem('tablaSerialMinWidth');
+const nuevaTabla = container.querySelector('table');
+if (nuevaTabla) {
+    if (savedFontSize) nuevaTabla.style.fontSize = savedFontSize + 'px';
+    if (savedFontFamily) nuevaTabla.style.fontFamily = savedFontFamily;
+    if (savedMinWidth) nuevaTabla.style.minWidth = savedMinWidth + 'px';
+}
     }
     
     // ==============================================
@@ -3612,16 +3789,42 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
             document.getElementById('cotejoContent').classList.add('active');
             document.querySelectorAll('.tab-btn')[0].classList.add('active');
             renderizarTablaCotejo();
-        } else if (pestana === 'posicion') {
-            document.getElementById('posicionContent').classList.add('active');
-            document.querySelectorAll('.tab-btn')[1].classList.add('active');
-            renderizarTablaPosiciones();
-        } else if (pestana === 'serial') {
-            document.getElementById('serialContent').classList.add('active');
-            document.querySelectorAll('.tab-btn')[2].classList.add('active');
-            renderizarTablaSerial();
+      } else if (pestana === 'posicion') {
+    document.getElementById('posicionContent').classList.add('active');
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    renderizarTablaPosiciones();
+    
+    // 🔥 Aplicar estilos guardados después de renderizar
+    setTimeout(() => {
+        const savedFontSize = localStorage.getItem('tablaPosicionFontSize');
+        const savedFontFamily = localStorage.getItem('tablaPosicionFontFamily');
+        const savedMinWidth = localStorage.getItem('tablaPosicionMinWidth');
+        const tabla = document.querySelector('#posicionContainer table');
+        if (tabla) {
+            if (savedFontSize) tabla.style.fontSize = savedFontSize + 'px';
+            if (savedFontFamily) tabla.style.fontFamily = savedFontFamily;
+            if (savedMinWidth) tabla.style.minWidth = savedMinWidth + 'px';
         }
-    }
+    }, 50);
+    
+} else if (pestana === 'serial') {
+    document.getElementById('serialContent').classList.add('active');
+    document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    renderizarTablaSerial();
+    
+    // 🔥 Aplicar estilos guardados después de renderizar
+    setTimeout(() => {
+        const savedFontSize = localStorage.getItem('tablaSerialFontSize');
+        const savedFontFamily = localStorage.getItem('tablaSerialFontFamily');
+        const savedMinWidth = localStorage.getItem('tablaSerialMinWidth');
+        const tabla = document.querySelector('#serialContainer table');
+        if (tabla) {
+            if (savedFontSize) tabla.style.fontSize = savedFontSize + 'px';
+            if (savedFontFamily) tabla.style.fontFamily = savedFontFamily;
+            if (savedMinWidth) tabla.style.minWidth = savedMinWidth + 'px';
+        }
+    }, 50);
+}
     
     function mostrarInfoModal() {
         const modal = document.createElement('div');
