@@ -953,7 +953,8 @@
         <!-- Sección colapsable: Importar Torneos -->
         <div class="collapsible-section">
             <div class="collapsible-header" onclick="toggleCollapsible('import-section')">
-                <h3><span>📥</span>TORNEOS </h3> <span id="offlineBadge" >📴 SIN INTERNET</span>
+<h3><span>📥</span>TORNEOS <span id="estadoInternetTexto" style="font-size: 11px; margin-left: 8px;"></span></h3>
+                
                 <span class="toggle-icon" id="import-toggle-icon">▼</span>
             </div>
             <div id="import-section" class="collapsible-content">
@@ -3628,11 +3629,24 @@ else if (torneoActual && torneoActual.infoTorneo.id === torneoId) torneoActual =
     // ==============================================
     // INICIALIZACIÓN
     // ==============================================
-    function actualizarEstadoOffline() {
-        const badge = document.getElementById('offlineBadge');
-        if (!navigator.onLine) badge.classList.add('show');
-        else badge.classList.remove('show');
+  function actualizarEstadoOffline() {
+    const badge = document.getElementById('offlineBadge');
+    const estadoSpan = document.getElementById('estadoInternetTexto');
+    
+    if (!navigator.onLine) {
+        badge.classList.add('show');
+        if (estadoSpan) {
+            estadoSpan.innerHTML = 'MODO OFFLINE 📴 SIN INTERNET';
+            estadoSpan.style.color = '#f44336';
+        }
+    } else {
+        badge.classList.remove('show');
+        if (estadoSpan) {
+            estadoSpan.innerHTML = 'MODO ONLINE ✅ CONECTADO A INTERNET';
+            estadoSpan.style.color = '#4CAF50';
+        }
     }
+}
     
     window.addEventListener('online', actualizarEstadoOffline);
     window.addEventListener('offline', actualizarEstadoOffline);
