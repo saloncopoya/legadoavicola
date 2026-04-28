@@ -1209,33 +1209,79 @@
         document.getElementById('loginPassword').value = '';
     }
 
-    async function iniciarSesion() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        
-        if (!email || !password) {
-            alert('Ingresa correo y contraseña');
-            return;
-        }
-        
-        try {
-            const credencial = await auth.signInWithEmailAndPassword(email, password);
-            usuarioActual = credencial.user;
-            usuarioUID = usuarioActual.uid;
-            modoOnline = true;
-            
-            cerrarModalLogin();
-            alert(`✅ Bienvenido ${usuarioActual.email}`);
-            
-            // Cargar torneos desde Firebase
-            await cargarTorneosDesdeFirebase();
-            
-            actualizarBotonesSesion();
-        } catch (error) {
-            alert('Error al iniciar sesión: ' + error.message);
-        }
-    }
 
+    async function iniciarSesion() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        alert('Ingresa correo y contraseña');
+        return;
+    }
+    
+    try {
+        const credencial = await auth.signInWithEmailAndPassword(email, password);
+        usuarioActual = credencial.user;
+        usuarioUID = usuarioActual.uid;
+        
+        cerrarModalLogin();
+        
+        // ==============================================
+        // 🔥 PREGUNTAR SI ELIMINAR TORNEOS LOCALES
+        // ==============================================
+        const hayTorneosLocales = torneos.length > 0;
+        
+        if (hayTorneosLocales) {
+            const confirmar = confirm(
+                '═══════════════════════════════════\n' +
+                '⚠️  SE DETECTARON TORNEOS LOCALES\n' +
+                '═══════════════════════════════════\n\n' +
+                '¿Deseas ELIMINAR los torneos locales\n' +
+                'y cargar los de la NUBE?\n\n' +
+                '✓ ACEPTAR → Eliminar locales y continuar\n' +
+                '✗ CANCELAR → Mantener locales y cerrar sesión\n\n' +
+                '═══════════════════════════════════'
+            );
+            
+            if (confirmar) {
+                // Usuario ACEPTA: Eliminar torneos locales
+                console.log('🗑️ Usuario aceptó eliminar torneos locales');
+                torneos = [];
+                calificacionesGlobales.clear();
+                torneoActual = null;
+                localStorage.removeItem('cotejoOffline_torneos');
+                localStorage.removeItem('cotejoOffline_calificaciones');
+                console.log('✅ Torneos locales eliminados');
+                
+                // Continuar con modo online
+                modoOnline = true;
+                alert(`✅ Bienvenido ${usuarioActual.email}`);
+                await cargarTorneosDesdeFirebase();
+                actualizarBotonesSesion();
+            } else {
+                // Usuario CANCELA: Mantener torneos locales, cerrar sesión
+                console.log('📁 Usuario decide mantener torneos locales, cerrando sesión...');
+                await auth.signOut();
+                usuarioActual = null;
+                usuarioUID = null;
+                modoOnline = false;
+                actualizarBotonesSesion();
+                alert('⚠️ Sesión cerrada. Continuas en modo OFFLINE con tus torneos locales.');
+                return; // Salir, no continuar
+            }
+        } else {
+            // No hay torneos locales, continuar normalmente
+            modoOnline = true;
+            alert(`✅ Bienvenido ${usuarioActual.email}`);
+            await cargarTorneosDesdeFirebase();
+            actualizarBotonesSesion();
+        }
+        
+    } catch (error) {
+        alert('Error al iniciar sesión: ' + error.message);
+    }
+}
+    
 
     function desconectarFirebaseTiempoReal() {
     if (firebaseListenerActivo && usuarioUID) {
@@ -1272,20 +1318,6 @@
             return;
         }
 
-
-        
-         //  Borrar todos los torneos importados localmente (JSON)
- console.log('🗑️ Limpiando torneos locales antes de cargar desde la nube...'); 
-    // 1. Borrar de la memoria
-    torneos = [];
-    calificacionesGlobales.clear();
-    torneoActual = null;
-    // 2. Borrar del localStorage para que no reaparezcan al recargar
-    localStorage.removeItem('cotejoOffline_torneos');
-    localStorage.removeItem('cotejoOffline_calificaciones');
-    console.log('✅ Torneos locales eliminados completamente');
-
-        
 
         
         // Mostrar loading
