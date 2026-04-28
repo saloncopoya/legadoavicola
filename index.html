@@ -1416,8 +1416,9 @@ const indexExistente = torneos.findIndex(t => t.cotejoOriginalId === torneoFireb
             }
             
             console.log(`✅ Cargados ${torneosArray.length} cotejos desde Firebase`);
+            
             // ==============================================
-// 🔥 ACTIVAR ESCUCHA EN TIEMPO REAL (sin borrar nada)
+// 🔥 ACTIVAR ESCUCHA EN TIEMPO REAL (CORREGIDA)
 // ==============================================
 if (firebaseListenerActivo) {
     adminDb.ref(`COTEJOS/${usuarioUID}`).off('value', firebaseListenerActivo);
@@ -1425,42 +1426,92 @@ if (firebaseListenerActivo) {
 
 firebaseListenerActivo = adminDb.ref(`COTEJOS/${usuarioUID}`).on('value', (snapshot) => {
     const nuevosDatos = snapshot.val();
-    if (!nuevosDatos) return;
+    console.log('📡 Evento en tiempo real de Firebase recibido');
     
-    let hayCambios = false;
+    if (!nuevosDatos) {
+        console.log('📭 Firebase está vacío');
+        return;
+    }
     
-    // Verificar cada pelea si cambió
+    let cambiosEnCalificaciones = false;
+    
+    // ==============================================
+    // 1. RECORRER CADA TORNEO EN FIREBASE
+    // ==============================================
     for (const [cotejoId, cotejoData] of Object.entries(nuevosDatos)) {
         if (cotejoId === 'undefined' || !cotejoId) continue;
         
         const torneoLocal = torneos.find(t => t.cotejoOriginalId === cotejoId);
-        if (!torneoLocal) continue;
+        if (!torneoLocal) {
+            console.log(`⚠️ Torneo ${cotejoId} no encontrado localmente`);
+            continue;
+        }
         
         const peleasFirebase = Array.isArray(cotejoData.peleas) ? cotejoData.peleas : Object.values(cotejoData.peleas || []);
         
-        peleasFirebase.forEach((peleaFB, idx) => {
-            if (peleaFB.ganador || peleaFB.calificada) {
-                const calKey = `${cotejoId}_${idx}`;
-                const calLocal = calificacionesGlobales.get(calKey);
-                
-                // Si cambió el ganador o el tiempo
-                if (!calLocal || calLocal.ganador !== peleaFB.ganador || calLocal.tiempo !== peleaFB.tiempo) {
+        // ==============================================
+        // 2. VERIFICAR CADA PELEA
+        // ==============================================
+        for (let idx = 0; idx < peleasFirebase.length; idx++) {
+            const peleaFB = peleasFirebase[idx];
+            const calKey = `${cotejoId}_${idx}`;
+            const calLocal = calificacionesGlobales.get(calKey);
+            
+            // 🔥 CASO A: Firebase TIENE calificación
+            if (peleaFB && (peleaFB.ganador || peleaFB.calificada === true)) {
+                // Comparar si cambió
+                if (!calLocal || 
+                    calLocal.ganador !== peleaFB.ganador || 
+                    calLocal.tiempo !== peleaFB.tiempo) {
+                    
                     calificacionesGlobales.set(calKey, {
                         ganador: peleaFB.ganador,
                         tiempo: peleaFB.tiempo,
-                        fechaCalificacion: peleaFB.fechaCalificacion
+                        fechaCalificacion: peleaFB.fechaCalificacion,
+                        timestamp: peleaFB.timestamp
                     });
-                    hayCambios = true;
-                    console.log(`🔄 Cambio en tiempo real - Pelea ${idx+1}: ${peleaFB.ganador} / ${peleaFB.tiempo}`);
+                    cambiosEnCalificaciones = true;
+                    console.log(`🔄 ACTUALIZADA Pelea ${idx+1}: ${peleaFB.ganador} / ${peleaFB.tiempo}`);
+                    
+                    // También actualizar el torneo local
+                    if (torneoLocal.resultadosCotejo?.peleas[idx]) {
+                        torneoLocal.resultadosCotejo.peleas[idx].calificada = true;
+                        torneoLocal.resultadosCotejo.peleas[idx].ganador = peleaFB.ganador;
+                        torneoLocal.resultadosCotejo.peleas[idx].tiempo = peleaFB.tiempo;
+                    }
+                }
+            } 
+            // 🔥 CASO B: Firebase NO tiene calificación (fue ELIMINADA)
+            else {
+                if (calLocal) {
+                    calificacionesGlobales.delete(calKey);
+                    cambiosEnCalificaciones = true;
+                    console.log(`🗑️ ELIMINADA Pelea ${idx+1} (ya no está en Firebase)`);
+                    
+                    // También eliminar del torneo local
+                    if (torneoLocal.resultadosCotejo?.peleas[idx]) {
+                        delete torneoLocal.resultadosCotejo.peleas[idx].calificada;
+                        delete torneoLocal.resultadosCotejo.peleas[idx].ganador;
+                        delete torneoLocal.resultadosCotejo.peleas[idx].tiempo;
+                    }
                 }
             }
-        });
+        }
     }
     
-    if (hayCambios) {
+    // ==============================================
+    // 3. SI HUBO CAMBIOS, ACTUALIZAR TODO
+    // ==============================================
+    if (cambiosEnCalificaciones) {
+        console.log('✅ Aplicando cambios en la interfaz...');
         guardarCalificacionesEnLocalStorage();
         actualizarTodo();
-        console.log('✅ Tablas actualizadas por cambio en Firebase');
+        
+        // Refrescar el selector de peleas si está visible
+        if (peleaSeleccionada && torneoActual) {
+            actualizarComboboxPeleas();
+        }
+        console.log('✅ UI actualizada con cambios de Firebase');
     }
 });
             
@@ -2755,6 +2806,14 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
                 //  ELIMINAR EN FIREBASE SI ESTÁ ONLINE
         if (modoOnline && usuarioUID) {
             await eliminarCalificacionEnFirebase(torneoId, indice);
+            actualizarComboboxPeleas();
+renderizarTablaCotejo();
+renderizarTablaPosiciones();
+renderizarTablaSerial();
+actualizarListaTorneosUI();
+actualizarBadgeTorneoActual();
+actualizarTop4Rapidas();
+            
         }
         
         // 2. Actualizar la pelea dentro del torneo
