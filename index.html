@@ -2565,8 +2565,8 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
             const club = info.club || '';
             
             torneoInfoDiv.innerHTML = `
-                <div style="font-size: 40px; font-weight: 900; color: #5D3A00; letter-spacing: -0.5px;">${nombreTorneo.toUpperCase()}</div>
-                <div style="font-size: 13px; font-weight: 600; color: #7A5C00;">${responsable} ${ciudad ? '· ' + ciudad : ''} ${club ? '· ' + club : ''}</div>
+                <div style="font-size: 22px; font-weight: 900; color: #5D3A00; letter-spacing: -0.5px;">${nombreTorneo.toUpperCase()}</div>
+                <div style="font-size: 12px; font-weight: 600; color: #7A5C00;">${responsable} ${ciudad ? '· ' + ciudad : ''} ${club ? '· ' + club : ''}</div>
             `;
         } else {
             torneoInfoDiv.innerHTML = ``;
@@ -2631,9 +2631,9 @@ const idx = torneos.findIndex(t => t.infoTorneo.id === torneoActual.infoTorneo.i
             if (top4[i]) {
                 const p = top4[i];
                 html += `
-                    <div class="top4-card" style="background: white; border-radius: 30px; padding: 1px 1px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
-                        <div style="font-size: 14px; font-weight: 900; text-transform: uppercase; margin: 2px 0; white-space: normal; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
-                        <div style="font-size: 22px; color: #E6A017; font-weight: 900;"> ${p.tiempo}</div>
+                    <div class="top4-card" style="background: white; border-radius: 20px; padding: 1px 1px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; margin: 2px 0; white-space: normal; overflow-x: hidden; text-overflow: ellipsis;">${p.ganador}</div>
+                        <div style="font-size: 20px; color: #E6A017; font-weight: 900;"> ${p.tiempo}</div>
                     </div>
                 `;
             } else {
