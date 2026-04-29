@@ -3151,7 +3151,11 @@ if (torneoActual && torneoActual.cotejoOriginalId === torneoId) {
              
         
         // 2. Actualizar la pelea dentro del torneo
-const torneoIndex = torneos.findIndex(t => t.cotejoOriginalId === torneoId);
+// 🔥 BÚSQUEDA INTELIGENTE: busca por cotejoOriginalId O por infoTorneo.id
+const torneoIndex = torneos.findIndex(t => 
+    t.cotejoOriginalId === torneoId || 
+    t.infoTorneo?.id === torneoId
+);
         
         if (torneoIndex !== -1 && torneos[torneoIndex].resultadosCotejo && torneos[torneoIndex].resultadosCotejo.peleas[indice]) {
             const pelea = torneos[torneoIndex].resultadosCotejo.peleas[indice];
