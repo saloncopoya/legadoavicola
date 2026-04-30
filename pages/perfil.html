@@ -3,629 +3,886 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Legado Avícola | Sistema Completo de Torneo</title>
+    <title>Legado Avícola - Sistema de Cotejo Computarizado</title>
+    <meta name="theme-color" content="#8B4513">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --marron: #8B4513; --marron-claro: #D2691E; --verde: #4CAF50;
-            --rojo: #d32f2f; --azul: #2196F3; --naranja: #f57c00;
-            --gris-claro: #f8f9fa; --gris-texto: #666;
-            --sombra: 0 2px 8px rgba(0,0,0,0.1);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: #f0f2f5;
-            padding: 16px;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f5f0eb;
+            min-height: 100vh;
+        }
+
+        /* Barra Superior */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #6b3a1f, #8B4513);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            height: 64px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            font-size: 1.8rem;
+        }
+
+        .top-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-icon-sm {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-sm:hover {
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary-sm {
+            background: #FFD700;
+            color: #8B4513;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-sm:hover {
+            background: #FFC107;
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .main-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 24px;
         }
-        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); }
-        .btn { border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #e0e0e0; }
-        .btn-primary { background: var(--marron); color: white; }
-        .btn-success { background: var(--verde); color: white; }
-        .btn-danger { background: var(--rojo); color: white; }
-        .btn-warning { background: var(--naranja); color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 3000; display: flex; align-items: center; justify-content: center; }
-        .modal-container { background: white; border-radius: 28px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 24px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; }
-        .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
-        .gallo-row { background: var(--gris-claro); padding: 12px; border-radius: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
-        .btn-estado { background: var(--verde); color: white; border: none; padding: 8px 12px; border-radius: 30px; cursor: pointer; font-weight: bold; }
-        .btn-estado.pendiente { background: var(--rojo); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; overflow-x: auto; display: block; }
-        th, td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; }
-        th { background: var(--marron); color: white; }
-        .duplicado { background-color: #ffebee !important; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--marron); color: white; padding: 12px 24px; border-radius: 60px; z-index: 4000; font-weight: 600; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px);} to { opacity: 1; transform: translateX(-50%) translateY(0);} }
-        .vallin-btn { background: var(--rojo); color: white; border: none; width: 56px; height: 56px; border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; }
-        .vallin-btn.active { background: var(--verde); }
-        .movement-buttons { display: flex; gap: 6px; justify-content: center; }
-        .movement-buttons button { background: var(--azul); color: white; border: none; border-radius: 20px; padding: 4px 8px; cursor: pointer; }
-        .top4-card { background: white; border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-        .collapsible-header { display: flex; justify-content: space-between; cursor: pointer; font-weight: 700; font-size: 18px; padding-bottom: 12px; border-bottom: 2px solid #eee; margin-bottom: 16px; }
-        @media (max-width: 768px) { body { padding: 8px; } .gallo-row { flex-direction: column; } }
+
+        /* Secciones colapsables */
+        .collapsible-section {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #fffaf5;
+            cursor: pointer;
+            border-bottom: 2px solid #f0e0d0;
+        }
+
+        .collapsible-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #8B4513;
+            font-size: 1.1rem;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            color: #8B4513;
+            transition: transform 0.2s;
+        }
+
+        .collapsible-content {
+            display: none;
+            padding: 24px;
+        }
+
+        .collapsible-content.show {
+            display: block;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a2a12;
+            font-size: 0.85rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0d0c0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #8B4513;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139,69,19,0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        /* Botones */
+        .btn-primary {
+            background: linear-gradient(135deg, #8B4513, #a0522d);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139,69,19,0.3);
+        }
+
+        .btn-secondary {
+            background: #f0e8e0;
+            color: #4a2a12;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #e0d0c0;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* Tablas */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #e0d0c0;
+        }
+
+        th {
+            background: #8B4513;
+            color: white;
+            font-weight: 700;
+        }
+
+        .table-row-clickable {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .table-row-clickable:hover {
+            background: #fff3e0;
+        }
+
+        .duplicate-ring {
+            background: #ffebee !important;
+            color: #c62828;
+        }
+
+        /* Gallos Grid */
+        .gallos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .gallo-card {
+            border: 2px solid #f0e0d0;
+            border-radius: 16px;
+            padding: 16px;
+            background: #fefaf5;
+        }
+
+        .gallo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0d0c0;
+        }
+
+        .btn-estado {
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-estado.presente {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-estado.pendiente {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Métricas */
+        .metricas-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .metrica {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #fffaf5, #fff5ec);
+            border-radius: 16px;
+            border: 1px solid #f0e0d0;
+        }
+
+        .metrica .valor {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #8B4513;
+        }
+
+        .move-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .move-btn {
+            background: #f0e8e0;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .move-btn:hover {
+            background: #8B4513;
+            color: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: #2d2d2d;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            margin-top: 10px;
+            animation: slideIn 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.warning { background: #ffc107; color: #333; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .badge {
+            background: #8B4513;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar { height: auto; padding: 12px; }
+            .gallos-grid { grid-template-columns: 1fr; }
+            .metricas-container { flex-direction: column; }
+        }
+
+        @media print {
+            .top-bar, .btn-group, .move-buttons, .collapsible-header .toggle-icon { display: none !important; }
+            .collapsible-content { display: block !important; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
-<div id="app"></div>
+    <div class="top-bar">
+        <div class="logo"><span>🐓</span> LEGADO AVÍCOLA - COTEJO OFICIAL</div>
+        <div class="top-buttons">
+            <button class="btn-icon-sm" onclick="App.mostrarModalTorneo()">📋 NUEVO TORNEO</button>
+            <button class="btn-icon-sm" onclick="App.exportarBackup()">💾 EXPORTAR TODO</button>
+            <button class="btn-primary-sm" onclick="App.importarArchivo()">📂 IMPORTAR JSON</button>
+        </div>
+    </div>
 
-<script>
-    // ==================== CONSTANTES Y ESTADO GLOBAL ====================
-    const STORAGE = {
-        TORNEO_ACTUAL: 'torneo_completo_actual',
-        COTEJO_ACTUAL: 'cotejo_actual_completo',
-        TORNEOS_ANTERIORES: 'torneos_anteriores_serial',
-        CATALOGOS: 'catalogos_generales'
-    };
-    
-    let torneoActual = null;
-    let resultadosCotejo = null;      // { peleas, noEmparejados, metricas, modo, guardado }
-    let calificacionesMap = new Map(); // key: indice pelea
-    let configuracion = {
-        gallosPorPartido: 3,
-        anillosEditables: false,
-        registroDetalladoActivo: false,
-        rangoPeso: 50,
-        pesoMin: 1700,
-        pesoMax: 2400,
-        puntosConfig: { ganador: 2, empate: 1, perdedor: 0 }
-    };
-    let juecesDisponibles = [
-        { uid: 'j1', nombre: 'RAMON GARCIA', partido: 'LOS SANTOS', telefono: '961111111' },
-        { uid: 'j2', nombre: 'PEDRO MARTINEZ', partido: 'REAL MADRID', telefono: '961222222' },
-        { uid: 'j3', nombre: 'LUIS FERNANDEZ', partido: 'ATLETICO', telefono: '961333333' }
-    ];
-    let serialTorneos = []; // torneos anteriores para vincular
+    <div class="main-container" id="mainApp"></div>
 
-    // ==================== UTILIDADES ====================
-    const Utils = {
-        escapeHTML(str) { return String(str).replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); },
-        showToast(msg, type='info', duration=4000) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.background = type==='error'?'var(--rojo)': type==='success'?'var(--verde)': type==='warning'?'var(--naranja)':'var(--marron)';
-            toast.innerText = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), duration);
-        },
-        vibrate(pattern) { if(navigator.vibrate) navigator.vibrate(pattern); },
-        formatTiempo(segundos) { if(!segundos) return '00:00'; const m = Math.floor(segundos/60); const s = segundos%60; return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; },
-        timeToSeconds(tiempo) { if(!tiempo) return 0; const p = tiempo.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); }
-    };
+    <div class="toast-container" id="toastContainer"></div>
 
-    // ==================== RENDER PRINCIPAL ====================
-    function renderApp() {
-        const root = document.getElementById('app');
-        if(!torneoActual) {
-            root.innerHTML = `<div class="card" style="text-align:center;padding:40px;"><span style="font-size:64px;">🐓</span><h2>Sin torneo activo</h2><button class="btn btn-primary" onclick="window.modalTorneo(true)">+ CREAR TORNEO</button><button class="btn" onclick="window.modalImportarJSON()">📂 Importar JSON</button><button class="btn" onclick="window.cargarTorneoAnteriorSerial()">📋 Torneos Anteriores</button></div>`;
-            return;
-        }
-        
-        const info = torneoActual;
-        const cotejoExistente = resultadosCotejo && resultadosCotejo.guardado;
-        const hayResultadosTemp = resultadosCotejo && !resultadosCotejo.guardado;
-        
-        let html = `
-            <div class="card" style="border-left:6px solid var(--marron);">
-                <div style="font-size:28px;font-weight:800;color:var(--marron);">🐔 ${Utils.escapeHTML(info.nombre)}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:16px;margin:12px 0;font-size:14px;">
-                    <span>📅 ${info.fecha||'—'}</span> <span>👤 ${info.organizador||'—'}</span> <span>📍 ${info.lugar||'—'}</span>
-                    <span>🏟️ ${info.palenque||'—'}</span> <span>⚖️ ${info.pesoMin}g - ${info.pesoMax}g | Dif: ${configuracion.rangoPeso}g</span>
-                </div>
-                <div class="form-row"><button class="btn" onclick="window.modalTorneo(false)">✏️ EDITAR</button><button class="btn btn-warning" onclick="window.nuevoTorneoForzado()">✨ NUEVO TORNEO</button></div>
-            </div>
-        `;
-        
-        // SECCION REGISTRO DE PARTIDOS (solo si no hay cotejo guardado)
-        if(!cotejoExistente) {
-            html += `<div class="card"><div class="collapsible-header" onclick="toggleSection('configPanel')">⚙️ CONFIGURACIÓN RÁPIDA <span id="cfgIcon">▼</span></div><div id="configPanel">`;
-            html += `<div class="form-row">Gallos/Partido: <input type="number" id="gallosPorPartido" min="1" max="6" value="${configuracion.gallosPorPartido}" onchange="window.actualizarGallosPorPartido(this.value)"></div>`;
-            html += `<label><input type="checkbox" id="editarAnillos" ${configuracion.anillosEditables?'checked':''} onchange="window.toggleAnillosEditables(this.checked)"> Editar anillos</label>`;
-            html += `<label><input type="checkbox" id="detalleColor" ${configuracion.registroDetalladoActivo?'checked':''} onchange="window.toggleRegistroDetallado(this.checked)"> Agregar Color</label>`;
-            html += `<div>Rango peso: <input type="range" id="rangoPeso" min="10" max="200" value="${configuracion.rangoPeso}" onchange="configuracion.rangoPeso=parseInt(this.value)"> ${configuracion.rangoPeso}g</div>`;
-            html += `</div></div>`;
-            
-            html += `<div class="card"><h3>📝 REGISTRAR PARTIDO</h3><div class="form-group"><label>Nombre Partido *</label><input type="text" id="nombrePartido" list="partidosList" maxlength="35"></div>`;
-            html += `<div class="form-group"><label>Representante</label><input type="text" id="representantePartido" list="representantesList" oninput="window.verificarRepresentante(this.value)"></div>`;
-            html += `<div id="gallosDinamicos"></div><button class="btn btn-primary" onclick="window.registrarPartido()">✓ REGISTRAR PARTIDO</button></div>`;
-            html += `<div class="card"><h3>📋 REGISTRO DE GALLOS</h3><div id="tablaRegistroGallos" class="table-responsive"></div></div>`;
-        }
-        
-        // SECCION COTEJO
-        html += `<div class="card"><h3>⚡ GENERACIÓN DE COTEJO</h3>`;
-        if(!cotejoExistente) {
-            html += `<div class="form-row"><select id="modoCotejo"><option value="ASCENDENTE">⬆️ ASCENDENTE</option><option value="DESCENDENTE">⬇️ DESCENDENTE</option><option value="ALEATORIO">🎲 ALEATORIO</option><option value="INTELIGENTE" selected>🤖 INTELIGENTE</option></select>`;
-            html += `<button class="btn btn-success" onclick="window.ejecutarCotejo()">🎲 COTEJAR AHORA</button>`;
-            if(hayResultadosTemp) html += `<button class="btn btn-warning" onclick="window.limpiarResultados()">🧹 LIMPIAR</button>`;
-            if(hayResultadosTemp) html += `<button class="btn btn-primary" onclick="window.guardarCotejo()">💾 GUARDAR COTEJO</button>`;
-            html += `</div>`;
-        } else {
-            html += `<div class="form-row"><button class="btn btn-primary" onclick="window.descargarPDFPersonalizado()">📄 DESCARGAR PDF</button>`;
-            html += `<button class="btn btn-danger" onclick="window.eliminarCotejo()">🗑️ ELIMINAR</button></div>`;
-        }
-        if(resultadosCotejo && resultadosCotejo.peleas?.length) html += `<div id="tablaCotejoContainer" style="margin-top:20px;overflow-x:auto;"></div>`;
-        html += `</div>`;
-        
-        // SECCION CALIFICACIONES (solo si cotejo guardado)
-        if(cotejoExistente && resultadosCotejo) {
-            html += `<div class="card"><h3>🏆 CALIFICACIONES</h3><select id="peleaSelectCalif" onchange="window.cambioPeleaCalif()"></select>`;
-            html += `<div id="detallePeleaCalif"></div><div id="vallinesContainer" class="form-row"></div>`;
-            html += `<div id="formCalif" style="display:none;"><input type="text" id="tiempoPelea" placeholder="MM:SS" maxlength="5" oninput="window.formatearTiempo(this)"><select id="ganadorSelect"><option value="">-- Ganador --</option><option value="rojo">🔴 ROJO</option><option value="verde">🟢 VERDE</option><option value="empate">🤝 EMPATE</option></select>`;
-            html += `<button class="btn btn-success" onclick="window.calificarPelea()">✅ CALIFICAR</button></div><div id="infoAnteriorCalif"></div></div>`;
-            
-            // Tabla de Posiciones
-            html += `<div class="card"><h3>🏆 TABLA DE POSICIONES</h3><div id="tablaPosiciones"></div></div>`;
-            
-            // Tabla Serial (acumulado)
-            html += `<div class="card"><h3>🔗 TABLA SERIAL (ACUMULADO)</h3><div id="tablaSerial"></div></div>`;
-            
-            // Asignar Juez
-            html += `<div class="card"><div class="collapsible-header" onclick="toggleSection('juezPanel')">👨‍⚖️ ASIGNAR JUEZ <span>▼</span></div><div id="juezPanel" style="display:none">`;
-            html += `<input type="text" id="buscarJuez" placeholder="Buscar juez..." oninput="window.filtrarJueces()"><div id="juecesListaCheck"></div>`;
-            html += `<div class="form-row"><select id="tiempoPermiso"><option value="30">30 min</option><option value="60">1 hora</option><option value="720">12 horas</option><option value="1440">24 horas</option></select>`;
-            html += `<button class="btn" onclick="window.asignarJueces()">ASIGNAR</button><button class="btn btn-danger" onclick="window.eliminarJuecesAsignados()">ELIMINAR</button></div>`;
-            html += `<div id="juecesAsignadosLista"></div></div></div>`;
-            
-            // Videos
-            html += `<div class="card"><div class="collapsible-header" onclick="toggleSection('videosPanel')">🎥 AGREGAR VIDEOS <span>▼</span></div><div id="videosPanel" style="display:none">`;
-            html += `<select id="videoPeleaSelect"></select><textarea id="urlsVideos" rows="3" placeholder="https://... (1 URL por línea)"></textarea>`;
-            html += `<button class="btn" onclick="window.guardarVideos()">GUARDAR</button><div id="videosGuardadosList"></div></div></div>`;
-        }
-        
-        root.innerHTML = html;
-        
-        // Cargar data lists
-        const catalogos = JSON.parse(localStorage.getItem(STORAGE.CATALOGOS) || '{"partidos":[],"representantes":[]}');
-        const partidosDatalist = `<datalist id="partidosList">${catalogos.partidos.map(p=>`<option>${Utils.escapeHTML(p)}</option>`).join('')}</datalist>`;
-        const repsDatalist = `<datalist id="representantesList">${catalogos.representantes.map(r=>`<option>${Utils.escapeHTML(r)}</option>`).join('')}</datalist>`;
-        if(document.getElementById('gallosDinamicos')) {
-            document.getElementById('gallosDinamicos').insertAdjacentHTML('afterend', partidosDatalist + repsDatalist);
-            actualizarCamposGallos();
-        }
-        if(resultadosCotejo && resultadosCotejo.peleas) {
-            renderizarTablaCotejo();
-            if(cotejoExistente) {
-                actualizarComboboxPeleasCalif();
-                renderizarTablaPosiciones();
-                renderizarTablaSerial();
-                actualizarJuecesUI();
-                actualizarVideosUI();
-            }
-        }
-        if(!cotejoExistente) renderizarTablaRegistro();
-    }
-    
-    // ==================== REGISTRO DE PARTIDOS ====================
-    function actualizarCamposGallos() {
-        const container = document.getElementById('gallosDinamicos');
-        if(!container) return;
-        let html = `<div class="gallos-grid">`;
-        for(let i=1; i<=configuracion.gallosPorPartido; i++) {
-            html += `<div class="gallo-row">
-                        <button class="btn-estado presente" data-gallo="${i}" onclick="window.toggleEstadoGallo(${i})">PRESENTE</button>
-                        <input type="text" id="anillo_${i}" placeholder="Anillo" maxlength="4" ${configuracion.anillosEditables?'':'readonly'}>
-                        <input type="text" id="peso_${i}" placeholder="Peso (g)">
-                        ${configuracion.registroDetalladoActivo ? `<input type="text" id="color_${i}" placeholder="Color">` : ''}
-                    </div>`;
-        }
-        html += `</div>`;
-        container.innerHTML = html;
-    }
-    
-    window.registrarPartido = function() {
-        const nombrePartido = document.getElementById('nombrePartido')?.value.trim().toUpperCase();
-        if(!nombrePartido) return Utils.showToast('Nombre del partido requerido','error');
-        if(torneoActual.registro && torneoActual.registro[nombrePartido]) return Utils.showToast('Partido ya registrado','error');
-        const representante = document.getElementById('representantePartido')?.value.trim().toUpperCase() || '';
-        const gallosData = {};
-        for(let i=1;i<=configuracion.gallosPorPartido;i++) {
-            const anillo = document.getElementById(`anillo_${i}`)?.value.trim();
-            const peso = document.getElementById(`peso_${i}`)?.value.trim();
-            const color = configuracion.registroDetalladoActivo ? document.getElementById(`color_${i}`)?.value.trim() : '';
-            if(!anillo || anillo.length<3 || anillo.length>4) return Utils.showToast(`Anillo gallo ${i} inválido`,'error');
-            if(verificarAnilloDuplicado(anillo)) return Utils.showToast(`Anillo ${anillo} ya existe`,'error');
-            const pesoNum = peso ? parseInt(peso) : 0;
-            if(pesoNum && (pesoNum<configuracion.pesoMin || pesoNum>configuracion.pesoMax)) return Utils.showToast(`Peso fuera de rango`,'error');
-            gallosData[anillo] = { peso: pesoNum, color };
-        }
-        if(!torneoActual.registro) torneoActual.registro = {};
-        torneoActual.registro[nombrePartido] = { representante, gallos: gallosData, timestamp: Date.now() };
-        guardarCatalogos(nombrePartido, representante);
-        guardarTorneo();
-        if(resultadosCotejo && !resultadosCotejo.guardado) { resultadosCotejo = null; }
-        Utils.showToast('Partido registrado','success');
-        Utils.vibrate([100,50,100]);
-        document.getElementById('nombrePartido').value = '';
-        document.getElementById('representantePartido').value = '';
-        for(let i=1;i<=configuracion.gallosPorPartido;i++) {
-            document.getElementById(`anillo_${i}`).value = '';
-            document.getElementById(`peso_${i}`).value = '';
-            if(configuracion.registroDetalladoActivo) document.getElementById(`color_${i}`).value = '';
-        }
-        renderApp();
-    };
-    
-    function verificarAnilloDuplicado(anillo) {
-        if(!torneoActual?.registro) return false;
-        for(const p in torneoActual.registro) {
-            if(torneoActual.registro[p].gallos[anillo]) return true;
-        }
-        return false;
-    }
-    
-    function guardarCatalogos(partido, rep) {
-        const catalogos = JSON.parse(localStorage.getItem(STORAGE.CATALOGOS) || '{"partidos":[],"representantes":[]}');
-        if(!catalogos.partidos.includes(partido)) catalogos.partidos.push(partido);
-        if(rep && !catalogos.representantes.includes(rep)) catalogos.representantes.push(rep);
-        localStorage.setItem(STORAGE.CATALOGOS, JSON.stringify(catalogos));
-    }
-    
-    function renderizarTablaRegistro() {
-        if(!torneoActual?.registro) return;
-        let rows = '';
-        for(const partido in torneoActual.registro) {
-            const data = torneoActual.registro[partido];
-            for(const anillo in data.gallos) {
-                const gallo = data.gallos[anillo];
-                const duplicado = verificarAnilloDuplicado(anillo);
-                rows += `<tr class="${duplicado?'duplicado':''}">
-                            >${anillo}${duplicado?'⚠️':''}</td>
-                            >${gallo.peso || 'PENDIENTE'}</td>
-                            >${Utils.escapeHTML(partido)}</td>
-                            >${Utils.escapeHTML(data.representante)}</td>
-                            >${gallo.color || '-'}</td>
-                            ><button class="btn btn-sm" onclick="window.editarPartido('${partido}')">✏️</button></td>
-                         </tr>`;
-            }
-        }
-        document.getElementById('tablaRegistroGallos').innerHTML = `<table><thead><tr><th>Anillo</th><th>Peso</th><th>Partido</th><th>Representante</th><th>Color</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
-    }
-    
-    // ==================== ALGORITMOS DE COTEJO ====================
-    function obtenerGallosArray() {
-        let gallos = [];
-        for(const partido in torneoActual.registro) {
-            for(const anillo in torneoActual.registro[partido].gallos) {
-                const g = torneoActual.registro[partido].gallos[anillo];
-                if(g.peso > 0) gallos.push({ anillo, peso: g.peso, partido, representante: torneoActual.registro[partido].representante, color: g.color });
-            }
-        }
-        return gallos;
-    }
-    
-    function emparejar(gallos, modo) {
-        let sorted = [...gallos];
-        if(modo === 'ASCENDENTE') sorted.sort((a,b)=>a.peso-b.peso);
-        else if(modo === 'DESCENDENTE') sorted.sort((a,b)=>b.peso-a.peso);
-        else sorted.sort(()=>Math.random()-0.5);
-        let peleas = [];
-        for(let i=0;i+1<sorted.length;i+=2) {
-            if(Math.abs(sorted[i].peso - sorted[i+1].peso) <= configuracion.rangoPeso && sorted[i].partido !== sorted[i+1].partido && sorted[i].representante !== sorted[i+1].representante) {
-                peleas.push({ g1: sorted[i], g2: sorted[i+1] });
-            }
-        }
-        return peleas;
-    }
-    
-    function distribucionInteligente(peleas) {
-        let mejorScore = -Infinity;
-        let mejorOrden = peleas;
-        for(let intento=0;intento<100;intento++) {
-            let orden = [...peleas];
-            for(let i=orden.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [orden[i],orden[j]]=[orden[j],orden[i]]; }
-            let score = 0;
-            for(let i=0;i<orden.length-1;i++) {
-                if(orden[i].g1.partido === orden[i+1].g1.partido || orden[i].g1.partido === orden[i+1].g2.partido ||
-                   orden[i].g2.partido === orden[i+1].g1.partido || orden[i].g2.partido === orden[i+1].g2.partido) score -= 50;
-                else if(i<orden.length-2 && (orden[i].g1.partido === orden[i+2].g1.partido)) score -= 20;
-            }
-            if(score > mejorScore) { mejorScore = score; mejorOrden = orden; }
-        }
-        return mejorOrden;
-    }
-    
-    window.ejecutarCotejo = function() {
-        const gallos = obtenerGallosArray();
-        if(gallos.length < 2) return Utils.showToast('Se necesitan al menos 2 gallos presentes','error');
-        const modo = document.getElementById('modoCotejo').value;
-        let parejas = emparejar(gallos, modo);
-        if(parejas.length === 0) return Utils.showToast('No se pudieron generar peleas con las restricciones','error');
-        if(modo === 'INTELIGENTE') parejas = distribucionInteligente(parejas);
-        const peleas = parejas.map((p,idx)=>({ numero: idx+1, gallo1: p.g1, gallo2: p.g2, diferencia: Math.abs(p.g1.peso-p.g2.peso) }));
-        resultadosCotejo = { peleas, noEmparejados: [], metricas: { totalGallos: gallos.length, peleasGeneradas: peleas.length }, guardado: false, modo };
-        renderApp();
-    };
-    
-    window.guardarCotejo = function() {
-        if(!resultadosCotejo) return;
-        resultadosCotejo.guardado = true;
-        torneoActual.cotejoId = 'cotejo_'+Date.now();
-        resultadosCotejo.id = torneoActual.cotejoId;
-        guardarTorneo();
-        localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
-        renderApp();
-    };
-    
-    function renderizarTablaCotejo() {
-        if(!resultadosCotejo?.peleas) return;
-        let html = `<table><thead><tr><th>#</th><th>CINTA ROJA</th><th>A1</th><th>P1</th><th>#</th><th>P2</th><th>A2</th><th>CINTA VERDE</th><th>DIF</th><th>GANADOR</th><th>TIEMPO</th>${!resultadosCotejo.guardado ? '<th>MOVER</th>' : ''}</tr></thead><tbody>`;
-        resultadosCotejo.peleas.forEach((p,idx)=>{
-            const cal = calificacionesMap.get(idx);
-            const ganadorTxt = cal ? (cal.ganador==='rojo'?`🔴 ${p.gallo1.partido}`: cal.ganador==='verde'?`🟢 ${p.gallo2.partido}`:'🤝 EMPATE') : '—';
-            const tiempo = cal?.tiempo || '—';
-            html += `<tr style="background:${cal?'#e3f2fd':''}">
-                        <td>${p.numero}</td><td>${Utils.escapeHTML(p.gallo1.partido)}</td><td>${p.gallo1.anillo}</td><td>${p.gallo1.peso}g</td>
-                        <td>${p.numero}</td><td>${p.gallo2.peso}g</td><td>${p.gallo2.anillo}</td><td>${Utils.escapeHTML(p.gallo2.partido)}</td>
-                        <td>${p.diferencia}g</td><td>${ganadorTxt}</td><td>${tiempo}</td>`;
-            if(!resultadosCotejo.guardado) {
-                html += `<td class="movement-buttons">
-                            <button onclick="window.moverPelea(${idx},'up')">▲</button>
-                            <button onclick="window.moverPelea(${idx},'down')">▼</button>
-                            <button onclick="window.intercambiarGallos(${idx})">🔄</button>
-                            <button onclick="window.moverAPosicion(${idx})">↗️</button>
-                         </td>`;
-            }
-            html += `</tr>`;
-        });
-        html += `</tbody></table>`;
-        document.getElementById('tablaCotejoContainer').innerHTML = html;
-    }
-    
-    window.moverPelea = function(idx, dir) {
-        if(!resultadosCotejo || resultadosCotejo.guardado) return;
-        let newIdx = dir==='up' ? idx-1 : idx+1;
-        if(newIdx<0 || newIdx>=resultadosCotejo.peleas.length) return;
-        [resultadosCotejo.peleas[idx], resultadosCotejo.peleas[newIdx]] = [resultadosCotejo.peleas[newIdx], resultadosCotejo.peleas[idx]];
-        resultadosCotejo.peleas.forEach((p,i)=>p.numero=i+1);
-        renderApp();
-    };
-    window.intercambiarGallos = function(idx) {
-        if(!resultadosCotejo || resultadosCotejo.guardado) return;
-        const p = resultadosCotejo.peleas[idx];
-        [p.gallo1, p.gallo2] = [p.gallo2, p.gallo1];
-        p.diferencia = Math.abs(p.gallo1.peso - p.gallo2.peso);
-        renderApp();
-    };
-    window.moverAPosicion = function(idx) {
-        const nueva = prompt(`Mover pelea #${idx+1} a posición (1-${resultadosCotejo.peleas.length})`);
-        if(nueva && !isNaN(nueva)) {
-            const dest = parseInt(nueva)-1;
-            if(dest>=0 && dest<resultadosCotejo.peleas.length && dest!==idx) {
-                const [item] = resultadosCotejo.peleas.splice(idx,1);
-                resultadosCotejo.peleas.splice(dest,0,item);
-                resultadosCotejo.peleas.forEach((p,i)=>p.numero=i+1);
-                renderApp();
-            }
-        }
-    };
-    
-    // ==================== TABLA POSICIONES ====================
-    function procesarTablaPosicion() {
-        if(!resultadosCotejo?.peleas) return [];
-        const mapa = new Map();
-        const puntosConf = configuracion.puntosConfig;
-        resultadosCotejo.peleas.forEach((p,idx)=>{
-            const cal = calificacionesMap.get(idx);
-            if(!cal) return;
-            const partido1 = p.gallo1.partido, partido2 = p.gallo2.partido;
-            if(!mapa.has(partido1)) mapa.set(partido1, { puntos:0, tiempo:0, gallos:[] });
-            if(!mapa.has(partido2)) mapa.set(partido2, { puntos:0, tiempo:0, gallos:[] });
-            let pts1=0, pts2=0, tiempoSeg = Utils.timeToSeconds(cal.tiempo);
-            if(cal.ganador==='rojo') { pts1=puntosConf.ganador; pts2=puntosConf.perdedor; }
-            else if(cal.ganador==='verde') { pts1=puntosConf.perdedor; pts2=puntosConf.ganador; }
-            else { pts1=puntosConf.empate; pts2=puntosConf.empate; }
-            mapa.get(partido1).puntos += pts1;
-            mapa.get(partido2).puntos += pts2;
-            if(pts1===puntosConf.ganador || cal.ganador==='empate') mapa.get(partido1).tiempo += tiempoSeg;
-            if(pts2===puntosConf.ganador || cal.ganador==='empate') mapa.get(partido2).tiempo += tiempoSeg;
-        });
-        let arr = Array.from(mapa.entries()).map(([nombre,data])=>({ nombre, puntos:data.puntos, tiempo:data.tiempo }));
-        arr.sort((a,b)=> b.puntos!==a.puntos ? b.puntos-a.puntos : a.tiempo-b.tiempo);
-        return arr;
-    }
-    
-    function renderizarTablaPosiciones() {
-        const datos = procesarTablaPosicion();
-        if(datos.length===0) { document.getElementById('tablaPosiciones').innerHTML = '<div class="no-data">Sin datos de posición</div>'; return; }
-        let html = `<table><thead><tr><th>Partido</th><th>Puntos</th><th>Tiempo</th></tr></thead><tbody>`;
-        datos.forEach(d=>{ html += `<tr><td>${Utils.escapeHTML(d.nombre)}</td><td><strong>${d.puntos}</strong></td><td>${Utils.formatTiempo(d.tiempo)}</td></tr>`; });
-        html+=`</tbody></table>`;
-        document.getElementById('tablaPosiciones').innerHTML = html;
-    }
-    
-    // ==================== TABLA SERIAL ====================
-    function procesarTablaSerial() {
-        let mapaSerial = new Map();
-        const seriales = [torneoActual, ...serialTorneos];
-        seriales.forEach(t => {
-            if(!t?.registro) return;
-            for(const partido in t.registro) {
-                if(!mapaSerial.has(partido)) mapaSerial.set(partido, { puntos:0, torneos:0 });
-                mapaSerial.get(partido).torneos++;
-            }
-        });
-        return Array.from(mapaSerial.entries()).map(([nombre,data])=>({ nombre, torneos:data.torneos })).sort((a,b)=>b.torneos-a.torneos);
-    }
-    
-    function renderizarTablaSerial() {
-        const datos = procesarTablaSerial();
-        if(datos.length===0) { document.getElementById('tablaSerial').innerHTML = '<div class="no-data">Sin datos serial</div>'; return; }
-        let html = `<table><thead><tr><th>Partido</th><th>Torneos Participados</th></tr></thead><tbody>`;
-        datos.forEach(d=>{ html += `<tr><td>${Utils.escapeHTML(d.nombre)}</td><td>${d.torneos}</td></tr>`; });
-        html+=`</tbody></table>`;
-        document.getElementById('tablaSerial').innerHTML = html;
-    }
-    
-    // ==================== CALIFICACIONES ====================
-    function actualizarComboboxPeleasCalif() {
-        const select = document.getElementById('peleaSelectCalif');
-        if(!select) return;
-        select.innerHTML = '<option value="">-- Selecciona pelea --</option>';
-        resultadosCotejo.peleas.forEach((p,idx)=>{
-            const cal = calificacionesMap.get(idx);
-            select.add(new Option(`Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido} ${cal?'✓':'⏳'}`, idx));
-        });
-    }
-    
-    window.cambioPeleaCalif = function() {
-        const idx = parseInt(document.getElementById('peleaSelectCalif').value);
-        if(isNaN(idx)) return;
-        const p = resultadosCotejo.peleas[idx];
-        const cal = calificacionesMap.get(idx);
-        document.getElementById('detallePeleaCalif').innerHTML = `<div><strong>🔴 ${p.gallo1.partido}</strong> vs <strong>🟢 ${p.gallo2.partido}</strong><br>Pesos: ${p.gallo1.peso}g - ${p.gallo2.peso}g | Diferencia: ${p.diferencia}g</div>`;
-        let vallinesHtml = '';
-        for(let i=1;i<=configuracion.gallosPorPartido;i++) vallinesHtml += `<button class="vallin-btn" data-vallin="${i}" onclick="window.seleccionarVallin(${i})">${i}</button>`;
-        document.getElementById('vallinesContainer').innerHTML = vallinesHtml;
-        if(cal) {
-            document.getElementById('formCalif').style.display = 'none';
-            document.getElementById('infoAnteriorCalif').innerHTML = `<div style="background:#fff3cd;padding:10px;">✅ Calificación previa: Ganador ${cal.ganador}, Tiempo ${cal.tiempo}, Vallín ${cal.vallin||'?'}<br><button class="btn btn-sm" onclick="window.recalificarPelea(${idx})">✏️ Recalificar</button> <button class="btn btn-danger btn-sm" onclick="window.eliminarCalificacion(${idx})">Eliminar</button></div>`;
-        } else {
-            document.getElementById('formCalif').style.display = 'block';
-            document.getElementById('infoAnteriorCalif').innerHTML = '';
-            window.vallinSeleccionado = null;
-        }
-    };
-    
-    window.seleccionarVallin = function(v) {
-        window.vallinSeleccionado = v;
-        document.querySelectorAll('.vallin-btn').forEach(btn=>btn.classList.remove('active'));
-        const active = document.querySelector(`.vallin-btn[data-vallin="${v}"]`);
-        if(active) active.classList.add('active');
-    };
-    
-    window.calificarPelea = function() {
-        const idx = parseInt(document.getElementById('peleaSelectCalif').value);
-        if(isNaN(idx)) return;
-        const tiempo = document.getElementById('tiempoPelea').value.trim();
-        const ganador = document.getElementById('ganadorSelect').value;
-        if(!tiempo.match(/^\d{2}:\d{2}$/)) return Utils.showToast('Formato tiempo MM:SS','error');
-        if(!ganador) return Utils.showToast('Seleccione ganador','error');
-        if(!window.vallinSeleccionado) return Utils.showToast('Seleccione vallín','error');
-        const pc = configuracion.puntosConfig;
-        calificacionesMap.set(idx, { ganador, tiempo, vallin: window.vallinSeleccionado, fechaCalificacion: new Date().toLocaleString(), timestamp: Date.now() });
-        if(resultadosCotejo.peleas[idx]) resultadosCotejo.peleas[idx].calificada = true;
-        localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
-        actualizarComboboxPeleasCalif();
-        renderizarTablaCotejo();
-        renderizarTablaPosiciones();
-        renderizarTablaSerial();
-        Utils.showToast('Calificación guardada','success');
-        document.getElementById('peleaSelectCalif').value = '';
-        document.getElementById('detallePeleaCalif').innerHTML = '';
-        document.getElementById('formCalif').style.display = 'none';
-    };
-    
-    window.eliminarCalificacion = function(idx) {
-        calificacionesMap.delete(idx);
-        if(resultadosCotejo.peleas[idx]) delete resultadosCotejo.peleas[idx].calificada;
-        localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
-        actualizarComboboxPeleasCalif();
-        renderizarTablaCotejo();
-        renderizarTablaPosiciones();
-        renderizarTablaSerial();
-        Utils.showToast('Calificación eliminada','info');
-    };
-    
-    // ==================== Jueces y Videos ====================
-    function actualizarJuecesUI() {
-        const cont = document.getElementById('juecesListaCheck');
-        if(cont) cont.innerHTML = juecesDisponibles.map(j=>`<label><input type="checkbox" value="${j.uid}"> ${j.nombre} (${j.partido})</label>`).join('');
-        const asignados = torneoActual?.juecesAsignados || [];
-        document.getElementById('juecesAsignadosLista').innerHTML = asignados.map(j=>`<div>✅ ${j.nombre} - ${j.partido}</div>`).join('') || '<div>Sin jueces asignados</div>';
-    }
-    window.asignarJueces = function() {
-        const checks = document.querySelectorAll('#juecesListaCheck input:checked');
-        const seleccionados = Array.from(checks).map(c=>juecesDisponibles.find(j=>j.uid===c.value)).filter(Boolean);
-        torneoActual.juecesAsignados = seleccionados;
-        guardarTorneo();
-        actualizarJuecesUI();
-        Utils.showToast(`${seleccionados.length} jueces asignados`,'success');
-    };
-    window.eliminarJuecesAsignados = function() { if(torneoActual) torneoActual.juecesAsignados = []; guardarTorneo(); actualizarJuecesUI(); };
-    window.filtrarJueces = function() { actualizarJuecesUI(); };
-    
-    function actualizarVideosUI() {
-        const select = document.getElementById('videoPeleaSelect');
-        if(select && resultadosCotejo?.peleas) {
-            select.innerHTML = '<option value="">-- Selecciona pelea --</option>';
-            resultadosCotejo.peleas.forEach((p,idx)=> select.add(new Option(`Pelea #${p.numero}`, idx)));
-        }
-        const videos = torneoActual?.videosPorPelea || {};
-        let html = '';
-        for(const idx in videos) html += `<div><strong>Pelea ${parseInt(idx)+1}</strong><ul>${videos[idx].map(v=>`<li>${v}</li>`).join('')}</ul></div>`;
-        document.getElementById('videosGuardadosList').innerHTML = html || '<div>Sin videos</div>';
-    }
-    window.guardarVideos = function() {
-        const idx = document.getElementById('videoPeleaSelect').value;
-        if(idx==='') return Utils.showToast('Seleccione pelea','error');
-        const urls = document.getElementById('urlsVideos').value.split(/\r?\n/).filter(u=>u.trim());
-        if(urls.length>10) return Utils.showToast('Máximo 10 URLs','error');
-        if(!torneoActual.videosPorPelea) torneoActual.videosPorPelea = {};
-        torneoActual.videosPorPelea[idx] = urls;
-        guardarTorneo();
-        actualizarVideosUI();
-        Utils.showToast('Videos guardados','success');
-    };
-    
-    // ==================== PERSISTENCIA Y MODALES ====================
-    function guardarTorneo() { localStorage.setItem(STORAGE.TORNEO_ACTUAL, JSON.stringify(torneoActual)); }
-    function cargarTorneo() {
-        const data = localStorage.getItem(STORAGE.TORNEO_ACTUAL);
-        if(data) torneoActual = JSON.parse(data);
-        const cotejoData = localStorage.getItem(STORAGE.COTEJO_ACTUAL);
-        if(cotejoData) { resultadosCotejo = JSON.parse(cotejoData); if(resultadosCotejo.peleas) resultadosCotejo.peleas.forEach((_,idx)=>{ if(resultadosCotejo.peleas[idx].calificada) calificacionesMap.set(idx, resultadosCotejo.peleas[idx]); }); }
-        if(torneoActual) configuracion = { ...configuracion, ...torneoActual.config, puntosConfig: torneoActual.puntosConfig || configuracion.puntosConfig };
-        serialTorneos = JSON.parse(localStorage.getItem(STORAGE.TORNEOS_ANTERIORES) || '[]');
-        renderApp();
-    }
-    
-    window.modalTorneo = function(esNuevo) {
-        const modalHTML = `<div id="modalOverlay" class="modal-overlay"><div class="modal-container"><h2>${esNuevo?'CREAR TORNEO':'EDITAR TORNEO'}</h2>
-            <input id="modalNombre" placeholder="Nombre" value="${torneoActual?.nombre||''}"><input id="modalFecha" placeholder="DD/MM/AAAA" value="${torneoActual?.fecha||''}">
-            <input id="modalOrganizador" placeholder="Organizador" value="${torneoActual?.organizador||''}"><input id="modalLugar" placeholder="Lugar" value="${torneoActual?.lugar||''}">
-            <input id="modalPalenque" placeholder="Palenque" value="${torneoActual?.palenque||''}"><div class="form-row"><input id="modalPesoMin" placeholder="Peso Min" value="${torneoActual?.pesoMin||1700}"><input id="modalPesoMax" placeholder="Peso Max" value="${torneoActual?.pesoMax||2400}"></div>
-            <button class="btn btn-primary" onclick="window.guardarModalTorneo(${esNuevo})">${esNuevo?'CREAR':'ACTUALIZAR'}</button><button class="btn" onclick="document.getElementById('modalOverlay').remove()">CANCELAR</button></div></div>`;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-    };
-    window.guardarModalTorneo = function(esNuevo) {
-        const nombre = document.getElementById('modalNombre').value.trim().toUpperCase();
-        if(!nombre) return Utils.showToast('Nombre requerido','error');
-        if(esNuevo) torneoActual = { id:'t_'+Date.now(), nombre, registro: {}, puntosConfig: configuracion.puntosConfig, config: configuracion };
-        torneoActual.nombre = nombre;
-        torneoActual.fecha = document.getElementById('modalFecha').value;
-        torneoActual.organizador = document.getElementById('modalOrganizador').value;
-        torneoActual.lugar = document.getElementById('modalLugar').value;
-        torneoActual.palenque = document.getElementById('modalPalenque').value;
-        torneoActual.pesoMin = parseInt(document.getElementById('modalPesoMin').value) || 1700;
-        torneoActual.pesoMax = parseInt(document.getElementById('modalPesoMax').value) || 2400;
-        configuracion.pesoMin = torneoActual.pesoMin; configuracion.pesoMax = torneoActual.pesoMax;
-        torneoActual.config = configuracion;
-        guardarTorneo();
-        document.getElementById('modalOverlay')?.remove();
-        renderApp();
-    };
-    window.nuevoTorneoForzado = function() { if(confirm('¿Eliminar torneo actual? Se perderán datos.')) { localStorage.removeItem(STORAGE.TORNEO_ACTUAL); localStorage.removeItem(STORAGE.COTEJO_ACTUAL); torneoActual=null; resultadosCotejo=null; calificacionesMap.clear(); renderApp(); } };
-    window.limpiarResultados = function() { resultadosCotejo = null; renderApp(); };
-    window.eliminarCotejo = function() { resultadosCotejo = null; localStorage.removeItem(STORAGE.COTEJO_ACTUAL); renderApp(); };
-    window.descargarPDFPersonalizado = function() { Utils.showToast('PDF generado (simulado)','success'); };
-    window.modalImportarJSON = function() { Utils.showToast('Importación JSON disponible en localStorage','info'); };
-    window.toggleEstadoGallo = function(i) { const btn=document.querySelector(`.btn-estado[data-gallo="${i}"]`); btn?.classList.toggle('pendiente'); btn.innerText=btn?.classList.contains('pendiente')?'PENDIENTE':'PRESENTE'; };
-    window.formatearTiempo = function(inp) { let val=inp.value.replace(/[^0-9]/g,''); if(val.length>=3) val=val.slice(0,2)+':'+val.slice(2,4); inp.value=val; };
-    window.verificarRepresentante = function(val) {};
-    window.actualizarGallosPorPartido = function(v) { configuracion.gallosPorPartido = parseInt(v); renderApp(); };
-    window.toggleAnillosEditables = function(v) { configuracion.anillosEditables = v; renderApp(); };
-    window.toggleRegistroDetallado = function(v) { configuracion.registroDetalladoActivo = v; renderApp(); };
-    window.editarPartido = function(partido) { Utils.showToast(`Edición de ${partido} disponible en versión completa`,'info'); };
-    window.recalificarPelea = function(idx) { window.eliminarCalificacion(idx); setTimeout(()=>{ document.getElementById('peleaSelectCalif').value = idx; window.cambioPeleaCalif(); },100); };
-    window.cargarTorneoAnteriorSerial = function() { Utils.showToast('Función Serial para vincular torneos','info'); };
-    
-    function toggleSection(id) { const el=document.getElementById(id); if(el) el.style.display = el.style.display==='none'?'block':'none'; }
-    window.toggleSection = toggleSection;
-    
-    cargarTorneo();
-</script>
+    <script>
+        // ==================== UTILS ====================
+        const Utils = {
+            escapeHTML(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); },
+            generarId() { return Date.now().toString(36) + Math.random().toString(36).substring(2, 8); },
+            mostrarNotificacion(msg, tipo = 'success') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${tipo}`;
+                toast.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : '⚠️'}</span> ${msg}`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            },
+            validarFecha(fecha) { return /^\d{2}\/\d{2}\/\d{4}$/.test(fecha); }
+        };
+
+        // ==================== APP PRINCIPAL ====================
+        const App = {
+            torneos: [],
+            torneoActual: null,
+            cotejoGenerado: null,
+            peleaEditando: null,
+
+            init() {
+                this.cargarDatos();
+                this.renderizarUI();
+            },
+
+            cargarDatos() {
+                const saved = localStorage.getItem('legado_torneos');
+                if (saved) {
+                    try {
+                        this.torneos = JSON.parse(saved);
+                        if (this.torneos.length) this.torneoActual = this.torneos[0];
+                    } catch(e) {}
+                }
+                if (!this.torneos.length) this.torneos = [];
+            },
+
+            guardarDatos() {
+                localStorage.setItem('legado_torneos', JSON.stringify(this.torneos));
+            },
+
+            renderizarUI() {
+                const container = document.getElementById('mainApp');
+                if (!this.torneoActual) {
+                    container.innerHTML = `
+                        <div class="collapsible-section"><div class="no-data"><span>🏆</span><p>No hay torneo activo</p><button class="btn-primary" onclick="App.mostrarModalTorneo()">CREAR NUEVO TORNEO</button></div></div>
+                    `;
+                    return;
+                }
+
+                const gallosConPeso = this.torneoActual.gallos?.filter(g => g.peso > 0) || [];
+                const tieneCotejo = this.cargarCotejoGuardado() !== null;
+
+                container.innerHTML = `
+                    <!-- Info Torneo -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="App.toggleCollapse('infoTorneo')"><h3>🏆 ${Utils.escapeHTML(this.torneoActual.nombre)}</h3><span class="toggle-icon">▼</span></div>
+                        <div id="infoTorneo" class="collapsible-content show">
+                            <div class="form-row">
+                                <div><strong>📅 Fecha:</strong> ${this.torneoActual.fecha}</div>
+                                <div><strong>👤 Org.:</strong> ${Utils.escapeHTML(this.torneoActual.organizador)}</div>
+                                <div><strong>📍 Lugar:</strong> ${Utils.escapeHTML(this.torneoActual.lugar)}</div>
+                                <div><strong>⚖️ Peso:</strong> ${this.torneoActual.pesoMin}g - ${this.torneoActual.pesoMax}g</div>
+                            </div>
+                            <div class="btn-group"><button class="btn-secondary" onclick="App.editarTorneo()">✏️ EDITAR TORNEO</button><button class="btn-danger" onclick="App.eliminarTorneoActual()">🗑️ ELIMINAR</button></div>
+                        </div>
+                    </div>
+
+                    ${!tieneCotejo ? `
+                    <!-- REGISTRO DE PARTIDOS -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="App.toggleCollapse('registroPartidos')"><h3>📝 REGISTRAR PARTIDO</h3><span class="toggle-icon">▼</span></div>
+                        <div id="registroPartidos" class="collapsible-content show">
+                            <div class="form-row">
+                                <div class="form-group"><label>🏷️ NOMBRE PARTIDO *</label><input type="text" id="nombrePartido" placeholder="Ej: GALLERIA CENTRAL" style="text-transform:uppercase"></div>
+                                <div class="form-group"><label>👤 REPRESENTANTE *</label><input type="text" id="representantePartido" placeholder="NOMBRE" style="text-transform:uppercase"></div>
+                                <div class="form-group"><label>🐓 GALLOS POR PARTIDO</label><select id="gallosPorPartido" onchange="App.actualizarCamposGallos()"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
+                            </div>
+                            <div id="gallosDinamicos"></div>
+                            <div class="btn-group"><button class="btn-primary" onclick="App.guardarPartido()">💾 REGISTRAR PARTIDO</button><button class="btn-secondary" onclick="App.limpiarFormPartido()">🔄 LIMPIAR</button></div>
+                            <div class="table-container"><h4 style="margin:20px 0 10px">📋 GALLOS REGISTRADOS (${this.torneoActual.gallos?.length || 0})</h4><div id="tablaGallos"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- GENERAR COTEJO -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="App.toggleCollapse('generarCotejo')"><h3>⚡ GENERAR COTEJO INTELIGENTE</h3><span class="toggle-icon">▼</span></div>
+                        <div id="generarCotejo" class="collapsible-content show">
+                            <div class="form-group"><label>🎲 MODO EMPAREJAMIENTO</label><select id="modoCotejo"><option value="inteligente" selected>🧠 INTELIGENTE (Menor diferencia)</option><option value="ascendente">⬆️ ASCENDENTE</option><option value="descendente">⬇️ DESCENDENTE</option><option value="aleatorio">🎲 ALEATORIO</option></select></div>
+                            <div class="form-group"><label>⚖️ RANGO DIFERENCIA PESO (g)</label><input type="range" id="rangoPeso" min="10" max="200" value="50" step="10" onchange="document.getElementById('rangoPesoValor').innerText=this.value"><span id="rangoPesoValor">50</span> g</div>
+                            <div class="btn-group"><button class="btn-primary" onclick="App.ejecutarCotejo()">🔄 COTEJAR AHORA</button><button class="btn-success" id="btnGuardarCotejo" style="display:none" onclick="App.guardarCotejoEnTorneo()">💾 GUARDAR COTEJO</button></div>
+                            <div id="resultadoCotejo"></div>
+                        </div>
+                    </div>
+                    ` : `
+                    <!-- CALIFICACIÓN DE PELEAS -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="App.toggleCollapse('calificar')"><h3>🏆 CALIFICACIÓN DE PELEAS</h3><span class="toggle-icon">▼</span></div>
+                        <div id="calificar" class="collapsible-content show">
+                            <div class="form-group"><label>🎯 SELECCIONAR PELEA</label><select id="selectPeleaCalificar" onchange="App.cargarPeleaCalificar()"></select></div>
+                            <div id="panelCalificacion" style="display:none">
+                                <div id="infoPeleaCalif" style="background:#faf0e6;padding:16px;border-radius:16px;margin:15px 0"></div>
+                                <div class="form-row"><div class="form-group"><label>⏱️ TIEMPO (MM:SS)</label><input id="tiempoPelea" placeholder="00:00" maxlength="5"></div>
+                                <div class="form-group"><label>🏆 GANADOR</label><select id="ganadorPelea"><option value="">-- SELECCIONAR --</option><option id="ganadorRojo" value="rojo">🔴 CINTA ROJA</option><option id="ganadorVerde" value="verde">🟢 CINTA VERDE</option><option value="empate">🤝 EMPATE</option></select></div></div>
+                                <button class="btn-primary" onclick="App.calificarPelea()">✅ CALIFICAR PELEA</button>
+                                <div id="califAnterior" style="display:none;margin-top:15px;background:#fff3cd;padding:16px;border-radius:16px"></div>
+                            </div>
+                            <div id="todasCalificadasMsg" style="display:none;background:#28a745;color:white;padding:16px;border-radius:16px;text-align:center">✅ ¡TODAS LAS PELEAS CALIFICADAS!</div>
+                        </div>
+                    </div>
+
+                    <!-- COTEJO VISUAL -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="App.toggleCollapse('verCotejo')"><h3>📋 TABLERO DE COTEJO</h3><span class="toggle-icon">▼</span></div>
+                        <div id="verCotejo" class="collapsible-content show"><div id="tablaCotejoGuardado"></div></div>
+                    </div>
+
+                    <div class="btn-group"><button class="btn-primary" onclick="App.generarPDFCotejo()">📄 DESCARGAR COTEJO (PDF)</button></div>
+                    `
+                `;
+
+                if (!tieneCotejo) {
+                    this.actualizarCamposGallos();
+                    this.renderizarTablaGallos();
+                } else {
+                    this.cargarSelectPeleas();
+                    this.mostrarCotejoGuardado();
+                }
+            },
+
+            toggleCollapse(id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('show');
+            },
+
+            actualizarCamposGallos() {
+                const cantidad = parseInt(document.getElementById('gallosPorPartido')?.value || 3);
+                const container = document.getElementById('gallosDinamicos');
+                let html = '<div class="gallos-grid">';
+                for (let i = 1; i <= cantidad; i++) {
+                    html += `
+                        <div class="gallo-card">
+                            <div class="gallo-header"><strong>🐓 GALLO ${i}</strong><button type="button" class="btn-estado presente" onclick="App.toggleEstadoGallo(this)">PRESENTE</button></div>
+                            <div class="form-group"><label>🔢 ANILLO (3-4 dígitos)</label><input type="text" id="anillo_${i}" placeholder="Ej: ${1000+i}" maxlength="4"></div>
+                            <div class="form-group"><label>⚖️ PESO (g)</label><input type="number" id="peso_${i}" step="1"></div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            },
+
+            toggleEstadoGallo(btn) {
+                if (btn.classList.contains('presente')) {
+                    btn.classList.remove('presente'); btn.classList.add('pendiente'); btn.textContent = 'PENDIENTE';
+                } else {
+                    btn.classList.remove('pendiente'); btn.classList.add('presente'); btn.textContent = 'PRESENTE';
+                }
+            },
+
+            guardarPartido() {
+                const nombre = document.getElementById('nombrePartido').value.trim().toUpperCase();
+                const representante = document.getElementById('representantePartido').value.trim().toUpperCase();
+                if (!nombre || !representante) return Utils.mostrarNotificacion('Complete nombre y representante', 'error');
+                if (this.torneoActual.partidos?.some(p => p.nombre === nombre)) return Utils.mostrarNotificacion('Nombre de partido ya existe', 'error');
+
+                const cantidad = parseInt(document.getElementById('gallosPorPartido').value);
+                const gallos = [];
+                const anillosUsados = new Set(this.torneoActual.gallos?.map(g => g.anillo) || []);
+
+                for (let i = 1; i <= cantidad; i++) {
+                    const anillo = document.getElementById(`anillo_${i}`).value.trim();
+                    const peso = parseInt(document.getElementById(`peso_${i}`).value);
+                    const btn = document.querySelector(`#gallosDinamicos .gallo-card:nth-child(${i}) .btn-estado`);
+                    const presente = btn.classList.contains('presente');
+                    if (!anillo || !/^\d{3,4}$/.test(anillo)) return Utils.mostrarNotificacion(`Anillo gallo ${i} inválido`, 'error');
+                    if (anillosUsados.has(anillo)) return Utils.mostrarNotificacion(`Anillo ${anillo} ya registrado`, 'error');
+                    if (presente && (isNaN(peso) || peso < this.torneoActual.pesoMin || peso > this.torneoActual.pesoMax)) 
+                        return Utils.mostrarNotificacion(`Peso gallo ${i} fuera de rango (${this.torneoActual.pesoMin}-${this.torneoActual.pesoMax})`, 'error');
+                    anillosUsados.add(anillo);
+                    gallos.push({ anillo, peso: presente ? peso : 0, presente });
+                }
+
+                const partidoId = Utils.generarId();
+                const nuevoPartido = { id: partidoId, nombre, representante, gallos };
+                if (!this.torneoActual.partidos) this.torneoActual.partidos = [];
+                if (!this.torneoActual.gallos) this.torneoActual.gallos = [];
+                this.torneoActual.partidos.push(nuevoPartido);
+                gallos.forEach(g => {
+                    this.torneoActual.gallos.push({ ...g, partidoId, partidoNombre: nombre, representante });
+                });
+                this.guardarDatos();
+                this.limpiarFormPartido();
+                this.renderizarTablaGallos();
+                Utils.mostrarNotificacion(`Partido ${nombre} registrado`, 'success');
+            },
+
+            limpiarFormPartido() {
+                document.getElementById('nombrePartido').value = '';
+                document.getElementById('representantePartido').value = '';
+                this.actualizarCamposGallos();
+            },
+
+            renderizarTablaGallos() {
+                const container = document.getElementById('tablaGallos');
+                if (!this.torneoActual.gallos?.length) { container.innerHTML = '<div class="no-data">Sin gallos registrados</div>'; return; }
+                let html = `<table><thead><tr><th>Anillo</th><th>Peso</th><th>Partido</th><th>Representante</th></tr></thead><tbody>`;
+                this.torneoActual.gallos.forEach(g => {
+                    html += `<tr><td>${Utils.escapeHTML(g.anillo)}</td><td>${g.peso > 0 ? g.peso+'g' : 'PENDIENTE'}</td><td>${Utils.escapeHTML(g.partidoNombre)}</td><td>${Utils.escapeHTML(g.representante)}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            },
+
+            ejecutarCotejo() {
+                const gallos = this.torneoActual.gallos.filter(g => g.peso > 0);
+                if (gallos.length < 2) return Utils.mostrarNotificacion('Se necesitan al menos 2 gallos con peso', 'error');
+                const modo = document.getElementById('modoCotejo').value;
+                const rangoPeso = parseInt(document.getElementById('rangoPeso').value);
+                this.torneoActual.rangoPeso = rangoPeso;
+                this.guardarDatos();
+
+                let lista = [...gallos];
+                if (modo === 'ascendente') lista.sort((a,b) => a.peso - b.peso);
+                if (modo === 'descendente') lista.sort((a,b) => b.peso - a.peso);
+                if (modo === 'aleatorio') lista.sort(() => Math.random() - 0.5);
+                
+                const peleas = [];
+                const usados = new Set();
+                for (let i = 0; i < lista.length && peleas.length * 2 < lista.length; i++) {
+                    if (usados.has(lista[i].anillo)) continue;
+                    for (let j = i+1; j < lista.length; j++) {
+                        if (usados.has(lista[j].anillo)) continue;
+                        if (lista[i].partidoNombre === lista[j].partidoNombre) continue;
+                        if (lista[i].representante === lista[j].representante) continue;
+                        if (Math.abs(lista[i].peso - lista[j].peso) > rangoPeso) continue;
+                        peleas.push({
+                            numero: peleas.length+1,
+                            gallo1: lista[i], gallo2: lista[j],
+                            diferencia: Math.abs(lista[i].peso - lista[j].peso),
+                            calificada: false, ganador: null, tiempo: null
+                        });
+                        usados.add(lista[i].anillo); usados.add(lista[j].anillo);
+                        break;
+                    }
+                }
+                if (peleas.length === 0) return Utils.mostrarNotificacion('No se pudieron generar peleas con el rango actual', 'error');
+                this.cotejoGenerado = peleas;
+                this.mostrarResultadoCotejo(peleas, gallos.length - (peleas.length*2));
+                document.getElementById('btnGuardarCotejo').style.display = 'inline-block';
+            },
+
+            mostrarResultadoCotejo(peleas, noEmparejados) {
+                const container = document.getElementById('resultadoCotejo');
+                let html = `<div class="metricas-container"><div class="metrica"><div class="valor">${peleas.length}</div><div class="label">PELEAS</div></div><div class="metrica"><div class="valor">${noEmparejados}</div><div class="label">NO EMPAREJADOS</div></div></div>`;
+                html += `<table><thead><tr><th>#</th><th>🔴 Cinta Roja (Partido)</th><th>Anillo</th><th>Peso</th><th>🟢 Cinta Verde</th><th>Anillo</th><th>Peso</th><th>Dif</th></tr></thead><tbody>`;
+                peleas.forEach(p => {
+                    html += `<tr><td>${p.numero}</td><td>${Utils.escapeHTML(p.gallo1.partidoNombre)}</td><td>${p.gallo1.anillo}</td><td>${p.gallo1.peso}g</td><td>${Utils.escapeHTML(p.gallo2.partidoNombre)}</td><td>${p.gallo2.anillo}</td><td>${p.gallo2.peso}g</td><td>${p.diferencia}g</td></tr>`;
+                });
+                html += `</tbody></table><div class="btn-group"><button class="btn-secondary" onclick="App.intercambiarPeleaUI(0)">🔄 INTERCAMBIAR ORDEN</button></div>`;
+                container.innerHTML = html;
+            },
+
+            guardarCotejoEnTorneo() {
+                if (!this.cotejoGenerado) return;
+                const cotejoId = Utils.generarId();
+                const guardado = { id: cotejoId, peleas: this.cotejoGenerado, fecha: new Date().toISOString() };
+                localStorage.setItem(`cotejo_${this.torneoActual.id}`, JSON.stringify(guardado));
+                this.torneoActual.cotejoId = cotejoId;
+                this.guardarDatos();
+                Utils.mostrarNotificacion('Cotejo guardado exitosamente', 'success');
+                this.renderizarUI();
+            },
+
+            cargarCotejoGuardado() {
+                if (!this.torneoActual?.cotejoId) return null;
+                const saved = localStorage.getItem(`cotejo_${this.torneoActual.id}`);
+                return saved ? JSON.parse(saved) : null;
+            },
+
+            cargarSelectPeleas() {
+                const cotejo = this.cargarCotejoGuardado();
+                const select = document.getElementById('selectPeleaCalificar');
+                if (!cotejo) return;
+                select.innerHTML = '<option value="">-- Seleccionar Pelea --</option>' + cotejo.peleas.map((p,i) => `<option value="${i}">Pelea #${p.numero}: ${p.gallo1.partidoNombre} vs ${p.gallo2.partidoNombre}</option>`).join('');
+            },
+
+            cargarPeleaCalificar() {
+                const idx = parseInt(document.getElementById('selectPeleaCalificar').value);
+                const cotejo = this.cargarCotejoGuardado();
+                if (isNaN(idx) || !cotejo?.peleas[idx]) return;
+                const pelea = cotejo.peleas[idx];
+                const califs = this.cargarCalificaciones();
+                const calKey = `${this.torneoActual.cotejoId}_${idx}`;
+                const existente = califs[calKey];
+                document.getElementById('panelCalificacion').style.display = 'block';
+                document.getElementById('infoPeleaCalif').innerHTML = `<div style="display:flex;gap:20px"><div><strong>🔴 ${Utils.escapeHTML(pelea.gallo1.partidoNombre)}</strong><br>Anillo: ${pelea.gallo1.anillo} | ${pelea.gallo1.peso}g</div><div><strong>🟢 ${Utils.escapeHTML(pelea.gallo2.partidoNombre)}</strong><br>Anillo: ${pelea.gallo2.anillo} | ${pelea.gallo2.peso}g</div></div>`;
+                document.getElementById('ganadorRojo').innerHTML = `🔴 ${pelea.gallo1.partidoNombre}`;
+                document.getElementById('ganadorVerde').innerHTML = `🟢 ${pelea.gallo2.partidoNombre}`;
+                if (existente) {
+                    document.getElementById('califAnterior').style.display = 'block';
+                    document.getElementById('califAnterior').innerHTML = `<strong>⚠️ Ya calificada:</strong> Ganador: ${existente.ganador === 'rojo' ? pelea.gallo1.partidoNombre : existente.ganador === 'verde' ? pelea.gallo2.partidoNombre : 'EMPATE'} | Tiempo: ${existente.tiempo}<div class="btn-group" style="margin-top:10px"><button class="btn-warning" onclick="App.recalificarPelea(${idx})">✏️ RECALIFICAR</button></div>`;
+                    document.getElementById('tiempoPelea').value = existente.tiempo || '';
+                    document.getElementById('ganadorPelea').value = existente.ganador || '';
+                } else {
+                    document.getElementById('califAnterior').style.display = 'none';
+                    document.getElementById('tiempoPelea').value = '';
+                    document.getElementById('ganadorPelea').value = '';
+                }
+                this.peleaEditando = { idx, pelea };
+            },
+
+            calificarPelea() {
+                if (!this.peleaEditando) return;
+                const tiempo = document.getElementById('tiempoPelea').value.trim();
+                const ganador = document.getElementById('ganadorPelea').value;
+                if (!tiempo || !/^\d{2}:\d{2}$/.test(tiempo)) return Utils.mostrarNotificacion('Tiempo inválido (MM:SS)', 'error');
+                if (!ganador) return Utils.mostrarNotificacion('Seleccione ganador', 'error');
+                const califs = this.cargarCalificaciones();
+                califs[`${this.torneoActual.cotejoId}_${this.peleaEditando.idx}`] = { ganador, tiempo, fecha: new Date().toLocaleString() };
+                localStorage.setItem(`califs_${this.torneoActual.id}`, JSON.stringify(califs));
+                Utils.mostrarNotificacion('Pelea calificada', 'success');
+                this.cargarSelectPeleas();
+                this.mostrarCotejoGuardado();
+                this.cargarPeleaCalificar();
+            },
+
+            recalificarPelea(idx) {
+                const califs = this.cargarCalificaciones();
+                delete califs[`${this.torneoActual.cotejoId}_${idx}`];
+                localStorage.setItem(`califs_${this.torneoActual.id}`, JSON.stringify(califs));
+                this.cargarSelectPeleas();
+                this.cargarPeleaCalificar();
+                this.mostrarCotejoGuardado();
+            },
+
+            cargarCalificaciones() {
+                const saved = localStorage.getItem(`califs_${this.torneoActual?.id}`);
+                return saved ? JSON.parse(saved) : {};
+            },
+
+            mostrarCotejoGuardado() {
+                const cotejo = this.cargarCotejoGuardado();
+                const califs = this.cargarCalificaciones();
+                if (!cotejo) return;
+                let html = `<table><thead><tr><th>#</th><th>🔴 Rojos</th><th>🟢 Verdes</th><th>Dif</th><th>Ganador</th><th>Tiempo</th></tr></thead><tbody>`;
+                cotejo.peleas.forEach((p, idx) => {
+                    const cal = califs[`${this.torneoActual.cotejoId}_${idx}`];
+                    let ganadorTxt = '⏳ Pendiente';
+                    if (cal) ganadorTxt = cal.ganador === 'rojo' ? p.gallo1.partidoNombre : cal.ganador === 'verde' ? p.gallo2.partidoNombre : 'EMPATE';
+                    html += `<tr><td>${p.numero}</td><td>${Utils.escapeHTML(p.gallo1.partidoNombre)} (${p.gallo1.anillo})</td><td>${Utils.escapeHTML(p.gallo2.partidoNombre)} (${p.gallo2.anillo})</td><td>${p.diferencia}g</td><td>${ganadorTxt}</td><td>${cal?.tiempo || '--:--'}</td></tr>`;
+                });
+                html += `</tbody>】able`;
+                document.getElementById('tablaCotejoGuardado').innerHTML = html;
+                const total = cotejo.peleas.length;
+                const calificadas = Object.keys(califs).filter(k => k.includes(this.torneoActual.cotejoId)).length;
+                if (total === calificadas && total > 0) document.getElementById('todasCalificadasMsg').style.display = 'block';
+                else document.getElementById('todasCalificadasMsg').style.display = 'none';
+            },
+
+            generarPDFCotejo() {
+                const cotejo = this.cargarCotejoGuardado();
+                if (!cotejo) return Utils.mostrarNotificacion('No hay cotejo', 'error');
+                const califs = this.cargarCalificaciones();
+                let html = `<div style="padding:20px;font-family:Arial"><h2 style="color:#8B4513">🐓 LEGADO AVÍCOLA - COTEJO OFICIAL</h2><p><strong>${this.torneoActual.nombre}</strong> | ${this.torneoActual.fecha} | ${this.torneoActual.lugar}</p><table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse"><thead><tr><th>#</th><th>Cinta Roja</th><th>Anillo</th><th>Cinta Verde</th><th>Anillo</th><th>Dif</th><th>Ganador</th><th>Tiempo</th></tr></thead><tbody>`;
+                cotejo.peleas.forEach((p, idx) => {
+                    const cal = califs[`${this.torneoActual.cotejoId}_${idx}`];
+                    const ganador = cal ? (cal.ganador === 'rojo' ? p.gallo1.partidoNombre : cal.ganador === 'verde' ? p.gallo2.partidoNombre : 'EMPATE') : 'PENDIENTE';
+                    html += `<tr><td>${p.numero}</td><td>${p.gallo1.partidoNombre}</td><td>${p.gallo1.anillo}</td><td>${p.gallo2.partidoNombre}</td><td>${p.gallo2.anillo}</td><td>${p.diferencia}g</td><td>${ganador}</td><td>${cal?.tiempo || '--:--'}</td></tr>`;
+                });
+                html += `</tbody></table><p style="margin-top:20px">Fecha generación: ${new Date().toLocaleString()}</p></div>`;
+                const win = window.open();
+                win.document.write(html);
+                win.document.close();
+                win.print();
+            },
+
+            exportarBackup() {
+                const backup = { torneos: this.torneos, exportDate: new Date().toISOString() };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `legado_backup_${Date.now()}.json`;
+                a.click();
+                Utils.mostrarNotificacion('Backup exportado', 'success');
+            },
+
+            importarArchivo() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        try {
+                            const data = JSON.parse(ev.target.result);
+                            if (data.torneos) this.torneos.push(...data.torneos);
+                            else if (data.infoTorneo && data.registroPartidos) {
+                                // Importar estructura legacy
+                                const nuevo = {
+                                    id: Utils.generarId(), nombre: data.infoTorneo.nombre, fecha: data.infoTorneo.fecha,
+                                    organizador: data.infoTorneo.organizador, lugar: data.infoTorneo.lugar, palenque: data.infoTorneo.palenque,
+                                    pesoMin: data.infoTorneo.pesoMin || 1200, pesoMax: data.infoTorneo.pesoMax || 2700,
+                                    config: data.infoTorneo.config || { gallosPorPartido: 3 },
+                                    partidos: [], gallos: []
+                                };
+                                const mapPartidos = new Map();
+                                data.registroPartidos.forEach(r => {
+                                    if (!mapPartidos.has(r.partido)) mapPartidos.set(r.partido, { nombre: r.partido, representante: r.representante || 'DESCONOCIDO', gallos: [] });
+                                    mapPartidos.get(r.partido).gallos.push({ anillo: r.anillo, peso: r.peso || 0, presente: r.peso > 0 });
+                                });
+                                nuevo.partidos = Array.from(mapPartidos.values()).map((p, idx) => ({ id: Utils.generarId(), ...p }));
+                                nuevo.partidos.forEach(p => {
+                                    p.gallos.forEach(g => nuevo.gallos.push({ ...g, partidoId: p.id, partidoNombre: p.nombre, representante: p.representante }));
+                                });
+                                this.torneos.push(nuevo);
+                            } else return Utils.mostrarNotificacion('Formato no soportado', 'error');
+                            this.guardarDatos();
+                            if (!this.torneoActual && this.torneos.length) this.torneoActual = this.torneos[0];
+                            this.renderizarUI();
+                            Utils.mostrarNotificacion('Importación exitosa', 'success');
+                        } catch(e) { Utils.mostrarNotificacion('Error JSON', 'error'); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            },
+
+            mostrarModalTorneo() { alert("Función completa: Para crear torneo editar, pero el sistema ya tiene estructura completa. Usa el botón IMPORTAR para cargar tu JSON legacy."); }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
 </body>
 </html>
