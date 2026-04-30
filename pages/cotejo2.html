@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Legado Avícola | Sistema Torneo Gallístico COMPLETO</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --marron: #8B4513; --marron-claro: #D2691E; --verde: #4CAF50;
+            --rojo: #d32f2f; --azul: #2196F3; --naranja: #f57c00;
+            --gris-claro: #f8f9fa; --gris: #666;
+            --sombra: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; padding: 16px; max-width: 1400px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--sombra); }
+        .btn { border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #e0e0e0; }
+        .btn-primary { background: var(--marron); color: white; }
+        .btn-success { background: var(--verde); color: white; }
+        .btn-danger { background: var(--rojo); color: white; }
+        .btn-warning { background: var(--naranja); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 3000; display: flex; align-items: center; justify-content: center; }
+        .modal-container { background: white; border-radius: 28px; width: 90%; max-width: 850px; max-height: 90vh; overflow-y: auto; padding: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; }
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .gallo-row { background: var(--gris-claro); padding: 12px; border-radius: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .btn-estado { background: var(--verde); color: white; border: none; padding: 8px 12px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .btn-estado.pendiente { background: var(--rojo); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; overflow-x: auto; display: block; }
+        th, td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; }
+        th { background: var(--marron); color: white; }
+        .duplicado { background-color: #ffebee !important; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--marron); color: white; padding: 12px 24px; border-radius: 60px; z-index: 4000; font-weight: 600; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px);} to { opacity: 1; transform: translateX(-50%) translateY(0);} }
+        .vallin-btn { background: var(--rojo); color: white; border: none; width: 56px; height: 56px; border-radius: 30px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .vallin-btn.active { background: var(--verde); }
+        .movement-buttons { display: flex; gap: 6px; justify-content: center; }
+        .movement-buttons button { background: var(--azul); color: white; border: none; border-radius: 20px; padding: 4px 8px; cursor: pointer; }
+        .top4-card { background: white; border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .collapsible-header { display: flex; justify-content: space-between; cursor: pointer; font-weight: 700; font-size: 18px; padding-bottom: 12px; border-bottom: 2px solid #eee; margin-bottom: 16px; }
+        .accordion-content { padding: 12px 0; }
+        .sub-accordion { margin-left: 16px; border-left: 2px solid #ddd; padding-left: 16px; margin-top: 12px; }
+        .danger-zone { border-top: 2px solid #ffcdd2; margin-top: 20px; padding-top: 16px; }
+        @media (max-width: 768px) { body { padding: 8px; } .gallo-row { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+    // ==================== CONSTANTES Y ESTADO GLOBAL ====================
+    const STORAGE = {
+        TORNEO_ACTUAL: 'torneo_completo_v2',
+        COTEJO_ACTUAL: 'cotejo_completo_v2',
+        TORNEOS_ANTERIORES: 'torneos_serial_lista',
+        CATALOGOS: 'catalogos_generales_v2'
+    };
+    
+    let torneoActual = null;
+    let resultadosCotejo = null;
+    let calificacionesMap = new Map();
+    let serialTorneos = []; // torneos anteriores para vincular
+    let juecesDisponibles = [
+        { uid: 'j1', nombre: 'RAMON GARCIA', email: 'ramon@mail.com', telefono: '961111111', partido: 'LOS SANTOS' },
+        { uid: 'j2', nombre: 'PEDRO MARTINEZ', email: 'pedro@mail.com', telefono: '961222222', partido: 'REAL MADRID' },
+        { uid: 'j3', nombre: 'LUIS FERNANDEZ', email: 'luis@mail.com', telefono: '961333333', partido: 'ATLETICO' },
+        { uid: 'j4', nombre: 'CARLOS LOPEZ', email: 'carlos@mail.com', telefono: '961444444', partido: 'BARCELONA' }
+    ];
+    
+    let configuracion = {
+        gallosPorPartido: 3,
+        anillosEditables: false,
+        registroDetalladoActivo: false,
+        rangoPeso: 50,
+        pesoMin: 1700,
+        pesoMax: 2400,
+        puntosConfig: { ganador: 2, empate: 1, perdedor: 0 }
+    };
+    
+    // ==================== UTILIDADES ====================
+    const Utils = {
+        escapeHTML(str) { return String(str).replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); },
+        showToast(msg, type='info', duration=4000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type==='error'?'var(--rojo)': type==='success'?'var(--verde)': type==='warning'?'var(--naranja)':'var(--marron)';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), duration);
+        },
+        vibrate(pattern) { if(navigator.vibrate) navigator.vibrate(pattern); },
+        formatTiempo(segundos) { if(!segundos && segundos!==0) return '--:--'; const m = Math.floor(segundos/60); const s = segundos%60; return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; },
+        timeToSeconds(tiempo) { if(!tiempo) return 0; const p = tiempo.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); },
+        generarId() { return Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
+    };
+    
+    // ==================== RENDER PRINCIPAL ====================
+    function renderApp() {
+        const root = document.getElementById('app');
+        if(!torneoActual) {
+            root.innerHTML = `
+                <div class="card" style="text-align:center;padding:40px;">
+                    <span style="font-size:64px;">🐓</span>
+                    <h2>Legado Avícola - Torneo Único</h2>
+                    <div class="form-row" style="justify-content:center;margin-top:20px;">
+                        <button class="btn btn-primary" onclick="window.modalTorneo(true)">+ CREAR TORNEO</button>
+                        <button class="btn" onclick="window.mostrarModalImportacion()">📂 IMPORTAR JSON</button>
+                        <button class="btn" onclick="window.mostrarSerialAnterior()">🔗 TORNEOS ANTERIORES</button>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        const info = torneoActual;
+        const cotejoGuardado = resultadosCotejo && resultadosCotejo.guardado;
+        const hayTemp = resultadosCotejo && !resultadosCotejo.guardado;
+        
+        let html = `
+            <div class="card" style="border-left:6px solid var(--marron);">
+                <div style="font-size:28px;font-weight:800;color:var(--marron);">🐔 ${Utils.escapeHTML(info.nombre)}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:16px;margin:12px 0;font-size:14px;">
+                    <span>📅 ${info.fecha||'—'}</span> <span>👤 ${info.organizador||'—'}</span>
+                    <span>📍 ${info.lugar||'—'}</span> <span>🏟️ ${info.palenque||'—'}</span>
+                    <span>⚖️ ${info.pesoMin}g - ${info.pesoMax}g | Dif: ${configuracion.rangoPeso}g</span>
+                </div>
+                ${info.serialVinculado ? `<div style="background:#e8f5e9;padding:8px;border-radius:12px;margin-bottom:10px;">🔗 SERIAL ACTIVO: ${info.serialVinculado.map(s=>s.nombre).join(', ')}</div>` : ''}
+                <div class="form-row">
+                    <button class="btn" onclick="window.modalTorneo(false)">✏️ EDITAR</button>
+                    <button class="btn btn-warning" onclick="window.prepararNuevoTorneo()">✨ NUEVO TORNEO</button>
+                    <button class="btn btn-danger" onclick="window.eliminarTorneoCompleto()">🗑️ ELIMINAR</button>
+                </div>
+            </div>
+        `;
+        
+        // SECCION REGISTRO (solo si no hay cotejo guardado)
+        if(!cotejoGuardado) {
+            html += `<div class="card"><div class="collapsible-header" onclick="window.toggleSection('configPanel')">⚙️ CONFIGURACIÓN RÁPIDA <span id="cfgIcon">▼</span></div><div id="configPanel">`;
+            html += `<div class="form-row">Gallos/Partido: <input type="number" id="gallosPorPartido" min="1" max="6" value="${configuracion.gallosPorPartido}" onchange="window.actualizarGallosPorPartido(this.value)"></div>`;
+            html += `<label><input type="checkbox" id="editarAnillos" ${configuracion.anillosEditables?'checked':''} onchange="window.toggleAnillosEditables(this.checked)"> Editar anillos manualmente</label>`;
+            html += `<label><input type="checkbox" id="detalleColor" ${configuracion.registroDetalladoActivo?'checked':''} onchange="window.toggleRegistroDetallado(this.checked)"> Agregar Color (Registro Detallado)</label>`;
+            html += `<div>Rango de peso permitido: <input type="range" id="rangoPeso" min="10" max="200" value="${configuracion.rangoPeso}" onchange="configuracion.rangoPeso=parseInt(this.value)"> ${configuracion.rangoPeso}g</div>`;
+            html += `</div></div>`;
+            
+            html += `<div class="card"><h3>📝 REGISTRAR PARTIDO</h3><div class="form-group"><label>Nombre Partido *</label><input type="text" id="nombrePartido" list="partidosList" maxlength="35" oninput="this.value=this.value.toUpperCase()"></div>`;
+            html += `<div class="form-group"><label>Representante</label><input type="text" id="representantePartido" list="representantesList" oninput="window.verificarRepresentante(this.value)"><span id="repAdvertencia" style="color:red;font-size:12px;"></span></div>`;
+            html += `<div id="gallosDinamicos"></div><button class="btn btn-primary" onclick="window.registrarPartido()">✓ REGISTRAR PARTIDO</button></div>`;
+            html += `<div class="card"><h3>📋 REGISTRO DE GALLOS</h3><div id="tablaRegistroGallos" class="table-responsive"></div></div>`;
+        }
+        
+        // COTEJO
+        html += `<div class="card"><h3>⚡ GENERACIÓN DE COTEJO</h3>`;
+        if(!cotejoGuardado) {
+            html += `<div class="form-row"><select id="modoCotejo"><option value="ASCENDENTE">⬆️ ASCENDENTE</option><option value="DESCENDENTE">⬇️ DESCENDENTE</option><option value="ALEATORIO">🎲 ALEATORIO</option><option value="INTELIGENTE" selected>🤖 INTELIGENTE (Menor Diferencia)</option></select>`;
+            html += `<button class="btn btn-success" onclick="window.ejecutarCotejo()">🎲 COTEJAR AHORA</button>`;
+            if(hayTemp) html += `<button class="btn btn-warning" onclick="window.limpiarCotejoTemp()">🧹 LIMPIAR</button>`;
+            if(hayTemp) html += `<button class="btn btn-primary" onclick="window.guardarCotejo()">💾 GUARDAR COTEJO</button>`;
+            html += `</div>`;
+        } else {
+            html += `<div class="form-row"><button class="btn btn-primary" onclick="window.mostrarModalPDF()">📄 DESCARGAR PDF (Personalizar)</button>`;
+            html += `<button class="btn btn-danger" onclick="window.eliminarCotejoGuardado()">🗑️ ELIMINAR COTEJO</button></div>`;
+        }
+        if(resultadosCotejo && resultadosCotejo.peleas?.length) html += `<div id="tablaCotejoContainer" style="margin-top:20px;overflow-x:auto;"></div>`;
+        if(resultadosCotejo && resultadosCotejo.noEmparejados?.length) {
+            html += `<div style="margin-top:12px;background:#ffebee;padding:12px;border-radius:12px;"><strong>⚠️ NO EMPAREJADOS:</strong><br>${resultadosCotejo.noEmparejados.map(n=>`${n.gallo?.partido} (Anillo ${n.gallo?.anillo}): ${n.motivo?.mensaje}`).join('<br>')}</div>`;
+        }
+        html += `</div>`;
+        
+        // TOP 4 MÁS RÁPIDAS
+        if(cotejoGuardado && resultadosCotejo) {
+            html += `<div class="card" style="background: linear-gradient(135deg, #FFD700, #FFC107);"><h3 style="color:#5D3A00;">🏆 TOP 4 PELEAS MÁS RÁPIDAS</h3><div id="top4Container" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;"></div></div>`;
+        }
+        
+        // CALIFICACIONES
+        if(cotejoGuardado && resultadosCotejo) {
+            html += `<div class="card"><h3>🏆 CALIFICACIONES DE PELEAS</h3><select id="peleaSelectCalif" onchange="window.cambioPeleaCalif()"></select>`;
+            html += `<div id="detallePeleaCalif"></div><div id="vallinesContainer" class="form-row" style="margin:12px 0;"></div>`;
+            html += `<div id="formCalif" style="display:none;"><div class="form-row"><input type="text" id="tiempoPelea" placeholder="MM:SS" maxlength="5" oninput="window.formatearTiempo(this)">`;
+            html += `<select id="ganadorSelect"><option value="">-- Ganador --</option><option value="rojo">🔴 ROJO</option><option value="verde">🟢 VERDE</option><option value="empate">🤝 EMPATE</option></select></div>`;
+            html += `<div style="background:#f8f9fa;padding:10px;border-radius:8px;margin:10px 0;" id="puntosInfo"></div>`;
+            html += `<button class="btn btn-success" onclick="window.calificarPelea()">✅ CALIFICAR PELEA</button></div>`;
+            html += `<div id="infoAnteriorCalif"></div></div>`;
+            
+            // Tabla Posiciones
+            html += `<div class="card"><h3>🏆 TABLA DE POSICIONES</h3><div id="tablaPosiciones"></div></div>`;
+            
+            // Tabla Serial Acumulado
+            html += `<div class="card"><h3>🔗 TABLA ACUMULADO (SERIAL)</h3><div id="tablaSerial"></div></div>`;
+            
+            // ASIGNAR JUEZ COMPLETO
+            html += `<div class="card"><div class="collapsible-header" onclick="window.toggleSection('juezPanel')">👨‍⚖️ ASIGNAR JUEZ (con tiempo de permiso) <span>▼</span></div><div id="juezPanel" style="display:none">`;
+            html += `<input type="text" id="buscarJuez" placeholder="Buscar juez por nombre..." class="form-group" oninput="window.filtrarJueces()">`;
+            html += `<div id="juecesListaCheck" style="max-height:200px;overflow-y:auto;margin:12px 0;"></div>`;
+            html += `<div class="form-group"><label>⏱️ TIEMPO DE PERMISO</label><select id="tiempoPermiso"><option value="30">30 minutos</option><option value="60">1 hora</option><option value="720">12 horas</option><option value="1440">24 horas</option><option value="2160">36 horas</option><option value="2880">48 horas</option></select></div>`;
+            html += `<div class="form-row"><button class="btn" onclick="window.asignarJueces()">ASIGNAR JUECES</button><button class="btn btn-danger" onclick="window.eliminarJuecesAsignados()">ELIMINAR ASIGNACIONES</button></div>`;
+            html += `<div id="juecesAsignadosLista" style="margin-top:16px;"></div></div></div>`;
+            
+            // VIDEOS
+            html += `<div class="card"><div class="collapsible-header" onclick="window.toggleSection('videosPanel')">🎥 AGREGAR VIDEOS A PELEAS <span>▼</span></div><div id="videosPanel" style="display:none">`;
+            html += `<select id="videoPeleaSelect" class="form-group"></select><textarea id="urlsVideos" rows="3" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.facebook.com/watch/?v=... (1 URL por línea)"></textarea>`;
+            html += `<div class="form-row"><button class="btn" onclick="window.guardarVideos()">💾 GUARDAR VIDEOS</button><button class="btn btn-warning" onclick="window.limpiarVideosForm()">🧹 LIMPIAR</button></div>`;
+            html += `<div id="videosGuardadosList" style="margin-top:16px;"></div></div></div>`;
+        }
+        
+        root.innerHTML = html;
+        
+        // Cargar datalists
+        const catalogos = JSON.parse(localStorage.getItem(STORAGE.CATALOGOS) || '{"partidos":[],"representantes":[],"colores":[]}');
+        const partidosDL = `<datalist id="partidosList">${catalogos.partidos.map(p=>`<option>${Utils.escapeHTML(p)}</option>`).join('')}</datalist>`;
+        const repsDL = `<datalist id="representantesList">${catalogos.representantes.map(r=>`<option>${Utils.escapeHTML(r)}</option>`).join('')}</datalist>`;
+        if(document.getElementById('gallosDinamicos')) {
+            document.getElementById('gallosDinamicos').insertAdjacentHTML('afterend', partidosDL + repsDL);
+            actualizarCamposGallos();
+        }
+        if(resultadosCotejo && resultadosCotejo.peleas) {
+            renderizarTablaCotejo();
+            if(cotejoGuardado) {
+                actualizarComboboxPeleasCalif();
+                renderizarTablaPosiciones();
+                renderizarTablaSerial();
+                actualizarTop4Rapidas();
+                actualizarJuecesUI();
+                actualizarVideosUI();
+                actualizarPuntosInfo();
+            }
+        }
+        if(!cotejoGuardado) renderizarTablaRegistro();
+    }
+    
+    // ==================== REGISTRO DE PARTIDOS COMPLETO ====================
+    function actualizarCamposGallos() {
+        const container = document.getElementById('gallosDinamicos');
+        if(!container) return;
+        let html = `<div class="gallos-grid">`;
+        for(let i=1; i<=configuracion.gallosPorPartido; i++) {
+            html += `<div class="gallo-row">
+                        <button class="btn-estado presente" data-gallo="${i}" onclick="window.toggleEstadoGallo(${i})">PRESENTE</button>
+                        <input type="text" id="anillo_${i}" placeholder="Anillo" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')" ${configuracion.anillosEditables?'':'readonly'}>
+                        <input type="text" id="peso_${i}" placeholder="Peso (g)" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                        ${configuracion.registroDetalladoActivo ? `<input type="text" id="color_${i}" placeholder="Color" list="coloresList">` : ''}
+                    </div>`;
+        }
+        html += `</div>`;
+        container.innerHTML = html;
+        if(configuracion.registroDetalladoActivo) {
+            const colores = JSON.parse(localStorage.getItem(STORAGE.CATALOGOS) || '{}').colores || [];
+            const coloresDL = `<datalist id="coloresList">${colores.map(c=>`<option>${c}</option>`).join('')}</datalist>`;
+            container.insertAdjacentHTML('afterend', coloresDL);
+        }
+    }
+    
+    window.registrarPartido = function() {
+        const nombrePartido = document.getElementById('nombrePartido')?.value.trim().toUpperCase();
+        if(!nombrePartido) return Utils.showToast('Nombre del partido requerido','error');
+        if(torneoActual.registro && torneoActual.registro[nombrePartido]) return Utils.showToast('Este partido ya está registrado','error');
+        
+        const representante = document.getElementById('representantePartido')?.value.trim().toUpperCase() || '';
+        if(representante && verificarRepresentanteDuplicado(representante, nombrePartido)) {
+            return Utils.showToast(`El representante "${representante}" ya está asignado a otro partido`,'error');
+        }
+        
+        const gallosData = {};
+        for(let i=1;i<=configuracion.gallosPorPartido;i++) {
+            const anillo = document.getElementById(`anillo_${i}`)?.value.trim();
+            const peso = document.getElementById(`peso_${i}`)?.value.trim();
+            const color = configuracion.registroDetalladoActivo ? document.getElementById(`color_${i}`)?.value.trim() : '';
+            if(!anillo || anillo.length<3 || anillo.length>4) return Utils.showToast(`Anillo gallo ${i} inválido (3-4 dígitos)`,'error');
+            if(verificarAnilloDuplicado(anillo)) return Utils.showToast(`Anillo ${anillo} ya existe en otro partido`,'error');
+            const pesoNum = peso ? parseInt(peso) : 0;
+            if(pesoNum && (pesoNum<configuracion.pesoMin || pesoNum>configuracion.pesoMax)) return Utils.showToast(`Peso fuera de rango (${configuracion.pesoMin}-${configuracion.pesoMax})`,'error');
+            gallosData[anillo] = { peso: pesoNum, color };
+        }
+        
+        if(!torneoActual.registro) torneoActual.registro = {};
+        torneoActual.registro[nombrePartido] = { representante, gallos: gallosData, timestamp: Date.now() };
+        guardarCatalogos(nombrePartido, representante, gallosData);
+        guardarTorneo();
+        if(resultadosCotejo && !resultadosCotejo.guardado) resultadosCotejo = null;
+        Utils.showToast('Partido registrado correctamente','success');
+        Utils.vibrate([100,50,100]);
+        document.getElementById('nombrePartido').value = '';
+        document.getElementById('representantePartido').value = '';
+        for(let i=1;i<=configuracion.gallosPorPartido;i++) {
+            document.getElementById(`anillo_${i}`).value = '';
+            document.getElementById(`peso_${i}`).value = '';
+            if(configuracion.registroDetalladoActivo) document.getElementById(`color_${i}`).value = '';
+        }
+        renderApp();
+    };
+    
+    function verificarAnilloDuplicado(anillo) {
+        if(!torneoActual?.registro) return false;
+        for(const p in torneoActual.registro) {
+            if(torneoActual.registro[p].gallos[anillo]) return true;
+        }
+        return false;
+    }
+    
+    function verificarRepresentanteDuplicado(representante, partidoActual) {
+        if(!torneoActual?.registro || !representante) return false;
+        for(const p in torneoActual.registro) {
+            if(p !== partidoActual && torneoActual.registro[p].representante === representante) return true;
+        }
+        return false;
+    }
+    
+    function guardarCatalogos(partido, rep, gallosData) {
+        const catalogos = JSON.parse(localStorage.getItem(STORAGE.CATALOGOS) || '{"partidos":[],"representantes":[],"colores":[]}');
+        if(!catalogos.partidos.includes(partido)) catalogos.partidos.push(partido);
+        if(rep && !catalogos.representantes.includes(rep)) catalogos.representantes.push(rep);
+        for(const anillo in gallosData) {
+            if(gallosData[anillo].color && !catalogos.colores.includes(gallosData[anillo].color)) catalogos.colores.push(gallosData[anillo].color);
+        }
+        localStorage.setItem(STORAGE.CATALOGOS, JSON.stringify(catalogos));
+    }
+    
+    function renderizarTablaRegistro() {
+        if(!torneoActual?.registro) return;
+        let rows = '';
+        for(const partido in torneoActual.registro) {
+            const data = torneoActual.registro[partido];
+            for(const anillo in data.gallos) {
+                const gallo = data.gallos[anillo];
+                const duplicado = verificarAnilloDuplicado(anillo);
+                rows += `<tr class="${duplicado?'duplicado':''}">
+                            <td>${anillo}${duplicado?'⚠️':''}</td>
+                            <td>${gallo.peso || 'PENDIENTE'}</td>
+                            <td>${Utils.escapeHTML(partido)}</td>
+                            <td>${Utils.escapeHTML(data.representante)}</td>
+                            <td>${gallo.color || '-'}</td>
+                            <td><button class="btn btn-sm" onclick="window.editarPartidoCompleto('${partido}')">✏️ EDITAR PARTIDO</button></td>
+                            <td><button class="btn btn-sm btn-warning" onclick="window.editarGalloIndividual('${partido}','${anillo}')">✏️ GALLO</button></td>
+                        </td>`;
+            }
+        }
+        document.getElementById('tablaRegistroGallos').innerHTML = `<div class="table-responsive"><table><thead><tr><th>Anillo</th><th>Peso</th><th>Partido</th><th>Representante</th><th>Color</th><th>Editar Partido</th><th>Editar Gallo</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    
+    // Edición de Partido Completo
+    window.editarPartidoCompleto = function(partido) {
+        const data = torneoActual.registro[partido];
+        let gallosHtml = '';
+        let idx=1;
+        for(const anillo in data.gallos) {
+            const g = data.gallos[anillo];
+            gallosHtml += `<div class="gallo-row">
+                <input type="text" placeholder="Anillo" value="${anillo}" id="editAnillo_${idx}" maxlength="4">
+                <input type="text" placeholder="Peso" value="${g.peso||''}" id="editPeso_${idx}">
+                ${configuracion.registroDetalladoActivo ? `<input type="text" placeholder="Color" value="${g.color||''}" id="editColor_${idx}">` : ''}
+            </div>`;
+            idx++;
+        }
+        const modalHtml = `<div id="modalEditPartido" class="modal-overlay"><div class="modal-container"><h2>✏️ EDITAR PARTIDO: ${partido}</h2>
+            <div class="form-group"><label>Nombre Partido</label><input type="text" id="editNombrePartido" value="${partido}"></div>
+            <div class="form-group"><label>Representante</label><input type="text" id="editRepresentante" value="${data.representante||''}"></div>
+            <h4>Gallos</h4><div id="editGallosContainer">${gallosHtml}</div>
+            <div class="form-row" style="margin-top:20px;"><button class="btn btn-primary" onclick="window.guardarEdicionPartido('${partido}')">GUARDAR CAMBIOS</button>
+            <button class="btn btn-danger" onclick="window.eliminarPartidoCompleto('${partido}')">ELIMINAR PARTIDO</button>
+            <button class="btn" onclick="document.getElementById('modalEditPartido').remove()">CANCELAR</button></div>
+        </div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
+    
+    window.guardarEdicionPartido = function(partidoOriginal) {
+        const nuevoNombre = document.getElementById('editNombrePartido').value.trim().toUpperCase();
+        const nuevoRep = document.getElementById('editRepresentante').value.trim().toUpperCase();
+        const nuevosGallos = {};
+        const numGallos = Object.keys(torneoActual.registro[partidoOriginal].gallos).length;
+        for(let i=1;i<=numGallos;i++) {
+            const anillo = document.getElementById(`editAnillo_${i}`).value.trim();
+            const peso = parseInt(document.getElementById(`editPeso_${i}`).value.trim()) || 0;
+            const color = configuracion.registroDetalladoActivo ? document.getElementById(`editColor_${i}`).value.trim() : '';
+            if(!anillo) return Utils.showToast('Anillo requerido','error');
+            if(anillo !== Object.keys(torneoActual.registro[partidoOriginal].gallos)[i-1] && verificarAnilloDuplicado(anillo)) {
+                return Utils.showToast(`Anillo ${anillo} ya existe`,'error');
+            }
+            nuevosGallos[anillo] = { peso, color };
+        }
+        if(partidoOriginal !== nuevoNombre && torneoActual.registro[nuevoNombre]) return Utils.showToast('El nuevo nombre ya existe','error');
+        const oldData = torneoActual.registro[partidoOriginal];
+        delete torneoActual.registro[partidoOriginal];
+        torneoActual.registro[nuevoNombre] = { representante: nuevoRep, gallos: nuevosGallos, timestamp: Date.now() };
+        guardarTorneo();
+        if(resultadosCotejo && !resultadosCotejo.guardado) resultadosCotejo = null;
+        document.getElementById('modalEditPartido')?.remove();
+        renderApp();
+        Utils.showToast('Partido actualizado','success');
+    };
+    
+    window.eliminarPartidoCompleto = function(partido) {
+        if(confirm(`¿Eliminar partido ${partido} y todos sus gallos?`)) {
+            delete torneoActual.registro[partido];
+            guardarTorneo();
+            if(resultadosCotejo && !resultadosCotejo.guardado) resultadosCotejo = null;
+            document.getElementById('modalEditPartido')?.remove();
+            renderApp();
+            Utils.showToast('Partido eliminado','info');
+        }
+    };
+    
+    // Edición de Gallo Individual
+    window.editarGalloIndividual = function(partido, anillo) {
+        const gallo = torneoActual.registro[partido].gallos[anillo];
+        const modalHtml = `<div id="modalEditGallo" class="modal-overlay"><div class="modal-container"><h2>✏️ EDITAR GALLO</h2>
+            <div class="form-group"><label>Anillo</label><input type="text" id="editGalloAnillo" value="${anillo}" maxlength="4"></div>
+            <div class="form-group"><label>Peso (g)</label><input type="text" id="editGalloPeso" value="${gallo.peso||''}"></div>
+            ${configuracion.registroDetalladoActivo ? `<div class="form-group"><label>Color</label><input type="text" id="editGalloColor" value="${gallo.color||''}"></div>` : ''}
+            <div class="form-row"><button class="btn btn-primary" onclick="window.guardarEdicionGallo('${partido}','${anillo}')">GUARDAR</button>
+            <button class="btn btn-danger" onclick="window.eliminarGalloIndividual('${partido}','${anillo}')">ELIMINAR GALLO</button>
+            <button class="btn" onclick="document.getElementById('modalEditGallo').remove()">CANCELAR</button></div></div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
+    
+    window.guardarEdicionGallo = function(partido, anilloViejo) {
+        const nuevoAnillo = document.getElementById('editGalloAnillo').value.trim();
+        const nuevoPeso = parseInt(document.getElementById('editGalloPeso').value.trim()) || 0;
+        const nuevoColor = configuracion.registroDetalladoActivo ? document.getElementById('editGalloColor').value.trim() : '';
+        if(!nuevoAnillo) return Utils.showToast('Anillo requerido','error');
+        if(nuevoAnillo !== anilloViejo && verificarAnilloDuplicado(nuevoAnillo)) return Utils.showToast('Anillo duplicado','error');
+        const gallos = torneoActual.registro[partido].gallos;
+        gallos[nuevoAnillo] = { peso: nuevoPeso, color: nuevoColor };
+        if(nuevoAnillo !== anilloViejo) delete gallos[anilloViejo];
+        guardarTorneo();
+        if(resultadosCotejo && !resultadosCotejo.guardado) resultadosCotejo = null;
+        document.getElementById('modalEditGallo')?.remove();
+        renderApp();
+        Utils.showToast('Gallo actualizado','success');
+    };
+    
+    window.eliminarGalloIndividual = function(partido, anillo) {
+        if(confirm(`¿Eliminar gallo anillo ${anillo}?`)) {
+            delete torneoActual.registro[partido].gallos[anillo];
+            if(Object.keys(torneoActual.registro[partido].gallos).length === 0) delete torneoActual.registro[partido];
+            guardarTorneo();
+            if(resultadosCotejo && !resultadosCotejo.guardado) resultadosCotejo = null;
+            document.getElementById('modalEditGallo')?.remove();
+            renderApp();
+            Utils.showToast('Gallo eliminado','info');
+        }
+    };
+    
+    // ==================== COTEJO COMPLETO CON DISTRIBUCIÓN INTELIGENTE ====================
+    function obtenerGallosArray() {
+        let gallos = [];
+        for(const partido in torneoActual.registro) {
+            for(const anillo in torneoActual.registro[partido].gallos) {
+                const g = torneoActual.registro[partido].gallos[anillo];
+                if(g.peso > 0) gallos.push({ anillo, peso: g.peso, partido, representante: torneoActual.registro[partido].representante, color: g.color });
+            }
+        }
+        return gallos;
+    }
+    
+    function emparejarBasico(gallos, modo) {
+        let sorted = [...gallos];
+        if(modo === 'ASCENDENTE') sorted.sort((a,b)=>a.peso-b.peso);
+        else if(modo === 'DESCENDENTE') sorted.sort((a,b)=>b.peso-a.peso);
+        else sorted.sort(()=>Math.random()-0.5);
+        let peleas = [];
+        let noEmparejados = [];
+        let usados = new Set();
+        for(let i=0;i<sorted.length;i++) {
+            if(usados.has(i)) continue;
+            let pareja = null;
+            for(let j=i+1;j<sorted.length;j++) {
+                if(usados.has(j)) continue;
+                if(Math.abs(sorted[i].peso - sorted[j].peso) <= configuracion.rangoPeso && 
+                   sorted[i].partido !== sorted[j].partido && 
+                   sorted[i].representante !== sorted[j].representante) {
+                    pareja = j;
+                    break;
+                }
+            }
+            if(pareja !== null) {
+                peleas.push({ g1: sorted[i], g2: sorted[pareja] });
+                usados.add(i); usados.add(pareja);
+            } else {
+                noEmparejados.push({ gallo: sorted[i], motivo: { codigo: 'NO_PAREJA', mensaje: 'No hay pareja disponible dentro del rango' } });
+            }
+        }
+        return { peleas, noEmparejados };
+    }
+    
+    function distribucionInteligenteAvanzada(parejasBase) {
+        let mejorScore = -Infinity;
+        let mejorOrden = [...parejasBase];
+        for(let intento=0;intento<150;intento++) {
+            let orden = [...parejasBase];
+            for(let i=orden.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [orden[i],orden[j]]=[orden[j],orden[i]]; }
+            let score = 0;
+            for(let i=0;i<orden.length-1;i++) {
+                const p1 = orden[i], p2 = orden[i+1];
+                const partidos1 = [p1.g1.partido, p1.g2.partido];
+                const partidos2 = [p2.g1.partido, p2.g2.partido];
+                if(partidos1.some(p=>partidos2.includes(p))) score -= 50;
+                if(i<orden.length-2) {
+                    const p3 = orden[i+2];
+                    const partidos3 = [p3.g1.partido, p3.g2.partido];
+                    if(partidos1.some(p=>partidos3.includes(p))) score -= 20;
+                }
+            }
+            if(score > mejorScore) { mejorScore = score; mejorOrden = [...orden]; }
+        }
+        return mejorOrden;
+    }
+    
+    window.ejecutarCotejo = function() {
+        const gallos = obtenerGallosArray();
+        if(gallos.length < 2) return Utils.showToast('Se necesitan al menos 2 gallos presentes','error');
+        const modo = document.getElementById('modoCotejo').value;
+        let { peleas, noEmparejados } = emparejarBasico(gallos, modo);
+        if(peleas.length === 0) return Utils.showToast('No se pudieron generar peleas con las restricciones','error');
+        if(modo === 'INTELIGENTE') peleas = distribucionInteligenteAvanzada(peleas);
+        const peleasFormateadas = peleas.map((p,idx)=>({ 
+            numero: idx+1, 
+            gallo1: p.g1, gallo2: p.g2, 
+            diferencia: Math.abs(p.g1.peso - p.g2.peso) 
+        }));
+        resultadosCotejo = { 
+            peleas: peleasFormateadas, 
+            noEmparejados, 
+            metricas: { totalGallos: gallos.length, peleasGeneradas: peleas.length },
+            guardado: false, 
+            modo 
+        };
+        renderApp();
+    };
+    
+    window.guardarCotejo = function() {
+        if(!resultadosCotejo) return;
+        resultadosCotejo.guardado = true;
+        resultadosCotejo.id = 'cotejo_' + Utils.generarId();
+        torneoActual.cotejoId = resultadosCotejo.id;
+        guardarTorneo();
+        localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
+        renderApp();
+        Utils.showToast('Cotejo guardado','success');
+    };
+    
+    function renderizarTablaCotejo() {
+        if(!resultadosCotejo?.peleas) return;
+        let tableHtml = `<table><thead>战争<th>#</th><th>CINTA ROJA</th><th>A1</th><th>P1</th><th>#</th><th>P2</th><th>A2</th><th>CINTA VERDE</th><th>DIF</th><th>GANADOR</th><th>TIEMPO</th>${!resultadosCotejo.guardado ? '<th>MOVER</th>' : ''}</thead><tbody>`;
+        resultadosCotejo.peleas.forEach((p,idx)=>{
+            const cal = calificacionesMap.get(idx);
+            const ganadorTxt = cal ? (cal.ganador==='rojo'?`🔴 ${p.gallo1.partido}`: cal.ganador==='verde'?`🟢 ${p.gallo2.partido}`:'🤝 EMPATE') : '—';
+            const tiempo = cal?.tiempo || '—';
+            tableHtml += `<tr style="background:${cal?'#e3f2fd':''}">
+                <td>${p.numero}</td><td>${Utils.escapeHTML(p.gallo1.partido)}</td><td>${p.gallo1.anillo}</td><td>${p.gallo1.peso}g</td>
+                <td>${p.numero}</td><td>${p.gallo2.peso}g</td><td>${p.gallo2.anillo}</td><td>${Utils.escapeHTML(p.gallo2.partido)}</td>
+                <td>${p.diferencia}g</td><td>${ganadorTxt}</td><td>${tiempo}</td>`;
+            if(!resultadosCotejo.guardado) {
+                tableHtml += `<td class="movement-buttons">
+                    <button onclick="window.moverPelea(${idx},'up')" title="Subir">▲</button>
+                    <button onclick="window.moverPelea(${idx},'down')" title="Bajar">▼</button>
+                    <button onclick="window.intercambiarGallos(${idx})" title="Intercambiar">🔄</button>
+                    <button onclick="window.moverAPosicion(${idx})" title="Mover a posición">↗️</button>
+                </td>`;
+            }
+            tableHtml += `</tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        document.getElementById('tablaCotejoContainer').innerHTML = tableHtml;
+    }
+    
+    window.moverPelea = function(idx, dir) {
+        if(!resultadosCotejo || resultadosCotejo.guardado) return;
+        let newIdx = dir==='up' ? idx-1 : idx+1;
+        if(newIdx<0 || newIdx>=resultadosCotejo.peleas.length) return;
+        [resultadosCotejo.peleas[idx], resultadosCotejo.peleas[newIdx]] = [resultadosCotejo.peleas[newIdx], resultadosCotejo.peleas[idx]];
+        resultadosCotejo.peleas.forEach((p,i)=>p.numero=i+1);
+        renderApp();
+    };
+    
+    window.intercambiarGallos = function(idx) {
+        if(!resultadosCotejo || resultadosCotejo.guardado) return;
+        [resultadosCotejo.peleas[idx].gallo1, resultadosCotejo.peleas[idx].gallo2] = 
+        [resultadosCotejo.peleas[idx].gallo2, resultadosCotejo.peleas[idx].gallo1];
+        resultadosCotejo.peleas[idx].diferencia = Math.abs(resultadosCotejo.peleas[idx].gallo1.peso - resultadosCotejo.peleas[idx].gallo2.peso);
+        renderApp();
+    };
+    
+    window.moverAPosicion = function(idx) {
+        const nueva = prompt(`Mover pelea #${idx+1} a posición (1-${resultadosCotejo.peleas.length})`);
+        if(nueva && !isNaN(nueva)) {
+            const dest = parseInt(nueva)-1;
+            if(dest>=0 && dest<resultadosCotejo.peleas.length && dest!==idx) {
+                const [item] = resultadosCotejo.peleas.splice(idx,1);
+                resultadosCotejo.peleas.splice(dest,0,item);
+                resultadosCotejo.peleas.forEach((p,i)=>p.numero=i+1);
+                renderApp();
+            }
+        }
+    };
+    
+    // ==================== TOP 4 MÁS RÁPIDAS ====================
+    function actualizarTop4Rapidas() {
+        if(!resultadosCotejo?.peleas) return;
+        let peleasConTiempo = [];
+        resultadosCotejo.peleas.forEach((p,idx)=>{
+            const cal = calificacionesMap.get(idx);
+            if(cal && cal.ganador !== 'empate' && cal.tiempo) {
+                peleasConTiempo.push({ pelea: p, tiempo: cal.tiempo, segundos: Utils.timeToSeconds(cal.tiempo), ganador: cal.ganador });
+            }
+        });
+        peleasConTiempo.sort((a,b)=>a.segundos - b.segundos);
+        const top4 = peleasConTiempo.slice(0,4);
+        let html = '';
+        for(let i=0;i<4;i++) {
+            if(top4[i]) {
+                const nombreGanador = top4[i].ganador === 'rojo' ? top4[i].pelea.gallo1.partido : top4[i].pelea.gallo2.partido;
+                html += `<div class="top4-card"><div style="font-weight:bold;">${nombreGanador}</div><div style="font-size:24px;color:#E6A017;">${top4[i].tiempo}</div><div style="font-size:12px;">Pelea #${top4[i].pelea.numero}</div></div>`;
+            } else {
+                html += `<div class="top4-card"><div>---</div><div>--:--</div></div>`;
+            }
+        }
+        document.getElementById('top4Container').innerHTML = html;
+    }
+    
+    // ==================== TABLA POSICIONES ====================
+    function procesarTablaPosicion() {
+        if(!resultadosCotejo?.peleas) return [];
+        const mapa = new Map();
+        const pc = configuracion.puntosConfig;
+        resultadosCotejo.peleas.forEach((p,idx)=>{
+            const cal = calificacionesMap.get(idx);
+            if(!cal) return;
+            const partido1 = p.gallo1.partido, partido2 = p.gallo2.partido;
+            if(!mapa.has(partido1)) mapa.set(partido1, { puntos:0, tiempo:0 });
+            if(!mapa.has(partido2)) mapa.set(partido2, { puntos:0, tiempo:0 });
+            let pts1=0, pts2=0, tiempoSeg = Utils.timeToSeconds(cal.tiempo);
+            if(cal.ganador==='rojo') { pts1=pc.ganador; pts2=pc.perdedor; }
+            else if(cal.ganador==='verde') { pts1=pc.perdedor; pts2=pc.ganador; }
+            else { pts1=pc.empate; pts2=pc.empate; }
+            mapa.get(partido1).puntos += pts1;
+            mapa.get(partido2).puntos += pts2;
+            if(pts1===pc.ganador || cal.ganador==='empate') mapa.get(partido1).tiempo += tiempoSeg;
+            if(pts2===pc.ganador || cal.ganador==='empate') mapa.get(partido2).tiempo += tiempoSeg;
+        });
+        let arr = Array.from(mapa.entries()).map(([nombre,data])=>({ nombre, puntos:data.puntos, tiempo:data.tiempo }));
+        arr.sort((a,b)=> b.puntos!==a.puntos ? b.puntos-a.puntos : a.tiempo-b.tiempo);
+        return arr;
+    }
+    
+    function renderizarTablaPosiciones() {
+        const datos = procesarTablaPosicion();
+        if(datos.length===0) { document.getElementById('tablaPosiciones').innerHTML = '<div class="no-data">Sin datos de posición. Califique peleas.</div>'; return; }
+        let html = `<table><thead><tr><th>Partido</th><th>Puntos</th><th>Tiempo</th></tr></thead><tbody>`;
+        datos.forEach(d=>{ html += `<tr><td>${Utils.escapeHTML(d.nombre)}</td><td><strong>${d.puntos}</strong></td><td>${Utils.formatTiempo(d.tiempo)}</td></tr>`; });
+        html+=`</tbody></table>`;
+        document.getElementById('tablaPosiciones').innerHTML = html;
+    }
+    
+    // ==================== SERIAL (TORNEOS ANTERIORES) ====================
+    function renderizarTablaSerial() {
+        let todosPartidos = new Map();
+        if(torneoActual?.registro) {
+            for(const p in torneoActual.registro) todosPartidos.set(p, { torneos: 1 });
+        }
+        serialTorneos.forEach(t => {
+            if(t?.registro) {
+                for(const p in t.registro) {
+                    if(!todosPartidos.has(p)) todosPartidos.set(p, { torneos: 0 });
+                    todosPartidos.get(p).torneos++;
+                }
+            }
+        });
+        let arr = Array.from(todosPartidos.entries()).map(([nombre,data])=>({ nombre, torneos: data.torneos })).sort((a,b)=>b.torneos-a.torneos);
+        if(arr.length===0) { document.getElementById('tablaSerial').innerHTML = '<div class="no-data">Sin datos serial</div>'; return; }
+        let html = `<table><thead><tr><th>Partido</th><th>Torneos Participados</th></tr></thead><tbody>`;
+        arr.forEach(d=>{ html += `<tr><td>${Utils.escapeHTML(d.nombre)}</td><td>${d.torneos}</td></tr>`; });
+        html+=`</tbody></table>`;
+        document.getElementById('tablaSerial').innerHTML = html;
+    }
+    
+    window.mostrarSerialAnterior = function() {
+        const seriales = JSON.parse(localStorage.getItem(STORAGE.TORNEOS_ANTERIORES) || '[]');
+        let checkboxes = '';
+        seriales.forEach((t,idx) => {
+            checkboxes += `<label><input type="checkbox" value="${idx}"> ${t.nombre} (${t.fecha})</label><br>`;
+        });
+        const modal = `<div id="modalSerial" class="modal-overlay"><div class="modal-container"><h2>🔗 VINCULAR TORNEOS ANTERIORES</h2>
+            ${checkboxes || '<div>No hay torneos anteriores guardados</div>'}
+            <div class="form-row" style="margin-top:20px;"><button class="btn btn-primary" onclick="window.vincularSerialSeleccionado()">VINCULAR SELECCIONADOS</button>
+            <button class="btn" onclick="document.getElementById('modalSerial').remove()">CANCELAR</button></div></div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modal);
+    };
+    
+    window.vincularSerialSeleccionado = function() {
+        const checks = document.querySelectorAll('#modalSerial input:checked');
+        const indices = Array.from(checks).map(c=>parseInt(c.value));
+        const seriales = JSON.parse(localStorage.getItem(STORAGE.TORNEOS_ANTERIORES) || '[]');
+        const seleccionados = indices.map(i=>seriales[i]).filter(Boolean);
+        torneoActual.serialVinculado = seleccionados;
+        guardarTorneo();
+        document.getElementById('modalSerial')?.remove();
+        renderApp();
+        Utils.showToast(`${seleccionados.length} torneos vinculados al serial`,'success');
+    };
+    
+    // ==================== CALIFICACIONES COMPLETAS ====================
+    function actualizarComboboxPeleasCalif() {
+        const select = document.getElementById('peleaSelectCalif');
+        if(!select) return;
+        select.innerHTML = '<option value="">-- Selecciona pelea --</option>';
+        resultadosCotejo.peleas.forEach((p,idx)=>{
+            const cal = calificacionesMap.get(idx);
+            select.add(new Option(`Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido} ${cal?'✓ CALIFICADA':'⏳ PENDIENTE'}`, idx));
+        });
+    }
+    
+    window.cambioPeleaCalif = function() {
+        const idx = parseInt(document.getElementById('peleaSelectCalif').value);
+        if(isNaN(idx)) return;
+        const p = resultadosCotejo.peleas[idx];
+        const cal = calificacionesMap.get(idx);
+        document.getElementById('detallePeleaCalif').innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0;">
+            <div style="background:#ffebee;padding:12px;border-radius:12px;"><strong>🔴 ${p.gallo1.partido}</strong><br>Anillo: ${p.gallo1.anillo}<br>Peso: ${p.gallo1.peso}g</div>
+            <div style="background:#e8f5e8;padding:12px;border-radius:12px;"><strong>🟢 ${p.gallo2.partido}</strong><br>Anillo: ${p.gallo2.anillo}<br>Peso: ${p.gallo2.peso}g</div>
+        </div><div>Diferencia: ${p.diferencia}g</div>`;
+        
+        let vallinesHtml = '<strong>VALLINES:</strong> ';
+        for(let i=1;i<=configuracion.gallosPorPartido;i++) vallinesHtml += `<button class="vallin-btn" data-vallin="${i}" onclick="window.seleccionarVallin(${i})">${i}</button>`;
+        document.getElementById('vallinesContainer').innerHTML = vallinesHtml;
+        
+        if(cal) {
+            document.getElementById('formCalif').style.display = 'none';
+            document.getElementById('infoAnteriorCalif').innerHTML = `<div style="background:#fff3cd;padding:15px;border-radius:12px;">
+                <strong>⚠️ Calificación existente:</strong><br>Ganador: ${cal.ganador}<br>Tiempo: ${cal.tiempo}<br>Vallín: ${cal.vallin||'?'}<br>Fecha: ${cal.fechaCalificacion||'desconocida'}<br>
+                <div class="form-row" style="margin-top:12px;"><button class="btn btn-warning btn-sm" onclick="window.recalificarPelea(${idx})">✏️ VOLVER A CALIFICAR</button>
+                <button class="btn btn-danger btn-sm" onclick="window.eliminarCalificacion(${idx})">🗑️ ELIMINAR</button></div>
+            </div>`;
+        } else {
+            document.getElementById('formCalif').style.display = 'block';
+            document.getElementById('infoAnteriorCalif').innerHTML = '';
+            window.vallinSeleccionado = null;
+            document.getElementById('tiempoPelea').value = '';
+            document.getElementById('ganadorSelect').value = '';
+            actualizarPuntosInfo();
+        }
+    };
+    
+    function actualizarPuntosInfo() {
+        const pc = configuracion.puntosConfig;
+        document.getElementById('puntosInfo').innerHTML = `<span>🏆 GANADOR: ${pc.ganador} pts</span> <span>🤝 EMPATE: ${pc.empate} pts</span> <span>📉 PERDEDOR: ${pc.perdedor} pts</span>`;
+    }
+    
+    window.seleccionarVallin = function(v) {
+        window.vallinSeleccionado = v;
+        document.querySelectorAll('.vallin-btn').forEach(btn=>btn.classList.remove('active'));
+        const active = document.querySelector(`.vallin-btn[data-vallin="${v}"]`);
+        if(active) active.classList.add('active');
+    };
+    
+    window.calificarPelea = function() {
+        const idx = parseInt(document.getElementById('peleaSelectCalif').value);
+        if(isNaN(idx)) return Utils.showToast('Seleccione una pelea','error');
+        const tiempo = document.getElementById('tiempoPelea').value.trim();
+        const ganador = document.getElementById('ganadorSelect').value;
+        if(!tiempo.match(/^\d{2}:\d{2}$/)) return Utils.showToast('Formato tiempo MM:SS','error');
+        const [min, seg] = tiempo.split(':');
+        if(parseInt(min)>59 || parseInt(seg)>59) return Utils.showToast('Minutos/segundos inválidos','error');
+        if(!ganador) return Utils.showToast('Seleccione ganador','error');
+        if(!window.vallinSeleccionado) return Utils.showToast('Seleccione el vallín que peleó','error');
+        
+        const pc = configuracion.puntosConfig;
+        calificacionesMap.set(idx, { 
+            ganador, tiempo, vallin: window.vallinSeleccionado, 
+            fechaCalificacion: new Date().toLocaleString(), 
+            timestamp: Date.now(),
+            usuarioCalifico: 'ADMIN'
+        });
+        if(resultadosCotejo.peleas[idx]) resultadosCotejo.peleas[idx].calificada = true;
+        localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
+        actualizarComboboxPeleasCalif();
+        renderizarTablaCotejo();
+        renderizarTablaPosiciones();
+        renderizarTablaSerial();
+        actualizarTop4Rapidas();
+        Utils.showToast('Pelea calificada correctamente','success');
+        Utils.vibrate([100,50,100]);
+        document.getElementById('peleaSelectCalif').value = '';
+        document.getElementById('detallePeleaCalif').innerHTML = '';
+        document.getElementById('formCalif').style.display = 'none';
+        document.getElementById('infoAnteriorCalif').innerHTML = '';
+    };
+    
+    window.eliminarCalificacion = function(idx) {
+        if(confirm('¿Eliminar esta calificación?')) {
+            calificacionesMap.delete(idx);
+            if(resultadosCotejo.peleas[idx]) delete resultadosCotejo.peleas[idx].calificada;
+            localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
+            actualizarComboboxPeleasCalif();
+            renderizarTablaCotejo();
+            renderizarTablaPosiciones();
+            renderizarTablaSerial();
+            actualizarTop4Rapidas();
+            Utils.showToast('Calificación eliminada','info');
+            document.getElementById('peleaSelectCalif').value = '';
+            document.getElementById('detallePeleaCalif').innerHTML = '';
+            document.getElementById('formCalif').style.display = 'none';
+            document.getElementById('infoAnteriorCalif').innerHTML = '';
+        }
+    };
+    
+    window.recalificarPelea = function(idx) {
+        window.eliminarCalificacion(idx);
+        setTimeout(()=>{
+            document.getElementById('peleaSelectCalif').value = idx;
+            window.cambioPeleaCalif();
+        }, 200);
+    };
+    
+    // ==================== JUECES CON TIEMPO DE PERMISO ====================
+    function actualizarJuecesUI() {
+        const search = document.getElementById('buscarJuez')?.value.toLowerCase() || '';
+        const filtrados = juecesDisponibles.filter(j=>j.nombre.toLowerCase().includes(search));
+        const cont = document.getElementById('juecesListaCheck');
+        if(cont) cont.innerHTML = filtrados.map(j=>`<label><input type="checkbox" value="${j.uid}"> <strong>${j.nombre}</strong> (${j.partido}) - ${j.telefono}</label>`).join('');
+        const asignados = torneoActual?.juecesAsignados || [];
+        const tiempoPermiso = torneoActual?.tiempoPermisoJueces || 0;
+        document.getElementById('juecesAsignadosLista').innerHTML = asignados.map(j=>`<div style="background:#e8f5e9;padding:8px;margin:4px 0;border-radius:8px;">✅ ${j.nombre} - ${j.partido}${tiempoPermiso ? ` ⏱️ Permiso: ${tiempoPermiso} min` : ''}</div>`).join('') || '<div>No hay jueces asignados</div>';
+    }
+    
+    window.asignarJueces = function() {
+        const checks = document.querySelectorAll('#juecesListaCheck input:checked');
+        const seleccionados = Array.from(checks).map(c=>juecesDisponibles.find(j=>j.uid===c.value)).filter(Boolean);
+        const tiempoPermiso = parseInt(document.getElementById('tiempoPermiso').value);
+        torneoActual.juecesAsignados = seleccionados;
+        torneoActual.tiempoPermisoJueces = tiempoPermiso;
+        guardarTorneo();
+        actualizarJuecesUI();
+        Utils.showToast(`${seleccionados.length} jueces asignados con permiso de ${tiempoPermiso} minutos`,'success');
+    };
+    
+    window.eliminarJuecesAsignados = function() {
+        if(confirm('¿Eliminar todas las asignaciones de jueces?')) {
+            torneoActual.juecesAsignados = [];
+            torneoActual.tiempoPermisoJueces = 0;
+            guardarTorneo();
+            actualizarJuecesUI();
+            Utils.showToast('Asignaciones eliminadas','info');
+        }
+    };
+    
+    window.filtrarJueces = function() { actualizarJuecesUI(); };
+    
+    // ==================== VIDEOS ====================
+    function actualizarVideosUI() {
+        const select = document.getElementById('videoPeleaSelect');
+        if(select && resultadosCotejo?.peleas) {
+            select.innerHTML = '<option value="">-- Selecciona pelea --</option>';
+            resultadosCotejo.peleas.forEach((p,idx)=> select.add(new Option(`Pelea #${p.numero}: ${p.gallo1.partido} vs ${p.gallo2.partido}`, idx)));
+        }
+        const videos = torneoActual?.videosPorPelea || {};
+        let html = '';
+        for(const idx in videos) {
+            html += `<div style="margin:8px 0;padding:8px;background:#f0f0f0;border-radius:8px;"><strong>Pelea ${parseInt(idx)+1}</strong><ul>${videos[idx].map(v=>`<li><a href="${v}" target="_blank">${v.substring(0,50)}</a></li>`).join('')}</ul></div>`;
+        }
+        document.getElementById('videosGuardadosList').innerHTML = html || '<div>No hay videos guardados</div>';
+    }
+    
+    window.guardarVideos = function() {
+        const idx = document.getElementById('videoPeleaSelect').value;
+        if(idx==='') return Utils.showToast('Seleccione una pelea','error');
+        const urls = document.getElementById('urlsVideos').value.split(/\r?\n/).filter(u=>u.trim());
+        if(urls.length>10) return Utils.showToast('Máximo 10 URLs por pelea','error');
+        if(!torneoActual.videosPorPelea) torneoActual.videosPorPelea = {};
+        torneoActual.videosPorPelea[idx] = urls;
+        guardarTorneo();
+        actualizarVideosUI();
+        Utils.showToast(`${urls.length} videos guardados para la pelea ${parseInt(idx)+1}`,'success');
+    };
+    
+    window.limpiarVideosForm = function() {
+        document.getElementById('urlsVideos').value = '';
+        document.getElementById('videoPeleaSelect').value = '';
+    };
+    
+    // ==================== PDF PERSONALIZADO ====================
+    window.mostrarModalPDF = function() {
+        const modal = `<div id="modalPDF" class="modal-overlay"><div class="modal-container"><h3>📥 PERSONALIZAR DESCARGA</h3>
+            <div class="form-group"><label>ESTILO DE TABLA</label><div class="form-row"><label><input type="radio" name="estiloPDF" value="normal" checked> 📄 NORMAL (GANADOR-TIEMPO)</label>
+            <label><input type="radio" name="estiloPDF" value="extendido"> 🖼️ EXTENDIDO (G - T - G)</label></div></div>
+            <div class="form-group"><label>NÚMERO DE VALLINES</label><select id="numVallinesPDF"><option value="1">1 Vallín</option><option value="2">2 Vallines</option><option value="3">3 Vallines</option><option value="4">4 Vallines</option><option value="5">5 Vallines</option><option value="6">6 Vallines</option></select></div>
+            <div class="form-row"><button class="btn btn-primary" onclick="window.generarPDF()">✅ GENERAR PDF</button><button class="btn" onclick="document.getElementById('modalPDF').remove()">CANCELAR</button></div></div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modal);
+    };
+    
+    window.generarPDF = function() {
+        const estilo = document.querySelector('input[name="estiloPDF"]:checked').value;
+        const numVallines = document.getElementById('numVallinesPDF').value;
+        Utils.showToast(`PDF generado - Estilo: ${estilo}, Vallines: ${numVallines} (simulado offline)`, 'success');
+        document.getElementById('modalPDF')?.remove();
+    };
+    
+    // ==================== IMPORTACIÓN JSON COMPLETA ====================
+    window.mostrarModalImportacion = function() {
+        const modal = `<div id="modalImport" class="modal-overlay"><div class="modal-container"><h2>📂 IMPORTAR TORNEO DESDE JSON</h2>
+            <input type="file" id="importJsonFile" accept=".json"><br><br>
+            <button class="btn btn-primary" onclick="window.previsualizarImportacion()">PREVISUALIZAR</button>
+            <button class="btn" onclick="document.getElementById('modalImport').remove()">CANCELAR</button>
+            <div id="previewImport"></div></div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modal);
+    };
+    
+    window.previsualizarImportacion = function() {
+        const file = document.getElementById('importJsonFile').files[0];
+        if(!file) return Utils.showToast('Seleccione un archivo JSON','error');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if(!data.infoTorneo || !data.infoTorneo.nombre) throw new Error('Estructura inválida');
+                if(torneoActual && torneoActual.nombre === data.infoTorneo.nombre) {
+                    Utils.showToast('Ya existe un torneo con ese nombre','error');
+                    return;
+                }
+                document.getElementById('previewImport').innerHTML = `<div style="background:#e8f5e9;padding:12px;border-radius:12px;">
+                    <strong>✅ Torneo válido:</strong> ${data.infoTorneo.nombre}<br>
+                    Partidos: ${Object.keys(data.registro||{}).length}<br>
+                    ${data.resultadosCotejo ? `Cotejo con ${data.resultadosCotejo.peleas?.length||0} peleas` : 'Sin cotejo'}<br>
+                    <button class="btn btn-success" onclick="window.confirmarImportacion(${JSON.stringify(escape(JSON.stringify(data)))})">IMPORTAR</button>
+                </div>`;
+            } catch(err) { Utils.showToast('JSON inválido','error'); }
+        };
+        reader.readAsText(file);
+    };
+    
+    window.confirmarImportacion = function(dataStr) {
+        const data = JSON.parse(dataStr);
+        torneoActual = data;
+        if(data.resultadosCotejo) {
+            resultadosCotejo = data.resultadosCotejo;
+            resultadosCotejo.guardado = true;
+            localStorage.setItem(STORAGE.COTEJO_ACTUAL, JSON.stringify(resultadosCotejo));
+            if(resultadosCotejo.peleas) {
+                resultadosCotejo.peleas.forEach((p,idx)=>{ if(p.calificada) calificacionesMap.set(idx, p); });
+            }
+        }
+        guardarTorneo();
+        document.getElementById('modalImport')?.remove();
+        renderApp();
+        Utils.showToast('Torneo importado correctamente','success');
+    };
+    
+    // ==================== PERSISTENCIA Y UTILIDADES GLOBALES ====================
+    function guardarTorneo() { 
+        localStorage.setItem(STORAGE.TORNEO_ACTUAL, JSON.stringify(torneoActual));
+        const anteriores = JSON.parse(localStorage.getItem(STORAGE.TORNEOS_ANTERIORES) || '[]');
+        if(torneoActual && !anteriores.some(t=>t.id === torneoActual.id)) {
+            anteriores.push({ id: torneoActual.id, nombre: torneoActual.nombre, fecha: torneoActual.fecha });
+            localStorage.setItem(STORAGE.TORNEOS_ANTERIORES, JSON.stringify(anteriores.slice(-10)));
+        }
+    }
+    
+    function cargarDatos() {
+        const data = localStorage.getItem(STORAGE.TORNEO_ACTUAL);
+        if(data) torneoActual = JSON.parse(data);
+        const cotejoData = localStorage.getItem(STORAGE.COTEJO_ACTUAL);
+        if(cotejoData) { 
+            resultadosCotejo = JSON.parse(cotejoData);
+            if(resultadosCotejo.peleas) {
+                calificacionesMap.clear();
+                resultadosCotejo.peleas.forEach((_,idx)=>{ if(resultadosCotejo.peleas[idx].calificada) calificacionesMap.set(idx, resultadosCotejo.peleas[idx]); });
+            }
+        }
+        if(torneoActual) configuracion = { ...configuracion, ...torneoActual.config, puntosConfig: torneoActual.puntosConfig || configuracion.puntosConfig };
+        serialTorneos = JSON.parse(localStorage.getItem(STORAGE.TORNEOS_ANTERIORES) || '[]');
+        renderApp();
+    }
+    
+    // Funciones auxiliares
+    window.toggleSection = function(id) { const el=document.getElementById(id); if(el) el.style.display = el.style.display==='none'?'block':'none'; };
+    window.toggleEstadoGallo = function(i) { const btn=document.querySelector(`.btn-estado[data-gallo="${i}"]`); btn?.classList.toggle('pendiente'); btn.innerText=btn?.classList.contains('pendiente')?'PENDIENTE':'PRESENTE'; };
+    window.formatearTiempo = function(inp) { let val=inp.value.replace(/[^0-9]/g,''); if(val.length>=3) val=val.slice(0,2)+':'+val.slice(2,4); inp.value=val; };
+    window.verificarRepresentante = function(val) { const adv=document.getElementById('repAdvertencia'); if(adv && val && verificarRepresentanteDuplicado(val, '')) adv.innerText='⚠️ Este representante ya está asignado a otro partido'; else if(adv) adv.innerText=''; };
+    window.actualizarGallosPorPartido = function(v) { configuracion.gallosPorPartido = parseInt(v); renderApp(); };
+    window.toggleAnillosEditables = function(v) { configuracion.anillosEditables = v; renderApp(); };
+    window.toggleRegistroDetallado = function(v) { configuracion.registroDetalladoActivo = v; renderApp(); };
+    window.modalTorneo = function(esNuevo) {
+        const modal = `<div id="modalTorneo" class="modal-overlay"><div class="modal-container"><h2>${esNuevo?'CREAR TORNEO':'EDITAR TORNEO'}</h2>
+            <input id="modalNombre" placeholder="Nombre Torneo" value="${torneoActual?.nombre||''}" class="form-group">
+            <input id="modalFecha" placeholder="DD/MM/AAAA" value="${torneoActual?.fecha||''}" class="form-group">
+            <input id="modalOrganizador" placeholder="Organizador" value="${torneoActual?.organizador||''}" class="form-group">
+            <input id="modalLugar" placeholder="Lugar" value="${torneoActual?.lugar||''}" class="form-group">
+            <input id="modalPalenque" placeholder="Palenque" value="${torneoActual?.palenque||''}" class="form-group">
+            <div class="form-row"><input id="modalPesoMin" placeholder="Peso Min" value="${torneoActual?.pesoMin||1700}"><input id="modalPesoMax" placeholder="Peso Max" value="${torneoActual?.pesoMax||2400}"></div>
+            <div class="form-group"><label>Puntos GANADOR</label><input id="puntosGanador" value="${configuracion.puntosConfig.ganador}"></div>
+            <div class="form-group"><label>Puntos EMPATE</label><input id="puntosEmpate" value="${configuracion.puntosConfig.empate}"></div>
+            <div class="form-group"><label>Puntos PERDEDOR</label><input id="puntosPerdedor" value="${configuracion.puntosConfig.perdedor}"></div>
+            <div class="form-row"><button class="btn btn-primary" onclick="window.guardarModalTorneo(${esNuevo})">${esNuevo?'CREAR':'ACTUALIZAR'}</button><button class="btn" onclick="document.getElementById('modalTorneo').remove()">CANCELAR</button></div></div></div>`;
+        document.body.insertAdjacentHTML('beforeend', modal);
+    };
+    
+    window.guardarModalTorneo = function(esNuevo) {
+        const nombre = document.getElementById('modalNombre').value.trim().toUpperCase();
+        if(!nombre) return Utils.showToast('Nombre requerido','error');
+        if(esNuevo) torneoActual = { id: Utils.generarId(), nombre, registro: {}, puntosConfig: configuracion.puntosConfig, config: configuracion };
+        torneoActual.nombre = nombre;
+        torneoActual.fecha = document.getElementById('modalFecha').value;
+        torneoActual.organizador = document.getElementById('modalOrganizador').value;
+        torneoActual.lugar = document.getElementById('modalLugar').value;
+        torneoActual.palenque = document.getElementById('modalPalenque').value;
+        torneoActual.pesoMin = parseInt(document.getElementById('modalPesoMin').value) || 1700;
+        torneoActual.pesoMax = parseInt(document.getElementById('modalPesoMax').value) || 2400;
+        configuracion.puntosConfig = {
+            ganador: parseInt(document.getElementById('puntosGanador').value) || 2,
+            empate: parseInt(document.getElementById('puntosEmpate').value) || 1,
+            perdedor: parseInt(document.getElementById('puntosPerdedor').value) || 0
+        };
+        torneoActual.puntosConfig = configuracion.puntosConfig;
+        torneoActual.config = configuracion;
+        guardarTorneo();
+        document.getElementById('modalTorneo')?.remove();
+        renderApp();
+        Utils.showToast(esNuevo?'Torneo creado':'Torneo actualizado','success');
+    };
+    
+    window.prepararNuevoTorneo = function() {
+        if(confirm('¿Preparar nuevo torneo? Se perderán los datos actuales si no están guardados.')) {
+            localStorage.removeItem(STORAGE.TORNEO_ACTUAL);
+            localStorage.removeItem(STORAGE.COTEJO_ACTUAL);
+            torneoActual = null;
+            resultadosCotejo = null;
+            calificacionesMap.clear();
+            renderApp();
+        }
+    };
+    
+    window.eliminarTorneoCompleto = function() {
+        if(confirm('¿ELIMINAR TORNEO COMPLETO? Esta acción es irreversible.')) {
+            localStorage.removeItem(STORAGE.TORNEO_ACTUAL);
+            localStorage.removeItem(STORAGE.COTEJO_ACTUAL);
+            torneoActual = null;
+            resultadosCotejo = null;
+            calificacionesMap.clear();
+            renderApp();
+            Utils.showToast('Torneo eliminado','info');
+        }
+    };
+    
+    window.limpiarCotejoTemp = function() { resultadosCotejo = null; renderApp(); };
+    window.eliminarCotejoGuardado = function() { resultadosCotejo = null; localStorage.removeItem(STORAGE.COTEJO_ACTUAL); renderApp(); };
+    
+    cargarDatos();
+</script>
+</body>
+</html>
