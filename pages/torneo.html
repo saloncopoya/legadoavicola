@@ -342,18 +342,14 @@ async function verificarNombreTorneoDuplicado(nombre) {
     if (!adminDb) return false;
     
     try {
-        const snapshot = await adminDb.ref('TORNEOS').once('value');
+        // SOLO verificar en el nodo del usuario actual (uid)
+        const snapshot = await adminDb.ref('TORNEOS').child(uid).once('value');
         if (!snapshot.exists()) return false;
         
-        const torneosData = snapshot.val();
-        for (const userUid in torneosData) {
-            const torneosUsuario = torneosData[userUid];
-            if (torneosUsuario) {
-                for (const torneoId in torneosUsuario) {
-                    if (torneosUsuario[torneoId].nombre === nombre) {
-                        return true; // Nombre duplicado encontrado
-                    }
-                }
+        const torneosUsuario = snapshot.val();
+        for (const torneoId in torneosUsuario) {
+            if (torneosUsuario[torneoId].nombre === nombre) {
+                return true; // Ya existe un torneo con ese nombre para ESTE usuario
             }
         }
         return false;
