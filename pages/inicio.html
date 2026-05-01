@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Legado Avícola - Sistema de Gestión de Torneos</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    
+    <!-- html2canvas para generar imágenes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast-notification.success {
+            background: #4CAF50;
+        }
+        
+        .toast-notification.error {
+            background: #f44336;
+        }
+        
+        .toast-notification.info {
+            background: #2196F3;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #8B4513;
+            border-radius: 3px;
+        }
+        
+        /* Responsive tables */
+        @media (max-width: 768px) {
+            table {
+                font-size: 10px !important;
+            }
+            th, td {
+                padding: 6px 4px !important;
+            }
+        }
+        
+        /* Loading skeleton animation */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-root"></div>
+    
+    <script>
+        // ==============================================
+        // CONFIGURACIÓN DE FIREBASE
+        // ==============================================
+        const FIREBASE_ADMIN_CONFIG = {
+            apiKey: "AIzaSyBMON_hBlUJfE-_L6qrt8MEP6JZrculRcs",
+            authDomain: "premiumcotejosgallistico-59e76.firebaseapp.com",
+            databaseURL: "https://premiumcotejosgallistico-59e76-default-rtdb.firebaseio.com",
+            projectId: "premiumcotejosgallistico-59e76",
+            storageBucket: "premiumcotejosgallistico-59e76.firebasestorage.app",
+            messagingSenderId: "785051078042",
+            appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
+        };
+        
+        // Inicializar Firebase
+        let firebaseApp = null;
+        let adminDb = null;
+        
+        try {
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(FIREBASE_ADMIN_CONFIG);
+            } else {
+                firebaseApp = firebase.apps[0];
+            }
+            adminDb = firebase.database();
+            console.log("✅ Firebase inicializado correctamente");
+        } catch (error) {
+            console.error("❌ Error inicializando Firebase:", error);
+        }
+        
+        // ==============================================
+        // SISTEMA DE NOTIFICACIONES
+        // ==============================================
+        window.AppState = {
+            user: { current: null },
+            notifications: [],
+            addNotification: function(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast-notification ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 10);
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+                
+                console.log(`📢 [${type.toUpperCase()}] ${message}`);
+            }
+        };
+        
+        // ==============================================
+        // FUNCIONES DE UTILIDAD GLOBAL
+        // ==============================================
+        
+        // Obtener instancia de admin database
+        window.getAdminDatabase = function() {
+            if (adminDb) return adminDb;
+            try {
+                adminDb = firebase.database();
+                return adminDb;
+            } catch(e) {
+                console.error("Error getting admin db:", e);
+                return null;
+            }
+        };
+        
+        // Detectar si está en visor interno (Facebook, Instagram, etc.)
+        window.esVisorInterno = function() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            return /FBAN|FBAV|Instagram|GSA|Twitter|WhatsApp/.test(ua);
+        };
+        
+        // Abrir en navegador externo
+        window.abrirEnNavegadorExterno = function(url) {
+            if (navigator.share) {
+                navigator.share({ url: url });
+            } else {
+                window.open(url, '_system', 'location=yes');
+            }
+        };
+        
+        // ==============================================
+        // PANTALLA PÚBLICA DE TORNEOS (COMPLETA)
+        // ==============================================
+        
+        window.renderPublicScreen = function() {
+            console.log("🏠 Cargando pantalla de inicio pública con pestañas...");
+            
+            // ===== VARIABLES DE ESTADO =====
+            let torneosHoy = [];
+            let torneosAyer = [];
+            let torneosUltimos = [];
+            let cargandoTorneos = false;
+            let errorCarga = null;
+            let inicializado = false;
+            let botonPresionado = false;
+            let ultimoHashCotejo = '';
+            let ultimoHashPosicion = '';
+            let ultimoHTMLCotejo = '';
+            let ultimoHTMLPosicion = '';
+            
+            // ===== VARIABLES PARA LISTENERS Y PESTAÑAS =====
+            let listenersActivos = [];
+            let torneosConListeners = new Set();
+            let pestanasActivas = new Map();
+            let pestanaManual = {};
+            
+            // ===== UTILIDADES =====
+            const Utils = {
+                escapeHTML: (str) => {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                },
+                
+                formatTiempo: (segundos) => {
+                    if (!segundos && segundos !== 0) return '--:--';
+                    const hrs = Math.floor(segundos / 3600);
+                    const mins = Math.floor((segundos % 3600) / 60);
+                    const segs = segundos % 60;
+                    if (hrs > 0) {
+                        return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+                    }
+                    return `${mins.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+                },
+                
+                obtenerFechaHoy: () => {
+                    const hoy = new Date();
+                    const dia = hoy.getDate().toString().padStart(2, '0');
+                    const mes = (hoy.getMonth() + 1).toString().padStart(2, '0');
+                    const anio = hoy.getFullYear();
+                    return `${dia}/${mes}/${anio}`;
+                },
+                
+                obtenerFechaAyer: () => {
+                    const ayer = new Date();
+                    ayer.setDate(ayer.getDate() - 1);
+                    const dia = ayer.getDate().toString().padStart(2, '0');
+                    const mes = (ayer.getMonth() + 1).toString().padStart(2, '0');
+                    const anio = ayer.getFullYear();
+                    return `${dia}/${mes}/${anio}`;
+                },
+                
+                hayUsuario: () => {
+                    return window.AppState?.user?.current ? true : false;
+                },
+                
+                limpiarListeners: () => {
+                    console.log(`🧹 Limpiando ${listenersActivos.length} listeners activos`);
+                    listenersActivos.forEach(off => {
+                        if (typeof off === 'function') off();
+                    });
+                    listenersActivos = [];
+                    torneosConListeners.clear();
+                },
+                
+                getPestanaActiva: (torneoId) => {
+                    return pestanasActivas.get(torneoId) || 'cotejo';
+                },
+                
+                setPestanaActiva: (torneoId, pestana) => {
+                    pestanasActivas.set(torneoId, pestana);
+                }
+            };
+            
+            // ===== INICIALIZAR BD =====
+            const initAdminDB = async () => {
+                if (inicializado && adminDb) return true;
+                console.log("🔥 Usando Firebase ADMIN...");
+                try {
+                    adminDb = window.getAdminDatabase();
+                    if (adminDb) {
+                        inicializado = true;
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error("❌ Error:", error);
+                    errorCarga = "No se pudo conectar";
+                    return false;
+                }
+            };
+            
+            // ===== PROCESAR TABLA DE POSICIÓN =====
+            const procesarTablaPosicion = (cotejoData, config) => {
+                if (!cotejoData?.peleas || !Array.isArray(cotejoData.peleas)) return [];
+                
+                const partidoMap = new Map();
+                const gallosPorPartido = config?.gallosPorPartido || 3;
+                
+                cotejoData.peleas.forEach(pelea => {
+                    if (!pelea.calificada) return;
+                    
+                    const g1 = pelea.gallo1;
+                    const g2 = pelea.gallo2;
+                    
+                    const initPartido = (nombre) => {
+                        if (!nombre) return null;
+                        if (!partidoMap.has(nombre)) {
+                            partidoMap.set(nombre, {
+                                puntos: 0,
+                                tiempo: 0,
+                                gallo1_puntos: 0,
+                                gallo1_tiempo: 0,
+                                gallo2_puntos: 0,
+                                gallo2_tiempo: 0,
+                                gallo3_puntos: 0,
+                                gallo3_tiempo: 0,
+                                gallo4_puntos: 0,
+                                gallo4_tiempo: 0,
+                                gallo5_puntos: 0,
+                                gallo5_tiempo: 0,
+                                gallo6_puntos: 0,
+                                gallo6_tiempo: 0,
+                                contadorGallos: 0
+                            });
+                        }
+                        return partidoMap.get(nombre);
+                    };
+                    
+                    let tiempoSegundos = 0;
+                    if (pelea.tiempo) {
+                        const partes = pelea.tiempo.split(':');
+                        tiempoSegundos = (parseInt(partes[0]) * 60) + (parseInt(partes[1]) || 0);
+                    }
+                    
+                    if (g1?.partido) {
+                        const data = initPartido(g1.partido);
+                        if (data) {
+                            data.contadorGallos++;
+                            const numGallo = data.contadorGallos;
+                            const puntosConfig = config?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+                            let puntosGallo = 0;
+                            
+                            if (pelea.ganador === 'rojo') {
+                                puntosGallo = puntosConfig.ganador;
+                            } else if (pelea.ganador === 'empate') {
+                                puntosGallo = puntosConfig.empate;
+                            } else {
+                                puntosGallo = puntosConfig.perdedor;
+                            }
+                            
+                            data[`gallo${numGallo}_puntos`] = puntosGallo;
+                            
+                            if (pelea.ganador === 'rojo' || pelea.ganador === 'empate') {
+                                data[`gallo${numGallo}_tiempo`] = tiempoSegundos;
+                                data.tiempo += tiempoSegundos;
+                            } else {
+                                data[`gallo${numGallo}_tiempo`] = 0;
+                            }
+                            
+                            data.puntos += puntosGallo;
+                        }
+                    }
+                    
+                    if (g2?.partido) {
+                        const data = initPartido(g2.partido);
+                        if (data) {
+                            data.contadorGallos++;
+                            const numGallo = data.contadorGallos;
+                            const puntosConfig = config?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+                            let puntosGallo = 0;
+                            
+                            if (pelea.ganador === 'verde') {
+                                puntosGallo = puntosConfig.ganador;
+                            } else if (pelea.ganador === 'empate') {
+                                puntosGallo = puntosConfig.empate;
+                            } else {
+                                puntosGallo = puntosConfig.perdedor;
+                            }
+                            
+                            data[`gallo${numGallo}_puntos`] = puntosGallo;
+                            
+                            if (pelea.ganador === 'verde' || pelea.ganador === 'empate') {
+                                data[`gallo${numGallo}_tiempo`] = tiempoSegundos;
+                                data.tiempo += tiempoSegundos;
+                            } else {
+                                data[`gallo${numGallo}_tiempo`] = 0;
+                            }
+                            
+                            data.puntos += puntosGallo;
+                        }
+                    }
+                });
+                
+                const datosPosicion = Array.from(partidoMap.entries()).map(([nombre, data]) => {
+                    const result = { nombre, puntos: data.puntos, tiempo: data.tiempo };
+                    for (let i = 1; i <= data.contadorGallos; i++) {
+                        result[`gallo${i}_puntos`] = data[`gallo${i}_puntos`] || 0;
+                        result[`gallo${i}_tiempo`] = data[`gallo${i}_tiempo`] || 0;
+                    }
+                    return result;
+                });
+                
+                datosPosicion.sort((a, b) => {
+                    const aIsZero = (a.puntos === 0 && a.tiempo === 0);
+                    const bIsZero = (b.puntos === 0 && b.tiempo === 0);
+                    if (aIsZero && !bIsZero) return 1;
+                    if (!aIsZero && bIsZero) return -1;
+                    if (a.puntos !== b.puntos) return b.puntos - a.puntos;
+                    return a.tiempo - b.tiempo;
+                });
+                
+                return datosPosicion;
+            };
+            
+            // ===== RENDERIZAR TABLA DE COTEJO =====
+            const renderTablaCotejo = (cotejo, config) => {
+                if (!cotejo?.peleas || cotejo.peleas.length === 0) {
+                    return `
+                        <div style="padding: 60px; text-align: center; background: #f9f9f9; color: #999; font-size: 16px;">
+                            <span style="font-size: 40px; display: block; margin-bottom: 20px;">⚡</span>
+                            No hay peleas generadas en este torneo
+                        </div>
+                    `;
+                }
+                
+                const hashActual = cotejo.peleas.map(p => {
+                    return `${p.numero}|${p.gallo1?.partido || ''}|${p.gallo2?.partido || ''}|${p.diferencia || 0}|${p.ganador || ''}|${p.tiempo || ''}`;
+                }).join('|');
+                
+                if (hashActual === ultimoHashCotejo && ultimoHTMLCotejo) {
+                    console.log("⏭️ [PUBLIC] Tabla cotejo sin cambios, usando caché");
+                    return ultimoHTMLCotejo;
+                }
+                
+                ultimoHashCotejo = hashActual;
+                const peleas = cotejo.peleas || [];
+                const registroDetalladoActivo = config?.registroDetalladoActivo || false;
+                
+                const htmlGenerado = `
+                    <div style="width: 100%; margin: 0; padding: 0;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #e0e0e0; border-top: 2px solid black; border-bottom: 2px solid black;">
+                            <thead style="position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th style="padding: 12px 8px; text-align: center; background: #d32f2f; color: white; min-width: 15px;">#</th>
+                                    <th style="padding: 12px 8px; text-align: left; background: #d32f2f; color: white;">CINTA ROJA</th>
+                                    ${registroDetalladoActivo ? '<th style="padding: 12px 8px; text-align: center; background: #d32f2f; color: white;">COLOR</th>' : ''}
+                                    <th style="padding: 12px 18px; text-align: center; background: #d32f2f; color: white; min-width: 30px;">P1</th>
+                                    <th style="padding: 12px 12px; text-align: center; background: #d32f2f; color: white; min-width: 20px;">A1</th>
+                                    <th style="padding: 12px 8px; text-align: center; background: #4CAF50; color: white; min-width: 15px;">#</th>
+                                    <th style="padding: 12px 12px; text-align: center; background: #4CAF50; color: white; min-width: 20px;">A2</th>
+                                    <th style="padding: 12px 18px; text-align: center; background: #4CAF50; color: white; min-width: 30px;">P2</th>
+                                    <th style="padding: 12px 8px; text-align: left; background: #4CAF50; color: white;">CINTA VERDE</th>
+                                    ${registroDetalladoActivo ? '<th style="padding: 12px 8px; text-align: center; background: #4CAF50; color: white;">COLOR</th>' : ''}
+                                    <th style="padding: 12px 12px; text-align: center; background: #333333; color: white;">DIF</th>
+                                    <th style="padding: 12px 8px; text-align: center; background: #333333; color: white;">GANADOR</th>
+                                    <th style="padding: 12px 8px; text-align: center; background: #333333; color: white; min-width: 30px;">TIEMPO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${peleas.map((p, i) => {
+                                    const bgColor = i % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                                    const calificada = p.calificada ? '#e8f5e8' : bgColor;
+                                    
+                                    let ganadorTexto = '';
+                                    if (p.ganador === 'rojo') ganadorTexto = `🔴 ${p.gallo1?.partido || ''}`;
+                                    else if (p.ganador === 'verde') ganadorTexto = `🟢 ${p.gallo2?.partido || ''}`;
+                                    else if (p.ganador === 'empate') ganadorTexto = 'TABLA';
+                                    else ganadorTexto = '⏳ PENDIENTE';
+                                    
+                                    return `
+                                        <tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${calificada};">
+                                            <td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #d32f2f; color: white;">${p.numero || i+1}</td>
+                                            <td style="padding: 12px 8px;">${Utils.escapeHTML(p.gallo1?.partido || '')}</td>
+                                            ${registroDetalladoActivo ? `<td style="padding: 12px 8px; text-align: center;">${Utils.escapeHTML(p.gallo1?.color || '-')}</td>` : ''}
+                                            <td style="padding: 12px 12px; text-align: center;">${p.gallo1?.peso || ''}</td>
+                                            <td style="padding: 12px 8px; text-align: center;">${p.gallo1?.anillo || ''}</td>
+                                            <td style="padding: 12px 8px; text-align: center; font-weight: 700; background: #4CAF50; color: white;">${p.numero || i+1}</td>
+                                            <td style="padding: 12px 8px; text-align: center;">${p.gallo2?.anillo || ''}</td>
+                                            <td style="padding: 12px 12px; text-align: center;">${p.gallo2?.peso || ''}</td>
+                                            <td style="padding: 12px 8px;">${Utils.escapeHTML(p.gallo2?.partido || '')}</td>
+                                            ${registroDetalladoActivo ? `<td style="padding: 12px 8px; text-align: center;">${Utils.escapeHTML(p.gallo2?.color || '-')}</td>` : ''}
+                                            <td style="padding: 12px 8px; text-align: center; color: ${p.diferencia <= 20 ? '#4CAF50' : '#f44336'};">${p.diferencia || 0}g</td>
+                                            <td style="padding: 12px 8px; text-align: center; font-weight: 600;">${ganadorTexto}</td>
+                                            <td style="padding: 12px 8px; text-align: center;">${p.tiempo || '--:--'}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                ultimoHTMLCotejo = htmlGenerado;
+                return htmlGenerado;
+            };
+            
+            // ===== RENDERIZAR TABLA DE POSICIÓN =====
+            const renderTablaPosicion = (tabla, config) => {
+                if (!tabla || tabla.length === 0) {
+                    return `
+                        <div style="padding: 60px; text-align: center; background: #f9f9f9; color: #999; font-size: 16px;">
+                            <span style="font-size: 40px; display: block; margin-bottom: 20px;">🏆</span>
+                            No hay peleas calificadas en este torneo
+                        </div>
+                    `;
+                }
+                
+                const hashActual = tabla.map(item => {
+                    return `${item.nombre}|${item.puntos}|${item.tiempo}`;
+                }).join('|');
+                
+                if (hashActual === ultimoHashPosicion && ultimoHTMLPosicion) {
+                    console.log("⏭️ [PUBLIC] Tabla posición sin cambios, usando caché");
+                    return ultimoHTMLPosicion;
+                }
+                
+                ultimoHashPosicion = hashActual;
+                const gallosPorPartido = config?.gallosPorPartido || 3;
+                
+                const htmlGenerado = `
+                    <div style="width: 100%; margin: 0; padding: 0;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px; border: 1px solid #e0e0e0;">
+                            <thead style="background: #000000; color: white; position: sticky; top: 0; z-index: 10;">
+                                <tr style="border-top: 2px solid #cccccc; border-bottom: 1px solid #cccccc;">
+                                    <th style="padding: 12px 8px; text-align: left;" rowspan="2">Partido</th>
+                                    <th style="padding: 12px 8px; text-align: center; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc;" colspan="${gallosPorPartido * 2}"># ENFRENTAMIENTOS</th>
+                                    <th style="padding: 4px 4px; text-align: center; border-right: 1px solid #cccccc;" rowspan="2">Total</th>
+                                    <th style="padding: 4px 4px; text-align: center; border-right: 1px solid #cccccc;" rowspan="2">Total</th>
+                                </tr>
+                                <tr style="background: #000000;">
+                                    ${Array.from({ length: gallosPorPartido }, (_, i) => `
+                                        <th style="padding: 8px 4px; text-align: center; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc;" colspan="2">Pelea ${i+1}</th>
+                                    `).join('')}
+                                </tr>
+                                <tr style="background: #000000;">
+                                    <th style="padding: 4px 8px;"></th>
+                                    ${Array.from({ length: gallosPorPartido }, () => `
+                                        <th style="padding: 4px 4px; text-align: center; border-left: 1px solid #cccccc;">Pts</th>
+                                        <th style="padding: 4px 4px; text-align: center; border-right: 1px solid #cccccc;">Tpo</th>
+                                    `).join('')}
+                                    <th style="padding: 4px 8px; border-right: 1px solid #cccccc;">Puntos</th>
+                                    <th style="padding: 4px 8px; border-right: 1px solid #cccccc;">Tiempo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tabla.map((item, index) => {
+                                    const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                                    let fila = `
+                                        <tr style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; background-color: ${bgColor};">
+                                            <td style="padding: 12px 8px; font-weight: 900; font-size: 26px; border-right: 1px solid #eee;">${Utils.escapeHTML(item.nombre)}</td>
+                                    `;
+                                    
+                                    for (let i = 1; i <= gallosPorPartido; i++) {
+                                        const puntos = item[`gallo${i}_puntos`];
+                                        const tiempo = item[`gallo${i}_tiempo`];
+                                        
+                                        if (puntos === undefined) {
+                                            fila += `
+                                                <td style="padding: 12px 8px; text-align: center; border-right: 1px solid #eee;"></td>
+                                                <td style="padding: 12px 8px; text-align: center; border-right: 1px solid #eee;"></td>
+                                            `;
+                                        } else {
+                                            const puntosConfig = config?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+                                            let bgPuntos = '#f0f8f0';
+                                            let bgTiempo = 'transparent';
+                                            let colorPuntos = '#333';
+                                            let colorTiempo = '#333';
+                                            
+                                            if (puntos === puntosConfig.ganador) {
+                                                bgPuntos = '#4CAF50';
+                                                bgTiempo = '#4CAF50';
+                                                colorPuntos = 'white';
+                                                colorTiempo = 'white';
+                                            } else if (puntos === puntosConfig.empate) {
+                                                bgPuntos = '#2196F3';
+                                                bgTiempo = '#2196F3';
+                                                colorPuntos = 'white';
+                                                colorTiempo = 'white';
+                                            } else if (puntos === puntosConfig.perdedor) {
+                                                bgPuntos = '#f44336';
+                                                bgTiempo = '#f44336';
+                                                colorPuntos = 'white';
+                                                colorTiempo = 'white';
+                                            }
+                                            
+                                            fila += `
+                                                <td style="padding: 12px 8px; text-align: center; background: ${bgPuntos}; border-right: 1px solid #eee; font-weight: bold; color: ${colorPuntos};">${puntos}</td>
+                                                <td style="padding: 12px 8px; text-align: center; background: ${bgTiempo}; border-right: 1px solid #000000; color: ${colorTiempo}; min-width: 25px;">${Utils.formatTiempo(tiempo)}</td>
+                                            `;
+                                        }
+                                    }
+                                    
+                                    fila += `
+                                        <td style="padding: 1px 1px; text-align: center; font-size: 15px; font-weight: 900; background: #000000; color: white; border-top: 2px solid #cccccc; border-right: 2px solid #cccccc;">${item.puntos}</td>
+                                        <td style="padding: 1px 1px; text-align: center; font-size: 15px; font-weight: 900; background: #000000; color: white; border-top: 2px solid #cccccc; border-right: 2px solid #cccccc;">${Utils.formatTiempo(item.tiempo)}</td>
+                                    </tr>
+                                    `;
+                                    return fila;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                ultimoHTMLPosicion = htmlGenerado;
+                return htmlGenerado;
+            };
+            
+            // ===== RENDERIZAR TARJETA DE TORNEO =====
+            const renderTarjetaTorneo = (torneo, titulo, colorTitulo) => {
+                const torneoId = `${torneo.uid}_${torneo.id}`;
+                const peleasCalificadas = torneo.cotejo?.peleas?.filter(p => p.calificada === true) || [];
+                const cantidadCalificadas = peleasCalificadas.length;
+                
+                let pestanaActiva = pestanaManual[torneoId];
+                if (!pestanaActiva) {
+                    pestanaActiva = 'cotejo';
+                    if (cantidadCalificadas >= 3) {
+                        pestanaActiva = 'posicion';
+                    }
+                }
+                
+                const config = { ...(torneo.config || {}), puntosConfig: torneo.puntosConfig };
+                const hayPeleasCalificadas = torneo.cotejo?.peleas?.some(p => p.calificada) || false;
+                
+                return `
+                    <div style="width: 100%; background: white; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #ddd;">
+                        <div style="background: linear-gradient(135deg, #8B4513 0%, #000000 100%); color: white; padding: 4px 6px;">
+                            <h2 id="torneo-${torneo.id}" style="margin: 0 0 0 0; font-size: clamp(18px, 5vw, 26px); font-weight: 900; text-align: center;">
+                                ${Utils.escapeHTML(torneo.nombre || 'Torneo sin nombre')}
+                            </h2>
+                            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 1px; font-size: clamp(11px, 3vw, 14px);">
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">👤 ${Utils.escapeHTML(torneo.organizador || 'No especificado')}</span>
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">📍 ${Utils.escapeHTML(torneo.lugar || 'No especificado')}</span>
+                                <span style="display: inline-flex; align-items: center; gap: 4px;">🏟️ ${Utils.escapeHTML(torneo.palenque || 'No especificado')}</span>
+                            </div>
+                            
+                            ${(() => {
+                                if (!torneo.cotejo?.peleas) return '';
+                                const peleasCalificadasFilter = torneo.cotejo.peleas.filter(p => p.calificada === true);
+                                if (peleasCalificadasFilter.length === 0) return '';
+                                
+                                const rapida = (tiempo) => {
+                                    if (!tiempo || tiempo === '--:--') return 9999;
+                                    const partes = tiempo.split(':');
+                                    return (parseInt(partes[0]) * 60) + (parseInt(partes[1]) || 0);
+                                };
+                                
+                                const lista = peleasCalificadasFilter.map(p => {
+                                    let ganador = '';
+                                    if (p.ganador === 'rojo') ganador = p.gallo1?.partido;
+                                    else if (p.ganador === 'verde') ganador = p.gallo2?.partido;
+                                    else if (p.ganador === 'empate') ganador = 'EMPATE';
+                                    return { nombre: ganador, tiempo: p.tiempo, segundos: rapida(p.tiempo), numero: p.numero };
+                                }).filter(p => p.nombre && p.nombre !== 'EMPATE' && p.segundos > 0)
+                                  .sort((a, b) => a.segundos - b.segundos)
+                                  .slice(0, 4);
+                                
+                                if (lista.length === 0) return '';
+                                
+                                const mitad = Math.ceil(lista.length / 2);
+                                const columna1 = lista.slice(0, mitad);
+                                const columna2 = lista.slice(mitad);
+                                
+                                return `
+                                    <div style="padding: 1px 0; background: transparent; border-radius: 8px;">
+                                        <div style="display: flex; align-items: center; gap: 2px; margin-bottom: 1px;">
+                                            <span style="font-size: clamp(11px, 3vw, 13px);">⚡</span>
+                                            <span style="font-weight: 900; color: #FFD700; font-size: clamp(10px, 2.5vw, 12px);">MÁS RÁPIDAS</span>
+                                            <span style="background: #FFD700; color: #000; padding: 1px 6px; border-radius: 12px; font-size: clamp(8px, 2vw, 10px); font-weight: 600;">TOP ${lista.length}</span>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                ${columna1.map((p, i) => `
+                                                    <div style="display: flex; align-items: center; justify-content: space-between; background: #FFF9C4; padding: 1px 4px; border-radius: 6px; gap: 6px;">
+                                                        <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                                                            <span style="background: #F57C00; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">${i+1}</span>
+                                                            <span style="font-weight: 900; color: #000; font-size: 11px; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                                ${Utils.escapeHTML(p.nombre)}
+                                                            </span>
+                                                        </div>
+                                                        <span style="background: #000; color: #FFD700; padding: 1px 3px; border-radius: 20px; font-weight: 900; font-size: 10px; font-family: monospace; white-space: nowrap; flex-shrink: 0;">
+                                                            ${p.tiempo}
+                                                        </span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                ${columna2.map((p, i) => `
+                                                    <div style="display: flex; align-items: center; justify-content: space-between; background: #FFF9C4; padding: 1px 4px; border-radius: 6px; gap: 6px;">
+                                                        <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                                                            <span style="background: #F57C00; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0;">${mitad + i + 1}</span>
+                                                            <span style="font-weight: 600; color: #000; font-size: 11px; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                                ${Utils.escapeHTML(p.nombre)}
+                                                            </span>
+                                                        </div>
+                                                        <span style="background: #000; color: #FFD700; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 10px; font-family: monospace; white-space: nowrap; flex-shrink: 0;">
+                                                            ${p.tiempo}
+                                                        </span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; justify-content: center; padding: 16px 10px; background: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                            <button onclick="cambiarPestanaPublic('${torneoId}', 'cotejo')" 
+                                    style="flex: 1; padding: 1px 1px; border: 2px solid #8B4513; border-radius: 11px; background: ${pestanaActiva === 'cotejo' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'cotejo' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 12px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 1px;">
+                                <span style="font-size: 18px;">⚡</span>
+                                <span>VER COTEJO</span>
+                                ${torneo.cotejo?.peleas?.length ? `<span style="background: ${pestanaActiva === 'cotejo' ? 'rgba(255,255,255,0.2)' : '#e9ecef'}; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 4px;">${torneo.cotejo.peleas.length}</span>` : ''}
+                            </button>
+                            <button onclick="cambiarPestanaPublic('${torneoId}', 'posicion')" 
+                                    style="flex: 1; padding: 3px 6px; border: 2px solid #8B4513; border-radius: 12px; background: ${pestanaActiva === 'posicion' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'posicion' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 11px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 1px;">
+                                <span style="font-size: 18px;">🏆</span>
+                                <span>VER TABLA DE POSICIONES</span>
+                                ${torneo.tablaPosicion?.length ? `<span style="background: ${pestanaActiva === 'posicion' ? 'rgba(255,255,255,0.2)' : '#e9ecef'}; padding: 2px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 4px;">${torneo.tablaPosicion.length}</span>` : ''}
+                            </button>
+                        </div>
+                        
+                        <div style="width: 100%; padding: 0; overflow-x: auto;">
+                            ${pestanaActiva === 'cotejo' 
+                                ? renderTablaCotejo(torneo.cotejo, config)
+                                : renderTablaPosicion(torneo.tablaPosicion, config)
+                            }
+                        </div>
+                        
+                        <div style="padding: 8px 16px; background: #f0f8ff; border-top: 1px solid #8B4513; font-size: 12px; color: #666; display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; background: #4CAF50; border-radius: 50%;"></span>
+                            <span>DATOS EN TIEMPO REAL</span>
+                            <span style="margin-left: auto;">⏱️ ${hayPeleasCalificadas ? 'Hay peleas calificadas' : 'Sin peleas calificadas'}</span>
+                        </div>
+                    </div>
+                `;
+            };
+            
+            // ===== FUNCIONES GLOBALES =====
+            window.cambiarPestanaPublic = (torneoId, pestana) => {
+                pestanaManual[torneoId] = pestana;
+                renderUI();
+            };
+            
+            window.handleVerTodosTorneos = function() {
+                window.navigateTo('rooster');
+            };
+            
+            window.compartirUrlInicio = function(torneoIdParam, torneoNombreParam) {
+                const torneoId = torneoIdParam || 'general';
+                const torneoNombre = torneoNombreParam || 'Tabla de Posiciones';
+                const urlCompartir = window.location.origin + window.location.pathname;
+                const textoCompartir = `🏆 🐓\n\nTabla de Posicion y Cotejo en Vivo aqui:\n\n${urlCompartir}?section=public`;
+                
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);z-index:10002;display:flex;align-items:center;justify-content:center;`;
+                
+                const modal = document.createElement('div');
+                modal.style.cssText = `background:white;border-radius:24px;width:90%;max-width:380px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:slideUp 0.3s ease;text-align:center;`;
+                
+                modal.innerHTML = `
+                    <div style="font-size:48px;margin-bottom:16px;">🔗</div>
+                    <h3 style="margin:0 0 8px;color:#8B4513;font-size:20px;">Compartir TABLA ACTUAL</h3>
+                    <p style="color:#666;margin:0 0 20px;">Compartir el archivo por:</p>
+                    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;">
+                        <button id="compartir-wa-inicio" style="background:#25D366;color:white;border:none;width:70px;height:70px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+                            <span style="font-size:24px;">📱</span>
+                            <span style="font-size:11px;">WhatsApp</span>
+                        </button>
+                        <button id="compartir-fb-inicio" style="background:#1877F2;color:white;border:none;width:70px;height:70px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+                            <span style="font-size:24px;">f</span>
+                            <span style="font-size:11px;">Facebook</span>
+                        </button>
+                        <button id="compartir-msg-inicio" style="background:#0084FF;color:white;border:none;width:70px;height:70px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+                            <span style="font-size:24px;">💬</span>
+                            <span style="font-size:11px;">Messenger</span>
+                        </button>
+                    </div>
+                    <div style="display:flex;gap:8px;background:#f0f2f5;border-radius:12px;padding:8px 12px;margin-bottom:16px;">
+                        <input type="text" id="copiar-url-inicio" value="${urlCompartir}" readonly style="flex:1;border:none;background:transparent;font-size:12px;font-family:monospace;">
+                        <button id="copiar-enlace-inicio" style="background:#8B4513;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;">Copiar</button>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-bottom:20px;">
+                        <button id="pdf-btn-public-${torneoId}" style="flex:1;background:#d32f2f;color:white;border:none;padding:12px;border-radius:12px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>📄</span> PDF (Tabla)
+                        </button>
+                        <button id="jpg-btn-public-${torneoId}" style="flex:1;background:#FFC107;color:#333;border:none;padding:12px;border-radius:12px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>📸</span> JPG (Tabla)
+                        </button>
+                    </div>
+                    <button id="cerrar-compartir-inicio" style="width:100%;background:#f0f2f5;border:none;padding:12px;border-radius:12px;cursor:pointer;font-weight:600;">Cerrar</button>
+                `;
+                
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+                
+                document.getElementById('compartir-wa-inicio').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(textoCompartir)}`, '_blank');
+                document.getElementById('compartir-fb-inicio').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlCompartir)}`, '_blank');
+                document.getElementById('compartir-msg-inicio').onclick = () => window.open(`https://www.facebook.com/dialog/send?link=${encodeURIComponent(urlCompartir)}`, '_blank');
+                document.getElementById('copiar-enlace-inicio').onclick = () => {
+                    const input = document.getElementById('copiar-url-inicio');
+                    input.select();
+                    navigator.clipboard.writeText(urlCompartir);
+                    if (window.AppState) AppState.addNotification('✅ Enlace copiado', 'success');
+                };
+                document.getElementById('cerrar-compartir-inicio').onclick = () => overlay.remove();
+                
+                const pdfBtn = document.getElementById(`pdf-btn-public-${torneoId}`);
+                if (pdfBtn) pdfBtn.onclick = () => { overlay.remove(); window.generarPDFPublic(torneoId, torneoNombre); };
+                
+                const jpgBtn = document.getElementById(`jpg-btn-public-${torneoId}`);
+                if (jpgBtn) jpgBtn.onclick = () => { overlay.remove(); window.generarJPGPublic(torneoId, torneoNombre); };
+                
+                overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+                if (navigator.vibrate) navigator.vibrate(200);
+            };
+            
+            // ===== RENDERIZAR UI =====
+            const renderUI = () => {
+                const container = document.getElementById('public-main-container');
+                if (!container) return;
+                
+                const hayUsuario = Utils.hayUsuario();
+                const estaEnVisorInterno = window.esVisorInterno();
+                let html = '';
+                
+                if (!botonPresionado && !cargandoTorneos && torneosHoy.length === 0 && torneosAyer.length === 0 && torneosUltimos.length === 0 && !errorCarga) {
+                    html = `
+                        <div style="min-height: 100vh; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            <div style="max-width: 500px; width: 90%; margin: 0 auto;">
+                                <div style="background: white; border-radius: 24px; padding: 40px 24px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                                    <div style="font-size: 60px; margin-bottom: 20px;">🏆</div>
+                                    <h3 style="color: #8B4513; margin: 0 0 15px;">Buscando Torneos</h3>
+                                    <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Conectando con servidores...</p>
+                                    <div style="width: 100%; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden;">
+                                        <div style="width: 60%; height: 100%; background: #8B4513;"></div>
+                                    </div>
+                                    <div style="margin-top: 40px;">
+                                        <div style="height: 100px; background: #f0f0f0; border-radius: 12px; margin-bottom: 15px;"></div>
+                                        <div style="height: 100px; background: #f0f0f0; border-radius: 12px; margin-bottom: 15px;"></div>
+                                        <div style="height: 100px; background: #f0f0f0; border-radius: 12px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(() => { if (typeof window.cargarTorneosPublicos === 'function') window.cargarTorneosPublicos(); }, 100);
+                } else if (cargandoTorneos) {
+                    html = `<div style="min-height:100vh;background:#f8f9fa;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;"><div style="width:50px;height:50px;border:3px solid #f3f3f3;border-top:3px solid #8B4513;border-radius:50%;margin:0 auto 20px;animation:spin 1s linear infinite;"></div><p style="color:#8B4513;">Cargando torneos...</p></div></div>`;
+                } else if (errorCarga) {
+                    html = `
+                        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f8f9fa;">
+                            <div style="text-align:center;background:white;padding:40px;border-radius:16px;max-width:400px;">
+                                <div style="font-size:60px;margin-bottom:20px;">❌</div>
+                                <h3 style="color:#d32f2f;margin:0 0 10px;">Error de conexión</h3>
+                                <p style="color:#666;margin-bottom:20px;">${errorCarga}</p>
+                                <button onclick="window.cargarTorneosPublicos()" style="background:#8B4513;color:white;border:none;padding:12px 30px;border-radius:8px;font-weight:600;cursor:pointer;">Reintentar</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (torneosHoy.length === 0 && torneosAyer.length === 0 && torneosUltimos.length === 0) {
+                    if (hayUsuario) {
+                        html = `
+                            <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f8f9fa;">
+                                <div style="text-align:center;background:white;padding:40px;border-radius:16px;max-width:400px;">
+                                    <div style="font-size:70px;margin-bottom:20px;">📭</div>
+                                    <h2 style="color:#8B4513;margin:0 0 15px;">No hay torneos recientes</h2>
+                                    <p style="color:#666;margin:15px 0;">Redirigiendo a la sección de torneos...</p>
+                                    <div style="width:50px;height:50px;border:3px solid #f3f3f3;border-top:3px solid #8B4513;border-radius:50%;margin:20px auto;animation:spin 1s linear infinite;"></div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        html = `
+                            <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f8f9fa;">
+                                <div style="text-align:center;max-width:450px;background:white;padding:40px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+                                    <div style="font-size:70px;margin-bottom:20px;">📭</div>
+                                    <h2 style="color:#8B4513;margin:0 0 15px;font-size:28px;">No hay torneos recientes</h2>
+                                    <p style="color:#666;margin-bottom:25px;font-size:16px;">No se encontraron torneos con cotejos guardados.</p>
+                                    <div style="background:#f0f8ff;border-radius:12px;padding:25px;margin-bottom:25px;border-left:4px solid #8B4513;">
+                                        <p style="margin:0 0 15px;font-weight:600;font-size:18px;">🔐 ¿Quieres ver todos los torneos?</p>
+                                        <p style="margin:0;color:#666;font-size:15px;">Inicia sesión para ver el historial completo de torneos.</p>
+                                    </div>
+                                    <button onclick="handleVerTodosTorneos()" style="width:100%;background:#8B4513;color:white;border:none;padding:18px;border-radius:12px;font-weight:700;font-size:18px;cursor:pointer;margin-bottom:12px;">MOSTRAR MAS TORNEOS..</button>
+                                    <button onclick="window.cargarTorneosPublicos()" style="width:100%;background:#f0f0f0;color:#333;border:1px solid #ddd;padding:18px;border-radius:12px;font-weight:600;font-size:16px;cursor:pointer;">REINTENTAR</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    html = `<div style="width:100%;max-width:100%;margin:0;padding:2px;box-sizing:border-box;background:#f8f9fa;">`;
+                    
+                    if (torneosHoy.length > 0) {
+                        html += `
+                            <div style="margin:8px 10px 16px 10px;">
+                                <div style="background:linear-gradient(135deg,#8B4513 0%,#D2691E 100%);border-radius:16px 16px 12px 12px;padding:5px 64px;margin-bottom:0px;box-shadow:0 4px 12px rgba(0,0,0,0.12);position:relative;overflow:hidden;">
+                                    <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(255,255,255,0.1);border-radius:50%;"></div>
+                                    <div style="position:absolute;bottom:-15px;left:-15px;width:60px;height:60px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                                        <div><div style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.8);letter-spacing:0.5px;margin-bottom:2px;">🏆 EN VIVO</div><div style="font-size:16px;font-weight:800;color:white;letter-spacing:-0.3px;">TORNEOS DE HOY:</div></div>
+                                        <div style="background:rgba(255,255,255,0.2);backdrop-filter:blur(4px);padding:4px 10px;border-radius:30px;"><span style="color:white;font-weight:700;font-size:14px;">${torneosHoy.length}</span></div>
+                                    </div>
+                                </div>
+                                <div style="display:flex;flex-direction:column;gap:5px;">
+                                    ${torneosHoy.map((t, index) => `
+                                        <div style="background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;border:1px solid rgba(139,69,19,0.1);">
+                                            <div style="display:flex;align-items:center;padding:4px 4px;">
+                                                <div style="width:26px;height:26px;background:linear-gradient(135deg,#8B4513 0%,#D2691E 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:5px;box-shadow:0 2px 6px rgba(139,69,19,0.25);">
+                                                    <span style="color:white;font-weight:800;font-size:17px;">${index + 1}</span>
+                                                </div>
+                                                <div style="flex:1;min-width:0;">
+                                                    <div style="font-weight:900;font-size:14px;color:#1a1a2e;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${Utils.escapeHTML(t.nombre || 'Torneo sin nombre')}</div>
+                                                    <div style="display:flex;gap:4px;font-size:13px;color:#666;"><span style="display:flex;align-items:center;gap:3px;"><span>📅</span> ${t.fecha || 'Sin fecha'}</span></div>
+                                                </div>
+                                                <div style="display:flex;gap:6px;">
+                                                    <button onclick="document.getElementById('torneo-${t.id}').scrollIntoView({ behavior: 'smooth', block: 'start' })" style="background:#f0f2f5;border:none;padding:10px 4px;border-radius:30px;font-weight:600;font-size:11px;color:#8B4513;cursor:pointer;display:flex;align-items:center;gap:4px;"><span style="font-size:12px;">👁️</span> VER T.</button>
+                                                    <button onclick="event.stopPropagation(); window.compartirUrlInicio('${t.id}', '${Utils.escapeHTML(t.nombre || 'Torneo')}')" style="background:#2196F3;border:none;padding:10px 4px;border-radius:30px;font-weight:600;font-size:11px;color:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 1px 4px rgba(33,150,243,0.25);">COMPARTIR</button>
+                                                </div>
+                                            </div>
+                                            <div style="height:2px;background:linear-gradient(90deg,#8B4513,#D2691E,#FFD700);width:${Math.floor(Math.random() * 40 + 60)}%;"></div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    if (torneosHoy.length > 0) {
+                        html += `<div style="margin-bottom:60px;">${torneosHoy.map((t, index) => `<div style="margin-bottom:60px;">${renderTarjetaTorneo(t, 'HOY', '#4CAF50')}${index < torneosHoy.length - 1 ? '<div style="height:2px;background:linear-gradient(90deg,transparent,#8B4513,transparent);margin:20px 0;"></div>' : ''}</div>`).join('')}</div>`;
+                    }
+                    
+                    if (torneosAyer.length > 0) {
+                        html += `<div style="margin-top:40px;margin-bottom:30px;"><div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;padding:0 10px;"><span style="background:#FF9800;color:white;padding:8px 25px;border-radius:30px;font-weight:700;font-size:18px;">AYER</span><span style="color:#666;font-size:16px;">${Utils.obtenerFechaAyer()}</span><span style="background:#f0f0f0;padding:5px 15px;border-radius:20px;font-size:14px;">${torneosAyer.length} torneo(s)</span></div>${torneosAyer.map((t, index) => `<div style="margin-bottom:60px;">${renderTarjetaTorneo(t, 'AYER', '#FF9800')}${index < torneosAyer.length - 1 ? '<div style="height:2px;background:linear-gradient(90deg,transparent,#8B4513,transparent);margin:20px 0;"></div>' : ''}</div>`).join('')}</div>`;
+                    }
+                    
+                    html += `<div style="text-align:center;margin:8px 12px 16px 12px;"><button onclick="handleVerTodosTorneos()" style="background:white;border:2px solid #8B4513;color:#8B4513;padding:10px 14px;border-radius:40px;font-weight:700;font-size:12px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);"><span>🏆</span><span>VER TODOS LOS TORNEOS Y SERIALES</span><span>📊</span></button></div>`;
+                    
+                    if (torneosUltimos.length > 0) {
+                        html += `<div style="margin-top:40px;"><div style="display:flex;align-items:center;gap:15px;margin-bottom:0px;padding:10 15px;"><span style="background:#2196F3;color:white;padding:4px 15px;border-radius:1px;font-weight:700;font-size:14px;">ÚLTIMO TORNEO:</span><span style="color:#666;font-size:9px;">Más recientes</span><span style="background:#f0f0f0;padding:5px 15px;border-radius:20px;font-size:10px;">${torneosUltimos.length} torneo(s)</span></div>${torneosUltimos.map((t, index) => `<div style="margin-bottom:60px;">${renderTarjetaTorneo(t, 'RECIENTE', '#2196F3')}${index < torneosUltimos.length - 1 ? '<div style="height:2px;background:linear-gradient(90deg,transparent,#8B4513,transparent);margin:20px 0;"></div>' : ''}</div>`).join('')}</div>`;
+                    }
+                    
+                    html += `<div style="margin-top:40px;text-align:center;padding:25px;background:linear-gradient(135deg,#f5f7fa 0%,#e9ecef 100%);border-radius:12px;"><p style="color:#333;margin:0 0 10px;font-size:16px;font-weight:500;">${hayUsuario ? '¿Quieres ver torneos anteriores? Ve a la sección TORNEOS en el menú superior.' : '¿Quieres acceso a todos los torneos y estadísticas?'}</p>${!hayUsuario ? `<button onclick="handleVerTodosTorneos()" style="background:#8B4513;color:white;border:none;padding:12px 35px;border-radius:30px;font-weight:600;font-size:16px;cursor:pointer;margin-top:10px;margin-right:10px;">TORNEOS GUARDADOS</button>` : ''}</div></div>`;
+                }
+                
+                if (estaEnVisorInterno) {
+                    html += `<div id="visor-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999999;cursor:pointer;"><div style="position:absolute;top:25%;left:50%;transform:translate(-50%,-50%);background:#1877F2;color:white;padding:10px 20px;border-radius:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:17px;font-weight:600;display:inline-flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(24,119,242,0.4),0 2px 4px rgba(0,0,0,0.1);cursor:pointer;white-space:nowrap;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 13V19C18 19.5304 17.7893 20.0391 17.4142 20.4142C17.0391 20.7893 16.5304 21 16 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V8C3 7.46957 3.21071 6.96086 3.58579 6.58579C3.96086 6.21071 4.46957 6 5 6H11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 3H21V9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 14L21 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Abrir en navegador externo</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>`;
+                }
+                
+                container.innerHTML = html;
+                
+                if (estaEnVisorInterno && !window._visorEventAttached) {
+                    window._visorEventAttached = true;
+                    document.body.onclick = function(e) {
+                        if (document.getElementById('visor-overlay') && e.target.closest('#visor-overlay')) {
+                            e.preventDefault();
+                            if (navigator.vibrate) navigator.vibrate(200);
+                            window.abrirEnNavegadorExterno(window.location.href);
+                            return false;
+                        }
+                    };
+                }
+            };
+            
+            // ===== CARGAR TORNEOS PÚBLICOS =====
+            const cargarTorneosPublicos = async () => {
+                if (cargandoTorneos) return;
+                
+                Utils.limpiarListeners();
+                pestanasActivas.clear();
+                pestanaManual = {};
+                
+                cargandoTorneos = true;
+                errorCarga = null;
+                torneosHoy = [];
+                torneosAyer = [];
+                torneosUltimos = [];
+                botonPresionado = true;
+                
+                renderUI();
+                
+                const fechaHoy = Utils.obtenerFechaHoy();
+                const fechaAyer = Utils.obtenerFechaAyer();
+                
+                if (!adminDb) {
+                    const initOK = await initAdminDB();
+                    if (!initOK) {
+                        cargandoTorneos = false;
+                        renderUI();
+                        return;
+                    }
+                }
+                
+                try {
+                    const snapshot = await adminDb.ref('TORNEOS').once('value');
+                    if (!snapshot.exists()) {
+                        cargandoTorneos = false;
+                        renderUI();
+                        return;
+                    }
+                    
+                    const torneosData = snapshot.val();
+                    const todosLosTorneos = [];
+                    
+                    for (const uid in torneosData) {
+                        const torneosUsuario = torneosData[uid];
+                        if (!torneosUsuario) continue;
+                        for (const torneoId in torneosUsuario) {
+                            const torneo = torneosUsuario[torneoId];
+                            if (torneo.cotejoId) {
+                                todosLosTorneos.push({ ...torneo, id: torneoId, uid: uid });
+                            }
+                        }
+                    }
+                    
+                    const hoyTemp = [];
+                    const ayerTemp = [];
+                    const otrosTemp = [];
+                    
+                    todosLosTorneos.forEach(t => {
+                        if (t.fecha === fechaHoy) hoyTemp.push(t);
+                        else if (t.fecha === fechaAyer) ayerTemp.push(t);
+                        else otrosTemp.push(t);
+                    });
+                    
+                    hoyTemp.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    ayerTemp.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    otrosTemp.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    
+                    const ultimosTemp = otrosTemp.slice(0, 1);
+                    
+                    // Cargar torneos de hoy con listeners
+                    for (const torneo of hoyTemp) {
+                        if (!torneo.cotejoId) continue;
+                        const torneoSnapshot = await adminDb.ref(`TORNEOS/${torneo.uid}/${torneo.id}`).once('value');
+                        let config = { gallosPorPartido: 3, puntosConfig: { ganador: 2, empate: 1, perdedor: 0 } };
+                        if (torneoSnapshot.exists()) {
+                            const torneoData = torneoSnapshot.val();
+                            if (torneoData.config?.gallosPorPartido) config.gallosPorPartido = torneoData.config.gallosPorPartido;
+                            if (torneoData.puntosConfig) config.puntosConfig = torneoData.puntosConfig;
+                            torneo.puntosConfig = config.puntosConfig;
+                            torneo.config = config;
+                        }
+                        const cotejoSnapshot = await adminDb.ref(`COTEJOS/${torneo.uid}/${torneo.cotejoId}`).once('value');
+                        if (cotejoSnapshot.exists()) {
+                            torneo.cotejo = cotejoSnapshot.val();
+                            torneo.tablaPosicion = procesarTablaPosicion(torneo.cotejo, config);
+                            torneosHoy.push(torneo);
+                            // Configurar listener en tiempo real
+                            setTimeout(() => {
+                                if (!adminDb) return;
+                                const cotejoRef = adminDb.ref(`COTEJOS/${torneo.uid}/${torneo.cotejoId}`);
+                                const onValueChange = cotejoRef.on('value', (snapshot) => {
+                                    if (!snapshot.exists()) return;
+                                    torneo.cotejo = snapshot.val();
+                                    torneo.tablaPosicion = procesarTablaPosicion(torneo.cotejo, config);
+                                    const index = torneosHoy.findIndex(t => t.id === torneo.id && t.uid === torneo.uid);
+                                    if (index !== -1) torneosHoy[index] = { ...torneo };
+                                    renderUI();
+                                });
+                                listenersActivos.push(() => cotejoRef.off('value', onValueChange));
+                            }, 500);
+                        }
+                    }
+                    
+                    // Cargar torneos de ayer sin listeners
+                    for (const torneo of ayerTemp) {
+                        if (!torneo.cotejoId) continue;
+                        const torneoSnapshot = await adminDb.ref(`TORNEOS/${torneo.uid}/${torneo.id}`).once('value');
+                        let config = { gallosPorPartido: 3, puntosConfig: { ganador: 2, empate: 1, perdedor: 0 } };
+                        if (torneoSnapshot.exists()) {
+                            const torneoData = torneoSnapshot.val();
+                            if (torneoData.config?.gallosPorPartido) config.gallosPorPartido = torneoData.config.gallosPorPartido;
+                            if (torneoData.puntosConfig) config.puntosConfig = torneoData.puntosConfig;
+                        }
+                        const cotejoSnapshot = await adminDb.ref(`COTEJOS/${torneo.uid}/${torneo.cotejoId}`).once('value');
+                        if (cotejoSnapshot.exists()) {
+                            torneo.cotejo = cotejoSnapshot.val();
+                            torneo.tablaPosicion = procesarTablaPosicion(torneo.cotejo, config);
+                            torneosAyer.push(torneo);
+                        }
+                    }
+                    
+                    // Cargar últimos torneos sin listeners
+                    for (const torneo of ultimosTemp) {
+                        if (!torneo.cotejoId) continue;
+                        const torneoSnapshot = await adminDb.ref(`TORNEOS/${torneo.uid}/${torneo.id}`).once('value');
+                        let config = { gallosPorPartido: 3, puntosConfig: { ganador: 2, empate: 1, perdedor: 0 } };
+                        if (torneoSnapshot.exists()) {
+                            const torneoData = torneoSnapshot.val();
+                            if (torneoData.config?.gallosPorPartido) config.gallosPorPartido = torneoData.config.gallosPorPartido;
+                            if (torneoData.puntosConfig) config.puntosConfig = torneoData.puntosConfig;
+                        }
+                        const cotejoSnapshot = await adminDb.ref(`COTEJOS/${torneo.uid}/${torneo.cotejoId}`).once('value');
+                        if (cotejoSnapshot.exists()) {
+                            torneo.cotejo = cotejoSnapshot.val();
+                            torneo.tablaPosicion = procesarTablaPosicion(torneo.cotejo, config);
+                            torneosUltimos.push(torneo);
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error("❌ Error cargando torneos:", error);
+                    errorCarga = "Error al cargar los torneos";
+                } finally {
+                    cargandoTorneos = false;
+                    renderUI();
+                }
+            };
+            
+            // ===== FUNCIONES PDF Y JPG =====
+            window.generarPDFPublic = function(torneoId, torneoNombre) {
+                const tituloElement = document.querySelector(`#torneo-${torneoId}`);
+                if (!tituloElement) {
+                    if (window.AppState) AppState.addNotification('❌ No se encontró el torneo', 'error');
+                    return;
+                }
+                
+                let tarjetaCompleta = tituloElement.closest('div[style*="margin-bottom: 60px;"]');
+                if (!tarjetaCompleta) tarjetaCompleta = tituloElement.closest('div[style*="background: white"]');
+                if (!tarjetaCompleta) return;
+                
+                let esCotejo = false;
+                let esPosicion = false;
+                const botonesPestanas = tarjetaCompleta.querySelectorAll('button[onclick*="cambiarPestanaPublic"]');
+                botonesPestanas.forEach(btn => {
+                    const estiloBg = btn.style.background;
+                    if (estiloBg === '#8B4513' || estiloBg === 'rgb(139, 69, 19)') {
+                        if (btn.textContent.includes('COTEJO')) esCotejo = true;
+                        if (btn.textContent.includes('POSICIONES')) esPosicion = true;
+                    }
+                });
+                if (!esCotejo && !esPosicion) esCotejo = true;
+                const tipoContenido = esCotejo ? 'COTEJO' : 'POSICIONES';
+                
+                const clone = tarjetaCompleta.cloneNode(true);
+                const botonesAccion = clone.querySelectorAll('button');
+                botonesAccion.forEach(btn => {
+                    if (btn.textContent.includes('VER') || btn.textContent.includes('COMPARTIR')) btn.remove();
+                });
+                const indicadorTiempo = clone.querySelector('div[style*="padding: 8px 16px; background: #f0f8ff"]');
+                if (indicadorTiempo) indicadorTiempo.remove();
+                
+                const contenedorPestanas = clone.querySelector('div[style*="display: flex; gap: 12px; justify-content: center"]');
+                if (contenedorPestanas) {
+                    const botones = contenedorPestanas.querySelectorAll('button');
+                    botones.forEach(btn => {
+                        if (esCotejo && btn.textContent.includes('POSICIONES')) btn.style.display = 'none';
+                        if (esPosicion && btn.textContent.includes('COTEJO')) btn.style.display = 'none';
+                    });
+                }
+                
+                const contenedoresContenido = clone.querySelectorAll('div[style*="overflow-x: auto;"]');
+                contenedoresContenido.forEach(contenedor => {
+                    const tablas = contenedor.querySelectorAll('table');
+                    tablas.forEach(tabla => {
+                        const esTablaPosicion = tabla.textContent.includes('Partido') && tabla.textContent.includes('Puntos');
+                        if (esPosicion && esTablaPosicion) tabla.style.display = 'table';
+                        else if (esCotejo && !esTablaPosicion) tabla.style.display = 'table';
+                        else tabla.style.display = 'none';
+                    });
+                });
+                
+                const leyendaDiv = document.createElement('div');
+                leyendaDiv.style.cssText = 'text-align:center;font-size:7px;font-weight:600;background:#f0f0f0;padding:3px;border-radius:53px;margin:5px 0 10px;border:1px solid #ddd;';
+                leyendaDiv.textContent = 'COTEJO COMPUTARIZADO: 961 115 03 94 LEGALIDAD QUE RESPALDA TU PASIÓN - IMPARCIALIDAD ABSOLUTA EN CADA DATO';
+                clone.insertBefore(leyendaDiv, clone.firstChild.nextSibling);
+                
+                const urlActual = window.location.href;
+                const fechaGeneracion = new Date().toLocaleString('es-MX');
+                
+                const footerDiv = document.createElement('div');
+                footerDiv.style.cssText = 'margin-top:5px;padding-top:5px;border-top:1px solid #ddd;text-align:center;page-break-inside:avoid;';
+                footerDiv.innerHTML = `<div style="background:#f8f9fa;padding:5px;border-radius:3px;margin-bottom:3px;"><div style="font-size:8px;color:#666;margin-bottom:3px;">🔗 VER TABLA COMPLETA ACTUALIZADA:</div><a href="${urlActual}" target="_blank" style="font-size:10px;color:#0066cc;word-break:break-all;">${urlActual}</a></div><div class="copyright" style="font-size:8px;color:#999;">© ${new Date().getFullYear()} LEGADO AVICOLA - Generado: ${fechaGeneracion}</div>`;
+                clone.appendChild(footerDiv);
+                
+                const estilos = `<style>@page{size:${esCotejo ? 'landscape' : 'portrait'};margin:0.2cm;}body{font-family:Arial,sans-serif;margin:0;padding:5px;background:white;}*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}body,div,table,tr,td,th{page-break-inside:avoid !important;break-inside:avoid !important;}table{width:auto !important;min-width:100%;border-collapse:collapse;font-size:12px !important;}th{background:${esCotejo ? '#d32f2f' : '#8B4513'} !important;color:white !important;padding:6px 4px !important;font-size:11px !important;}td{padding:4px 3px !important;border:1px solid #ddd;text-align:center;font-size:11px !important;}</style>`;
+                
+                const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${Utils.escapeHTML(torneoNombre)} - ${tipoContenido}</title>${estilos}</head><body><div style="page-break-inside:avoid;break-inside:avoid;">${clone.outerHTML}</div></body></html>`;
+                const ventana = window.open('', '_blank');
+                if (!ventana) {
+                    if (window.AppState) AppState.addNotification('❌ Permite ventanas emergentes', 'error');
+                    return;
+                }
+                ventana.document.write(html);
+                ventana.document.close();
+                setTimeout(() => ventana.print(), 500);
+                if (window.AppState) AppState.addNotification(`📄 Generando PDF de ${tipoContenido}...`, 'info');
+            };
+            
+            window.generarJPGPublic = async function(torneoId, torneoNombre) {
+                const tituloElement = document.querySelector(`#torneo-${torneoId}`);
+                if (!tituloElement) {
+                    if (window.AppState) AppState.addNotification('❌ No se encontró el torneo', 'error');
+                    return;
+                }
+                
+                let tarjetaCompleta = tituloElement.closest('div[style*="margin-bottom: 60px;"]');
+                if (!tarjetaCompleta) tarjetaCompleta = tituloElement.closest('div[style*="background: white"]');
+                if (!tarjetaCompleta) return;
+                
+                let esCotejo = false;
+                let esPosicion = false;
+                const botonesPestanas = tarjetaCompleta.querySelectorAll('button[onclick*="cambiarPestanaPublic"]');
+                botonesPestanas.forEach(btn => {
+                    const estiloBg = btn.style.background;
+                    if (estiloBg === '#8B4513' || estiloBg === 'rgb(139, 69, 19)') {
+                        if (btn.textContent.includes('COTEJO')) esCotejo = true;
+                        if (btn.textContent.includes('POSICIONES')) esPosicion = true;
+                    }
+                });
+                if (!esCotejo && !esPosicion) esPosicion = true;
+                const tipoContenido = esCotejo ? 'COTEJO' : 'POSICIONES';
+                
+                if (window.AppState) AppState.addNotification(`📸 Generando imagen de ${tipoContenido}...`, 'info');
+                
+                const clone = tarjetaCompleta.cloneNode(true);
+                const botonesAccion = clone.querySelectorAll('button');
+                botonesAccion.forEach(btn => {
+                    if (btn.textContent.includes('VER') || btn.textContent.includes('COMPARTIR')) btn.remove();
+                });
+                const indicadorTiempo = clone.querySelector('div[style*="padding: 8px 16px; background: #f0f8ff"]');
+                if (indicadorTiempo) indicadorTiempo.remove();
+                
+                const contenedorPestanas = clone.querySelector('div[style*="display: flex; gap: 12px; justify-content: center"]');
+                if (contenedorPestanas) {
+                    const botones = contenedorPestanas.querySelectorAll('button');
+                    botones.forEach(btn => {
+                        if (esCotejo && btn.textContent.includes('POSICIONES')) btn.style.display = 'none';
+                        if (esPosicion && btn.textContent.includes('COTEJO')) btn.style.display = 'none';
+                    });
+                }
+                
+                const contenedoresContenido = clone.querySelectorAll('div[style*="overflow-x: auto;"]');
+                contenedoresContenido.forEach(contenedor => {
+                    const tablas = contenedor.querySelectorAll('table');
+                    tablas.forEach(tabla => {
+                        const esTablaPosicion = tabla.textContent.includes('Partido') && tabla.textContent.includes('Puntos');
+                        if (esPosicion && esTablaPosicion) tabla.style.display = 'table';
+                        else if (esCotejo && !esTablaPosicion) tabla.style.display = 'table';
+                        else tabla.style.display = 'none';
+                    });
+                });
+                
+                const leyendaDiv = document.createElement('div');
+                leyendaDiv.style.cssText = 'text-align:center;font-size:7px;font-weight:600;background:#f0f0f0;padding:3px;border-radius:53px;margin:5px 0 10px;border:1px solid #ddd;';
+                leyendaDiv.textContent = 'COTEJO COMPUTARIZADO: 961 115 03 94 LEGALIDAD QUE RESPALDA TU PASIÓN - IMPARCIALIDAD ABSOLUTA EN CADA DATO';
+                clone.insertBefore(leyendaDiv, clone.firstChild.nextSibling);
+                
+                clone.style.width = '100%';
+                clone.style.backgroundColor = 'white';
+                clone.style.padding = '15px';
+                clone.style.boxSizing = 'border-box';
+                
+                const container = document.createElement('div');
+                container.style.cssText = 'position:fixed;top:-9999px;left:-9999px;background:white;padding:15px;display:inline-block;';
+                container.appendChild(clone);
+                document.body.appendChild(container);
+                await new Promise(r => setTimeout(r, 300));
+                
+                try {
+                    const canvas = await html2canvas(container, { scale: 2.5, backgroundColor: '#ffffff', logging: false, useCORS: false });
+                    const link = document.createElement('a');
+                    const nombreArchivo = `${torneoNombre.replace(/[^a-z0-9]/gi, '_')}_${esCotejo ? 'cotejo' : 'posiciones'}_${Date.now()}.jpg`;
+                    link.download = nombreArchivo;
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
+                    link.click();
+                    if (window.AppState) AppState.addNotification('✅ Imagen guardada', 'success');
+                } catch(e) {
+                    console.error(e);
+                    if (window.AppState) AppState.addNotification('❌ Error al generar imagen', 'error');
+                } finally {
+                    document.body.removeChild(container);
+                }
+            };
+            
+            window.cargarTorneosPublicos = cargarTorneosPublicos;
+            
+            setTimeout(() => renderUI(), 100);
+            
+            return `<div id="public-main-container" role="main" style="width:100%;min-height:100vh;background:#f8f9fa;padding:0;margin:0;"></div>`;
+        };
+        
+        // ==============================================
+        // NAVEGACIÓN Y RENDERIZADO PRINCIPAL
+        // ==============================================
+        
+        window.navigateTo = function(section) {
+            console.log("Navegando a:", section);
+            const root = document.getElementById('app-root');
+            if (!root) return;
+            
+            if (section === 'public') {
+                root.innerHTML = window.renderPublicScreen();
+            }
+        };
+        
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            const root = document.getElementById('app-root');
+            if (root) {
+                root.innerHTML = window.renderPublicScreen();
+            }
+        });
+    </script>
+</body>
+</html>
