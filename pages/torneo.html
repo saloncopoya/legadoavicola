@@ -6160,7 +6160,9 @@ window.mostrarModalTorneoEdicion = () => {
     // ========================================================================
     window.abrirModalEdicion = (anillo, partidoNombre, representante, peso, color) => {
 
- // ===== VERIFICAR INTERNET ANTES DE ABRIR MODAL =====    if (!navigator.onLine) {
+ // ===== VERIFICAR INTERNET ANTES DE ABRIR MODAL =====    
+        
+        if (!navigator.onLine) {
         if (window.AppState?.addNotification) {
             AppState.addNotification('❌ SIN INTERNET - No puedes editar sin conexión', 'error');
         }
