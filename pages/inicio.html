@@ -1118,8 +1118,9 @@
                     hoyTemp.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                     ayerTemp.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                     otrosTemp.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    
-                    const ultimosTemp = otrosTemp.slice(0, 1);
+
+                    //Cambiar esta linea para aumentar el numero de torneos a mostrar ultimos
+                    const ultimosTemp = otrosTemp.slice(0, 0);
                     
                     // Cargar torneos de hoy con listeners
                     for (const torneo of hoyTemp) {
