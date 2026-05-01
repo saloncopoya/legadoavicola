@@ -3283,31 +3283,30 @@ function calcularNumeroConflictos(peleas) {
     // ========================================================================
     // FUNCIÓN: EJECUTAR COTEJO (PRINCIPAL - EXPUESTA GLOBALMENTE)
     // ========================================================================
-    window.ejecutarCotejo = async () => {
+   window.ejecutarCotejo = async () => {
     // ===== VALIDACIÓN DE INTERNET =====
     if (!navigator.onLine) {
         AppState.addNotification('❌ SIN INTERNET - Conéctate para cotejar', 'error');
         return;
     }
 
-
     // ===== NUEVO: Verificar permiso en tiempo real DESDE FIREBASE PRINCIPAL =====
     try {
-        // Verificar si tenemos el usuario actual
-        const currentUser = AppState?.user?.current;
+        // Obtener usuario actual DIRECTAMENTE de Firebase Auth
+        const auth = firebase.auth();
+        const currentUser = auth.currentUser;
+        
         if (!currentUser) {
             AppState.addNotification('❌ Debes iniciar sesión', 'error');
             return;
         }
 
-        // Consultar DIRECTAMENTE a Firebase el nodo cotejo del usuario
-        // IMPORTANTE: Usamos la base de datos PRINCIPAL (AppState.firebase.database), NO adminDb
-        const database = AppState.firebase.database;
+        // ✅ CORREGIDO: Usar la instancia principal de Firebase Database
+        const database = firebase.database();
         if (!database) {
             AppState.addNotification('❌ Error de conexión', 'error');
             return;
         }
-
 
         // Consultar el valor actual en Firebase
         const cotejoSnapshot = await database.ref(`users/${currentUser.uid}/cotejo`).once('value');
@@ -3316,12 +3315,11 @@ function calcularNumeroConflictos(peleas) {
         if (!tienePermiso) {
             AppState.addNotification('⛔ SIN Permiso: CONTRATAME: 9611150394', 'error', 4000);
             
-            // Opcional: Actualizar el perfil en AppState para reflejar el cambio
+            // Opcional: Actualizar el perfil en AppState
             if (AppState.user.profile) {
                 AppState.user.profile.cotejo = false;
             }
             
-            // Deshabilitar visualmente el botón
             const btnCotejar = document.getElementById('btn-cotejar');
             if (btnCotejar) {
                 btnCotejar.disabled = true;
