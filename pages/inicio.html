@@ -104,10 +104,10 @@
                 /* Responsive tables */
         @media (max-width: 768px) {
             table {
-                font-size: 10px !important;
+                font-size: 11px !important;
             }
             th, td {
-                padding: 6px 4px !important;
+                padding: 2px 2px !important;
             }
         }
         
@@ -616,7 +616,7 @@
                                     const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
                                     let fila = `
                                         <tr style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; background-color: ${bgColor};">
-                                            <td style="padding: 3px 5px; font-weight: 900; font-size: 19px; border-right: 1px solid #eee;">${Utils.escapeHTML(item.nombre)}</td>
+                                            <td style="padding: 3px 5px; font-weight: 900; font-size: 17px; border-right: 1px solid #eee;">${Utils.escapeHTML(item.nombre)}</td>
                                     `;
                                     
                                     for (let i = 1; i <= gallosPorPartido; i++) {
@@ -660,8 +660,8 @@
                                     }
                                     
                                     fila += `
-                                        <td style="padding: 1px 1px; text-align: center; font-size: 22px; font-weight: 900; background: #000000; color: white; border-top: 2px solid #cccccc; border-right: 2px solid #cccccc;">${item.puntos}</td>
-                                        <td style="padding: 1px 1px; text-align: center; font-size: 22px; font-weight: 900; background: #000000; color: white; border-top: 2px solid #cccccc; border-right: 2px solid #cccccc;">${Utils.formatTiempo(item.tiempo)}</td>
+                                        <td style="padding: 1px 1px; text-align: center; font-size: 21px; font-weight: 900; background: #000000; color: white; border-top: 2px solid #cccccc; border-right: 2px solid #cccccc;">${item.puntos}</td>
+                                        <td style="padding: 1px 1px; text-align: center; font-size: 21px; font-weight: 900; background: #000000; color: white; border-top: 2px solid #cccccc; border-right: 2px solid #cccccc;">${Utils.formatTiempo(item.tiempo)}</td>
                                     </tr>
                                     `;
                                     return fila;
