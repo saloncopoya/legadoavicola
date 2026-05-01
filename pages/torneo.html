@@ -9639,12 +9639,23 @@ if (typeof window.renderMobileNavBar !== 'function') {
 // Finalmente, para que la app se muestre automáticamente, ejecutamos el render.
 // Pero primero esperamos a que Firebase esté listo y AppState tenga el usuario.
 // Como ya inicializamos Firebase arriba, simplemente llamamos al render después de un pequeño delay.
-setTimeout(() => {
+// Finalmente, para que la app se muestre automáticamente, esperamos al usuario
+const waitForUser = () => {
+    return new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+};
+
+waitForUser().then((user) => {
+    console.log("Usuario autenticado:", user?.uid || "No hay usuario");
     const root = document.getElementById('app-root');
     if (root && window.renderAdminScreen) {
         root.innerHTML = window.renderAdminScreen();
     }
-}, 100);
+});
 
     </script>
 </body>
