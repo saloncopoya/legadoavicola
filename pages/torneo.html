@@ -9268,10 +9268,12 @@ console.log("🔵 [LISTENER] Total peleas:", totalPeleas);
         document.getElementById('calificacion-todas-mensaje').style.display = 'block';
         
         // Mostrar mensaje de que no hay listener
-        const infoDiv = document.getElementById('calificacion-usuario-info');
-        if (infoDiv) {
-            infoDiv.innerHTML = '<span style="color:#4CAF50;">✅ Todas las peleas calificadas.</span>';
-        }
+       const infoDiv = document.getElementById('calificacion-usuario-info');
+if (infoDiv) {
+    infoDiv.innerHTML = '<span style="color:#4CAF50;">✅ Todas las peleas calificadas.</span>';
+} else {
+    console.log("ℹ️ Elemento calificacion-usuario-info no encontrado, se creará más tarde");
+}
         return;
     }
 
