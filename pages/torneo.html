@@ -9265,15 +9265,19 @@ console.log("🔵 [LISTENER] Total peleas:", totalPeleas);
     // ===== 4. SI TODAS ESTÁN CALIFICADAS, NO CONFIGURAR LISTENER =====
     if (todasCalificadas) {
         console.log(`✅ TODAS LAS PELEAS CALIFICADAS (${calificadas}/${totalPeleas}) - NO HAY LISTENER`);
-        document.getElementById('calificacion-todas-mensaje').style.display = 'block';
+       
+     const mensajeDiv = document.getElementById('calificacion-todas-mensaje');
+        if (mensajeDiv) {
+            mensajeDiv.style.display = 'block';
+        }
         
         // Mostrar mensaje de que no hay listener
-       const infoDiv = document.getElementById('calificacion-usuario-info');
-if (infoDiv) {
-    infoDiv.innerHTML = '<span style="color:#4CAF50;">✅ Todas las peleas calificadas.</span>';
-} else {
-    console.log("ℹ️ Elemento calificacion-usuario-info no encontrado, se creará más tarde");
-}
+        const infoDiv = document.getElementById('calificacion-usuario-info');
+        if (infoDiv) {
+            infoDiv.innerHTML = '<span style="color:#4CAF50;">✅ Todas las peleas calificadas.</span>';
+        } else {
+            console.log("ℹ️ Elemento calificacion-usuario-info no encontrado, se creará más tarde");
+        }
         return;
     }
 
