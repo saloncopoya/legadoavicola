@@ -100,6 +100,7 @@
         
         /* Responsive tables */
         @media (max-width: 768px) {
+            
             table {
                 font-size: 10px !important;
             }
@@ -729,27 +730,47 @@
                             })()}
                         </div>
                         
+                      
                         <div style="display: flex; gap: 12px; justify-content: center; padding: 16px 10px; background: #f8f9fa; border-bottom: 1px solid #e9ecef;">
-                            <button onclick="cambiarPestanaPublic('${torneoId}', 'cotejo')" 
-                                    style="flex: 1; padding: 1px 1px; border: 2px solid #8B4513; border-radius: 11px; background: ${pestanaActiva === 'cotejo' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'cotejo' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 12px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 1px;">
-                                <span style="font-size: 18px;">⚡</span>
-                                <span>VER COTEJO</span>
-                                ${torneo.cotejo?.peleas?.length ? `<span style="background: ${pestanaActiva === 'cotejo' ? 'rgba(255,255,255,0.2)' : '#e9ecef'}; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 4px;">${torneo.cotejo.peleas.length}</span>` : ''}
-                            </button>
-                            <button onclick="cambiarPestanaPublic('${torneoId}', 'posicion')" 
-                                    style="flex: 1; padding: 3px 6px; border: 2px solid #8B4513; border-radius: 12px; background: ${pestanaActiva === 'posicion' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'posicion' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 11px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 1px;">
-                                <span style="font-size: 18px;">🏆</span>
-                                <span>VER TABLA DE POSICIONES</span>
-                                ${torneo.tablaPosicion?.length ? `<span style="background: ${pestanaActiva === 'posicion' ? 'rgba(255,255,255,0.2)' : '#e9ecef'}; padding: 2px 5px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 4px;">${torneo.tablaPosicion.length}</span>` : ''}
-                            </button>
-                        </div>
-                        
-                        <div style="width: 100%; padding: 0; overflow-x: auto;">
-                            ${pestanaActiva === 'cotejo' 
-                                ? renderTablaCotejo(torneo.cotejo, config)
-                                : renderTablaPosicion(torneo.tablaPosicion, config)
-                            }
-                        </div>
+    <button onclick="cambiarPestanaPublic('${torneoId}', 'cotejo')" 
+            style="flex: 1; padding: 1px 1px; border: 2px solid #8B4513; border-radius: 11px; background: ${pestanaActiva === 'cotejo' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'cotejo' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 1px;">
+        <span style="font-size: 18px;">⚡</span>
+        <span>VER COTEJO</span>
+    </button>
+    <button onclick="cambiarPestanaPublic('${torneoId}', 'posicion')" 
+            style="flex: 1; padding: 3px 6px; border: 2px solid #8B4513; border-radius: 12px; background: ${pestanaActiva === 'posicion' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'posicion' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 1px;">
+        <span style="font-size: 18px;">🏆</span>
+        <span>VER TABLA DE POSICIONES</span>
+    </button>
+    <button onclick="cambiarPestanaPublic('${torneoId}', 'ambos')" 
+            style="flex: 1; padding: 3px 6px; border: 2px solid #8B4513; border-radius: 12px; background: ${pestanaActiva === 'ambos' ? '#8B4513' : '#ffffff'}; color: ${pestanaActiva === 'ambos' ? '#ffffff' : '#2c3e50'}; font-weight: 900; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 1px;">
+        <span style="font-size: 18px;">➕</span>
+        <span>VER AMBOS</span>
+    </button>
+</div>
+
+
+
+                    ${pestanaActiva === 'ambos' ? `
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; width: 100%; padding: 0;">
+        <div style="flex: 1; min-width: 300px; overflow-x: auto;">
+            <div style="background: #f0f0f0; padding: 8px; text-align: center; font-weight: bold; border-radius: 8px 8px 0 0;">⚡ COTEJO</div>
+            ${renderTablaCotejo(torneo.cotejo, config)}
+        </div>
+        <div style="flex: 1; min-width: 300px; overflow-x: auto;">
+            <div style="background: #f0f0f0; padding: 8px; text-align: center; font-weight: bold; border-radius: 8px 8px 0 0;">🏆 POSICIONES</div>
+            ${renderTablaPosicion(torneo.tablaPosicion, config)}
+        </div>
+    </div>
+` : `
+    <div style="width: 100%; padding: 0; overflow-x: auto;">
+        ${pestanaActiva === 'cotejo' 
+            ? renderTablaCotejo(torneo.cotejo, config)
+            : renderTablaPosicion(torneo.tablaPosicion, config)
+        }
+    </div>
+`}
+
                         
                         <div style="padding: 8px 16px; background: #f0f8ff; border-top: 1px solid #8B4513; font-size: 12px; color: #666; display: flex; align-items: center; gap: 8px;">
                             <span style="display: inline-block; width: 10px; height: 10px; background: #4CAF50; border-radius: 50%;"></span>
