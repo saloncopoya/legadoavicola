@@ -1009,7 +1009,7 @@
                                                     <div style="display:flex;gap:4px;font-size:13px;color:#666;"><span style="display:flex;align-items:center;gap:3px;"><span>📅</span> ${t.fecha || 'Sin fecha'}</span></div>
                                                 </div>
                                                 <div style="display:flex;gap:6px;">
-                                                    <button onclick="document.getElementById('torneo-${t.id}').scrollIntoView({ behavior: 'smooth', block: 'start' })" style="background:#f0f2f5;border:none;padding:10px 4px;border-radius:30px;font-weight:600;font-size:11px;color:#8B4513;cursor:pointer;display:flex;align-items:center;gap:4px;"><span style="font-size:12px;">👁️</span> VER T.</button>
+                                                    <button onclick="document.getElementById('torneo-${t.id}').scrollIntoView({ behavior: 'smooth', block: 'start' })" style="background:#f0f2f5;border:none;padding:10px 4px;border-radius:30px;font-weight:600;font-size:11px;color:#8B4513;cursor:pointer;display:flex;align-items:center;gap:4px;"><span style="font-size:12px;">👁️</span> VER TABLAS.</button>
                                                     <button onclick="event.stopPropagation(); window.compartirUrlInicio('${t.id}', '${Utils.escapeHTML(t.nombre || 'Torneo')}')" style="background:#2196F3;border:none;padding:10px 4px;border-radius:30px;font-weight:600;font-size:11px;color:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 1px 4px rgba(33,150,243,0.25);">COMPARTIR</button>
                                                 </div>
                                             </div>
