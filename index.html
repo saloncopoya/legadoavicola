@@ -309,7 +309,6 @@
             </div>
             <div id="userSessionArea" class="user-info">
                 <span id="welcomeUserSpan" style="display: none;"></span>
-                    <button id="headerLoginBtn" class="btn-outline">Iniciar sesión</button>
 
                 <button id="headerLogoutBtn" class="btn-outline" style="display: none;">Cerrar sesión</button>
             </div>
@@ -368,7 +367,6 @@
 
     // Elementos DOM
     const menuContainer = document.getElementById('menuGridContainer');
-    const headerLoginBtn = document.getElementById('headerLoginBtn');
     const headerLogoutBtn = document.getElementById('headerLogoutBtn');
     const welcomeSpan = document.getElementById('welcomeUserSpan');
     const connTextSpan = document.getElementById('connText');
@@ -591,7 +589,6 @@
     }
     
     // Eventos de UI
-    headerLoginBtn.addEventListener('click', showLoginModal);
     headerLogoutBtn.addEventListener('click', cerrarSesionExplicito);
     modalLoginBtn.addEventListener('click', performLogin);
     modalCancelBtn.addEventListener('click', closeModal);
