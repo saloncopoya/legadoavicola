@@ -406,13 +406,11 @@
     function updateSessionUI() {
         const hasValidSession = (currentUser !== null && isOnline);
         if (hasValidSession) {
-            headerLoginBtn.style.display = 'none';
             headerLogoutBtn.style.display = 'inline-flex';
             const nombre = getUserDisplayName();
             welcomeSpan.style.display = 'inline';
             welcomeSpan.innerText = `👤 ${nombre}`;
         } else {
-            headerLoginBtn.style.display = 'inline-flex';
             headerLogoutBtn.style.display = 'none';
             welcomeSpan.style.display = 'none';
         }
