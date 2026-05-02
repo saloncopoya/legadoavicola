@@ -9669,24 +9669,15 @@ if (typeof window.renderMobileNavBar !== 'function') {
 // Pero primero esperamos a que Firebase esté listo y AppState tenga el usuario.
 // Como ya inicializamos Firebase arriba, simplemente llamamos al render después de un pequeño delay.
 // Finalmente, para que la app se muestre automáticamente, esperamos al usuario
-const waitForUser = () => {
-    return new Promise((resolve) => {
-        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-            unsubscribe();
-            resolve(user);
-        });
-    });
-};
-
-waitForUser().then(async (user) => {
-    console.log("Usuario autenticado:", user?.uid || "No hay usuario");
+// INICIAR PANEL DIRECTAMENTE
+(async function() {
+    console.log("🟢 INICIANDO PANEL...");
     const root = document.getElementById('app-root');
     if (root && window.renderAdminScreen) {
-        // Ahora esperamos a que termine la verificación antes de mostrar el panel
         const panelHTML = await window.renderAdminScreen();
         root.innerHTML = panelHTML;
     }
-});
+})();
 
     </script>
 </body>
