@@ -31,31 +31,13 @@ self.addEventListener('install', event => {
                 
                 console.log('🚀 Forzando caché de páginas importantes:', paginasForzadas);
 
+                
                 for (const pagina of paginasForzadas) {
     try {
-        // Hacer fetch DIRECTAMENTE a la URL completa para evitar redirecciones
-        const urlCompleta = new URL(pagina, self.location.origin).href;
-        console.log(`🌐 Fetching: ${urlCompleta}`);
-        
-        const response = await fetch(urlCompleta, {
-            redirect: 'follow',  // ← CLAVE: Seguir redirecciones automáticamente
-            cache: 'no-cache'    // ← Evitar caché intermedia
-        });
-        
+        // Hacer fetch directamente a la página
+        const response = await fetch(pagina);
         if (response && response.ok) {
-            // Obtener la URL final después de las redirecciones
-            const urlFinal = response.url;
-            console.log(`✅ Respuesta OK desde: ${urlFinal}`);
-            
-            // Guardar en caché con la URL original (para que el usuario la encuentre)
-            await cache.put(pagina, response.clone());
-            
-            // También guardar con la URL final por si acaso
-            if (urlFinal !== pagina) {
-                await cache.put(urlFinal, response);
-                console.log(`✅ También cacheado como: ${urlFinal}`);
-            }
-            
+            await cache.put(pagina, response);
             console.log(`✅ Página forzada en caché: ${pagina}`);
         } else {
             console.warn(`⚠️ No se pudo obtener: ${pagina} (status: ${response?.status})`);
@@ -64,7 +46,6 @@ self.addEventListener('install', event => {
         console.error(`❌ Error cacheando ${pagina}:`, error);
     }
 }
-                
                 
                 // 3. Verificar que realmente están en caché
                 const onlineEnCache = await cache.match('/online.html');
