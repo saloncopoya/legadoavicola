@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -160,7 +159,7 @@
         // desde "window.renderAdminScreen = function() {" hasta el final "}; //]]>"
         // Lo he extraído y pegado íntegramente a continuación.
         
-window.renderAdminScreen = function() {
+        window.renderAdminScreen = function() {
     console.log("🚀 INICIANDO PANEL ADMIN - VERSIÓN COMPLETA");
     
     // ========================================================================
@@ -194,8 +193,96 @@ window.renderAdminScreen = function() {
         console.error("Error obteniendo usuario:", e);
     }
 
+    // 1.1 Verificación de identidad - SIN CACHE, SIN LOCALSTORAGE
     
+    // 1.1 Verificación de identidad - CON RECARGA DE PERFIL
+    
+    // Si el perfil no está cargado, intentar recargarlo de Firebase
+    if (!userProfile && currentUser) {
+        console.log("⏳ Perfil no cargado, consultando Firebase...");
+        
+        // Consulta SÍNCRONA usando .then() (no async/await)
+        firebase.database().ref(`users/${currentUser.uid}`).once('value')
+            .then((snapshot) => {
+                const profile = snapshot.val() || {};
+                if (window.AppState && AppState.user) {
+                    AppState.user.profile = profile;
+                }
+                userProfile = profile;
+                
+                // Volver a ejecutar la verificación después de cargar
+                if (userProfile && userProfile.gallo === true) {
+                    console.log("✅ Perfil recargado, acceso concedido");
+                    // Continuar con la ejecución normal
+                    initAdmin();
+                    actualizarPantalla();
+                } else {
+                    console.warn("🚫 ACCESO DENEGADO después de recargar");
+                    mostrarAccesoDenegado();
+                }
+            })
+            .catch((error) => {
+                console.error("Error cargando perfil:", error);
+                mostrarAccesoDenegado();
+            });
+        
+        // Mostrar loading mientras se carga el perfil
+        return `<div style="min-height:100vh; background:#f8f9fa; display:flex; align-items:center; justify-content:center;">
+            <div style="text-align:center; background:white; padding:30px; border-radius:16px; max-width:400px;">
+                <div style="font-size:40px; margin-bottom:20px;">⏳</div>
+                <h3 style="margin:0 0 10px;">Cargando perfil...</h3>
+                <p style="color:#666; margin:0;">Verificando permisos de administrador</p>
+            </div>
+        </div>`;
+    }
+    
+    // Verificación normal (si el perfil ya estaba cargado)
+    if (!currentUser || !userProfile || userProfile.gallo !== true) {
+        console.warn("🚫 ACCESO DENEGADO - No tienes permiso 'gallo'");
+        console.log("CurrentUser:", currentUser?.uid);
+        console.log("userProfile:", userProfile);
+        console.log("Permiso gallo:", userProfile?.gallo);
+        
+        if (window.AppState && AppState.addNotification) {
+            AppState.addNotification('⛔ ACCESO DENEGADO - No eres administrador', 'error', 4000);
+        }
+        
+        setTimeout(() => {
+            window.location.href = '/?section=public';
+        }, 2000);
+        
+        return `<div style="min-height:100vh; background:#f8f9fa; display:flex; align-items:center; justify-content:center;">
+            <div style="text-align:center; background:white; padding:30px; border-radius:16px; max-width:400px;">
+                <div style="font-size:60px; margin-bottom:20px;">⛔</div>
+                <h3 style="color:#d32f2f; margin:0 0 10px;">Acceso Denegado</h3>
+                <p style="color:#666; margin:0 0 20px;">No tienes permisos de administrador</p>
+                <p style="color:#999; font-size:12px;">Redirigiendo...</p>
+            </div>
+        </div>`;
+    }
 
+                // Función auxiliar para mostrar acceso denegado
+    function mostrarAccesoDenegado() {
+        if (window.AppState && AppState.addNotification) {
+            AppState.addNotification('⛔ ACCESO DENEGADO - No eres administrador', 'error', 4000);
+        }
+        
+        setTimeout(() => {
+            window.location.href = '/?section=public';
+        }, 2000);
+        
+        const container = document.getElementById('admin-main-container');
+        if (container) {
+            container.innerHTML = `<div style="min-height:100vh; background:#f8f9fa; display:flex; align-items:center; justify-content:center;">
+                <div style="text-align:center; background:white; padding:30px; border-radius:16px; max-width:400px;">
+                    <div style="font-size:60px; margin-bottom:20px;">⛔</div>
+                    <h3 style="color:#d32f2f; margin:0 0 10px;">Acceso Denegado</h3>
+                    <p style="color:#666; margin:0 0 20px;">No tienes permisos de administrador</p>
+                    <p style="color:#999; font-size:12px;">Redirigiendo...</p>
+                </div>
+            </div>`;
+        }
+    }
 
     // 1.3 Toma el ID del usuario para todas las operaciones
     uid = currentUser.uid;
