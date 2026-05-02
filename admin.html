@@ -221,10 +221,9 @@
     // 1.1 Verificación de identidad - CON RECARGA DE PERFIL
     
     // Si el perfil no está cargado, intentar recargarlo de Firebase
-    if (!userProfile && currentUser) {
+       if (!userProfile && currentUser) {
         console.log("⏳ Perfil no cargado, consultando Firebase...");
         
-        // Consulta SÍNCRONA usando .then() (no async/await)
         firebase.database().ref(`users/${currentUser.uid}`).once('value')
             .then((snapshot) => {
                 const profile = snapshot.val() || {};
@@ -233,12 +232,9 @@
                 }
                 userProfile = profile;
                 
-                // Volver a ejecutar la verificación después de cargar
                 if (userProfile && userProfile.gallo === true) {
                     console.log("✅ Perfil recargado, acceso concedido");
-                    // Continuar con la ejecución normal
-                    initAdmin();
-                    actualizarPantalla();
+                    location.reload();  // Recarga la página y ahora sí tendrá el perfil
                 } else {
                     console.warn("🚫 ACCESO DENEGADO después de recargar");
                     mostrarAccesoDenegado();
@@ -248,6 +244,8 @@
                 console.error("Error cargando perfil:", error);
                 mostrarAccesoDenegado();
             });
+        
+
         
         // Mostrar loading mientras se carga el perfil
         return `<div style="min-height:100vh; background:#f8f9fa; display:flex; align-items:center; justify-content:center;">
