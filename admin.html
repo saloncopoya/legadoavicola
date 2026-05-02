@@ -270,7 +270,7 @@ try {
     
     // Leer también el permiso cotejo para usarlo después
     // Verificar permiso cotejo sin await
-    let tieneCotejo = false;
+    tieneCotejo = false;
     if (AppState.user.profile && AppState.user.profile.cotejo === true) {
         tieneCotejo = true;
     }
