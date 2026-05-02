@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cotejo-offline-v4.0.7.0';
+const CACHE_NAME = 'cotejo-offline-v4.0.6.7';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -11,27 +11,20 @@ const urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
-// Instalar Service Worker - CORREGIDO: cachea uno por uno sin fallar
+// Instalar Service Worker
 self.addEventListener('install', event => {
     console.log('⚡ Service Worker instalando...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then(async (cache) => {
-            console.log('📦 Comenzando a cachear archivos...');
-            for (const url of urlsToCache) {
-                try {
-                    await cache.add(url);
-                    console.log(`✅ Cacheado: ${url}`);
-                } catch (error) {
-                    console.warn(`⚠️ No se pudo cachear (continuará igual): ${url}`, error);
-                }
-            }
-            console.log('📦 Proceso de cache completado');
-        })
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('📦 Archivos cacheados:', urlsToCache);
+                return cache.addAll(urlsToCache);
+            })
     );
     self.skipWaiting();
 });
 
-// Activar Service Worker - IGUAL que tu código original
+// Activar Service Worker
 self.addEventListener('activate', event => {
     console.log('✅ Service Worker activado');
     event.waitUntil(
@@ -49,48 +42,43 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Interceptar peticiones - MEJORADO para detectar navegación
+// Interceptar peticiones (SOLO AGREGUE UNA LÍNEA PARA .html)
 self.addEventListener('fetch', event => {
-    const request = event.request;
+    const url = event.request.url;
     
-    // Para peticiones de navegación (páginas HTML)
-    if (request.mode === 'navigate') {
+    // 🔥 SOLO AGREGUE ESTO: también cachear URLs que terminan en .html
+    if (url.includes('.html') || event.request.mode === 'navigate') {
         event.respondWith(
-            caches.match(request).then(cachedResponse => {
-                if (cachedResponse) {
-                    console.log(`📄 Servido desde cache: ${request.url}`);
-                    return cachedResponse;
-                }
-                return fetch(request).catch(async () => {
-                    console.log(`📄 Fallback a offline.html para: ${request.url}`);
-                    const offlinePage = await caches.match('/offline.html');
-                    return offlinePage || new Response('Página no disponible offline', {
-                        status: 503,
-                        statusText: 'Offline'
+            caches.match(event.request)
+                .then(response => {
+                    if (response) {
+                        return response;
+                    }
+                    return fetch(event.request).catch(() => {
+                        return caches.match('/offline.html');
                     });
-                });
-            })
+                })
         );
         return;
     }
     
-    // Para recursos estáticos (JS, CSS, imágenes, etc.)
+    // TU CÓDIGO ORIGINAL (NO TOQUÉ NADA)
     event.respondWith(
-        caches.match(request).then(cachedResponse => {
-            if (cachedResponse) {
-                return cachedResponse;
-            }
-            return fetch(request).catch(() => {
-                // Para recursos externos, devolver respuesta vacía silenciosa
-                if (request.url.includes('cdnjs') || request.url.includes('firebase')) {
-                    return new Response('', { status: 200 });
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    return response;
                 }
-                return new Response('Recurso no disponible offline', {
-                    status: 503,
-                    statusText: 'Offline',
-                    headers: new Headers({ 'Content-Type': 'text/plain' })
+                return fetch(event.request).catch(() => {
+                    if (event.request.mode === 'navigate') {
+                        return caches.match('/offline.html');
+                    }
+                    return new Response('Contenido no disponible offline', {
+                        status: 503,
+                        statusText: 'Offline',
+                        headers: new Headers({ 'Content-Type': 'text/plain' })
+                    });
                 });
-            });
-        })
+            })
     );
 });
