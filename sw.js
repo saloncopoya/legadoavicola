@@ -1,13 +1,12 @@
-const CACHE_NAME = 'cotejo-offline-v1.0.0.0';
+const CACHE_NAME = 'cotejo-offline-v1.0.0.1';
 const urlsToCache = [
     '/',
     '/index.html',
     '/offline.html',
+     '/online.html',
+     '/importar.html',
     '/manifest.json',
-    '/online.html',
-    '/importar.html',
-    '/sw.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+     'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
@@ -42,27 +41,8 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Interceptar peticiones (SOLO AGREGUE UNA LÍNEA PARA .html)
+// Interceptar peticiones
 self.addEventListener('fetch', event => {
-    const url = event.request.url;
-    
-    // 🔥 SOLO AGREGUE ESTO: también cachear URLs que terminan en .html
-    if (url.includes('.html') || event.request.mode === 'navigate') {
-        event.respondWith(
-            caches.match(event.request)
-                .then(response => {
-                    if (response) {
-                        return response;
-                    }
-                    return fetch(event.request).catch(() => {
-                        return caches.match('/offline.html');
-                    });
-                })
-        );
-        return;
-    }
-    
-    // TU CÓDIGO ORIGINAL (NO TOQUÉ NADA)
     event.respondWith(
         caches.match(event.request)
             .then(response => {
