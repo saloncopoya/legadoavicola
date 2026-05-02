@@ -159,13 +159,29 @@
         // desde "window.renderAdminScreen = function() {" hasta el final "}; //]]>"
         // Lo he extraído y pegado íntegramente a continuación.
         
-        window.renderAdminScreen = function() {
+        window.renderAdminScreen = async function() {
     console.log("🚀 INICIANDO PANEL ADMIN - VERSIÓN COMPLETA");
-    
+
+             // ===== NUEVO: Asegurar que el usuario está cargado =====
+    let currentUser = firebase.auth().currentUser;
+    if (!currentUser) {
+        // Esperar activamente a que el usuario cargue
+        console.log("⏳ Esperando a que el usuario cargue...");
+        await new Promise((resolve) => {
+            const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    unsubscribe();
+                    resolve();
+                }
+            });
+        });
+        console.log("✅ Usuario cargado:", currentUser?.uid);
+    }
+            
     // ========================================================================
     // CAPÍTULO 1: VERIFICACIÓN DE IDENTIDAD (DESDE FIREBASE PRINCIPAL - SIN CACHE)
     // ========================================================================
-    let currentUser = null;
     let userProfile = null;
     let uid = null;
 
@@ -194,7 +210,38 @@
     }
 
    
-      
+      if (currentUser && uid) {
+    try {
+        // Obtener una referencia a la base de datos PRINCIPAL (no a la de admin)
+        // Usamos la app principal ya inicializada: mainApp
+        const mainDatabase = mainApp.database();
+        
+        // Consultar el valor de 'gallo' para este usuario en tiempo real
+        const galloSnapshot = await mainDatabase.ref(`users/${uid}/gallo`).once('value');
+        const tienePermisoGallo = galloSnapshot.val() === true;
+
+        if (!tienePermisoGallo) {
+            console.warn("⛔ Usuario sin permiso 'gallo: true'. Redirigiendo a la raíz...");
+            // Redirigir a la raíz del sitio
+            window.location.href = '/';
+            return; // Detener la ejecución de la función para que no siga cargando el panel
+        } else {
+            console.log("✅ Permiso 'gallo' verificado correctamente.");
+        }
+    } catch (error) {
+        console.error("❌ Error al verificar el permiso 'gallo':", error);
+        // En caso de error, por seguridad, podrías redirigir o mostrar un mensaje.
+        // Por ahora, detenemos la ejecución.
+        AppState.addNotification('Error de seguridad. No se pudo verificar tu acceso.', 'error');
+        window.location.href = '/';
+        return;
+    }
+} else {
+    // Si no hay usuario, redirigir a la raíz también
+    console.warn("No se pudo obtener el usuario. Redirigiendo...");
+    window.location.href = '/';
+    return;
+}
 
     // 1.3 Toma el ID del usuario para todas las operaciones
     uid = currentUser.uid;
@@ -9627,11 +9674,13 @@ const waitForUser = () => {
     });
 };
 
-waitForUser().then((user) => {
+waitForUser().then(async (user) => {
     console.log("Usuario autenticado:", user?.uid || "No hay usuario");
     const root = document.getElementById('app-root');
     if (root && window.renderAdminScreen) {
-        root.innerHTML = window.renderAdminScreen();
+        // Ahora esperamos a que termine la verificación antes de mostrar el panel
+        const panelHTML = await window.renderAdminScreen();
+        root.innerHTML = panelHTML;
     }
 });
 
