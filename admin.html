@@ -217,7 +217,7 @@ try {
             AppState.addNotification('⛔ Debes iniciar sesión', 'error', 3000);
         }
         setTimeout(() => {
-            window.location.href = '/?section=public';
+            window.location.href = '/';
         }, 2000);
         return `<div style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
             <div style="text-align:center; background:white; padding:30px; border-radius:16px;">
@@ -230,7 +230,11 @@ try {
     
     // 3. 🔥 NUEVO: Leer permiso "gallo" DIRECTAMENTE de Firebase (SIN CACHE)
     const database = firebase.database();
-    const galloSnapshot = await database.ref(`users/${uid}/gallo`).once('value');
+    // Verificar permiso gallo sin await
+    let tienePermisoAdmin = false;
+    if (AppState.user.profile && AppState.user.profile.gallo === true) {
+        tienePermisoAdmin = true;
+    }
     const tienePermisoAdmin = galloSnapshot.val() === true;
     
     console.log(`🔍 Permiso 'gallo' en tiempo real: ${tienePermisoAdmin}`);
@@ -247,7 +251,7 @@ try {
             if (window.navigateTo) {
                 window.navigateTo('public');
             } else {
-                window.location.href = '/?section=public';
+                window.location.href = '/';
             }
         }, 2000);
         
@@ -265,7 +269,11 @@ try {
     console.log("✅ PERMISO VERIFICADO - Cargando panel admin...");
     
     // Leer también el permiso cotejo para usarlo después
-    const cotejoSnapshot = await database.ref(`users/${uid}/cotejo`).once('value');
+    // Verificar permiso cotejo sin await
+    let tieneCotejo = false;
+    if (AppState.user.profile && AppState.user.profile.cotejo === true) {
+        tieneCotejo = true;
+    }
     const tieneCotejo = cotejoSnapshot.val() === true;
     
     // Actualizar AppState con los valores REALES de Firebase
@@ -285,7 +293,7 @@ try {
         AppState.addNotification('❌ Error de conexión', 'error', 3000);
     }
     setTimeout(() => {
-        window.location.href = '/?section=public';
+        window.location.href = '/';
     }, 2000);
     return `<div style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
         <div style="text-align:center; background:white; padding:30px; border-radius:16px;">
