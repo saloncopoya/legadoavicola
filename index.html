@@ -2,635 +2,666 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Legado Avícola | Menú Profesional</title>
-    <meta name="theme-color" content="#8B4513">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Legado Avícola | Panel de Control Profesional</title>
+    <meta name="theme-color" content="#0F172A">
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Legado Avícola">
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/8B4513/white?text=🐓">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
+    
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            background: radial-gradient(circle at 10% 30%, #0a0c10, #0b0f15);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            background: #F1F5F9;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            line-height: 1.5;
+            color: #0F172A;
         }
 
-        /* DASHBOARD PRINCIPAL – TARJETA DE LUJO */
-        .glass-dashboard {
-            max-width: 1300px;
-            width: 100%;
-            background: rgba(18, 22, 30, 0.65);
-            backdrop-filter: blur(14px);
-            border-radius: 3.5rem;
-            padding: 2rem 2rem 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,215,0,0.25);
-            transition: all 0.3s ease;
+        /* Layout principal */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem 2rem 3rem;
         }
 
-        /* HEADER CON ESTADO Y USUARIO */
-        .menu-header {
+        /* Header profesional */
+        .dashboard-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 2.5rem;
-            border-bottom: 2px solid rgba(255,215,0,0.4);
-            padding-bottom: 1rem;
-        }
-        .logo-area h1 {
-            font-size: 1.9rem;
-            background: linear-gradient(135deg, #FFE6B0, #FFD966);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-            font-weight: 800;
-        }
-        .logo-area p {
-            color: #a0a8b9;
-            font-size: 0.8rem;
-        }
-        .user-status {
-            background: rgba(0,0,0,0.5);
-            padding: 0.5rem 1.2rem;
-            border-radius: 60px;
-            backdrop-filter: blur(4px);
-            display: flex;
             align-items: center;
-            gap: 1rem;
-        }
-        .user-name {
-            color: #FFDF85;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        .online-badge, .offline-badge {
-            font-size: 0.7rem;
-            background: #2ecc71;
-            padding: 0.2rem 0.6rem;
-            border-radius: 50px;
-            color: #000;
-            font-weight: bold;
-        }
-        .offline-badge {
-            background: #e67e22;
-            color: white;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #E2E8F0;
         }
 
-        /* GRID DE BOTONES – ESTILO MENÚ AVANZADO */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.8rem;
-            margin: 2rem 0 1rem;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        .menu-card {
-            background: radial-gradient(ellipse at top left, rgba(30,35,48,0.9), rgba(15,18,25,0.95));
-            backdrop-filter: blur(8px);
-            border-radius: 2rem;
-            padding: 1.6rem 1rem;
-            text-align: center;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            border: 1px solid rgba(255,215,0,0.25);
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+
+        .brand-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: #8B5CF6;
+            stroke-width: 1.5;
         }
-        .menu-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: #FFD966;
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,217,102,0.3);
-        }
-        .menu-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            filter: drop-shadow(0 4px 6px #00000055);
-        }
-        .menu-card h3 {
-            font-size: 1.6rem;
+
+        .brand-text h1 {
+            font-size: 1.75rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #F9E79F, #F7DC6F);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1E293B, #334155);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
         }
-        .menu-card p {
-            color: #bfc9dd;
-            font-size: 0.75rem;
-            margin-top: 0.4rem;
+
+        .brand-text span {
+            font-size: 0.85rem;
+            color: #64748B;
             font-weight: 500;
         }
-        .logout-section {
+
+        /* Estado de conexión y usuario */
+        .status-panel {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px dashed rgba(255,215,0,0.3);
+            gap: 1.2rem;
+            background: #FFFFFF;
+            padding: 0.6rem 1.2rem;
+            border-radius: 100px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #E2E8F0;
         }
-        .btn-outline-gold {
-            background: transparent;
-            border: 1.5px solid #F7DC6F;
-            color: #F7DC6F;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
+
+        .connection-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-outline-gold:hover {
-            background: #F7DC6F;
-            color: #0a0c10;
-        }
-        .btn-gold {
-            background: linear-gradient(95deg, #F9E79F, #F7DC6F);
-            border: none;
-            padding: 0.5rem 1.4rem;
+            padding: 0.25rem 0.75rem;
             border-radius: 40px;
-            font-weight: 800;
-            color: #1e1f2c;
+            background: #F8FAFC;
+        }
+
+        .connection-badge.online {
+            color: #059669;
+        }
+        .connection-badge.online svg {
+            stroke: #059669;
+        }
+        .connection-badge.offline {
+            color: #DC2626;
+        }
+        .connection-badge.offline svg {
+            stroke: #DC2626;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1E293B;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #CBD5E1;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #334155;
+        }
+        .btn-outline:hover {
+            background: #F1F5F9;
+            border-color: #94A3B8;
+        }
+        .btn-primary-solid {
+            background: #1E293B;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
-        .install-btn {
-            background: #2c3e50;
-            color: #FFD966;
-            border: none;
+        .btn-primary-solid:hover {
+            background: #0F172A;
         }
-        /* modal elegante */
-        .modal-luxury {
+
+        /* Grid de menú profesional (sin animaciones innecesarias) */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0 2rem;
+        }
+
+        .menu-card {
+            background: #FFFFFF;
+            border-radius: 1.25rem;
+            border: 1px solid #E2E8F0;
+            padding: 1.5rem;
+            transition: box-shadow 0.15s ease;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .menu-card:hover {
+            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.12);
+            border-color: #CBD5E1;
+        }
+
+        .menu-icon-svg {
+            margin-bottom: 1rem;
+        }
+        .menu-icon-svg svg {
+            width: 44px;
+            height: 44px;
+            stroke: #4F46E5;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .menu-card h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #0F172A;
+            margin-bottom: 0.5rem;
+        }
+        .menu-card p {
+            font-size: 0.85rem;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        /* Footer técnico */
+        .tech-footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #64748B;
+        }
+
+        .badge-manifest {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Modal profesional */
+        .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(12px);
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
             visibility: hidden;
             opacity: 0;
-            transition: all 0.2s ease;
+            transition: opacity 0.2s;
         }
-        .modal-luxury.active {
+        .modal-overlay.active {
             visibility: visible;
             opacity: 1;
         }
         .modal-card {
-            background: #12161f;
+            background: #FFFFFF;
             border-radius: 2rem;
-            max-width: 420px;
             width: 90%;
+            max-width: 440px;
             padding: 2rem;
-            border: 1px solid #FFD966;
-            box-shadow: 0 30px 40px rgba(0,0,0,0.5);
-            transform: scale(0.95);
-            transition: transform 0.2s;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.25);
         }
-        .modal-luxury.active .modal-card {
-            transform: scale(1);
+        .modal-card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #0F172A;
         }
         .modal-card input {
             width: 100%;
-            padding: 0.9rem;
-            margin: 0.8rem 0;
-            background: #1e2432;
-            border: 1px solid #3a4050;
+            padding: 0.9rem 1rem;
+            margin: 0.75rem 0;
+            border: 1px solid #CBD5E1;
             border-radius: 1rem;
-            color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            background: #FFFFFF;
         }
-        .modal-card button {
-            width: 100%;
-            margin-top: 0.8rem;
+        .modal-card input:focus {
+            outline: none;
+            border-color: #4F46E5;
         }
-        .flex-btns {
+        .modal-buttons {
             display: flex;
-            gap: 12px;
+            gap: 0.75rem;
             margin-top: 1rem;
         }
-        .text-gold {
-            color: #FFD966;
-            text-align: center;
-            margin-bottom: 1rem;
+        .modal-buttons button {
+            flex: 1;
         }
-        @media (max-width: 640px) {
-            body { padding: 1rem; }
-            .glass-dashboard { padding: 1.5rem; }
-            .menu-card h3 { font-size: 1.3rem; }
-            .menu-icon { font-size: 2.5rem; }
-        }
-        .footer-manifest {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 0.7rem;
-            color: #5e677b;
-        }
-        .status-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
+
+        @media (max-width: 680px) {
+            .app-container {
+                padding: 1rem;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="glass-dashboard">
-    <div class="menu-header">
-        <div class="logo-area">
-            <h1>⚡ LEGADO AVÍCOLA</h1>
-            <p>menú profesional · torneo inteligente</p>
+<div class="app-container">
+    <!-- Header profesional -->
+    <div class="dashboard-header">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 12V22" stroke="currentColor"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1>Legado Avícola</h1>
+                <span>Gestión de torneos · Cotejos profesionales</span>
+            </div>
         </div>
-        <div class="user-status" id="userStatusWidget">
-            <div class="status-row">
-                <span id="connectionLed" class="online-badge">🌐 ONLINE</span>
-                <span id="userNameDisplay" class="user-name" style="display: none;">Invitado</span>
-                <button id="quickLoginBtn" class="btn-outline-gold" style="padding: 0.3rem 1rem;">🔐 Ingresar</button>
-                <button id="quickLogoutBtn" class="btn-outline-gold" style="display: none; padding: 0.3rem 1rem;">🚪 Salir</button>
+        <div class="status-panel">
+            <div id="connStatus" class="connection-badge online">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v8M8 12h8"/>
+                </svg>
+                <span id="connText">Conectado</span>
+            </div>
+            <div id="userSessionArea" class="user-info">
+                <span id="welcomeUserSpan" style="display: none;"></span>
+                <button id="headerLoginBtn" class="btn-outline">Iniciar sesión</button>
+                <button id="headerLogoutBtn" class="btn-outline" style="display: none;">Cerrar sesión</button>
             </div>
         </div>
     </div>
 
-    <!-- RED DE BOTONES PRINCIPAL (solo botones: importar, crear cotejo online, offline, ver tablas, login/logout) -->
-    <div class="menu-grid" id="menuDynamicButtons">
-        <!-- Botones se generarán dinámicamente según condiciones -->
+    <!-- Grid de acciones dinámicas (solo botones funcionales basados en condiciones) -->
+    <div id="menuGridContainer" class="menu-grid">
+        <!-- Los botones se inyectarán aquí con JS según conectividad y sesión -->
     </div>
 
-    <div class="logout-section" id="extraSessionPanel" style="justify-content: space-between;">
-        <button id="installPwaBtn" class="btn-outline-gold install-btn" style="display: none;">📲 INSTALAR APP</button>
-        <div></div>
-        <span id="versionInfo" style="color:#6f7a8c; font-size:12px;">⚙️ manifest | sw activo</span>
-    </div>
-    <div class="footer-manifest">
-        🐓 PWA lista para usar offline · Datos sincronizados
+    <!-- Footer técnico (manifest, sw, offline) -->
+    <div class="tech-footer">
+        <div class="badge-manifest">
+            <span>📄 manifest.json</span>
+            <span>⚙️ Service Worker activo</span>
+            <span id="offlineIndicator" style="display: none;">📴 Modo offline</span>
+        </div>
+        <div>
+            <button id="installPwaBtnTech" class="btn-outline" style="font-size:0.7rem; padding:0.3rem 0.8rem;">📲 Instalar aplicación</button>
+        </div>
     </div>
 </div>
 
-<!-- MODAL DE INICIO DE SESIÓN (lujoso) -->
-<div id="loginModalGlobal" class="modal-luxury">
+<!-- MODAL DE INICIO DE SESIÓN (estilo profesional) -->
+<div id="globalLoginModal" class="modal-overlay">
     <div class="modal-card">
-        <h3 class="text-gold">🔐 ACCESO AUTORIZADO</h3>
-        <input type="email" id="modalEmail" placeholder="correo@ejemplo.com" autocomplete="email">
-        <input type="password" id="modalPassword" placeholder="contraseña" autocomplete="current-password">
-        <button id="modalLoginBtn" class="btn-gold" style="width:100%">INICIAR SESIÓN</button>
-        <div class="flex-btns">
-            <button id="modalCancelBtn" class="btn-outline-gold" style="flex:1">CANCELAR</button>
+        <h2>Acceso restringido</h2>
+        <p style="color:#475569; margin-bottom:1rem;">Ingrese sus credenciales autorizadas</p>
+        <input type="email" id="loginEmail" placeholder="usuario@dominio.com" autocomplete="email">
+        <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+        <div class="modal-buttons">
+            <button id="modalLoginConfirm" class="btn-primary-solid" style="background:#1E293B;">Ingresar</button>
+            <button id="modalLoginCancel" class="btn-outline">Cancelar</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --------------------------------------------- CONFIGURACIÓN FIREBASE (misma proporcionada)
+    // ---------- CONFIGURACIÓN FIREBASE (misma autenticación) ----------
     const FIREBASE_CONFIG = {
         apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
         authDomain: "galloslivebadge.firebaseapp.com",
-        databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
         projectId: "galloslivebadge",
+        storageBucket: "galloslivebadge.firebasestorage.app",
         messagingSenderId: "979482928760",
         appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
     };
     if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     const auth = firebase.auth();
 
-    // Variables globales de estado
-    let currentUser = null;         // null = sin sesión
+    // ---------- ESTADO GLOBAL ----------
+    let currentUser = null;          // usuario autenticado (solo con internet)
     let isOnline = navigator.onLine;
-    let deferredPrompt = null;      // PWA install
+    let deferredPrompt = null;
 
     // Elementos DOM
-    const menuContainer = document.getElementById('menuDynamicButtons');
-    const quickLoginBtn = document.getElementById('quickLoginBtn');
-    const quickLogoutBtn = document.getElementById('quickLogoutBtn');
-    const userNameSpan = document.getElementById('userNameDisplay');
-    const connectionLed = document.getElementById('connectionLed');
-    const loginModal = document.getElementById('loginModalGlobal');
-    const modalLoginBtn = document.getElementById('modalLoginBtn');
-    const modalCancelBtn = document.getElementById('modalCancelBtn');
-    const modalEmail = document.getElementById('modalEmail');
-    const modalPassword = document.getElementById('modalPassword');
-    const installBtn = document.getElementById('installPwaBtn');
+    const menuContainer = document.getElementById('menuGridContainer');
+    const headerLoginBtn = document.getElementById('headerLoginBtn');
+    const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+    const welcomeSpan = document.getElementById('welcomeUserSpan');
+    const connTextSpan = document.getElementById('connText');
+    const connStatusDiv = document.getElementById('connStatus');
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    const modalOverlay = document.getElementById('globalLoginModal');
+    const modalLoginBtn = document.getElementById('modalLoginConfirm');
+    const modalCancelBtn = document.getElementById('modalLoginCancel');
+    const emailInput = document.getElementById('loginEmail');
+    const passInput = document.getElementById('loginPassword');
+    const installPwaFooterBtn = document.getElementById('installPwaBtnTech');
 
-    // -------------------- Helper UI --------------------
+    // ---------- HELPER UI ----------
     function updateConnectionUI() {
         isOnline = navigator.onLine;
         if (isOnline) {
-            connectionLed.innerHTML = '✅ ONLINE';
-            connectionLed.className = 'online-badge';
+            connTextSpan.innerText = 'Conectado';
+            connStatusDiv.className = 'connection-badge online';
+            offlineIndicator.style.display = 'none';
         } else {
-            connectionLed.innerHTML = '📴 OFFLINE';
-            connectionLed.className = 'offline-badge';
+            connTextSpan.innerText = 'Sin conexión';
+            connStatusDiv.className = 'connection-badge offline';
+            offlineIndicator.style.display = 'inline';
         }
-        renderMenuButtons();    // afecta visibilidad de botones
+        // Refrescar menú completo porque cambian condiciones (internet + sesion)
+        renderMenu();
     }
 
-    function getDisplayName() {
+    function getUserDisplayName() {
         if (!currentUser) return null;
-        let name = currentUser.displayName;
-        if (!name || name === 'null') name = currentUser.email?.split('@')[0] || 'Usuario';
-        return name;
+        if (currentUser.displayName && currentUser.displayName.trim() !== '')
+            return currentUser.displayName;
+        const email = currentUser.email || '';
+        return email.split('@')[0] || 'Usuario';
     }
 
     function updateSessionUI() {
-        if (currentUser && isOnline) {
-            quickLoginBtn.style.display = 'none';
-            quickLogoutBtn.style.display = 'inline-flex';
-            const nombre = getDisplayName();
-            userNameSpan.style.display = 'inline-block';
-            userNameSpan.textContent = `👤 ${nombre}`;
+        const hasValidSession = (currentUser !== null && isOnline);
+        if (hasValidSession) {
+            headerLoginBtn.style.display = 'none';
+            headerLogoutBtn.style.display = 'inline-flex';
+            const nombre = getUserDisplayName();
+            welcomeSpan.style.display = 'inline';
+            welcomeSpan.innerText = `👤 ${nombre}`;
         } else {
-            quickLoginBtn.style.display = 'inline-flex';
-            quickLogoutBtn.style.display = 'none';
-            userNameSpan.style.display = 'none';
+            headerLoginBtn.style.display = 'inline-flex';
+            headerLogoutBtn.style.display = 'none';
+            welcomeSpan.style.display = 'none';
         }
-        renderMenuButtons(); // refrescar botones según sesión + conectividad
+        renderMenu(); // siempre actualizar el grid de botones en cada cambio de sesión/conexión
     }
 
-    // -------------------- Lógica principal de botones condicionales --------------------
-    // Necesitamos 5 tipos:
-    // 1. IR A IMPORTAR (/importar) → SIEMPRE (tenga o no internet, sin importar sesión). Pero si hay sesión iniciada NO debe aparecer.
-    // 2. CREAR COTEJO ONLINE (/admin) → solo cuando hay internet Y sesión iniciada.
-    // 3. COTEJO OFFLINE (/adminoffline) → solo cuando NO hay internet Y NO tiene sesión iniciada.
-    // 4. VER TABLAS ONLINE (/online) → solo cuando hay internet (sin importar sesión)
-    // 5. INICIAR SESION (modal) → aparece cuando hay internet Y sin sesion. Si hay sesion iniciada: mostrar botón CERRAR SESION + nombre usuario (ya está en zona superior, pero además quitamos el de iniciar y exponemos el cierre)
-
-    // Estructura de botones: se renderiza cada vez que cambia sesión o conectividad.
-    function renderMenuButtons() {
-        const hasInternet = isOnline;
-        const loggedIn = (currentUser !== null && hasInternet); // sesion iniciada solo relevante si hay internet (por coherencia, si offline no hay inicio real)
-        // Nota: "sesion iniciada" solo aplica cuando hay conexión a internet (firebase auth requiere internet). Dado que offline no hay sesión posible.
-
-        let buttons = [];
-
-        // 1. Botón IMPORTAR (/importar) → siempre visible pero condición extra: cuando no haya sesion iniciada (loggedIn === false)
-        if (!loggedIn) {
-            buttons.push({
-                id: 'btnImport',
-                label: '📂 IMPORTAR TORNEOS',
-                desc: 'Cargar JSON / torneos externos',
-                icon: '📂',
-                link: '/importar',
-                target: '_self'
-            });
-        }
-
-        // 2. CREAR COTEJO ONLINE (/admin) → internet Y sesion iniciada
-        if (hasInternet && loggedIn) {
-            buttons.push({
-                id: 'btnAdminOnline',
-                label: '🏆 CREAR COTEJO ONLINE',
-                desc: 'Organiza torneos en la nube',
-                icon: '🌐',
-                link: '/admin',
-                target: '_self'
-            });
-        }
-
-        // 3. COTEJO OFFLINE (/adminoffline) → sin internet Y sin sesion iniciada (loggedIn false y offline)
-        if (!hasInternet && !loggedIn) {
-            buttons.push({
-                id: 'btnAdminOffline',
-                label: '📴 COTEJO OFFLINE',
-                desc: 'Modo local sin conexión',
-                icon: '⚡',
-                link: '/adminoffline',
-                target: '_self'
-            });
-        }
-
-        // 4. VER TABLAS ONLINE (/online) → solo cuando hay internet, independientemente sesión
-        if (hasInternet) {
-            buttons.push({
-                id: 'btnOnlineTables',
-                label: '📊 VER TABLAS ONLINE',
-                desc: 'Rankings y resultados en vivo',
-                icon: '🏅',
-                link: '/online',
-                target: '_self'
-            });
-        }
-
-        // 5. INICIAR SESIÓN (modal) si hay internet Y no sesion. Adicionalmente, el botón de cerrar sesión ya está fuera pero lo integramos en zona de menú si se desea? pero el menu ya tiene botones condicionales.
-        // Según requerimiento: INICIAR SESIÓN muestre modal cuando internet y sin sesion. Y cuando sesion iniciada aparezca boton cerrar sesión y nombre. Ya tenemos en header logout, pero además para completar añadimos un botón de "Cerrar sesión" dentro del grid si está logueado.
-        if (hasInternet && !loggedIn) {
-            buttons.push({
-                id: 'btnLoginAction',
-                label: '🔑 INICIAR SESIÓN',
-                desc: 'Accede a tu cuenta',
-                icon: '👤',
-                action: 'login'
-            });
-        } else if (loggedIn) {
-            // Cuando hay sesión iniciamos mostramos además botón de cerrar sesión en el grid (además del de header)
-            buttons.push({
-                id: 'btnLogoutAction',
-                label: '🚪 CERRAR SESIÓN',
-                desc: `Hasta luego, ${getDisplayName() || ''}`,
-                icon: '🔒',
-                action: 'logout'
-            });
-        }
-
-        // Renderizado dinámico con efectos profesionales
+    // ---------- LÓGICA DE BOTONES SEGÚN REQUERIMIENTO (solo botones funcionales)----------
+    // Reglas:
+    // 1. Botón "Importar" (/importar) → aparece siempre, tenga o no internet, condición: NO tenga sesión iniciada.
+    // 2. Botón "Crear cotejo online" (/admin) → solo cuando hay internet Y sesión iniciada.
+    // 3. Botón "Cotejo offline" (/adminoffline) → solo cuando NO hay internet y NO tiene sesión iniciada.
+    // 4. Botón "Ver tablas online" (/online) → aparece solo cuando hay internet, sin importar sesión.
+    // 5. Botón "Iniciar sesión" (modal) cuando tenga internet y sin sesión; cuando sesión iniciada: botón "Cerrar sesión" + nombre del usuario.
+    //    Además de los botones de header, se agrega en el menú mismo el botón de cerrar sesión para mayor claridad.
+    
+    function renderMenu() {
         if (!menuContainer) return;
+        const online = isOnline;
+        const logged = (currentUser !== null && online); // sesión válida requiere internet
+        
+        let buttons = [];
+        
+        // 1. Importar (siempre que NO haya sesión iniciada)
+        if (!logged) {
+            buttons.push({
+                label: 'Importar torneos',
+                description: 'Subir archivos JSON y gestionar datos locales',
+                route: '/importar',
+                iconType: 'import'
+            });
+        }
+        
+        // 2. Crear cotejo online (Solo internet + sesión)
+        if (online && logged) {
+            buttons.push({
+                label: 'Crear cotejo online',
+                description: 'Organizar torneo en la nube, sincronización en tiempo real',
+                route: '/admin',
+                iconType: 'cloud'
+            });
+        }
+        
+        // 3. Cotejo offline (Solo offline y sin sesión)
+        if (!online && !logged) {
+            buttons.push({
+                label: 'Cotejo offline',
+                description: 'Modo completo sin conexión, datos locales',
+                route: '/adminoffline',
+                iconType: 'offline'
+            });
+        }
+        
+        // 4. Ver tablas online (Solo cuando hay internet)
+        if (online) {
+            buttons.push({
+                label: 'Ver tablas online',
+                description: 'Rankings, posiciones y estadísticas en vivo',
+                route: '/online',
+                iconType: 'tables'
+            });
+        }
+        
+        // 5. Botones de sesión en el menú (respetando línea original)
+        if (online && !logged) {
+            buttons.push({
+                label: 'Iniciar sesión',
+                description: 'Acceda a funciones avanzadas y sincronización',
+                action: 'login',
+                iconType: 'login'
+            });
+        } else if (logged) {
+            buttons.push({
+                label: 'Cerrar sesión',
+                description: `Finalizar sesión de ${getUserDisplayName() || 'usuario'}`,
+                action: 'logout',
+                iconType: 'logout'
+            });
+        }
+        
+        // Si no hay botones por algún escenario extraño mostrar guía.
         if (buttons.length === 0) {
-            menuContainer.innerHTML = `<div class="menu-card" style="grid-column:1/-1; text-align:center; background:#1e1b26;"><div class="menu-icon">⚙️</div><h3>Sin acciones disponibles</h3><p>Verifica tu conexión o estado de sesión</p></div>`;
+            menuContainer.innerHTML = `<div class="menu-card" style="grid-column:1/-1; text-align:center;"><h3>Sin acciones disponibles</h3><p>Verifique conectividad o permisos</p></div>`;
             return;
         }
-
+        
+        // Generar HTML (iconos SVG profesionales, sin emojis, limpios)
         let html = '';
-        for (let btn of buttons) {
-            if (btn.link) {
-                html += `
-                    <div class="menu-card" data-href="${btn.link}" data-target="${btn.target || '_self'}">
-                        <div class="menu-icon">${btn.icon}</div>
-                        <h3>${btn.label}</h3>
-                        <p>${btn.desc}</p>
-                    </div>
-                `;
-            } else if (btn.action === 'login') {
-                html += `
-                    <div class="menu-card" id="dynamicLoginCard">
-                        <div class="menu-icon">${btn.icon}</div>
-                        <h3>${btn.label}</h3>
-                        <p>${btn.desc}</p>
-                    </div>
-                `;
-            } else if (btn.action === 'logout') {
-                html += `
-                    <div class="menu-card" id="dynamicLogoutCard">
-                        <div class="menu-icon">${btn.icon}</div>
-                        <h3>${btn.label}</h3>
-                        <p>${btn.desc}</p>
-                    </div>
-                `;
-            }
+        for (const btn of buttons) {
+            const iconSvg = getIconSvg(btn.iconType);
+            html += `
+                <div class="menu-card" data-route="${btn.route || ''}" data-action="${btn.action || ''}">
+                    <div class="menu-icon-svg">${iconSvg}</div>
+                    <h3>${btn.label}</h3>
+                    <p>${btn.description}</p>
+                </div>
+            `;
         }
         menuContainer.innerHTML = html;
-
-        // Asignar eventos para redirección y modal
-        document.querySelectorAll('.menu-card[data-href]').forEach(card => {
+        
+        // Asignar eventos a cada card
+        document.querySelectorAll('.menu-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                const url = card.getAttribute('data-href');
-                if (url) window.location.href = url;
+                const route = card.getAttribute('data-route');
+                const action = card.getAttribute('data-action');
+                if (route && route !== '') {
+                    window.location.href = route;
+                } else if (action === 'login') {
+                    showLoginModal();
+                } else if (action === 'logout') {
+                    cerrarSesionExplicito();
+                }
             });
         });
-        const loginCard = document.getElementById('dynamicLoginCard');
-        if (loginCard) loginCard.addEventListener('click', () => showLoginModal());
-        const logoutCard = document.getElementById('dynamicLogoutCard');
-        if (logoutCard) logoutCard.addEventListener('click', () => cerrarSesion());
+    }
+    
+    // Iconos SVG vectoriales profesionales (diseño minimalista)
+    function getIconSvg(type) {
+        switch(type) {
+            case 'import':
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M12 3v12m-4-4 4 4 4-4"/></svg>`;
+            case 'cloud':
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M17.5 19H9a3.5 3.5 0 0 1 0-7h.5c.4-2.5 2.5-4.5 5-4.5s4.6 2 5 4.5h.5a3.5 3.5 0 0 1 0 7Z"/><path d="M12 12v4m-2-2 2 2 2-2"/></svg>`;
+            case 'offline':
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M18 10v4m-4-4v4m-4-4v4M6 10v4"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>`;
+            case 'tables':
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 6v12M16 6v12"/></svg>`;
+            case 'login':
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>`;
+            case 'logout':
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+            default:
+                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`;
+        }
     }
 
-    // ---------------- Firebase Auth + Modal ----------------
+    // ---------- MODAL Y AUTENTICACIÓN ----------
     function showLoginModal() {
         if (!isOnline) {
-            alert('⚠️ No hay conexión a internet. No es posible iniciar sesión.');
+            alert("No hay conexión a internet. No se puede iniciar sesión.");
             return;
         }
-        loginModal.classList.add('active');
-        modalEmail.value = '';
-        modalPassword.value = '';
+        modalOverlay.classList.add('active');
+        emailInput.value = '';
+        passInput.value = '';
     }
-
     function closeModal() {
-        loginModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
     }
-
-    async function iniciarSesionDesdeModal() {
-        const email = modalEmail.value.trim();
-        const pwd = modalPassword.value;
-        if (!email || !pwd) {
-            alert('Ingresa correo y contraseña');
+    async function performLogin() {
+        const email = emailInput.value.trim();
+        const password = passInput.value;
+        if (!email || !password) {
+            alert("Complete correo y contraseña");
             return;
         }
         try {
-            const cred = await auth.signInWithEmailAndPassword(email, pwd);
+            const cred = await auth.signInWithEmailAndPassword(email, password);
             currentUser = cred.user;
             closeModal();
-            // refrescar UI y menu
             updateSessionUI();
-            renderMenuButtons();
         } catch (err) {
-            alert('Error de autenticación: ' + err.message);
+            alert("Error de autenticación: " + err.message);
         }
     }
-
-    async function cerrarSesion() {
+    async function cerrarSesionExplicito() {
         if (currentUser) {
             await auth.signOut();
             currentUser = null;
             updateSessionUI();
-            renderMenuButtons();
-            alert('Sesión finalizada.');
         } else {
-            // si por alguna razón hay inconsistencia
             currentUser = null;
             updateSessionUI();
-            renderMenuButtons();
         }
     }
-
-    // Eventos modales
-    modalLoginBtn.addEventListener('click', iniciarSesionDesdeModal);
+    
+    // Eventos de UI
+    headerLoginBtn.addEventListener('click', showLoginModal);
+    headerLogoutBtn.addEventListener('click', cerrarSesionExplicito);
+    modalLoginBtn.addEventListener('click', performLogin);
     modalCancelBtn.addEventListener('click', closeModal);
-    loginModal.addEventListener('click', (e) => { if (e.target === loginModal) closeModal(); });
-
-    quickLoginBtn.addEventListener('click', showLoginModal);
-    quickLogoutBtn.addEventListener('click', cerrarSesion);
-
-    // Monitoreo de autenticación + conectividad
+    modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+    
+    // Firebase Auth state + monitoreo online/offline
     auth.onAuthStateChanged((user) => {
         if (user && navigator.onLine) {
             currentUser = user;
         } else if (user && !navigator.onLine) {
-            // Si está offline pero firebase dice usuario, se fuerza cierre porque no hay conectividad real.
-            auth.signOut();
+            // Si está offline forzar cierre de sesión porque firebase no puede sincronizar estado real
+            auth.signOut().catch(()=>{});
             currentUser = null;
         } else {
             currentUser = null;
         }
         updateSessionUI();
-        renderMenuButtons();
     });
-
+    
     window.addEventListener('online', () => {
         isOnline = true;
         updateConnectionUI();
-        // Re-sincronizar estado de auth si es posible (ya que puede haber estado pendiente)
+        // Revisar si hay sesión pendiente de firebase
         if (auth.currentUser && !currentUser) {
             currentUser = auth.currentUser;
             updateSessionUI();
-            renderMenuButtons();
         } else if (!auth.currentUser && currentUser) {
             currentUser = null;
             updateSessionUI();
-            renderMenuButtons();
         } else {
-            renderMenuButtons();
+            renderMenu();
         }
     });
+    
     window.addEventListener('offline', () => {
         isOnline = false;
         updateConnectionUI();
-        // offline no se puede tener sesión activa por coerción, forzar cerrar estado visual
+        // offline: no puede haber sesión activa porque requiere internet, forzar logout visual
         if (currentUser) {
             currentUser = null;
             updateSessionUI();
-            renderMenuButtons();
         } else {
-            renderMenuButtons();
+            renderMenu();
         }
     });
-
-    // --- soporte para PWA (manifest, sw, instalación)
+    
+    // Registro service worker y PWA
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(reg => console.log('✅ SW registrado')).catch(e => console.warn('SW fallo', e));
+        navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registrado', reg)).catch(e => console.warn('SW error', e));
     }
+    
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        installBtn.style.display = 'inline-flex';
+        installPwaFooterBtn.style.display = 'inline-block';
     });
-    installBtn.addEventListener('click', async () => {
+    installPwaFooterBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') installBtn.style.display = 'none';
+            if (outcome === 'accepted') installPwaFooterBtn.style.display = 'none';
             deferredPrompt = null;
-        } else {
-            alert('El navegador no soporta instalación manual o ya está instalada');
         }
     });
-    if (window.matchMedia('(display-mode: standalone)').matches) installBtn.style.display = 'none';
-
-    // Inicialización general
+    if (window.matchMedia('(display-mode: standalone)').matches) installPwaFooterBtn.style.display = 'none';
+    
+    // Inicializar todo
     function init() {
         updateConnectionUI();
         updateSessionUI();
-        renderMenuButtons();
+        renderMenu();
     }
     init();
 </script>
