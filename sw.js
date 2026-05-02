@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cotejo-offline-v4.0.6.7';
+const CACHE_NAME = 'cotejo-offline-v4.0.6.8';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -6,6 +6,7 @@ const urlsToCache = [
     '/manifest.json',
      '/online.html',
     '/importar.html',
+    '/sw.js',
      'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
