@@ -195,16 +195,58 @@
     }
 
     // 1.1 Verificación de identidad - SIN CACHE, SIN LOCALSTORAGE
+    // ========================================================================
+// CAPÍTULO 1: VERIFICACIÓN DE IDENTIDAD (SIN CACHE - EN TIEMPO REAL)
+// ========================================================================
+let uid = null;
+let tienePermisoAdmin = false;
+
+try {
+    // 1. Obtener usuario de Firebase Auth (NUNCA de localStorage)
+    const auth = firebase.auth();
+    const currentUser = auth.currentUser;
     
-   if (!currentUser || !userProfile || userProfile.gallo !== true) {
+    if (!currentUser) {
+        console.warn("🚫 No hay usuario autenticado");
+        if (window.AppState?.addNotification) {
+            AppState.addNotification('⛔ Debes iniciar sesión', 'error', 3000);
+        }
+        setTimeout(() => {
+            window.location.href = '/?section=public';
+        }, 2000);
+        return `<div style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
+            <div style="text-align:center; background:white; padding:30px; border-radius:16px;">
+                <div style="font-size:60px;">⛔</div>
+                <h3>Debes iniciar sesión</h3>
+                <p>Redirigiendo...</p>
+            </div>
+        </div>`;
+    }
+    
+    uid = currentUser.uid;
+    console.log("✅ Usuario autenticado:", uid);
+    
+    // 2. Leer permiso "gallo" DIRECTAMENTE de Firebase (SIN CACHE)
+    const database = firebase.database();
+    const snapshot = await database.ref(`users/${uid}/gallo`).once('value');
+    tienePermisoAdmin = snapshot.val() === true;
+    
+    console.log(`🔍 Permiso 'gallo' en tiempo real: ${tienePermisoAdmin}`);
+    
+    // 3. Si NO tiene permiso, redirigir
+    if (!tienePermisoAdmin) {
         console.warn("🚫 ACCESO DENEGADO - No tienes permiso 'gallo'");
         
-        if (window.AppState && AppState.addNotification) {
+        if (window.AppState?.addNotification) {
             AppState.addNotification('⛔ ACCESO DENEGADO - No eres administrador', 'error', 4000);
         }
         
         setTimeout(() => {
-            window.location.href = '/?section=public';
+            if (window.navigateTo) {
+                window.navigateTo('public');
+            } else {
+                window.location.href = '/?section=public';
+            }
         }, 2000);
         
         return `<div style="min-height:100vh; background:#f8f9fa; display:flex; align-items:center; justify-content:center;">
@@ -215,7 +257,36 @@
                 <p style="color:#999; font-size:12px;">Redirigiendo...</p>
             </div>
         </div>`;
-    } 
+    }
+    
+    // 4. Si llegamos aquí, TODO OK - Continuar con el panel
+    console.log("✅ PERMISO VERIFICADO - Cargando panel admin...");
+    
+    // Opcional: Actualizar AppState con el valor real
+    if (window.AppState && AppState.user) {
+        AppState.user.current = currentUser;
+        if (!AppState.user.profile) AppState.user.profile = {};
+        AppState.user.profile.gallo = true;
+        
+        // También leer permiso cotejo para usarlo después
+        const cotejoSnap = await database.ref(`users/${uid}/cotejo`).once('value');
+        AppState.user.profile.cotejo = cotejoSnap.val() === true;
+    }
+    
+} catch (error) {
+    console.error("❌ Error verificando permisos:", error);
+    setTimeout(() => {
+        window.location.href = '/?section=public';
+    }, 2000);
+    return `<div style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
+        <div style="text-align:center; background:white; padding:30px; border-radius:16px;">
+            <div style="font-size:60px;">⚠️</div>
+            <h3>Error de conexión</h3>
+            <p>Redirigiendo...</p>
+        </div>
+    </div>`;
+}
+
 
 
     // 1.3 Toma el ID del usuario para todas las operaciones
