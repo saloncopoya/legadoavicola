@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Legado Avícola | Panel de Control Profesional</title>
-    <meta name="theme-color" content="#0F172A">
+    <title>Legado Avícola | Nexus Dashboard</title>
+    <meta name="theme-color" content="#0B1121">
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,21 +21,84 @@
             box-sizing: border-box;
         }
 
+        /* TRANSICIONES SUAVES PARA CAMBIO DE FONDO Y BOTONES */
         body {
-            background: #F1F5F9;
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
             line-height: 1.5;
-            color: #0F172A;
+            transition: background 0.3s ease, color 0.2s ease;
+            min-height: 100vh;
         }
 
-        /* Layout principal */
+        /* ========== ESTADOS DE FONDO GLOBAL (4 estados distintos) ========== */
+        /* Estado 1: Sin internet + Sin sesión */
+        body.state-offline-noauth {
+            background: radial-gradient(circle at 10% 20%, #1A1A2E, #0F0F1A);
+            color: #E2E8F0;
+        }
+        body.state-offline-noauth .menu-card {
+            background: rgba(30, 30, 50, 0.85);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        body.state-offline-noauth .dashboard-header,
+        body.state-offline-noauth .tech-footer {
+            border-bottom-color: rgba(255, 80, 80, 0.2);
+            border-top-color: rgba(255, 80, 80, 0.2);
+        }
+        
+        /* Estado 2: Sin internet + Sesión iniciada (raro forzado offline pero con sesión - UI distinta) */
+        body.state-offline-auth {
+            background: radial-gradient(circle at 90% 20%, #2C1A2E, #1A0F1F);
+            color: #F1DBCF;
+        }
+        body.state-offline-auth .menu-card {
+            background: rgba(45, 25, 50, 0.9);
+            border: 1px solid #FFB347;
+            box-shadow: 0 8px 20px rgba(255, 180, 70, 0.15);
+        }
+        body.state-offline-auth .dashboard-header,
+        body.state-offline-auth .tech-footer {
+            border-bottom-color: #FFB34740;
+        }
+        
+        /* Estado 3: Con internet + Sin sesión */
+        body.state-online-noauth {
+            background: linear-gradient(145deg, #EFF6FF 0%, #E2E8F0 100%);
+            color: #0F172A;
+        }
+        body.state-online-noauth .menu-card {
+            background: #FFFFFF;
+            border: 1px solid #CBD5E1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        /* Estado 4: Con internet + Sesión iniciada */
+        body.state-online-auth {
+            background: linear-gradient(135deg, #0B2B26 0%, #1A3A32 100%);
+            color: #F0FDF4;
+        }
+        body.state-online-auth .menu-card {
+            background: #1F3E3A;
+            border: 1px solid #2DD4BF;
+            box-shadow: 0 12px 28px rgba(0, 200, 180, 0.2);
+        }
+        body.state-online-auth .brand-text h1 {
+            background: linear-gradient(135deg, #D9F99D, #A7F3D0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Ajustes comunes */
         .app-container {
             max-width: 1440px;
             margin: 0 auto;
             padding: 2rem 2rem 3rem;
+            position: relative;
         }
 
-        /* Header profesional */
+        /* Header robusto estilo software */
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -44,183 +107,175 @@
             gap: 1.5rem;
             margin-bottom: 2.5rem;
             padding-bottom: 1.5rem;
-            border-bottom: 2px solid #E2E8F0;
+            border-bottom: 2px solid;
+            transition: border-color 0.2s;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
         .brand-icon svg {
-            width: 40px;
-            height: 40px;
-            stroke: #8B5CF6;
-            stroke-width: 1.5;
+            width: 44px;
+            height: 44px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .brand-text h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-size: 1.9rem;
+            font-weight: 800;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #1E293B, #334155);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            transition: background 0.2s;
         }
 
         .brand-text span {
-            font-size: 0.85rem;
-            color: #64748B;
+            font-size: 0.8rem;
+            opacity: 0.8;
             font-weight: 500;
         }
 
-        /* Estado de conexión y usuario */
+        /* Panel de estados con estilo moderno */
         .status-panel {
             display: flex;
             align-items: center;
             gap: 1.2rem;
-            background: #FFFFFF;
-            padding: 0.6rem 1.2rem;
-            border-radius: 100px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #E2E8F0;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(12px);
+            padding: 0.5rem 1.5rem;
+            border-radius: 60px;
+            border: 1px solid rgba(255,255,255,0.15);
         }
 
         .connection-badge {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             font-size: 0.85rem;
-            font-weight: 600;
-            padding: 0.25rem 0.75rem;
+            font-weight: 700;
+            padding: 0.3rem 1rem;
             border-radius: 40px;
-            background: #F8FAFC;
+            background: rgba(0,0,0,0.3);
         }
 
-        .connection-badge.online {
-            color: #059669;
-        }
-        .connection-badge.online svg {
-            stroke: #059669;
-        }
-        .connection-badge.offline {
-            color: #DC2626;
-        }
-        .connection-badge.offline svg {
-            stroke: #DC2626;
-        }
+        .connection-badge.online svg { stroke: #86EFAC; }
+        .connection-badge.online { color: #D9F99D; }
+        .connection-badge.offline svg { stroke: #F87171; }
+        .connection-badge.offline { color: #FECACA; }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-weight: 500;
+            gap: 0.9rem;
+            font-weight: 600;
             font-size: 0.9rem;
-            color: #1E293B;
         }
 
+        /* Botones estilo consistentes con cada modo (cambian colores base pero se adaptan) */
         .btn-outline {
             background: transparent;
-            border: 1px solid #CBD5E1;
+            border: 1px solid currentColor;
             border-radius: 40px;
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1.2rem;
             font-weight: 600;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            color: #334155;
+            transition: all 0.2s;
+            color: inherit;
         }
         .btn-outline:hover {
-            background: #F1F5F9;
-            border-color: #94A3B8;
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.97);
         }
+        
         .btn-primary-solid {
-            background: #1E293B;
-            color: white;
-            border: none;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 40px;
-            padding: 0.5rem 1.25rem;
-            font-weight: 600;
+            padding: 0.5rem 1.3rem;
+            font-weight: 700;
             font-size: 0.85rem;
             cursor: pointer;
             transition: 0.2s;
+            color: white;
         }
         .btn-primary-solid:hover {
-            background: #0F172A;
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
         }
 
-        /* Grid de menú profesional (sin animaciones innecesarias) */
+        /* Grid profesional (dashboard cards) */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1.8rem;
+            margin: 2.5rem 0 2rem;
         }
 
         .menu-card {
-            background: #FFFFFF;
-            border-radius: 1.25rem;
-            border: 1px solid #E2E8F0;
-            padding: 1.5rem;
-            transition: box-shadow 0.15s ease;
+            border-radius: 1.8rem;
+            padding: 1.6rem;
+            transition: all 0.25s ease;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            transform: translateY(0);
+            backdrop-filter: blur(4px);
         }
         .menu-card:hover {
-            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.12);
-            border-color: #CBD5E1;
+            transform: translateY(-6px);
         }
 
         .menu-icon-svg {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
         .menu-icon-svg svg {
-            width: 44px;
-            height: 44px;
-            stroke: #4F46E5;
+            width: 48px;
+            height: 48px;
+            stroke: currentColor;
             stroke-width: 1.5;
             fill: none;
         }
         .menu-card h3 {
-            font-size: 1.35rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             letter-spacing: -0.01em;
-            color: #0F172A;
             margin-bottom: 0.5rem;
         }
         .menu-card p {
             font-size: 0.85rem;
-            color: #475569;
+            opacity: 0.85;
             line-height: 1.4;
         }
 
-        /* Footer técnico */
+        /* Footer técnico mejorado */
         .tech-footer {
             margin-top: 3rem;
             padding-top: 1.5rem;
-            border-top: 1px solid #E2E8F0;
+            border-top: 1px solid rgba(255,255,255,0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            font-size: 0.75rem;
-            color: #64748B;
+            font-size: 0.7rem;
+            font-weight: 500;
         }
-
+        
         .badge-manifest {
             display: flex;
-            gap: 1rem;
+            gap: 1.2rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
         }
 
-        /* Modal profesional */
+        /* Modal premium */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -234,36 +289,38 @@
             opacity: 1;
         }
         .modal-card {
-            background: #FFFFFF;
-            border-radius: 2rem;
+            background: #111827;
+            border-radius: 2.5rem;
             width: 90%;
-            max-width: 440px;
+            max-width: 460px;
             padding: 2rem;
-            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.25);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.5);
+            border: 1px solid #2DD4BF;
+            color: white;
         }
         .modal-card h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.8rem;
+            font-weight: 700;
             margin-bottom: 1rem;
-            color: #0F172A;
         }
         .modal-card input {
             width: 100%;
-            padding: 0.9rem 1rem;
+            padding: 1rem 1rem;
             margin: 0.75rem 0;
-            border: 1px solid #CBD5E1;
-            border-radius: 1rem;
+            border: 1px solid #334155;
+            border-radius: 1.2rem;
             font-size: 0.95rem;
-            background: #FFFFFF;
+            background: #1E293B;
+            color: white;
         }
         .modal-card input:focus {
             outline: none;
-            border-color: #4F46E5;
+            border-color: #2DD4BF;
         }
         .modal-buttons {
             display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
         .modal-buttons button {
             flex: 1;
@@ -277,13 +334,15 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            .menu-card h3 {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Header profesional -->
     <div class="dashboard-header">
         <div class="brand">
             <div class="brand-icon">
@@ -296,12 +355,12 @@
             </div>
             <div class="brand-text">
                 <h1>Legado Avícola</h1>
-                <span>Gestión de torneos · Cotejos profesionales</span>
+                <span>Dashboard Nexus · Torneos inteligentes</span>
             </div>
         </div>
         <div class="status-panel">
             <div id="connStatus" class="connection-badge online">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 8v8M8 12h8"/>
                 </svg>
@@ -309,46 +368,41 @@
             </div>
             <div id="userSessionArea" class="user-info">
                 <span id="welcomeUserSpan" style="display: none;"></span>
-
                 <button id="headerLogoutBtn" class="btn-outline" style="display: none;">Cerrar sesión</button>
             </div>
         </div>
     </div>
 
-    <!-- Grid de acciones dinámicas (solo botones funcionales basados en condiciones) -->
-    <div id="menuGridContainer" class="menu-grid">
-        <!-- Los botones se inyectarán aquí con JS según conectividad y sesión -->
-    </div>
+    <div id="menuGridContainer" class="menu-grid"></div>
 
-    <!-- Footer técnico (manifest, sw, offline) -->
     <div class="tech-footer">
         <div class="badge-manifest">
-            <span>📄 manifest.json</span>
-            <span>⚙️ Service Worker activo</span>
-            <span id="offlineIndicator" style="display: none;">📴 Modo offline</span>
+            <span>📡 PWA ready</span>
+            <span>⚡ Service Worker activo</span>
+            <span id="offlineIndicator" style="display: none;">⚠️ Modo sin red</span>
         </div>
         <div>
-            <button id="installPwaBtnTech" class="btn-outline" style="font-size:0.7rem; padding:0.3rem 0.8rem;">📲 Instalar aplicación</button>
+            <button id="installPwaBtnTech" class="btn-outline" style="font-size:0.7rem;">📲 Instalar aplicación</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL DE INICIO DE SESIÓN (estilo profesional) -->
+<!-- MODAL -->
 <div id="globalLoginModal" class="modal-overlay">
     <div class="modal-card">
-        <h2>Acceso restringido</h2>
-        <p style="color:#475569; margin-bottom:1rem;">Ingrese sus credenciales autorizadas</p>
+        <h2>🔐 Acceso restringido</h2>
+        <p style="margin-bottom:1rem; opacity:0.8;">Credenciales autorizadas para gestión en nube</p>
         <input type="email" id="loginEmail" placeholder="usuario@dominio.com" autocomplete="email">
         <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
         <div class="modal-buttons">
-            <button id="modalLoginConfirm" class="btn-primary-solid" style="background:#1E293B;">Ingresar</button>
+            <button id="modalLoginConfirm" class="btn-primary-solid" style="background:#2DD4BF; color:#0F172A;">Ingresar</button>
             <button id="modalLoginCancel" class="btn-outline">Cancelar</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ---------- CONFIGURACIÓN FIREBASE (misma autenticación) ----------
+    // ---------- FIREBASE ----------
     const FIREBASE_CONFIG = {
         apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
         authDomain: "galloslivebadge.firebaseapp.com",
@@ -361,11 +415,11 @@
     const auth = firebase.auth();
 
     // ---------- ESTADO GLOBAL ----------
-    let currentUser = null;          // usuario autenticado (solo con internet)
+    let currentUser = null;
     let isOnline = navigator.onLine;
     let deferredPrompt = null;
 
-    // Elementos DOM
+    // DOM elements
     const menuContainer = document.getElementById('menuGridContainer');
     const headerLogoutBtn = document.getElementById('headerLogoutBtn');
     const welcomeSpan = document.getElementById('welcomeUserSpan');
@@ -379,124 +433,138 @@
     const passInput = document.getElementById('loginPassword');
     const installPwaFooterBtn = document.getElementById('installPwaBtnTech');
 
-    // ---------- HELPER UI ----------
-    function updateConnectionUI() {
-        isOnline = navigator.onLine;
-        if (isOnline) {
-            connTextSpan.innerText = 'Conectado';
+    // ---------- FUNCIÓN CLAVE: ACTUALIZAR TEMA DE CUERPO SEGÚN ESTADO (4 diferenciadores) ----------
+    function updateBodyTheme() {
+        const hasInternet = isOnline;
+        const hasSession = (currentUser !== null && hasInternet); // sesión solo válida si hay internet
+        
+        // Remover todas las clases de estado previas
+        document.body.classList.remove('state-offline-noauth', 'state-offline-auth', 'state-online-noauth', 'state-online-auth');
+        
+        if (!hasInternet && !hasSession) {
+            // Sin internet + sin sesión
+            document.body.classList.add('state-offline-noauth');
+        } 
+        else if (!hasInternet && hasSession) {
+            // Sin internet + sesión iniciada (escenario excepcional, pero forzamos visual diferente)
+            document.body.classList.add('state-offline-auth');
+        }
+        else if (hasInternet && !hasSession) {
+            document.body.classList.add('state-online-noauth');
+        }
+        else if (hasInternet && hasSession) {
+            document.body.classList.add('state-online-auth');
+        }
+        
+        // Ajustes específicos adicionales para badges visuales
+        if (hasInternet) {
+            connTextSpan.innerText = '🟢 En línea';
             connStatusDiv.className = 'connection-badge online';
             offlineIndicator.style.display = 'none';
         } else {
-            connTextSpan.innerText = 'Sin conexión';
+            connTextSpan.innerText = '🔴 Sin conexión';
             connStatusDiv.className = 'connection-badge offline';
-            offlineIndicator.style.display = 'inline';
+            offlineIndicator.style.display = 'inline-flex';
         }
-        // Refrescar menú completo porque cambian condiciones (internet + sesion)
-        renderMenu();
     }
 
     function getUserDisplayName() {
         if (!currentUser) return null;
-        if (currentUser.displayName && currentUser.displayName.trim() !== '')
-            return currentUser.displayName;
+        if (currentUser.displayName && currentUser.displayName.trim() !== '') return currentUser.displayName;
         const email = currentUser.email || '';
         return email.split('@')[0] || 'Usuario';
     }
 
     function updateSessionUI() {
-        const hasValidSession = (currentUser !== null && isOnline);
-        if (hasValidSession) {
+        const hasInternet = isOnline;
+        const validSession = (currentUser !== null && hasInternet);
+        if (validSession) {
             headerLogoutBtn.style.display = 'inline-flex';
-            const nombre = getUserDisplayName();
             welcomeSpan.style.display = 'inline';
-            welcomeSpan.innerText = `👤 ${nombre}`;
+            welcomeSpan.innerText = `👑 ${getUserDisplayName()}`;
         } else {
             headerLogoutBtn.style.display = 'none';
             welcomeSpan.style.display = 'none';
+            // Si no hay internet pero currentUser existe por algún estado inconsistente, se fuerza logout visual
+            if (currentUser && !hasInternet) {
+                // Forzar borrado de referencia lógica para UI correcta
+                currentUser = null;
+            }
         }
-        renderMenu(); // siempre actualizar el grid de botones en cada cambio de sesión/conexión
+        updateBodyTheme();     // reflejar background distinto
+        renderMenu();
     }
 
-    // ---------- LÓGICA DE BOTONES SEGÚN REQUERIMIENTO (solo botones funcionales)----------
-    // Reglas:
-    // 1. Botón "Importar" (/importar) → aparece siempre, tenga o no internet, condición: NO tenga sesión iniciada.
-    // 2. Botón "Crear cotejo online" (/admin) → solo cuando hay internet Y sesión iniciada.
-    // 3. Botón "Cotejo offline" (/adminoffline) → solo cuando NO hay internet y NO tiene sesión iniciada.
-    // 4. Botón "Ver tablas online" (/online) → aparece solo cuando hay internet, sin importar sesión.
-    // 5. Botón "Iniciar sesión" (modal) cuando tenga internet y sin sesión; cuando sesión iniciada: botón "Cerrar sesión" + nombre del usuario.
-    //    Además de los botones de header, se agrega en el menú mismo el botón de cerrar sesión para mayor claridad.
-    
+    // ---------- LÓGICA DE BOTONES (Mantiene todas las validaciones originales) ----------
     function renderMenu() {
         if (!menuContainer) return;
         const online = isOnline;
-        const logged = (currentUser !== null && online); // sesión válida requiere internet
+        const logged = (currentUser !== null && online);
         
         let buttons = [];
         
-        // 1. Importar (siempre que NO haya sesión iniciada)
+        // 1. Importar (siempre que NO haya sesión iniciada) -> original
         if (!logged) {
             buttons.push({
-                label: 'Importar torneos',
-                description: 'Subir archivos JSON y gestionar datos locales',
+                label: '📂 Importar torneos',
+                description: 'Subir archivos JSON / gestión local',
                 route: '/importar',
                 iconType: 'import'
             });
         }
         
-        // 2. Crear cotejo online (Solo internet + sesión)
+        // 2. Crear cotejo online (online + sesion)
         if (online && logged) {
             buttons.push({
-                label: 'Crear cotejo online',
-                description: 'Organizar torneo en la nube, sincronización en tiempo real',
+                label: '☁️ Crear cotejo online',
+                description: 'Sincronización en nube, tiempo real',
                 route: '/admin',
                 iconType: 'cloud'
             });
         }
         
-        // 3. Cotejo offline (Solo offline y sin sesión)
+        // 3. Cotejo offline (offline y sin sesión)
         if (!online && !logged) {
             buttons.push({
-                label: 'Cotejo offline',
-                description: 'Modo completo sin conexión, datos locales',
+                label: '📴 Cotejo offline',
+                description: 'Modo avión · datos locales completos',
                 route: '/adminoffline',
                 iconType: 'offline'
             });
         }
         
-        // 4. Ver tablas online (Solo cuando hay internet)
+        // 4. Ver tablas online (si hay internet)
         if (online) {
             buttons.push({
-                label: 'Ver tablas online',
-                description: 'Rankings, posiciones y estadísticas en vivo',
+                label: '🏆 Ver tablas online',
+                description: 'Rankings, estadísticas y posiciones en vivo',
                 route: '/online',
                 iconType: 'tables'
             });
         }
         
-        // 5. Botones de sesión en el menú (respetando línea original)
+        // 5. Inicio / cierre sesión en menú (coherente)
         if (online && !logged) {
             buttons.push({
-                label: 'Iniciar sesión',
-                description: 'Acceda a funciones avanzadas y sincronización',
+                label: '🔓 Iniciar sesión',
+                description: 'Accede a funciones cloud y gestión avanzada',
                 action: 'login',
                 iconType: 'login'
             });
         } else if (logged) {
             buttons.push({
-                label: 'Cerrar sesión',
-                description: `Finalizar sesión de ${getUserDisplayName() || 'usuario'}`,
+                label: '🚪 Cerrar sesión',
+                description: `Salir de ${getUserDisplayName() || 'usuario'}`,
                 action: 'logout',
                 iconType: 'logout'
             });
         }
         
-        // Si no hay botones por algún escenario extraño mostrar guía.
         if (buttons.length === 0) {
-            menuContainer.innerHTML = `<div class="menu-card" style="grid-column:1/-1; text-align:center;"><h3>Sin acciones disponibles</h3><p>Verifique conectividad o permisos</p></div>`;
+            menuContainer.innerHTML = `<div class="menu-card" style="grid-column:1/-1; text-align:center;"><h3>⚙️ Panel sin acciones</h3><p>Verifica conectividad o permisos</p></div>`;
             return;
         }
         
-        // Generar HTML (iconos SVG profesionales, sin emojis, limpios)
         let html = '';
         for (const btn of buttons) {
             const iconSvg = getIconSvg(btn.iconType);
@@ -510,7 +578,6 @@
         }
         menuContainer.innerHTML = html;
         
-        // Asignar eventos a cada card
         document.querySelectorAll('.menu-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const route = card.getAttribute('data-route');
@@ -526,54 +593,47 @@
         });
     }
     
-    // Iconos SVG vectoriales profesionales (diseño minimalista)
+    // Iconos mejorados con stroke currentColor para adaptación temática
     function getIconSvg(type) {
         switch(type) {
             case 'import':
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M12 3v12m-4-4 4 4 4-4"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M12 3v12m-4-4 4 4 4-4"/></svg>`;
             case 'cloud':
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M17.5 19H9a3.5 3.5 0 0 1 0-7h.5c.4-2.5 2.5-4.5 5-4.5s4.6 2 5 4.5h.5a3.5 3.5 0 0 1 0 7Z"/><path d="M12 12v4m-2-2 2 2 2-2"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.5 19H9a3.5 3.5 0 0 1 0-7h.5c.4-2.5 2.5-4.5 5-4.5s4.6 2 5 4.5h.5a3.5 3.5 0 0 1 0 7Z"/><path d="M12 12v4m-2-2 2 2 2-2"/></svg>`;
             case 'offline':
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M18 10v4m-4-4v4m-4-4v4M6 10v4"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 10v4m-4-4v4m-4-4v4M6 10v4"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>`;
             case 'tables':
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 6v12M16 6v12"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 6v12M16 6v12"/></svg>`;
             case 'login':
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>`;
             case 'logout':
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
             default:
-                return `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4F46E5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`;
+                return `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`;
         }
     }
 
     // ---------- MODAL Y AUTENTICACIÓN ----------
     function showLoginModal() {
         if (!isOnline) {
-            alert("No hay conexión a internet. No se puede iniciar sesión.");
+            alert("❌ Sin conexión a internet. No se puede iniciar sesión.");
             return;
         }
         modalOverlay.classList.add('active');
         emailInput.value = '';
         passInput.value = '';
     }
-    function closeModal() {
-        modalOverlay.classList.remove('active');
-    }
+    function closeModal() { modalOverlay.classList.remove('active'); }
     async function performLogin() {
         const email = emailInput.value.trim();
         const password = passInput.value;
-        if (!email || !password) {
-            alert("Complete correo y contraseña");
-            return;
-        }
+        if (!email || !password) { alert("Complete correo y contraseña"); return; }
         try {
             const cred = await auth.signInWithEmailAndPassword(email, password);
             currentUser = cred.user;
             closeModal();
             updateSessionUI();
-        } catch (err) {
-            alert("Error de autenticación: " + err.message);
-        }
+        } catch (err) { alert("Error de autenticación: " + err.message); }
     }
     async function cerrarSesionExplicito() {
         if (currentUser) {
@@ -586,18 +646,18 @@
         }
     }
     
-    // Eventos de UI
+    // Event listeners
     headerLogoutBtn.addEventListener('click', cerrarSesionExplicito);
     modalLoginBtn.addEventListener('click', performLogin);
     modalCancelBtn.addEventListener('click', closeModal);
     modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
     
-    // Firebase Auth state + monitoreo online/offline
+    // Firebase State + gestión online/offline estricta
     auth.onAuthStateChanged((user) => {
         if (user && navigator.onLine) {
             currentUser = user;
         } else if (user && !navigator.onLine) {
-            // Si está offline forzar cierre de sesión porque firebase no puede sincronizar estado real
+            // Desautorizar sesión offline por coherencia
             auth.signOut().catch(()=>{});
             currentUser = null;
         } else {
@@ -608,8 +668,7 @@
     
     window.addEventListener('online', () => {
         isOnline = true;
-        updateConnectionUI();
-        // Revisar si hay sesión pendiente de firebase
+        updateBodyTheme();
         if (auth.currentUser && !currentUser) {
             currentUser = auth.currentUser;
             updateSessionUI();
@@ -618,24 +677,25 @@
             updateSessionUI();
         } else {
             renderMenu();
+            updateBodyTheme();
         }
     });
     
     window.addEventListener('offline', () => {
         isOnline = false;
-        updateConnectionUI();
-        // offline: no puede haber sesión activa porque requiere internet, forzar logout visual
         if (currentUser) {
             currentUser = null;
             updateSessionUI();
         } else {
+            updateBodyTheme();
             renderMenu();
         }
+        updateBodyTheme();
     });
     
-    // Registro service worker y PWA
+    // PWA Service worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registrado', reg)).catch(e => console.warn('SW error', e));
+        navigator.serviceWorker.register('/sw.js').catch(e => console.warn('SW no registrado', e));
     }
     
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -653,9 +713,8 @@
     });
     if (window.matchMedia('(display-mode: standalone)').matches) installPwaFooterBtn.style.display = 'none';
     
-    // Inicializar todo
     function init() {
-        updateConnectionUI();
+        updateBodyTheme();
         updateSessionUI();
         renderMenu();
     }
