@@ -163,22 +163,26 @@
     console.log("🚀 INICIANDO PANEL ADMIN - VERSIÓN COMPLETA");
 
              // ===== NUEVO: Asegurar que el usuario está cargado =====
-    let currentUser = firebase.auth().currentUser;
-    if (!currentUser) {
-        // Esperar activamente a que el usuario cargue
-        console.log("⏳ Esperando a que el usuario cargue...");
-        await new Promise((resolve) => {
-            const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    currentUser = user;
-                    unsubscribe();
-                    resolve();
-                }
-            });
-        });
-        console.log("✅ Usuario cargado:", currentUser?.uid);
-    }
-            
+    
+            // ===== ESPERAR A QUE FIREBASE AUTH ESTÉ LISTO =====
+let currentUser = null;
+console.log("⏳ Esperando autenticación de Firebase...");
+
+await new Promise((resolve) => {
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+        currentUser = user;
+        unsubscribe();
+        resolve();
+    });
+});
+
+console.log("✅ Firebase Auth listo. Usuario:", currentUser?.uid || "No autenticado");
+
+if (!currentUser) {
+    console.warn("⛔ No hay usuario autenticado. Redirigiendo...");
+    window.location.href = '/';
+    return;
+}
     // ========================================================================
     // CAPÍTULO 1: VERIFICACIÓN DE IDENTIDAD (DESDE FIREBASE PRINCIPAL - SIN CACHE)
     // ========================================================================
