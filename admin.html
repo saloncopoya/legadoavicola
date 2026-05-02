@@ -231,7 +231,7 @@ try {
     // 3. 🔥 NUEVO: Leer permiso "gallo" DIRECTAMENTE de Firebase (SIN CACHE)
     const database = firebase.database();
     // Verificar permiso gallo sin await
-    let tienePermisoAdmin = false;
+    tienePermisoAdmin = false;
     if (AppState.user.profile && AppState.user.profile.gallo === true) {
         tienePermisoAdmin = true;
     }
