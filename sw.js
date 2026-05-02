@@ -1,30 +1,37 @@
-const CACHE_NAME = 'cotejo-offline-v4.0.6.8';
+const CACHE_NAME = 'cotejo-offline-v4.0.6.9';
 const urlsToCache = [
     '/',
     '/index.html',
     '/offline.html',
     '/manifest.json',
-     '/online.html',
+    '/online.html',
     '/importar.html',
     '/sw.js',
-     'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
-// Instalar Service Worker
+// Instalar Service Worker - CORREGIDO: cachea uno por uno sin fallar
 self.addEventListener('install', event => {
     console.log('⚡ Service Worker instalando...');
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('📦 Archivos cacheados:', urlsToCache);
-                return cache.addAll(urlsToCache);
-            })
+        caches.open(CACHE_NAME).then(async (cache) => {
+            console.log('📦 Comenzando a cachear archivos...');
+            for (const url of urlsToCache) {
+                try {
+                    await cache.add(url);
+                    console.log(`✅ Cacheado: ${url}`);
+                } catch (error) {
+                    console.warn(`⚠️ No se pudo cachear (continuará igual): ${url}`, error);
+                }
+            }
+            console.log('📦 Proceso de cache completado');
+        })
     );
     self.skipWaiting();
 });
 
-// Activar Service Worker
+// Activar Service Worker - IGUAL que tu código original
 self.addEventListener('activate', event => {
     console.log('✅ Service Worker activado');
     event.waitUntil(
@@ -42,24 +49,48 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Interceptar peticiones
+// Interceptar peticiones - MEJORADO para detectar navegación
 self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) {
-                    return response;
+    const request = event.request;
+    
+    // Para peticiones de navegación (páginas HTML)
+    if (request.mode === 'navigate') {
+        event.respondWith(
+            caches.match(request).then(cachedResponse => {
+                if (cachedResponse) {
+                    console.log(`📄 Servido desde cache: ${request.url}`);
+                    return cachedResponse;
                 }
-                return fetch(event.request).catch(() => {
-                    if (event.request.mode === 'navigate') {
-                        return caches.match('/offline.html');
-                    }
-                    return new Response('Contenido no disponible offline', {
+                return fetch(request).catch(async () => {
+                    console.log(`📄 Fallback a offline.html para: ${request.url}`);
+                    const offlinePage = await caches.match('/offline.html');
+                    return offlinePage || new Response('Página no disponible offline', {
                         status: 503,
-                        statusText: 'Offline',
-                        headers: new Headers({ 'Content-Type': 'text/plain' })
+                        statusText: 'Offline'
                     });
                 });
             })
+        );
+        return;
+    }
+    
+    // Para recursos estáticos (JS, CSS, imágenes, etc.)
+    event.respondWith(
+        caches.match(request).then(cachedResponse => {
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+            return fetch(request).catch(() => {
+                // Para recursos externos, devolver respuesta vacía silenciosa
+                if (request.url.includes('cdnjs') || request.url.includes('firebase')) {
+                    return new Response('', { status: 200 });
+                }
+                return new Response('Recurso no disponible offline', {
+                    status: 503,
+                    statusText: 'Offline',
+                    headers: new Headers({ 'Content-Type': 'text/plain' })
+                });
+            });
+        })
     );
 });
