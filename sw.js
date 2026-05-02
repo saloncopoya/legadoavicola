@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cotejo-offline-v1.0.0.4'; 
+const CACHE_NAME = 'cotejo-offline-v1.0.0.5'; 
 const urlsToCache = [
     '/',
     '/index.html',
@@ -22,49 +22,7 @@ self.addEventListener('install', event => {
                 await cache.addAll(urlsToCache).catch(err => {
                     console.warn('⚠️ Error cacheando algunos archivos:', err);
                 });
-                
-                // 2. 🔥 FORZAR CACHE DE ONLINE.HTML E IMPORTAR.HTML (sin visitarlos)
-                const paginasForzadas = [
-                    '/online.html',
-                    '/importar.html'
-                ];
-                
-                console.log('🚀 Forzando caché de páginas importantes:', paginasForzadas);
-
-                
-                for (const pagina of paginasForzadas) {
-    try {
-        // Hacer fetch directamente a la página
-        const response = await fetch(pagina);
-        if (response && response.ok) {
-            await cache.put(pagina, response);
-            console.log(`✅ Página forzada en caché: ${pagina}`);
-        } else {
-            console.warn(`⚠️ No se pudo obtener: ${pagina} (status: ${response?.status})`);
-        }
-    } catch (error) {
-        console.error(`❌ Error cacheando ${pagina}:`, error);
-    }
-}
-                
-                // 3. Verificar que realmente están en caché
-                const onlineEnCache = await cache.match('/online.html');
-                const importarEnCache = await cache.match('/importar.html');
-                
-                if (onlineEnCache) {
-                    console.log('✅ VERIFICADO: /online.html está en caché');
-                } else {
-                    console.warn('⚠️ /online.html NO está en caché');
-                }
-                
-                if (importarEnCache) {
-                    console.log('✅ VERIFICADO: /importar.html está en caché');
-                } else {
-                    console.warn('⚠️ /importar.html NO está en caché');
-                }
-                
-                return cache;
-            })
+                            })
     );
     self.skipWaiting();
 });
