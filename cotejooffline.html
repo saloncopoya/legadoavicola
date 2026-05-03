@@ -1121,7 +1121,8 @@
             let mejorPareja = null;
             let menorDiferencia = Infinity;
             const rangoPermitido = configuracion.rangoPeso || 50;
-            
+                console.log(`🎯 Buscando pareja con rango de peso: ${rangoPermitido}g`);
+
             for (const posible of listaGallos) {
                 if (usados.has(posible.anillo) || posible.anillo === gallo.anillo) continue;
                 if (posible.partido === gallo.partido) continue;
@@ -2844,9 +2845,14 @@
                             </label>
                             <div style="background:white; padding:10px; border-radius:8px;">
                                 <div style="text-align:center; font-size:12px;">📏 RANGO DE PESO: <span id="rango-valor-actual">${configuracion.rangoPeso || 50}</span>g</div>
-                                <input type="range" id="config-rango-peso-slider" min="0" max="100" value="${configuracion.rangoPeso || 50}" oninput="document.getElementById('config-rango-peso').value=this.value; document.getElementById('rango-valor-actual').innerText=this.value" style="width:100%;">
-                                <input type="text" id="config-rango-peso" value="${configuracion.rangoPeso || 50}" class="form-input" style="width:70px; margin:8px auto 0; display:block; text-align:center;" onchange="window.actualizarConfig('rangoPeso', this.value)">
-                            </div>
+                                <input type="range" id="config-rango-peso-slider" min="0" max="100" value="${configuracion.rangoPeso || 50}" 
+    oninput="document.getElementById('config-rango-peso').value=this.value; document.getElementById('rango-valor-actual').innerText=this.value;"
+    onchange="window.actualizarConfig('rangoPeso', this.value);"
+    style="width:100%;">
+<input type="text" id="config-rango-peso" value="${configuracion.rangoPeso || 50}" class="form-input" 
+    style="width:70px; margin:8px auto 0; display:block; text-align:center;" 
+    onchange="window.actualizarConfig('rangoPeso', this.value); document.getElementById('config-rango-peso-slider').value=this.value; document.getElementById('rango-valor-actual').innerText=this.value;">
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -3121,10 +3127,23 @@ ${hayResultadosCotejo ? `
         };
         
         window.actualizarConfig = (clave, valor) => {
-            let numValor = parseInt(valor, 10);
-            if (isNaN(numValor)) numValor = 0;
-            actualizarConfiguracion(clave, numValor);
-        };
+    let numValor = parseInt(valor, 10);
+    if (isNaN(numValor)) numValor = 0;
+    
+    // Forzar límites 0-100 para rangoPeso
+    if (clave === 'rangoPeso') {
+        if (numValor < 0) numValor = 0;
+        if (numValor > 100) numValor = 100;
+    }
+    
+    actualizarConfiguracion(clave, numValor);
+    
+    // ✅ FORZAR ACTUALIZACIÓN INMEDIATA EN CONSOLA
+    console.log(`✅ RANGO DE PESO ACTUALIZADO A: ${configuracion.rangoPeso}g`);
+    
+    // Mostrar notificación visual
+    AppState.addNotification(`📏 Rango de peso cambiado a ${configuracion.rangoPeso}g`, 'success');
+};
         
         window.cargarTorneoAnterior = async (torneoIdSeleccionado) => {
             if (!torneoIdSeleccionado) return;
