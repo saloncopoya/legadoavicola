@@ -1604,7 +1604,7 @@
             if (configuracion.registroDetalladoActivo) tablaHTML += `<th>COLOR 2</th>`;
             tablaHTML += `<th>DIF</th><th>GANADOR</th><th>TIEMPO</th></tr></thead><tbody>`;
             
-            resultadosCotejo.peleas.forEach((p, index) => {
+                        resultadosCotejo.peleas.forEach((p, index) => {
                 const calificacion = calificacionesCargadas.get(index);
                 let ganadorTexto = '_______', tiempoTexto = '_______';
                 if (calificacion) {
@@ -1627,7 +1627,7 @@
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo2.color || '-'}</td>`;
                 tablaHTML += `<td style="padding:6px; text-align:center;">${p.diferencia}g</td>
                     <td style="padding:6px; text-align:center;">${ganadorTexto}</td>
-                    <td style="padding:6px; text-align:center;">${tiempoTexto}</td>
+                    <td style="padding:6px; text-align:center;">${tiempoTexto}</td>`;
 
                 // Botones para mover peleas (solo si no hay cotejo guardado Y tiene permiso)
                 const cotejoGuardadoEnFirebase = torneoActual?.cotejoId ? true : false;
@@ -1654,7 +1654,7 @@
                     `;
                 }
 
-                </tr>`;
+                tablaHTML += `</tr>`;
             });
             
             tablaHTML += `</tbody></table></div>`;
