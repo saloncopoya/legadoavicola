@@ -1,18 +1,18 @@
 {
     "name": " IMPORTAR Legado Avícola",
     "short_name": "IMPORTAR LegadoAV",
-    "description": "Cotejo Computarizado - Tabla de Posiciones en Vivo",
+    "description": "IMPORTAR Cotejo Computarizado - Tabla de Posiciones en Vivo",
     "start_url": "/importar",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
     "theme_color": "#8B4513",
     "background_color": "#f8f9fa",
     "orientation": "portrait-primary",
-    "scope": "/",
+ "scope": "/cotejooffline",
+  "id": "/cotejooffline",
     "lang": "es-MX",
     "dir": "ltr",
     "categories": ["sports", "entertainment", "productivity"],
-    "id": "/",
     "version": "2.0.0",
     
     "icons": [
