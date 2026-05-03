@@ -1437,6 +1437,13 @@
                         conflictosConsecutivos: conflictos
                     }
                 };
+
+                // Forzar que la variable local se actualice correctamente
+console.log(`📊 PELEAS GENERADAS: ${resultadosCotejo.peleas.length}`);
+// Pequeño delay para asegurar que la UI se actualice
+setTimeout(() => {
+    actualizarPantalla();
+}, 50);
                 
                 renderizarResultadosCotejo();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2919,6 +2926,7 @@
                         ${hayResultadosCotejo && !cotejoGuardado ? `<select id="cotejo-modo" style="padding:6px; border:2px solid red; border-radius:6px;"><option value="">CAMBIAR MODO:</option><option value="ASCENDENTE">⬆️ ASCENDENTE</option><option value="DESCENDENTE">⬇️ DESCENDENTE</option><option value="ALEATORIO">🎲 ALEATORIO</option><option value="INTELIGENTE">🤖 MENOR DIFERENCIA</option></select>` : ''}
                     </div>
                     
+
                   ${cotejoGuardado ? `
 <div style="display:flex; gap:8px; margin-bottom:12px;">
     <button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2;">📥 DESCARGAR PDF</button>
@@ -3081,10 +3089,11 @@ ${hayResultadosCotejo ? `
                             </div>
                         </div>
                         
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
-                            <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
-                        </div>
+                       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+    <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
+    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1;">🗑️ ELIMINAR TORNEO</button>` : ''}
+    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
+</div>
                     </form>
                 </div>
             `;
@@ -3206,6 +3215,31 @@ ${hayResultadosCotejo ? `
             actualizarPantalla();
             AppState.addNotification(`✅ Cargado torneo: ${torneo.nombre}`, 'success');
         };
+
+
+        window.eliminarTorneoModal = () => {
+    if (!torneoActual) {
+        AppState.addNotification('❌ No hay torneo para eliminar', 'error');
+        return;
+    }
+    
+    if (confirm(`⚠️ ¿ELIMINAR COMPLETAMENTE el torneo "${torneoActual.nombre}"?\n\nSe borrarán:\n- TODOS los partidos (${partidosList.length})\n- TODOS los gallos\n- Cotejo y calificaciones\n\n¡Esta acción NO se puede deshacer!`)) {
+        eliminarTorneoDeStorage(torneoId);
+        torneoActual = null;
+        torneoId = null;
+        partidosList = [];
+        resultadosCotejo = { peleas: [], noEmparejados: [], metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 } };
+        calificacionesCargadas.clear();
+        
+        const modal = document.getElementById('tournament-modal-overlay');
+        if (modal) modal.remove();
+        
+        actualizarPantalla();
+        AppState.addNotification('✅ Torneo eliminado completamente', 'success');
+        
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+};
         
         window.crearTorneo = async () => {
             const submitBtn = document.getElementById('submit-tournament-btn');
