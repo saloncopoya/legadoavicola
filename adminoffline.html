@@ -339,55 +339,23 @@ console.log("📦 DB Module loaded - Offline ready");
              // ===== NUEVO: Asegurar que el usuario está cargado =====
     
             // ===== ESPERAR A QUE FIREBASE AUTH ESTÉ LISTO =====
-let currentUser = null;
-console.log("⏳ Esperando autenticación de Firebase...");
+// ===== SIMULAR USUARIO OFFLINE =====
+let currentUser = { uid: 'offline_user' };
+let uid = 'offline_user';
+let userProfile = { cotejo: true, posicion: true };
 
+console.log("✅ Modo OFFLINE - Usuario simulado:", uid);
 
-
-
-
-    // ========================================================================
-    // CAPÍTULO 1: VERIFICACIÓN DE IDENTIDAD (DESDE FIREBASE PRINCIPAL - SIN CACHE)
-    // ========================================================================
-    let userProfile = null;
-    let uid = null;
-
-    // Variables para optimización
-    let ultimoHashPeleas = '';
-    let ultimoHashNoEmparejados = '';
-    let ultimoHTMLGenerado = '';
-    
-    try {
-        // Obtener usuario DIRECTAMENTE de Firebase Auth (NO AppState, NO localStorage)
-        if (window.firebase && firebase.auth) {
-            const auth = firebase.auth();
-            if (auth.currentUser) {
-                currentUser = auth.currentUser;
-                uid = currentUser.uid;
-                console.log("✅ Usuario obtenido DIRECTAMENTE de Firebase Auth:", uid);
-            }
-        }
-        
-        // Obtener perfil (solo para verificar gallo, pero NO confiamos en cache)
-        if (window.AppState && AppState.user && AppState.user.profile) {
-            userProfile = AppState.user.profile;
-        }
-    } catch (e) {
-        console.error("Error obteniendo usuario:", e);
-    }
-
-   
-    
-
-    // 1.3 Toma el ID del usuario para todas las operaciones
-    uid = currentUser.uid;
-
+// Variables para optimización
+let ultimoHashPeleas = '';
+let ultimoHashNoEmparejados = '';
+let ultimoHTMLGenerado = '';
+            
    
 
     // ========================================================================
     // VARIABLES DE ESTADO (Todas locales, sin closures)
     // ========================================================================
-    let adminDb = null;
     let isAdminReady = false;
     let isLoading = true;
     let errorMessage = null;
@@ -965,283 +933,90 @@ async function mostrarModalPreviewImportacion() {
     // ========================================================================
 
        let initAdmin = async () => {
-    console.log("🔥 Usando Firebase ADMIN GLOBAL para Admin...");
+    console.log("📀 Usando Base de Datos OFFLINE (IndexedDB)...");
     try {
-        adminDb = getAdminDatabase();
-        if (!adminDb) throw new Error("No se pudo conectar");
+        await window.DB.init();
         isAdminReady = true;
- 
-        // 2.3 Carga masiva de datos existentes
-        console.log("📦 Cargando datos globales...");
         
-        // Cargar palenques
-        try {
-            const palSnap = await adminDb.ref('PALENQUES').once('value');
-            if (palSnap.exists()) {
-                const data = palSnap.val();
-                palenquesList = Object.values(data || {}).map(item => 
-                    typeof item === 'string' ? item : (item.nombre || '')
-                ).filter(Boolean);
-            }
-            console.log(`✅ ${palenquesList.length} palenques cargados`);
-        } catch (e) {
-            console.error("Error cargando palenques:", e);
-        }
+        // Cargar listas auxiliares desde localStorage
+        palenquesList = window.DB.obtenerListaLocal('palenques');
+        nombresPartidosList = window.DB.obtenerListaLocal('nombresPartidos');
+        coloresGallosList = window.DB.obtenerListaLocal('coloresGallos');
         
-        // Cargar nombres de partidos
-        try {
-            const nomSnap = await adminDb.ref('NOMPARTIDOS').once('value');
-            if (nomSnap.exists()) {
-                const data = nomSnap.val();
-                nombresPartidosList = Object.values(data || {}).map(item => 
-                    typeof item === 'string' ? item : (item.nombre || '')
-                ).filter(Boolean);
-            }
-            console.log(`✅ ${nombresPartidosList.length} nombres de partidos cargados`);
+        // Cargar torneos guardados
+        const torneos = await window.DB.obtenerTodosTorneos();
+        torneosAnteriores = torneos.map(t => ({ ...t, fechaCreacion: t.createdAt || 0 }));
         
-            // --- NUEVO: Cargar colores de gallos ---
-            try {
-                const colSnap = await adminDb.ref('COLORGALLOS').once('value');
-                if (colSnap.exists()) {
-                    const data = colSnap.val();
-                    coloresGallosList = Object.values(data || {}).map(item => 
-                        typeof item === 'string' ? item : (item.nombre || '')
-                    ).filter(Boolean);
-                }
-                console.log(`✅ ${coloresGallosList.length} colores de gallos cargados`);
-            } catch (e) {
-                console.error("Error cargando colores:", e);
-            }
-
-        } catch (e) {
-            console.error("Error cargando nombres:", e);
-        }
-        
-        // CAPÍTULO 3: BÚSQUEDA DEL TORNEO ACTIVO
-        console.log(`🔍 Buscando torneos para UID: ${uid}`);
-        
-        try {
-            const torneosSnap = await adminDb.ref('TORNEOS').child(uid).once('value');
+        if (torneosAnteriores.length > 0) {
+            const t = torneosAnteriores[0];
+            torneoActual = t;
+            torneoId = t.id;
             
-            if (torneosSnap.exists()) {
-                const data = torneosSnap.val();
-                torneosAnteriores = Object.entries(data).map(([id, t]) => ({ 
-                    id, 
-                    ...t,
-                    fechaCreacion: t.createdAt || 0
-                })).sort((a, b) => (b.fechaCreacion || 0) - (a.fechaCreacion || 0));
-                
-                if (torneosAnteriores.length > 0) {
-                    // Seleccionar el más reciente
-                    const t = torneosAnteriores[0];
-                    torneoActual = t;
-                    torneoId = t.id;
-                    
-                    configuracion = {
-                        gallosPorPartido: t.config?.gallosPorPartido,
-                        pesoMin: t.pesoMin || 1700,
-                        pesoMax: t.pesoMax || 2400,
-                        rangoPeso: t.rangoPeso !== undefined ? t.rangoPeso : 50,
-                        anillosEditables: t.config?.anillosEditables || false,
-                        registroDetalladoActivo: t.config?.registroDetallado || false
-                    };
-                    
-                    representantesList = t.representantesUsados || [];
-
-                // --- NUEVO: Leer información del serial ---
-                serialIdActual = t.serialInfo?.serialId || null;
-                torneosEnSerialActual = t.serialInfo?.torneosEnSerial || (serialIdActual ? [t.id] : []);
-
-
-// CARGAR CONFIGURACIÓN DE PUNTOS DESDE FIREBASE
-// ==========================================================
-if (t.puntosConfig) {
-    puntosConfiguracion = {
-        ganador: t.puntosConfig.ganador ?? 2,
-        empate: t.puntosConfig.empate ?? 1,
-        perdedor: t.puntosConfig.perdedor ?? 0
-    };
-} else {
-    // Valores por defecto si el torneo no tiene configuración
-    puntosConfiguracion = { ganador: 2, empate: 1, perdedor: 0 };
-}
-console.log("✅ Puntos del torneo cargados en initAdmin:", puntosConfiguracion);
-
-                
-                // Cargar nombres unificados del serial si existe
-                if (serialIdActual && torneosEnSerialActual.length > 0) {
-                    await cargarNombresPartidosUnificados();
-                } else {
-                    nombresPartidosUnificados = []; // Limpiar si no hay serial
-                }
-                // -----------------------------------------
-
-
-                    
-                    // 3.3 Carga de partidos del torneo
-                    
-                    // 3.3 Carga de partidos del torneo (VERSIÓN QUE MUESTRA TODOS LOS DATOS)
-console.log(`📊 Cargando partidos del torneo: ${t.nombre}`);
-
-const partidosSnap = await adminDb.ref('TORNEOS')
-    .child(uid)
-    .child(t.id)
-    .child('REGISTRO')
-    .once('value');
-    
-partidosList = [];
-let maxRing = 0;
-const anillosMap = new Map(); // Para detectar duplicados
-
-if (partidosSnap.exists()) {
-    const pData = partidosSnap.val();
-    
-    // Recorremos todos los partidos
-    Object.entries(pData).forEach(([matchId, match]) => {
-        if (match.gallos) {
-            // Recorremos todos los gallos de este partido
-            Object.entries(match.gallos).forEach(([anillo, galloData]) => {
-                const anilloFormateado = anillo.padStart(3, '0');
-                
-                // Verificar si este anillo ya existe (duplicado)
-                let esDuplicado = false;
-                if (anillosMap.has(anilloFormateado)) {
-                    esDuplicado = true;
-                    console.warn(`⚠️ Anillo duplicado detectado: ${anilloFormateado} en partido "${match.nombre}"`);
-                } else {
-                    anillosMap.set(anilloFormateado, true);
-                }
-                
-                // AGREGAR SIEMPRE a la lista (incluso duplicados)
-                partidosList.push({
-                    anillo: anilloFormateado,
-                    peso: galloData.peso,
-                    color: galloData.color || '',
-                    partido: match.nombre || 'Sin nombre',
-                    representante: match.representante || '',
-                    matchId: matchId,
-                    esDuplicado: esDuplicado,  // ← Bandera para resaltar en la UI
-                    problema: esDuplicado ? 'anillo_duplicado' : ''
-                });
-                
-                const num = parseInt(anillo, 10);
-                if (!isNaN(num) && num > maxRing) maxRing = num;
-            });
-        }
-    });
-    
-    // Mostrar resumen de duplicados
-    const duplicados = partidosList.filter(g => g.esDuplicado);
-    if (duplicados.length > 0) {
-        console.warn(`⚠️ Se encontraron ${duplicados.length} gallos con anillos duplicados`);
-    }
-}
-
-ultimoAnillo = maxRing;
-console.log(`✅ ${partidosList.length} gallos cargados (incluyendo ${partidosList.filter(g => g.esDuplicado).length} duplicados). Último anillo: ${ultimoAnillo}`);
-
-                    ultimoAnillo = maxRing;
-                    console.log(`✅ ${partidosList.length} gallos cargados. Último anillo: ${ultimoAnillo}`);
-                    console.log(`🏆 Torneo activo: ${t.nombre}`);
-
-// ===== CARGAR REPRESENTANTES AL INICIAR =====
-const repsSet = new Set();
-partidosList.forEach(p => {
-    if (p.representante && p.representante.trim() !== '') {
-        repsSet.add(p.representante);
-    }
-});
-representantesList = Array.from(repsSet);
-console.log(`✅ representantesList cargados al iniciar: ${representantesList.length} representantes`);
-
-                    
-                    // ===== NUEVO: Cargar resultados de cotejo si existe =====
-                                        // ===== NUEVO: Cargar resultados de cotejo si existe =====
-                    if (t.cotejoId) {
-                        console.log(`🔍 Torneo tiene cotejo ID: ${t.cotejoId}`);
-                        try {
-                            // Buscar en la nueva estructura: COTEJOS/{uid}/{cotejoId}
-                            const cotejoSnap = await adminDb.ref('COTEJOS')
-                                .child(uid)           // ← NUEVO: Primero el UID
-                                .child(t.cotejoId)    // ← Luego el ID del cotejo
-                                .once('value');
-
-
-
-
-                                                    if (cotejoSnap.exists()) {
-                                const cotejoData = cotejoSnap.val();
-                                
-                                // Reconstruir los resultados en el formato esperado
-                                resultadosCotejo = {
-                                    peleas: cotejoData.peleas || [],
-                                    noEmparejados: cotejoData.noEmparejados || [],
-                                    metricas: cotejoData.metricas || {
-                                        totalGallos: partidosList.filter(g => g.peso > 0).length,
-                                        peleasGeneradas: cotejoData.peleas?.length || 0,
-                                        noEmparejados: cotejoData.noEmparejados?.length || 0,
-                                        diferenciaPromedio: cotejoData.metricas?.diferenciaPromedio || 0,
-                                        conflictosConsecutivos: cotejoData.metricas?.conflictosConsecutivos || 0
-                                    }
-                                };
-                                
-                                cotejoUltimoModo = cotejoData.modo || 'INTELIGENTE';
-                                
-                                // Actualizar AppState para que la tabla sea visible
-                                if (window.AppState) {
-                                    AppState.rooster.cotejoState = true;
-                                }
-                                
-                                console.log(`✅ Resultados de cotejo cargados: ${resultadosCotejo.peleas.length} peleas`);
-
-                                // 🔥🔥🔥 NUEVO: Cargar calificaciones existentes
-                                if (typeof cargarCalificacionesExistentes === 'function') {
-                                    await cargarCalificacionesExistentes();
-                                }
-
-                                // 🔥🔥🔥 NUEVO: Iniciar listener en tiempo real
-                                if (typeof configurarListenerCalificaciones === 'function') {
-                                    configurarListenerCalificaciones();
-                                }
-
-                            } else {
-                                console.log(`⚠️ No se encontraron datos para el cotejo ID: ${t.cotejoId}`);
-                            }
-
-                        } catch (e) {
-                            console.warn("No se pudo cargar el cotejo:", e);
-                        }
+            configuracion = {
+                gallosPorPartido: t.config?.gallosPorPartido || 3,
+                pesoMin: t.pesoMin || 1700,
+                pesoMax: t.pesoMax || 2400,
+                rangoPeso: t.rangoPeso !== undefined ? t.rangoPeso : 50,
+                anillosEditables: t.config?.anillosEditables || false,
+                registroDetalladoActivo: t.config?.registroDetallado || false
+            };
+            
+            puntosConfiguracion = t.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+            representantesList = t.representantesUsados || [];
+            
+            // Cargar partidos
+            const partidos = await window.DB.obtenerPartidosPorTorneo(t.id);
+            partidosList = [];
+            let maxRing = 0;
+            
+            for (const partido of partidos) {
+                if (partido.gallos) {
+                    for (const [anillo, galloData] of Object.entries(partido.gallos)) {
+                        partidosList.push({
+                            anillo: anillo.padStart(3, '0'),
+                            peso: galloData.peso,
+                            color: galloData.color || '',
+                            partido: partido.nombre,
+                            representante: partido.representante || '',
+                            matchId: partido.id,
+                            esDuplicado: false
+                        });
+                        const numAnillo = parseInt(anillo, 10);
+                        if (!isNaN(numAnillo) && numAnillo > maxRing) maxRing = numAnillo;
                     }
-
                 }
             }
-        } catch (e) {
-            console.error("Error cargando torneos:", e);
+            ultimoAnillo = maxRing;
+            
+            // Cargar cotejo si existe
+            if (t.cotejoId) {
+                const cotejos = await window.DB.obtenerCotejosPorTorneo(t.id);
+                const cotejo = cotejos.find(c => c.id === t.cotejoId);
+                if (cotejo) {
+                    resultadosCotejo = {
+                        peleas: cotejo.peleas || [],
+                        noEmparejados: cotejo.noEmparejados || [],
+                        metricas: cotejo.metricas || {}
+                    };
+                    cotejoUltimoModo = cotejo.modo || 'INTELIGENTE';
+                    AppState.rooster.cotejoState = true;
+                    
+                    if (typeof cargarCalificacionesExistentes === 'function') {
+                        await cargarCalificacionesExistentes();
+                    }
+                }
+            }
         }
         
         isLoading = false;
-        
-        // 3.4 Decisión visual
         actualizarPantalla();
         
-// Inicializar videos SOLO UNA VEZ si hay torneo =====
-
-        if (torneoActual) {
-            setTimeout(() => {
-                initVideosSection();
-            }, 500);
-        }
-
-
-        // Si no hay torneo, mostrar modal
         if (!torneoActual && !document.getElementById('tournament-modal-overlay')) {
-            setTimeout(() => {
-                mostrarModalTorneo();
-            }, 100);
+            setTimeout(() => mostrarModalTorneo(), 100);
         }
         
     } catch (error) {
-        console.error("❌ Error fatal:", error);
+        console.error("❌ Error fatal initAdmin:", error);
         errorMessage = error.message;
         isLoading = false;
         actualizarPantalla();
@@ -3282,50 +3057,9 @@ function calcularNumeroConflictos(peleas) {
         return;
     }
 
-    // ===== NUEVO: Verificar permiso en tiempo real DESDE FIREBASE PRINCIPAL =====
-    try {
-        // Obtener usuario actual DIRECTAMENTE de Firebase Auth
-        const auth = firebase.auth();
-        const currentUser = auth.currentUser;
-        
-        if (!currentUser) {
-            AppState.addNotification('❌ Debes iniciar sesión', 'error');
-            return;
-        }
-
-        // ✅ CORREGIDO: Usar la instancia principal de Firebase Database
-        const database = firebase.database();
-        if (!database) {
-            AppState.addNotification('❌ Error de conexión', 'error');
-            return;
-        }
-
-        // Consultar el valor actual en Firebase
-        const cotejoSnapshot = await database.ref(`users/${currentUser.uid}/cotejo`).once('value');
-        const tienePermiso = cotejoSnapshot.val() === true;
-
-        if (!tienePermiso) {
-            AppState.addNotification('⛔ SIN Permiso: CONTRATAME: 9611150394', 'error', 4000);
-            
-            // Opcional: Actualizar el perfil en AppState
-            if (AppState.user.profile) {
-                AppState.user.profile.cotejo = false;
-            }
-            
-            const btnCotejar = document.getElementById('btn-cotejar');
-            if (btnCotejar) {
-                btnCotejar.disabled = true;
-                btnCotejar.style.opacity = '0.5';
-                btnCotejar.style.cursor = 'not-allowed';
-            }
-            return;
-        }
-
-        console.log("✅ Permiso COTEJO verificado en tiempo real");
-        
-        // ===== CONTINUAR CON LA LÓGICA EXISTENTE =====
-        // (Aquí va TODO el código original de ejecutarCotejo que ya tenías)
-        
+    
+       // ===== OFFLINE MODE - Permisos siempre true =====
+console.log("✅ Modo OFFLINE - Permiso COTEJO siempre activo"); 
        
 // Validar pre-cotejo
 if (!validarPreCotejo()) return;
@@ -6941,183 +6675,77 @@ if (sinInternet()) return;
     // GUARDAR EDICIÓN DE PARTIDO COMPLETO (CON VALIDACIONES)
     // ========================================================================
     const guardarEdicionPartido = async (nombreOriginal, nuevoNombre, nuevoRepresentante, gallosEditados) => {
-    if (sinInternet()) return false; // ← PEGA ESTO
+    if (!torneoId) return false;
 
+    // Validaciones (mantener las mismas)
+    if (!nuevoNombre || nuevoNombre.trim() === '') {
+        AppState.addNotification('❌ El nombre del partido es obligatorio', 'error');
+        return false;
+    }
 
-        if (!adminDb || !torneoId) return;
-
-        // Validar nombre del partido
-        if (!nuevoNombre || nuevoNombre.trim() === '') {
-            AppState.addNotification('❌ El nombre del partido es obligatorio', 'error');
-            return;
-        }
-
-        // Validar que los anillos no estén vacíos y tengan formato correcto
-        for (let gallo of gallosEditados) {
-            if (!gallo.anillo || gallo.anillo.trim() === '') {
-                AppState.addNotification('❌ Todos los anillos son obligatorios', 'error');
-                return;
-            }
-            
-            if (!/^\d{3,4}$/.test(gallo.anillo)) {
-                AppState.addNotification(`❌ El anillo ${gallo.anillo} debe tener 3 o 4 dígitos`, 'error');
-                return;
+    try {
+        // Buscar el partido original
+        const partidos = await window.DB.obtenerPartidosPorTorneo(torneoId);
+        let partidoOriginal = null;
+        let matchId = null;
+        
+        for (const p of partidos) {
+            if (p.nombre === nombreOriginal) {
+                partidoOriginal = p;
+                matchId = p.id;
+                break;
             }
         }
-
-        // Validar que no haya anillos duplicados DENTRO del mismo partido
-        const anillosEnPartido = gallosEditados.map(g => g.anillo.padStart(3, '0'));
-        const anillosUnicos = new Set(anillosEnPartido);
-        if (anillosUnicos.size !== anillosEnPartido.length) {
-            AppState.addNotification('❌ No puede haber anillos duplicados en el mismo partido', 'error');
-            return;
+        
+        if (!matchId) {
+            AppState.addNotification('❌ No se encontró el partido', 'error');
+            return false;
         }
-
-        // Validar que los anillos no estén repetidos en OTROS partidos
-        for (let gallo of gallosEditados) {
-            const anilloFormateado = gallo.anillo.padStart(3, '0');
-            
-            // Buscar si el anillo existe en otros partidos (que no sean el actual)
-            const anilloExistente = partidosList.find(p => 
-                p.anillo === anilloFormateado && 
-                p.partido !== nombreOriginal
-            );
-            
-            if (anilloExistente) {
-                AppState.addNotification(`❌ El anillo ${gallo.anillo} ya está registrado en el partido "${anilloExistente.partido}"`, 'error');
-                return;
-            }
-        }
-
-        // Validar pesos
-        for (let gallo of gallosEditados) {
-            if (gallo.peso > 0) {
-                if (gallo.peso < configuracion.pesoMin || gallo.peso > configuracion.pesoMax) {
-                    AppState.addNotification(`❌ El peso del gallo ${gallo.anillo} debe estar entre ${configuracion.pesoMin} y ${configuracion.pesoMax} gramos`, 'error');
-                    return;
-                }
-            }
-        }
-
-        try {
-            // Buscar el matchId del partido original
-            const partidosSnap = await adminDb.ref('TORNEOS')
-                .child(uid)
-                .child(torneoId)
-                .child('REGISTRO')
-                .once('value');
-
-            let matchId = null;
-            if (partidosSnap.exists()) {
-                const pData = partidosSnap.val();
-                for (let id in pData) {
-                    if (pData[id].nombre === nombreOriginal) {
-                        matchId = id;
-                        break;
-                    }
-                }
-            }
-
-            if (!matchId) {
-                AppState.addNotification('❌ No se encontró el partido', 'error');
-                return;
-            }
-
-            // Construir objeto de gallos actualizado
-            const gallosObj = {};
-            gallosEditados.forEach(g => {
-                gallosObj[g.anillo.padStart(3, '0')] = {
-                    peso: g.peso,
-                    color: g.color || ''
-                };
-            });
-
-            // Actualizar en Firebase
-            await adminDb.ref('TORNEOS')
-                .child(uid)
-                .child(torneoId)
-                .child('REGISTRO')
-                .child(matchId)
-                .update({
-                    nombre: nuevoNombre,
-                    representante: nuevoRepresentante || '',
-                    gallos: gallosObj
-                });
-
-            // Guardar nombre de partido si es nuevo
-            if (nuevoNombre !== nombreOriginal && !nombresPartidosList.includes(nuevoNombre)) {
-                const nomRef = adminDb.ref('NOMPARTIDOS').push();
-                await nomRef.set({ nombre: nuevoNombre });
-                nombresPartidosList.push(nuevoNombre);
-            }
-
-            // Guardar representante si es nuevo
-            if (nuevoRepresentante && nuevoRepresentante.trim() !== '' && !representantesList.includes(nuevoRepresentante)) {
-                representantesList.push(nuevoRepresentante);
-                const repRef = adminDb.ref('TORNEOS')
-                    .child(uid)
-                    .child(torneoId)
-                    .child('representantesUsados');
-                await repRef.set(representantesList);
-            }
-
-            // Guardar colores nuevos
-            for (let gallo of gallosEditados) {
-                if (gallo.color && gallo.color.trim() !== '' && !coloresGallosList.includes(gallo.color)) {
-                    const colRef = adminDb.ref('COLORGALLOS').push();
-                    await colRef.set({ nombre: gallo.color });
-                    coloresGallosList.push(gallo.color);
-                }
-            }
-
-            // Actualizar lista local
-            // Eliminar todos los gallos del partido original
-            // Actualizar lista local - ELIMINAR TODOS los gallos del partido original
-            partidosList = partidosList.filter(p => p.partido !== nombreOriginal);
-            
-            // Agregar los nuevos (esto evita duplicados)
-                       // Agregar los nuevos (esto evita duplicados)
-            gallosEditados.forEach(g => {
-                partidosList.push({
-                    anillo: g.anillo.padStart(3, '0'),
-                    peso: g.peso,
-                    color: g.color || '',
-                    partido: nuevoNombre,
-                    representante: nuevoRepresentante || ''
-                });
-            });
-
-
-
-if (resultadosCotejo && resultadosCotejo.peleas && resultadosCotejo.peleas.length > 0 && !torneoActual?.cotejoId) {
-            console.log("🧹 Limpiando cotejo temporal porque se editó un partido");
-            resultadosCotejo = {
-                peleas: [],
-                noEmparejados: [],
-                metricas: {
-                    totalGallos: 0,
-                    peleasGeneradas: 0,
-                    noEmparejados: 0,
-                    diferenciaPromedio: 0,
-                    conflictosConsecutivos: 0
-                }
+        
+        // Construir objeto de gallos actualizado
+        const gallosObj = {};
+        gallosEditados.forEach(g => {
+            gallosObj[g.anillo.padStart(3, '0')] = {
+                peso: g.peso,
+                color: g.color || ''
             };
-            
-            // Actualizar AppState si existe
-            if (window.AppState) {
-                AppState.rooster.cotejoState = false;
-            }
-        }
-
-
-            AppState.addNotification('✅ Partido actualizado', 'success');
-           actualizarPantallaLigera();
-
-        } catch (error) {
-            console.error('Error actualizando partido:', error);
-            AppState.addNotification('❌ Error al actualizar', 'error');
-        }
-    };  // ← ESTE CIERRA LA FUNCIÓN guardarEdicionPartido
+        });
+        
+        // Actualizar partido
+        const partidoActualizado = {
+            ...partidoOriginal,
+            nombre: nuevoNombre,
+            representante: nuevoRepresentante || '',
+            gallos: gallosObj,
+            timestamp: Date.now()
+        };
+        
+        await window.DB.guardarPartido(partidoActualizado);
+        
+        // Actualizar listas locales
+        partidosList = partidosList.filter(p => p.partido !== nombreOriginal);
+        
+        gallosEditados.forEach(g => {
+            partidosList.push({
+                anillo: g.anillo.padStart(3, '0'),
+                peso: g.peso,
+                color: g.color || '',
+                partido: nuevoNombre,
+                representante: nuevoRepresentante || '',
+                matchId: matchId
+            });
+        });
+        
+        AppState.addNotification('✅ Partido actualizado', 'success');
+        actualizarPantallaLigera();
+        return true;
+        
+    } catch (error) {
+        console.error('Error actualizando partido:', error);
+        AppState.addNotification('❌ Error al actualizar', 'error');
+        return false;
+    }
+};  // ← ESTE CIERRA LA FUNCIÓN guardarEdicionPartido
     // ========================================================================
     // ELIMINAR PARTIDO COMPLETO
     // ========================================================================
@@ -7442,246 +7070,80 @@ actualizarPantallaLigera();
 
     // 4.2.7 Función para cargar torneo anterior
 window.cargarTorneoAnterior = async (torneoIdSeleccionado) => {
-    if (sinInternet()) return;
-
-
     if (!torneoIdSeleccionado) return;
     
     try {
-        //  PASO 1: DETENER TODOS LOS LISTENERS ANTERIORES 
-        if (typeof calificacionListeners !== 'undefined' && calificacionListeners) {
-            calificacionListeners.forEach(off => off());
-            calificacionListeners = [];
-        }
+        // Obtener torneo desde IndexedDB
+        const torneo = await window.DB.obtenerTorneo(torneoIdSeleccionado);
         
-        //  PASO 2: LIMPIAR DATOS DE CALIFICACIONES ANTERIORES 
-        if (typeof calificacionesCargadas !== 'undefined') {
-            calificacionesCargadas.clear();
-        }
-        
-        //  PASO 3: LIMPIAR SELECCIÓN ACTUAL 
-        peleaSeleccionadaActual = null;
-
-        // Forzar lectura fresca del torneo desde Firebase
-        const torneoSnapshot = await adminDb.ref('TORNEOS')
-            .child(uid)
-            .child(torneoIdSeleccionado)
-            .once('value');
-        
-        if (!torneoSnapshot.exists()) {
+        if (!torneo) {
             AppState.addNotification('❌ Torneo no encontrado', 'error');
             return;
         }
         
-        const torneo = { id: torneoIdSeleccionado, ...torneoSnapshot.val() };
-
-       
-        
-        // Cargar partidos del torneo seleccionado
-        const partidosSnap = await adminDb.ref('TORNEOS')
-            .child(uid)
-            .child(torneo.id)
-            .child('REGISTRO')
-            .once('value');
-            
+        // Cargar partidos
+        const partidos = await window.DB.obtenerPartidosPorTorneo(torneoIdSeleccionado);
         const partidosCargados = [];
         let maxRing = 0;
         
-        if (partidosSnap.exists()) {
-            const pData = partidosSnap.val();
-            Object.values(pData).forEach(match => {
-                if (match.gallos) {
-                    Object.entries(match.gallos).forEach(([anillo, galloData]) => {
-                        const peso = typeof galloData === 'object' ? galloData.peso : galloData;
-                        const color = typeof galloData === 'object' ? galloData.color || '' : '';
-                        
-                        partidosCargados.push({
-                            anillo: anillo.padStart(3, '0'),
-                            peso: peso,
-                            color: color,
-                            partido: match.nombre || '',
-                            representante: match.representante || ''
-                        });
-                        
-                        const num = parseInt(anillo, 10);
-                        if (!isNaN(num) && num > maxRing) maxRing = num;
+        for (const partido of partidos) {
+            if (partido.gallos) {
+                for (const [anillo, galloData] of Object.entries(partido.gallos)) {
+                    partidosCargados.push({
+                        anillo: anillo.padStart(3, '0'),
+                        peso: galloData.peso,
+                        color: galloData.color || '',
+                        partido: partido.nombre,
+                        representante: partido.representante || '',
+                        matchId: partido.id
                     });
+                    const num = parseInt(anillo, 10);
+                    if (!isNaN(num) && num > maxRing) maxRing = num;
                 }
-            });
+            }
         }
-
-
-        AppState.addNotification(`Espere 🔄 Cargando torneo... "${torneo.nombre}" con ${partidosCargados.length} gallos`, 'success');
-
-
         
-        // ACTUALIZAR TODAS LAS VARIABLES DE ESTADO
+        // Actualizar estado
         torneoActual = torneo;
         torneoId = torneo.id;
         partidosList = partidosCargados;
         ultimoAnillo = maxRing;
         
-
-
-
         configuracion = {
-            gallosPorPartido: torneo.config?.gallosPorPartido,
+            gallosPorPartido: torneo.config?.gallosPorPartido || 3,
             pesoMin: torneo.pesoMin || 1700,
             pesoMax: torneo.pesoMax || 2400,
-            rangoPeso: torneo.rangoPeso !== undefined ? torneo.rangoPeso : 50,
+            rangoPeso: torneo.rangoPeso || 50,
             anillosEditables: torneo.config?.anillosEditables || false,
             registroDetalladoActivo: torneo.config?.registroDetallado || false
         };
         
-        // Cargar configuración de puntos
-        if (torneo.puntosConfig) {
-            puntosConfiguracion = {
-                ganador: torneo.puntosConfig.ganador,
-                empate: torneo.puntosConfig.empate,
-                perdedor: torneo.puntosConfig.perdedor
-            };
+        puntosConfiguracion = torneo.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        
+        // Calcular representantes
+        const repsSet = new Set();
+        partidosCargados.forEach(p => {
+            if (p.representante && p.representante.trim()) repsSet.add(p.representante);
+        });
+        representantesList = Array.from(repsSet);
+        
+        // Cargar cotejo
+        if (torneo.cotejoId) {
+            const cotejos = await window.DB.obtenerCotejosPorTorneo(torneoId);
+            const cotejo = cotejos.find(c => c.id === torneo.cotejoId);
+            if (cotejo) {
+                resultadosCotejo = {
+                    peleas: cotejo.peleas || [],
+                    noEmparejados: cotejo.noEmparejados || [],
+                    metricas: cotejo.metricas || {}
+                };
+                AppState.rooster.cotejoState = true;
+            }
         } else {
-            puntosConfiguracion = { ganador: 2, empate: 1, perdedor: 0 };
-        }
-        
-// Calcular representantes desde REGISTRO en lugar de leer nodo aparte
-representantesList = [];
-if (partidosCargados.length > 0) {
-    const representantesSet = new Set();
-    partidosCargados.forEach(g => {
-        if (g.representante && g.representante.trim() !== '') {
-            representantesSet.add(g.representante);
-        }
-    });
-    representantesList = Array.from(representantesSet);
-}
-
-        // Leer información del serial del torneo cargado
-        serialIdActual = torneo.serialInfo?.serialId || null;
-        torneosEnSerialActual = torneo.serialInfo?.torneosEnSerial || (serialIdActual ? [torneo.id] : []);
-        
-        // Cargar nombres unificados del serial si existe
-        if (serialIdActual && torneosEnSerialActual.length > 0) {
-            await cargarNombresPartidosUnificados();
-        } else {
-            nombresPartidosUnificados = [];
-        }
-        
-        // Cerrar modal y actualizar pantalla principal
-        const modal = document.getElementById('tournament-modal-overlay');
-        if (modal) modal.remove();
-
-        //  PASO 4: LIMPIAR RESULTADOS DE COTEJO ANTERIORES 
-        resultadosCotejo = {
-            peleas: [],
-            noEmparejados: [],
-            metricas: {
-                totalGallos: 0,
-                peleasGeneradas: 0,
-                noEmparejados: 0,
-                diferenciaPromedio: 0,
-                conflictosConsecutivos: 0
-            }
-        };
-
-         // Verificar si el torneo tiene un cotejo guardado
-if (torneo.cotejoId) {
-    console.log(`🔍 Torneo tiene cotejo ID: ${torneo.cotejoId}`);
-    AppState.rooster.cotejoState = true;
-    
-    // Intentar cargar los resultados del cotejo
-    try {
-        const cotejoSnap = await adminDb.ref('COTEJOS')
-            .child(uid)
-            .child(torneo.cotejoId)
-            .once('value');
-            
-        if (cotejoSnap.exists()) {
-            const cotejoData = cotejoSnap.val();
-            
-            resultadosCotejo = {
-                peleas: cotejoData.peleas || [],
-                noEmparejados: cotejoData.noEmparejados || [],
-                metricas: cotejoData.metricas || {
-                    totalGallos: partidosCargados.length,
-                    peleasGeneradas: cotejoData.peleas?.length || 0,
-                    noEmparejados: cotejoData.noEmparejados?.length || 0
-                }
-            };
-            
-            cotejoUltimoModo = cotejoData.modo || 'INTELIGENTE';
-            
-            console.log(`✅ Resultados de cotejo cargados: ${resultadosCotejo.peleas.length} peleas`);
-            
-            // ===== NUEVO: CARGAR CALIFICACIONES EXISTENTES =====
-            if (typeof cargarCalificacionesExistentes === 'function') {
-                await cargarCalificacionesExistentes();
-            }
-            
-            // ===== NUEVO: VERIFICAR SI TODAS ESTÁN CALIFICADAS =====
-            const totalPeleas = resultadosCotejo.peleas.length;
-            const calificadas = calificacionesCargadas.size;
-            const todasCalificadas = totalPeleas > 0 && calificadas === totalPeleas;
-            
-            if (todasCalificadas) {
-                console.log(`✅ TORNEO "${torneo.nombre}" - TODAS LAS PELEAS CALIFICADAS (${calificadas}/${totalPeleas})`);
-                console.log(`⏭️ NO se configura listener de calificaciones`);
-                // Mostrar mensaje en la UI
-                const infoDiv = document.getElementById('calificacion-usuario-info');
-                if (infoDiv) {
-                    infoDiv.innerHTML = '<span style="color:#4CAF50;">✅ Todas las peleas calificadas. Listener inactivo.</span>';
-                }
-
-
-            const mensajeElemento = document.getElementById('calificacion-todas-mensaje');
-if (mensajeElemento) {
-    mensajeElemento.style.display = 'block';
-}
-
-            
-} else {
-                console.log(`⏳ TORNEO "${torneo.nombre}" - ${calificadas}/${totalPeleas} peleas calificadas`);
-                console.log(`👂 Configurando listener de calificaciones...`);
-                // Configurar listener en tiempo real SOLO si no están todas calificadas
-                if (typeof configurarListenerCalificaciones === 'function') {
-                    configurarListenerCalificaciones();
-                }
-            }
-        }
-    } catch (e) {
-        console.warn("No se pudo cargar el cotejo:", e);
-    }
-} else {
             AppState.rooster.cotejoState = false;
         }
-
-        actualizarPantalla();
         
-
-
-
-        // 🔥 NUEVO: Recargar lista de jueces para el nuevo torneo
-        if (torneoActual?.cotejoId) {
-            console.log("🔄 Recargando jueces para nuevo torneo...");
-            setTimeout(() => {
-                // Limpiar lista actual
-                listaCompletaJueces = [];
-                // Recargar desde Firebase
-                obtenerJuecesDeFirebasePrincipal();
-            }, 300);
-        } else {
-            // Si el nuevo torneo NO tiene cotejo, limpiar todo
-            listaCompletaJueces = [];
-            const asignadosContainer = document.getElementById('jueces-asignados-lista-container');
-            if (asignadosContainer) {
-                asignadosContainer.innerHTML = '<div style="text-align:center; color:#999; padding:10px;">No hay jueces asignados</div>';
-            }
-            const busquedaContainer = document.getElementById('lista-jueces-container');
-            if (busquedaContainer) {
-                busquedaContainer.style.display = 'none';
-            }
-        }
-
+        actualizarPantalla();
         
     } catch (error) {
         console.error("Error cargando torneo:", error);
