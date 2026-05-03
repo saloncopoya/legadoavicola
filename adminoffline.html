@@ -3237,61 +3237,74 @@
         // ============================================================
         
         function init() {
-            console.log("🚀 INICIANDO PANEL ADMIN OFFLINE");
-            cargarTorneosDesdeStorage();
-            
-            if (torneosAnteriores.length > 0) {
-                torneoActual = torneosAnteriores[0];
-                torneoId = torneoActual.id;
-                partidosList = [];
-                let maxRing = 0;
-                if (torneoActual.REGISTRO) {
-                    Object.values(torneoActual.REGISTRO).forEach(match => {
-                        if (match.gallos) {
-                            Object.entries(match.gallos).forEach(([anillo, galloData]) => {
-                                partidosList.push({
-                                    anillo: anillo,
-                                    peso: galloData.peso,
-                                    color: galloData.color || '',
-                                    partido: match.nombre,
-                                    representante: match.representante || ''
-                                });
-                                const num = parseInt(anillo, 10);
-                                if (!isNaN(num) && num > maxRing) maxRing = num;
-                            });
-                        }
+    console.log("🚀 INICIANDO PANEL ADMIN OFFLINE");
+    cargarTorneosDesdeStorage();
+    
+    if (torneosAnteriores.length > 0) {
+        const primerTorneo = torneosAnteriores[0];
+        torneoId = primerTorneo.id;
+        torneoActual = primerTorneo;
+        
+        partidosList = [];
+        let maxRing = 0;
+        
+        if (torneoActual.REGISTRO) {
+            Object.values(torneoActual.REGISTRO).forEach(match => {
+                if (match.gallos) {
+                    Object.entries(match.gallos).forEach(([anillo, galloData]) => {
+                        partidosList.push({
+                            anillo: anillo,
+                            peso: galloData.peso,
+                            color: galloData.color || '',
+                            partido: match.nombre,
+                            representante: match.representante || ''
+                        });
+                        const num = parseInt(anillo, 10);
+                        if (!isNaN(num) && num > maxRing) maxRing = num;
                     });
                 }
-                ultimoAnillo = maxRing;
-                configuracion = {
-                    gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
-                    pesoMin: torneoActual.pesoMin || 1700,
-                    pesoMax: torneoActual.pesoMax || 2400,
-                    rangoPeso: torneoActual.rangoPeso || 50,
-                    anillosEditables: torneoActual.config?.anillosEditables || false,
-                    registroDetalladoActivo: torneoActual.config?.registroDetallado || false
-                };
-                puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
-                representantesList = torneoActual.representantesUsados || [];
-                serialIdActual = torneoActual.serialInfo?.serialId || null;
-                torneosEnSerialActual = torneoActual.serialInfo?.torneosEnSerial || [];
-                cargarNombresPartidosUnificados();
-                
-                if (torneoActual.cotejoData) {
-                    resultadosCotejo = {
-                        peleas: torneoActual.cotejoData.peleas || [],
-                        noEmparejados: torneoActual.cotejoData.noEmparejados || [],
-                        metricas: torneoActual.cotejoData.metricas || {}
-                    };
-                    cargarCalificacionesExistentes();
-                    AppState.rooster.cotejoState = true;
-                }
-            }
-            
-            isLoading = false;
-            actualizarPantalla();
+            });
         }
         
+        ultimoAnillo = maxRing;
+        
+        configuracion = {
+            gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
+            pesoMin: torneoActual.pesoMin || 1700,
+            pesoMax: torneoActual.pesoMax || 2400,
+            rangoPeso: torneoActual.rangoPeso || 50,
+            anillosEditables: torneoActual.config?.anillosEditables || false,
+            registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+        };
+        
+        puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        representantesList = torneoActual.representantesUsados || [];
+        serialIdActual = torneoActual.serialInfo?.serialId || null;
+        torneosEnSerialActual = torneoActual.serialInfo?.torneosEnSerial || [];
+        
+        cargarNombresPartidosUnificados();
+        
+        if (torneoActual.cotejoData) {
+            resultadosCotejo = {
+                peleas: torneoActual.cotejoData.peleas || [],
+                noEmparejados: torneoActual.cotejoData.noEmparejados || [],
+                metricas: torneoActual.cotejoData.metricas || {}
+            };
+            cargarCalificacionesExistentes();
+            AppState.rooster.cotejoState = true;
+        }
+    }
+    
+    isLoading = false;
+    
+    // ✅ IMPORTANTE: Asegurar que el contenedor existe antes de actualizar
+    const root = document.getElementById('app-root');
+    if (root) {
+        root.innerHTML = '<div id="admin-main-container" style="padding:12px; max-width:1200px; margin:0 auto;"></div>';
+    }
+    
+    actualizarPantalla();
+}
         init();
         
         // ============================================================
