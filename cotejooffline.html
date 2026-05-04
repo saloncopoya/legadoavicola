@@ -4665,16 +4665,30 @@ function renderizarTablaPosiciones() {
     html += `<th style="padding: 4px 8px;"></th><th style="padding: 4px 8px;"></th>`;
     html += `</tr></thead><tbody>`;
     
-    // Recorrer cada partido
-    datosPosicion.forEach((item, idx) => {
-        const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
-        html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
-        html += `<td style="padding: 6px 2px; font-weight: 900; text-align: left;">${escapeHTML(item.nombre)}</td>`;
+ // Recorrer cada partido
+datosPosicion.forEach((item, idx) => {
+    const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+    html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
+    
+    // Número de posición (con círculo amarillo para los primeros 3)
+    const numeroPosicion = idx + 1;
+    let numeroHTML = '';
+    
+    if (numeroPosicion <= 3) {
+        // Círculo amarillo para los primeros 3 lugares
+        numeroHTML = `<span style="display: inline-flex; align-items: center; justify-content: center; background: #FFD700; color: #8B4513; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; font-weight: 900; margin-right: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${numeroPosicion}</span>`;
+    } else {
+        // Números normales para el resto
+        numeroHTML = `<span style="display: inline-block; color: #666; font-weight: 700; margin-right: 8px;">${numeroPosicion}.</span>`;
+    }
+    
+    html += `<td style="padding: 6px 2px; font-weight: 900; text-align: left;">${numeroHTML} ${escapeHTML(item.nombre)}</td>`;
+    
+    // Recorrer cada gallo del partido (1 a gallosPorPartido)
+    for (let i = 1; i <= gallosPorPartido; i++) {
+        const puntos = item[`gallo${i}_puntos`];
+        const tiempo = item[`gallo${i}_tiempo`];
         
-        // Recorrer cada gallo del partido (1 a gallosPorPartido)
-        for (let i = 1; i <= gallosPorPartido; i++) {
-            const puntos = item[`gallo${i}_puntos`];
-            const tiempo = item[`gallo${i}_tiempo`];
             
             // 🔥 MISMA LÓGICA QUE importar.html
             // Si el gallo NO existe (puntos === undefined) → celdas vacías
