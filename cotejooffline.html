@@ -1809,16 +1809,29 @@ window.limpiarResultadosCotejo = () => {
         // RECARGAR LA PANTALLA COMPLETA
         actualizarPantalla();
         
-        // Hacer scroll al formulario de registro
-        setTimeout(() => {
-            const formularioRegistro = document.querySelector('#admin-main-container > div:nth-child(2)');
-            if (formularioRegistro) {
-                formularioRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-            if (typeof regenerarCamposGallos === 'function') {
-                regenerarCamposGallos(configuracion.gallosPorPartido);
-            }
-        }, 100);
+       // Hacer scroll a la TABLA DE REGISTRO
+setTimeout(() => {
+    // Buscar el título "📋 Tabla de Registro"
+    const tablaRegistro = document.querySelector('#admin-main-container h3');
+    
+    // Alternativa: buscar el div que contiene la tabla
+    const tablaContainer = document.querySelector('#admin-main-container table');
+    
+    if (tablaRegistro) {
+        // Scroll al título de la tabla
+        tablaRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Ajustar un poco hacia arriba para que no quede pegado
+        window.scrollBy({ top: -20, behavior: 'smooth' });
+    } else if (tablaContainer) {
+        // Si no encuentra el título, scroll al contenedor de la tabla
+        tablaContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.scrollBy({ top: -20, behavior: 'smooth' });
+    }
+    
+    if (typeof regenerarCamposGallos === 'function') {
+        regenerarCamposGallos(configuracion.gallosPorPartido);
+    }
+}, 150);
         
         overlay.remove();
         AppState.addNotification(`🧹 Resultados de cotejo eliminados. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
