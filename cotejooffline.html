@@ -2581,15 +2581,35 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
             }))
         } : null,
         calificaciones: Array.from(calificacionesCargadas.entries()).map(([index, cal]) => ({
-            indicePelea: index,
-            numero: cal.numero,
-            ganador: cal.ganador,
-            tiempo: cal.tiempo,
-            usuarioCalifico: cal.usuarioCalifico,
-            fechaCalificacion: cal.fechaCalificacion,
-            puntosGallo1: cal.gallo1?.puntos,
-            puntosGallo2: cal.gallo2?.puntos
-        }))
+    indicePelea: index,
+    calificada: true,                           // ← AGREGAR
+    diferencia: cal.diferencia || 0,            // ← AGREGAR
+    fechaCalificacion: cal.fechaCalificacion,
+    gallo1: {
+        anillo: cal.gallo1?.anillo || '',
+        color: cal.gallo1?.color || '',
+        partido: cal.gallo1?.partido || '',
+        partidoId: cal.gallo1?.partidoId || '',
+        peso: cal.gallo1?.peso || 0,
+        puntos: cal.gallo1?.puntos || 0,
+        representante: cal.gallo1?.representante || ''
+    },
+    gallo2: {
+        anillo: cal.gallo2?.anillo || '',
+        color: cal.gallo2?.color || '',
+        partido: cal.gallo2?.partido || '',
+        partidoId: cal.gallo2?.partidoId || '',
+        peso: cal.gallo2?.peso || 0,
+        puntos: cal.gallo2?.puntos || 0,
+        representante: cal.gallo2?.representante || ''
+    },
+    ganador: cal.ganador,
+    numero: cal.numero,
+    tiempo: cal.tiempo,
+    timestamp: cal.timestamp || Date.now(),     // ← AGREGAR
+    usuarioCalifico: cal.usuarioCalifico,
+    usuarioId: cal.usuarioId || 'admin_offline' // ← AGREGAR
+}))
     };
     
     const jsonStr = JSON.stringify(datosCompletos, null, 2);
@@ -2720,6 +2740,63 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                                 noEmparejados: datos.resultadosCotejo.noEmparejados || [],
                                 configuracion: torneoData.config
                             };
+
+                                                        // ========== INICIO: IMPORTAR CALIFICACIONES ==========
+                            if (datos.calificaciones && datos.calificaciones.length > 0) {
+                                console.log(`📝 Importando ${datos.calificaciones.length} calificaciones...`);
+                                
+                                datos.calificaciones.forEach(calImport => {
+                                    const indicePelea = calImport.indicePelea;
+                                    
+                                    if (indicePelea >= 0 && indicePelea < torneoData.cotejoData.peleas.length) {
+                                        const peleaExistente = torneoData.cotejoData.peleas[indicePelea];
+                                        
+                                        // Asignar puntos según el ganador
+                                        let puntosRojo = 0, puntosVerde = 0;
+                                        const puntosConfig = torneoData.puntosConfig;
+                                        
+                                        if (calImport.ganador === 'rojo') {
+                                            puntosRojo = puntosConfig.ganador;
+                                            puntosVerde = puntosConfig.perdedor;
+                                        } else if (calImport.ganador === 'verde') {
+                                            puntosRojo = puntosConfig.perdedor;
+                                            puntosVerde = puntosConfig.ganador;
+                                        } else if (calImport.ganador === 'empate') {
+                                            puntosRojo = puntosConfig.empate;
+                                            puntosVerde = puntosConfig.empate;
+                                        }
+                                        
+                                        // Actualizar la pelea con la calificación
+                                        torneoData.cotejoData.peleas[indicePelea] = {
+                                            ...peleaExistente,
+                                            calificada: true,
+                                            diferencia: calImport.diferencia || peleaExistente.diferencia,
+                                            fechaCalificacion: calImport.fechaCalificacion || new Date().toLocaleString(),
+                                            ganador: calImport.ganador,
+                                            tiempo: calImport.tiempo,
+                                            timestamp: calImport.timestamp || Date.now(),
+                                            usuarioCalifico: calImport.usuarioCalifico || 'Importado',
+                                            usuarioId: calImport.usuarioId || 'importado',
+                                            gallo1: {
+                                                ...peleaExistente.gallo1,
+                                                puntos: puntosRojo
+                                            },
+                                            gallo2: {
+                                                ...peleaExistente.gallo2,
+                                                puntos: puntosVerde
+                                            }
+                                        };
+                                    }
+                                });
+                                
+                                // Actualizar métrica de peleas calificadas
+                                const calificadasCount = torneoData.cotejoData.peleas.filter(p => p.calificada === true).length;
+                                torneoData.cotejoData.metricas.peleasCalificadas = calificadasCount;
+                                console.log(`🏆 Total de peleas calificadas importadas: ${calificadasCount}`);
+                            }
+                            // ========== FIN: IMPORTAR CALIFICACIONES ==========
+
+                            
                         }
                         
                         guardarTorneoEnStorage(torneoData);
@@ -2774,7 +2851,11 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                 reader.readAsText(archivo);
             });
         }
-        
+
+
+
+
+    
         async function mostrarModalPreviewImportacion() {
             if (!archivoSeleccionado) {
                 AppState.addNotification('❌ Primero selecciona un archivo JSON', 'error');
