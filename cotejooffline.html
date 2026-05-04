@@ -1746,8 +1746,17 @@ tablaHTML += `<th style="padding:4px 2px; width: 7%;">A1</th>
             <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA VERDE</th>`;
 if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 2</th>`;
 tablaHTML += `<th style="padding:4px 2px; width: 6%;">DIF</th>
-            <th style="padding:4px 2px; width: 10%;">GANADOR</th>
-            <th style="padding:4px 2px; width: 9%;">TIEMPO</th>
+
+                       `;
+
+            // SOLO mostrar GANADOR y TIEMPO si hay calificaciones O hay cotejo guardado
+if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
+    tablaHTML += `<th style="padding:4px 2px; width: 10%;">GANADOR</th>
+                  <th style="padding:4px 2px; width: 9%;">TIEMPO</th>`;
+}
+            
+tablaHTML += `
+
         </tr></thead><tbody>`;
             
                         resultadosCotejo.peleas.forEach((p, index) => {
@@ -1772,9 +1781,18 @@ tablaHTML += `<th style="padding:4px 2px; width: 6%;">DIF</th>
                     <td style="padding:6px;">${p.gallo2.partido}</td>`;
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo2.color || '-'}</td>`;
                 tablaHTML += `<td style="padding:6px; text-align:center;">${p.diferencia}g</td>
-                    <td style="padding:6px; text-align:center;">${ganadorTexto}</td>
-                    <td style="padding:6px; text-align:center;">${tiempoTexto}</td>`;
 
+if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
+    tablaHTML += `<td style="padding:6px; text-align:center;">${ganadorTexto}</td>`;
+}
+// SOLO mostrar TIEMPO si hay calificaciones O hay cotejo guardado
+if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
+    tablaHTML += `<td style="padding:6px; text-align:center;">${tiempoTexto}</td>`;
+}
+        
+tablaHTML += `
+
+                
                 // Botones para mover peleas (solo si no hay cotejo guardado Y tiene permiso)
                 const cotejoGuardadoEnFirebase = torneoActual?.cotejoId ? true : false;
                 const puedeMover = !cotejoGuardadoEnFirebase && PERMISOS_USUARIO.posicion === true;
@@ -3068,7 +3086,7 @@ tablaHTML += `<th style="padding:4px 2px; width: 6%;">DIF</th>
                 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding:15px; border-radius:12px; text-align:center;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
                 
                <!-- MÓDULO DE COTEJO -->
-<div style="background:white; border-radius:16px; padding:16px; margin-top:16px;">
+<div style="background:white; border-radius:1px; padding:16px; margin-top:16px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
     </div>
