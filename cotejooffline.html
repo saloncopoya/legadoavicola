@@ -3348,7 +3348,14 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                             <div><label>Peso Mín (g)</label><input type="text" inputmode="numeric" id="tournament-peso-min" value="${pesoMinValor}" class="form-input" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
                             <div><label>Peso Máx (g)</label><input type="text" inputmode="numeric" id="tournament-peso-max" value="${pesoMaxValor}" class="form-input" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
                         </div>
-                        <div style="margin-bottom:12px;"><label><input type="checkbox" id="tournament-anillos-editables" ${anillosEditablesValor ? 'checked' : ''}> ✏️ Permitir editar anillos manualmente</label></div>
+
+                  <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+    <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
+    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1; border-radius:30px; padding:12px; font-weight:700;">🗑️ ELIMINAR TORNEO</button>` : ''}
+    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#e7e7e7; padding:22px; border:none; border-radius:8px; font-weight:700;">CANCELAR</button>
+</div>
+
+                    
                         
                         <div style="margin:15px 0; padding:12px; background:#f9f9f9; border-radius:12px;">
                             <div onclick="window.togglePuntosSection()" style="display:flex; justify-content:space-between; cursor:pointer;">
@@ -3373,11 +3380,7 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                             </div>
                         </div>
                         
-                       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-    <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
-    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1; border-radius:30px; padding:12px; font-weight:700;">🗑️ ELIMINAR TORNEO</button>` : ''}
-    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#e7e7e7; padding:22px; border:none; border-radius:8px; font-weight:700;">CANCELAR</button>
-</div>
+             
                     </form>
                 </div>
             `;
