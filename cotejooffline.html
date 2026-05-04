@@ -3335,7 +3335,7 @@ setTimeout(() => {
         // FUNCIONES DE PDF Y DESCARGA
         // ============================================================
         
-        window.mostrarModalDescargaCotejo = () => {
+      window.mostrarModalDescargaCotejo = () => {
     if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
         AppState.addNotification('❌ No hay resultados de cotejo para descargar', 'warning');
         return;
@@ -3352,58 +3352,152 @@ setTimeout(() => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-        <div class="modal-container" style="max-width:380px;">
+        <div class="modal-container" style="max-width:400px;">
             <h3 style="text-align:center; margin-bottom:20px;">📥 DESCARGAR COTEJO</h3>
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">ESTILO DE TABLA</label>
-                <div style="display:flex; gap:10px;">
-                    <label style="flex:1; padding:10px; border:2px solid #8B4513; border-radius:12px; text-align:center; cursor:pointer;" id="formato-pdf-label">
-                        <input type="radio" name="formato" value="pdf" checked style="display:none;"> 📄 PDF
+            
+            <!-- SECCIÓN 1: ESTILO TABLA COTEJO -->
+            <div style="margin-bottom:20px; border:1px solid #ddd; border-radius:12px; padding:12px;">
+                <div style="font-weight:700; margin-bottom:12px;">ESTILO DE TABLA COTEJO</div>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="radio" name="formato" value="pdf" checked style="margin:0;"> 📄 PDF
                     </label>
-                    <label style="flex:1; padding:10px; border:2px solid #ddd; border-radius:12px; text-align:center; cursor:pointer;" id="formato-imagen-label">
-                        <input type="radio" name="formato" value="imagen" style="display:none;"> 🖼️ EXTENDIDO
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="radio" name="formato" value="imagen" style="margin:0;"> 🖼️ EXTENDIDO
                     </label>
+                    <select id="num-vallines-select" class="form-input" style="width:auto; flex:1; min-width:140px; margin:0;">
+                        ${opcionesVallines}
+                    </select>
                 </div>
             </div>
+            
+            <!-- SECCIÓN 2: ESTILO TABLA POSICIÓN -->
+            <div style="margin-bottom:20px; border:1px solid #ddd; border-radius:12px; padding:12px;">
+                <div style="font-weight:700; margin-bottom:12px;">ESTILO TABLA POSICIÓN</div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button id="btn-descargar-pdf-posicion" class="btn-primary" style="flex:1; background:#2196F3;">📄 DESCARGAR PDF</button>
+                    <button id="btn-descargar-jpg-posicion" class="btn-primary" style="flex:1; background:#4CAF50;">🖼️ DESCARGAR JPG</button>
+                </div>
+            </div>
+            
+            <!-- BOTÓN EXPORTAR JSON -->
             <div style="margin-bottom:20px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">NÚMERO DE VALLINES</label>
-                <select id="num-vallines-select" class="form-input">${opcionesVallines}</select>
+                <button id="btn-json-modal" class="btn-primary" style="width:100%; background:#FF9800; padding:12px;">📦 EXPORTAR JSON</button>
             </div>
-            <div style="margin-bottom:15px; border-top:1px solid #ddd; padding-top:15px;">
-                <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>
-            </div>
+            
+            <!-- BOTONES FINALES -->
             <div style="display:flex; gap:10px;">
-
-                ${totalPeleas > 0 ? '<button id="confirmar-descarga" class="btn-success" style="flex:2; padding: 12px; border-radius: 30px; font-weight: 900;">✅ DESCARGAR PDF</button>' : ''}
-                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; padding: 12px; border:none; border-radius:8px; font-weight: 900;">CANCELAR</button>
+                <button id="confirmar-descarga" class="btn-success" style="flex:1; padding:12px; border-radius:30px; font-weight:900;">✅ DESCARGAR PDF</button>
+                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:30px; font-weight:900; cursor:pointer;">❌ CANCELAR</button>
             </div>
         </div>
     `;
     document.body.appendChild(overlay);
+    
+    // Manejar botón PDF de tabla posición (función placeholder)
+    document.getElementById('btn-descargar-pdf-posicion').onclick = () => {
+        AppState.addNotification('📄 Descargar PDF de tabla posición - Función en desarrollo', 'info');
+        // Aquí puedes llamar a tu función existente de PDF de posición
+        if (typeof window.descargarPDFPosicion === 'function') {
+            window.descargarPDFPosicion();
+        }
+    };
+    
+    // Manejar botón JPG de tabla posición (función placeholder)
+    document.getElementById('btn-descargar-jpg-posicion').onclick = () => {
+        AppState.addNotification('🖼️ Descargar JPG de tabla posición - Función en desarrollo', 'info');
+        if (typeof window.descargarJPGPosicion === 'function') {
+            window.descargarJPGPosicion();
+        }
+    };
+    
+    // Manejar botón JSON
+    document.getElementById('btn-json-modal').onclick = () => {
+        if (typeof window.generarDescargaCotejoJSON === 'function') {
+            window.generarDescargaCotejoJSON();
+        }
+        overlay.remove();
+    };
+    
+    // Manejar botón PDF principal
+    document.getElementById('confirmar-descarga').onclick = () => {
+        const formato = document.querySelector('input[name="formato"]:checked')?.value || 'pdf';
+        const numVallines = parseInt(document.getElementById('num-vallines-select').value, 10);
+        if (typeof window.generarPDFNativo === 'function') {
+            window.generarPDFNativo(numVallines, formato);
+        }
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelar-descarga').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+};
 
-            
-            const pdfLabel = document.getElementById('formato-pdf-label');
-            const imagenLabel = document.getElementById('formato-imagen-label');
-            pdfLabel.onclick = () => {
-                document.querySelector('input[name="formato"][value="pdf"]').checked = true;
-                pdfLabel.style.borderColor = '#8B4513';
-                imagenLabel.style.borderColor = '#ddd';
-            };
-            imagenLabel.onclick = () => {
-                document.querySelector('input[name="formato"][value="imagen"]').checked = true;
-                imagenLabel.style.borderColor = '#8B4513';
-                pdfLabel.style.borderColor = '#ddd';
-            };
-            
-            document.getElementById('confirmar-descarga').onclick = () => {
-                const formato = document.querySelector('input[name="formato"]:checked')?.value || 'pdf';
-                const numVallines = parseInt(document.getElementById('num-vallines-select').value, 10);
-                generarPDFNativo(numVallines, formato);
-                overlay.remove();
-            };
-            document.getElementById('cancelar-descarga').onclick = () => overlay.remove();
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-        };
+
+
+        // Función para descargar PDF de la tabla de posiciones
+window.descargarPDFPosicion = () => {
+    const tablaPosicion = document.getElementById('tabla-posiciones-content');
+    if (!tablaPosicion || !tablaPosicion.querySelector('table')) {
+        AppState.addNotification('❌ No hay tabla de posiciones para descargar', 'warning');
+        return;
+    }
+    
+    const ventana = window.open('', '_blank');
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Tabla de Posiciones - ${torneoActual?.nombre || 'Torneo'}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .titulo { text-align: center; margin-bottom: 20px; }
+                .titulo h1 { margin: 0; color: #8B4513; }
+                .fecha { text-align: center; color: #666; margin-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+                th { background: #8B4513; color: white; }
+                @media print { body { margin: 0; padding: 10px; } }
+            </style>
+        </head>
+        <body>
+            <div class="titulo"><h1>${torneoActual?.nombre || 'TORNEO'}</h1></div>
+            <div class="fecha">Fecha: ${torneoActual?.fecha || obtenerFechaHoy()} | Palenque: ${torneoActual?.palenque || 'No especificado'}</div>
+            ${tablaPosicion.querySelector('table').outerHTML}
+        </body>
+        </html>
+    `;
+    ventana.document.write(html);
+    ventana.document.close();
+    setTimeout(() => ventana.print(), 500);
+};
+
+// Función para descargar JPG de la tabla de posiciones
+window.descargarJPGPosicion = () => {
+    const tablaPosicion = document.getElementById('tabla-posiciones-content');
+    if (!tablaPosicion || !tablaPosicion.querySelector('table')) {
+        AppState.addNotification('❌ No hay tabla de posiciones para capturar', 'warning');
+        return;
+    }
+    
+    AppState.addNotification('📸 Capturando tabla de posiciones...', 'info');
+    
+    html2canvas(tablaPosicion, {
+        scale: 2,
+        backgroundColor: '#ffffff'
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `tabla_posiciones_${torneoActual?.nombre || 'torneo'}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        AppState.addNotification('✅ JPG descargado correctamente', 'success');
+    }).catch(error => {
+        console.error('Error al capturar:', error);
+        AppState.addNotification('❌ Error al generar la imagen', 'error');
+    });
+};
+
+
         
         function generarPDFNativo(numVallines, estilo) {
             const totalPeleas = resultadosCotejo.peleas.length;
