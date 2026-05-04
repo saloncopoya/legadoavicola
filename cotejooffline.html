@@ -2273,11 +2273,12 @@ window.limpiarResultadosCotejo = () => {
                 <select id="num-vallines-select" class="form-input">${opcionesVallines}</select>
             </div>
             <div style="margin-bottom:15px; border-top:1px solid #ddd; padding-top:15px;">
-                <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>
+               ${totalPeleas > 0 ? ' <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>' : ''}
             </div>
             <div style="display:flex; gap:10px;">
-                <button id="confirmar-descarga" class="btn-success" style="flex:2;">✅ DESCARGAR ${totalPeleas > 0 ? 'PDF' : ''}</button>
-                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
+
+                ${totalPeleas > 0 ? '<button id="confirmar-descarga" class="btn-success" style="flex:2; padding: 12px; border-radius: 30px; font-weight: 900;">✅ DESCARGAR PDF</button>' : ''}
+                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; padding: 12px; border:none; border-radius:8px; font-weight: 900;">CANCELAR</button>
             </div>
         </div>
     `;
@@ -3065,7 +3066,7 @@ window.limpiarResultadosCotejo = () => {
 
     ${cotejoGuardado ? `
     <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700;">📥 DESCARGAR PDF</button>
+<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700;">📥 DESCARGAR</button>
 <button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:15px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
 </div>
     ` : `
@@ -3265,7 +3266,7 @@ window.limpiarResultadosCotejo = () => {
                        <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
     <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
     ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1; border-radius:30px; padding:12px; font-weight:700;">🗑️ ELIMINAR TORNEO</button>` : ''}
-    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
+    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#e7e7e7; padding:22px; border:none; border-radius:8px; font-weight:700;">CANCELAR</button>
 </div>
                     </form>
                 </div>
