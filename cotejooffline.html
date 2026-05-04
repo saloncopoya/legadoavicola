@@ -3359,9 +3359,9 @@ setTimeout(() => {
             <!-- SECCIÓN 1: ESTILO TABLA COTEJO -->
             <div style="margin-bottom:20px; border:1px solid #ddd; border-radius:12px; padding:12px;">
                 <div style="font-weight:700; margin-bottom:12px;">ESTILO DE TABLA COTEJO</div>
-                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom: 20px;">
                     <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                        <input type="radio" name="formato" value="pdf" checked style="margin:0;"> 📄 PDF
+                        <input type="radio" name="formato" value="pdf" checked style="margin:0;"> 📄 NORMAL
                     </label>
                     <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
                         <input type="radio" name="formato" value="imagen" style="margin:0;"> 🖼️ EXTENDIDO
@@ -3372,8 +3372,8 @@ setTimeout(() => {
                 </div>
 
                 <!-- BOTONES FINALES -->
-            <div style="display:flex; gap:10px;">
-                <button id="confirmar-descarga" class="btn-success" style="flex:1; padding:12px; border-radius:30px; font-weight:900;">✅ DESCARGAR PDF</button>
+            <div style="display:flex; gap:10px; ">
+                <button id="confirmar-descarga" class="btn-success" style="flex:1; padding:12px; border-radius:30px; font-weight:900;">✅ DESCARGAR</button>
                 <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:30px; font-weight:900; cursor:pointer;">❌ CANCELAR</button>
             </div>
             </div>
@@ -3392,7 +3392,10 @@ setTimeout(() => {
                 <button id="btn-json-modal" class="btn-primary" style="width:100%; background:#FF9800; padding:12px;">📦 EXPORTAR JSON</button>
             </div>
             
-            
+               <!-- BOTONES FINALES -->
+            <div style="display:flex; gap:10px; ">
+                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:30px; font-weight:900; cursor:pointer;">❌ CANCELAR</button>
+            </div>
         </div>
     `;
     document.body.appendChild(overlay);
