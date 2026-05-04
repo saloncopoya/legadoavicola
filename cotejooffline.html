@@ -142,6 +142,100 @@
                 width: 100%;
             }
         }
+
+
+
+
+        /* Estilos para Tabla de Posiciones */
+.posicion-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.posicion-table th {
+    background: #8B4513;
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.posicion-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.posicion-table td:first-child {
+    font-weight: 900;
+    text-align: left;
+}
+
+/* Puntos y tiempos con colores */
+.puntos-ganador {
+    background: #4CAF50;
+    color: white;
+    font-weight: bold;
+}
+
+.puntos-empate {
+    background: #2196F3;
+    color: white;
+    font-weight: bold;
+}
+
+.puntos-perdedor {
+    background: #f44336;
+    color: white;
+    font-weight: bold;
+}
+
+.tiempo-ganador {
+    background: #4CAF50;
+    color: white;
+}
+
+.tiempo-empate {
+    background: #2196F3;
+    color: white;
+}
+
+.tiempo-perdedor {
+    background: #f44336;
+    color: white;
+}
+
+/* NUEVA TABLA DE POSICIONES - Sección */
+#posiciones-container {
+    margin-top: 20px;
+    overflow-x: auto;
+    background: white;
+    border-radius: 16px;
+    padding: 1px;
+}
+
+.posiciones-header {
+    background: #8B4513;
+    color: white;
+    padding: 15px;
+    border-radius: 16px 16px 0 0;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+}
+
+.posiciones-header span {
+    font-size: 24px;
+}
+
+.no-posiciones {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    background: #f9f9f9;
+    border-radius: 0 0 16px 16px;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
@@ -1097,6 +1191,7 @@ for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
             if (headerGallos) headerGallos.textContent = partidosList.length;
 
              actualizarListaRepresentantes();
+            renderizarTablaPosiciones();
         }
         
         // ============================================================
@@ -2546,6 +2641,7 @@ container.innerHTML = `
             }
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
+            renderizarTablaPosiciones();
         }
         
         window.cambioPeleaSelect = (indexStr) => {
@@ -2710,6 +2806,7 @@ container.innerHTML = `
             calificacionesCargadas.set(index, calificacionData);
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
+            renderizarTablaPosiciones();
             window.limpiarSeleccionPelea();
             
             if (calificacionesCargadas.size === resultadosCotejo.peleas.length) {
@@ -3739,10 +3836,244 @@ setTimeout(() => {
     <div id="cotejo-resultados-container" style="margin-top:15px; overflow-x:auto;">
         ${hayResultadosCotejo ? '' : `<div style="text-align:center; padding:40px; color:#999;">⚡ Presiona COTEJAR para generar enfrentamientos</div>`}
     </div>
+
+    <!-- SECCIÓN TABLA DE POSICIONES -->
+<div id="posiciones-container" style="display: none; margin-top: 30px;">
+    <div class="posiciones-header">
+        <span>🏆</span> TABLA DE POSICIONES
+    </div>
+    <div id="tabla-posiciones-content">
+        <div class="no-posiciones">
+            <span>📊</span>
+            <p>Califica peleas para ver la tabla de posiciones</p>
+        </div>
+    </div>
+</div>
+
+
 </div>
             </div>
             `;
         }
+
+
+
+// ============================================================
+// FUNCIONES PARA TABLA DE POSICIONES
+// ============================================================
+
+function procesarTablaPosiciones() {
+    if (!resultadosCotejo || !resultadosCotejo.peleas || resultadosCotejo.peleas.length === 0) {
+        return [];
+    }
+    
+    const peleas = resultadosCotejo.peleas;
+    const partidoMap = new Map();
+    
+    // Obtener configuración de puntos del torneo
+    const puntosConfig = torneoActual?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+    const gallosPorPartido = configuracion.gallosPorPartido || 3;
+    
+    peleas.forEach((pelea, index) => {
+        // Buscar calificación (desde calificacionesCargadas)
+        const calificacion = calificacionesCargadas.get(index);
+        if (!calificacion) return;
+        
+        const gallo1 = pelea.gallo1;
+        const gallo2 = pelea.gallo2;
+        
+        // Función para inicializar partido en el mapa
+        const initPartido = (nombre) => {
+            if (!nombre) return null;
+            if (!partidoMap.has(nombre)) {
+                partidoMap.set(nombre, {
+                    puntos: 0,
+                    tiempo: 0,
+                    gallos: [],
+                    gallosPuntos: [],
+                    gallosTiempos: []
+                });
+            }
+            return partidoMap.get(nombre);
+        };
+        
+        // Convertir tiempo a segundos
+        const tiempoSegundos = convertirTiempoASegundos(calificacion.tiempo);
+        
+        // Procesar gallo1 (rojo)
+        if (gallo1 && gallo1.partido) {
+            const data = initPartido(gallo1.partido);
+            if (data) {
+                let puntosGallo = 0;
+                if (calificacion.ganador === 'rojo') {
+                    puntosGallo = puntosConfig.ganador;
+                    data.tiempo += tiempoSegundos;
+                } else if (calificacion.ganador === 'empate') {
+                    puntosGallo = puntosConfig.empate;
+                    data.tiempo += tiempoSegundos;
+                } else {
+                    puntosGallo = puntosConfig.perdedor;
+                }
+                
+                data.puntos += puntosGallo;
+                data.gallos.push(gallo1);
+                data.gallosPuntos.push(puntosGallo);
+                data.gallosTiempos.push(calificacion.ganador === 'rojo' || calificacion.ganador === 'empate' ? tiempoSegundos : 0);
+            }
+        }
+        
+        // Procesar gallo2 (verde)
+        if (gallo2 && gallo2.partido) {
+            const data = initPartido(gallo2.partido);
+            if (data) {
+                let puntosGallo = 0;
+                if (calificacion.ganador === 'verde') {
+                    puntosGallo = puntosConfig.ganador;
+                    data.tiempo += tiempoSegundos;
+                } else if (calificacion.ganador === 'empate') {
+                    puntosGallo = puntosConfig.empate;
+                    data.tiempo += tiempoSegundos;
+                } else {
+                    puntosGallo = puntosConfig.perdedor;
+                }
+                
+                data.puntos += puntosGallo;
+                data.gallos.push(gallo2);
+                data.gallosPuntos.push(puntosGallo);
+                data.gallosTiempos.push(calificacion.ganador === 'verde' || calificacion.ganador === 'empate' ? tiempoSegundos : 0);
+            }
+        }
+    });
+    
+    // Convertir mapa a array y ordenar
+    let resultados = Array.from(partidoMap.entries()).map(([nombre, data]) => {
+        const resultado = {
+            nombre: nombre,
+            puntos: data.puntos,
+            tiempo: data.tiempo,
+            gallosPuntos: data.gallosPuntos,
+            gallosTiempos: data.gallosTiempos
+        };
+        
+        // Agregar datos de cada gallo (máximo 6)
+        for (let i = 0; i < gallosPorPartido; i++) {
+            resultado[`gallo${i+1}_puntos`] = data.gallosPuntos[i] || 0;
+            resultado[`gallo${i+1}_tiempo`] = data.gallosTiempos[i] || 0;
+        }
+        
+        return resultado;
+    });
+    
+    // Ordenar: por puntos (mayor primero) y luego por tiempo (menor primero)
+    resultados.sort((a, b) => {
+        if (a.puntos !== b.puntos) return b.puntos - a.puntos;
+        return a.tiempo - b.tiempo;
+    });
+    
+    return resultados;
+}
+
+function convertirTiempoASegundos(tiempo) {
+    if (!tiempo) return 0;
+    const partes = tiempo.split(':');
+    if (partes.length === 2) {
+        return parseInt(partes[0]) * 60 + parseInt(partes[1]);
+    }
+    return 0;
+}
+
+function formatTiempo(segundos) {
+    if (!segundos && segundos !== 0) return '00:00';
+    const minutos = Math.floor(segundos / 60);
+    const segs = segundos % 60;
+    return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+}
+
+function renderizarTablaPosiciones() {
+    const container = document.getElementById('posiciones-container');
+    const contentDiv = document.getElementById('tabla-posiciones-content');
+    
+    if (!container || !contentDiv) return;
+    
+    // Verificar si hay cotejo guardado Y calificaciones
+    const tieneCotejo = torneoActual?.cotejoId;
+    const tieneCalificaciones = calificacionesCargadas.size > 0;
+    
+    if (!tieneCotejo || resultadosCotejo.peleas.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'block';
+    
+    const datosPosicion = procesarTablaPosiciones();
+    const gallosPorPartido = configuracion.gallosPorPartido || 3;
+    const puntosConfig = torneoActual?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+    
+    if (datosPosicion.length === 0 || !tieneCalificaciones) {
+        contentDiv.innerHTML = `<div class="no-posiciones">
+            <span>📊</span>
+            <p>Califica peleas para ver la tabla de posiciones</p>
+        </div>`;
+        return;
+    }
+    
+    // Construir tabla HTML
+    let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
+    html += `<thead><tr style="background: #8B4513; color: white;">`;
+    html += `<th style="padding: 12px 8px;">PARTIDO</th>`;
+    
+    // Columnas de gallos
+    for (let i = 0; i < gallosPorPartido; i++) {
+        html += `<th style="padding: 12px 4px;" colspan="2">GALLO ${i+1}</th>`;
+    }
+    html += `<th style="padding: 12px 8px;">PUNTOS</th>`;
+    html += `<th style="padding: 12px 8px;">TIEMPO</th>`;
+    html += `</tr>`;
+    
+    html += `<tr style="background: #A0522D; color: white;">`;
+    html += `<th style="padding: 8px 8px;"></th>`;
+    for (let i = 0; i < gallosPorPartido; i++) {
+        html += `<th style="padding: 8px 4px;">Pts</th>`;
+        html += `<th style="padding: 8px 4px;">Tpo</th>`;
+    }
+    html += `<th style="padding: 8px 8px;"></th>`;
+    html += `<th style="padding: 8px 8px;"></th>`;
+    html += `</tr></thead><tbody>`;
+    
+    datosPosicion.forEach((item, idx) => {
+        const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+        html += `<tr style="background-color: ${bgColor};">`;
+        html += `<td style="padding: 10px 8px; font-weight: bold; text-align: left;">${escapeHTML(item.nombre)}</td>`;
+        
+        for (let i = 1; i <= gallosPorPartido; i++) {
+            const puntos = item[`gallo${i}_puntos`] || 0;
+            const tiempo = item[`gallo${i}_tiempo`] || 0;
+            
+            // Clases para puntos
+            let puntosClass = '';
+            if (puntos === puntosConfig.ganador) puntosClass = 'puntos-ganador';
+            else if (puntos === puntosConfig.empate) puntosClass = 'puntos-empate';
+            else if (puntos === puntosConfig.perdedor) puntosClass = 'puntos-perdedor';
+            
+            // Clases para tiempo
+            let tiempoClass = '';
+            if (puntos === puntosConfig.ganador) tiempoClass = 'tiempo-ganador';
+            else if (puntos === puntosConfig.empate) tiempoClass = 'tiempo-empate';
+            else if (puntos === puntosConfig.perdedor) tiempoClass = 'tiempo-perdedor';
+            
+            html += `<td style="padding: 8px 4px; text-align: center;" class="${puntosClass}">${puntos}</td>`;
+            html += `<td style="padding: 8px 4px; text-align: center;" class="${tiempoClass}">${formatTiempo(tiempo)}</td>`;
+        }
+        
+        html += `<td style="padding: 10px 8px; text-align: center; font-weight: bold; background: #e8f5e8;">${item.puntos}</td>`;
+        html += `<td style="padding: 10px 8px; text-align: center; font-weight: bold;">${formatTiempo(item.tiempo)}</td>`;
+        html += `</tr>`;
+    });
+    
+    html += `</tbody></table>`;
+    contentDiv.innerHTML = html;
+}
         
         // ============================================================
 
@@ -3764,6 +4095,8 @@ setTimeout(() => {
     const cotejoContainer = document.getElementById('cotejo-resultados-container');
     if (cotejoContainer && resultadosCotejo.peleas.length > 0) {
         renderizarResultadosCotejo();
+        renderizarTablaPosiciones();
+
     }
     regenerarCamposGallos(configuracion.gallosPorPartido);
     
