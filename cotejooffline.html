@@ -2641,7 +2641,13 @@ container.innerHTML = `
             }
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
-            renderizarTablaPosiciones();
+
+        setTimeout(() => {
+    if (typeof renderizarTablaPosiciones === 'function') {
+        renderizarTablaPosiciones();
+    }
+}, 100);
+        
         }
         
         window.cambioPeleaSelect = (indexStr) => {
@@ -2806,8 +2812,14 @@ container.innerHTML = `
             calificacionesCargadas.set(index, calificacionData);
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
-            renderizarTablaPosiciones();
             window.limpiarSeleccionPelea();
+
+            // Después de calificacionesCargadas.set(index, calificacionData);
+setTimeout(() => {
+    if (typeof renderizarTablaPosiciones === 'function') {
+        renderizarTablaPosiciones();
+    }
+}, 50);
             
             if (calificacionesCargadas.size === resultadosCotejo.peleas.length) {
                 AppState.addNotification('✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!', 'success', 5000);
@@ -2837,6 +2849,13 @@ container.innerHTML = `
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
             window.limpiarSeleccionPelea();
+            
+            setTimeout(() => {
+    if (typeof renderizarTablaPosiciones === 'function') {
+        renderizarTablaPosiciones();
+    }
+}, 50);
+            
             AppState.addNotification('✅ Calificación eliminada', 'success');
         };
         
@@ -3993,14 +4012,19 @@ function renderizarTablaPosiciones() {
     const container = document.getElementById('posiciones-container');
     const contentDiv = document.getElementById('tabla-posiciones-content');
     
-    if (!container || !contentDiv) return;
+    if (!container || !contentDiv) {
+        console.log('⚠️ Elementos de posiciones no encontrados en el DOM');
+        return;
+    }
     
-    // Verificar si hay cotejo guardado Y calificaciones
-    const tieneCotejo = torneoActual?.cotejoId;
-    const tieneCalificaciones = calificacionesCargadas.size > 0;
+    // ✅ CORREGIDO: Verificar cotejoData (no cotejoId)
+    const tieneCotejo = torneoActual && torneoActual.cotejoData && torneoActual.cotejoData.peleas && torneoActual.cotejoData.peleas.length > 0;
+    const tieneCalificaciones = calificacionesCargadas && calificacionesCargadas.size > 0;
     
-    if (!tieneCotejo || resultadosCotejo.peleas.length === 0) {
+    // ✅ La tabla SOLO se muestra si hay cotejo guardado Y calificaciones
+    if (!tieneCotejo || resultadosCotejo.peleas.length === 0 || !tieneCalificaciones) {
         container.style.display = 'none';
+        console.log('Tabla de posiciones oculta: sin cotejo guardado o sin calificaciones');
         return;
     }
     
@@ -4010,7 +4034,7 @@ function renderizarTablaPosiciones() {
     const gallosPorPartido = configuracion.gallosPorPartido || 3;
     const puntosConfig = torneoActual?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
     
-    if (datosPosicion.length === 0 || !tieneCalificaciones) {
+    if (datosPosicion.length === 0) {
         contentDiv.innerHTML = `<div class="no-posiciones">
             <span>📊</span>
             <p>Califica peleas para ver la tabla de posiciones</p>
@@ -4023,7 +4047,6 @@ function renderizarTablaPosiciones() {
     html += `<thead><tr style="background: #8B4513; color: white;">`;
     html += `<th style="padding: 12px 8px;">PARTIDO</th>`;
     
-    // Columnas de gallos
     for (let i = 0; i < gallosPorPartido; i++) {
         html += `<th style="padding: 12px 4px;" colspan="2">GALLO ${i+1}</th>`;
     }
@@ -4050,13 +4073,11 @@ function renderizarTablaPosiciones() {
             const puntos = item[`gallo${i}_puntos`] || 0;
             const tiempo = item[`gallo${i}_tiempo`] || 0;
             
-            // Clases para puntos
             let puntosClass = '';
             if (puntos === puntosConfig.ganador) puntosClass = 'puntos-ganador';
             else if (puntos === puntosConfig.empate) puntosClass = 'puntos-empate';
             else if (puntos === puntosConfig.perdedor) puntosClass = 'puntos-perdedor';
             
-            // Clases para tiempo
             let tiempoClass = '';
             if (puntos === puntosConfig.ganador) tiempoClass = 'tiempo-ganador';
             else if (puntos === puntosConfig.empate) tiempoClass = 'tiempo-empate';
@@ -4073,6 +4094,14 @@ function renderizarTablaPosiciones() {
     
     html += `</tbody></table>`;
     contentDiv.innerHTML = html;
+    
+    // Aplicar estilos guardados
+    const savedFontSize = localStorage.getItem('tablaPosicionFontSize');
+    if (savedFontSize && contentDiv.querySelector('table')) {
+        contentDiv.querySelector('table').style.fontSize = savedFontSize + 'px';
+    }
+    
+    console.log(`✅ Tabla de posiciones renderizada: ${datosPosicion.length} partidos`);
 }
         
         // ============================================================
