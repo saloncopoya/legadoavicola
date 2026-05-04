@@ -1628,7 +1628,7 @@ window.limpiarResultadosCotejo = () => {
                     <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR COTEJO?</h3>
                     <p style="margin-bottom:20px;">Se eliminarán todas las peleas generadas y calificaciones.</p>
                     <div style="display:flex; gap:10px;">
-                        <button id="confirmar-eliminar-cotejo" class="btn-danger" style="flex:2; padding:14px;">🗑️ ELIMINAR</button>
+                        <button id="confirmar-eliminar-cotejo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
                         <button id="cancelar-eliminar-cotejo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
                     </div>
                 </div>
@@ -2683,8 +2683,8 @@ window.limpiarResultadosCotejo = () => {
                             <div><strong>⚡ Peleas:</strong> ${preview.cantidadPeleas}</div>
                         </div>
                         <div style="display:flex; gap:10px;">
-                            <button id="confirmar-importar" class="btn-success" style="flex:2;">✅ IMPORTAR</button>
-                            <button id="cancelar-importar" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
+                            <button id="confirmar-importar" class="btn-success" style="flex:2; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">✅ IMPORTAR</button>
+                            <button id="cancelar-importar" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">CANCELAR</button>
                         </div>
                     </div>
                 `;
@@ -3064,8 +3064,8 @@ window.limpiarResultadosCotejo = () => {
 
     ${cotejoGuardado ? `
     <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700; font-size:16px;">📥 DESCARGAR PDF</button>
-<button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:12px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700;">📥 DESCARGAR PDF</button>
+<button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:15px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
 </div>
     ` : `
     <!-- FILA 1: Selector de modo y botón COTEJAR/REINTENTAR -->
