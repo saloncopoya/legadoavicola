@@ -1803,13 +1803,33 @@ window.limpiarResultadosCotejo = () => {
             }
 
 
-              let noEmparejadosHTML = '';
-            if (resultadosCotejo.noEmparejados.length > 0) {
-                noEmparejadosHTML = `<div style="margin-top:12px; padding:2px; background:#fff8e1; border-radius:8px;">
-                    <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
-${resultadosCotejo.noEmparejados.map(item => `<div>• Anillo: ${item.gallo.anillo} (${item.gallo.peso} g) - ${item.gallo.partido} - ${item.motivo.mensaje}</div>`).join('')}
-                </div>`;
-            }
+             let noEmparejadosHTML = '';
+if (resultadosCotejo.noEmparejados.length > 0) {
+    // Función para obtener color según el motivo
+    const getMotivoColor = (motivo) => {
+        const mensaje = motivo.mensaje || '';
+        if (mensaje.includes('Supera rango de peso') || mensaje.includes('RANGO_EXCEDIDO')) {
+            return 'background:#ffebee; border-left:4px solid #d32f2f;';
+        } else if (mensaje.includes('Mismo nombre') || mensaje.includes('MISMO_PARTIDO')) {
+            return 'background:#fff3e0; border-left:4px solid #ff9800;';
+        } else if (mensaje.includes('Mismo representante') || mensaje.includes('MISMO_REPRESENTANTE')) {
+            return 'background:#e3f2fd; border-left:4px solid #2196f3;';
+        } else if (mensaje.includes('Peso no registrado') || mensaje.includes('PESO_CERO')) {
+            return 'background:#f3e5f5; border-left:4px solid #9c27b0;';
+        } else {
+            return 'background:#fff8e1; border-left:4px solid #ffc107;';
+        }
+    };
+    
+    noEmparejadosHTML = `<div style="margin-top:12px; padding:2px; background:#fff8e1; border-radius:8px;">
+        <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
+        ${resultadosCotejo.noEmparejados.map(item => `
+            <div style="padding:8px 12px; margin:5px 0; border-radius:8px; ${getMotivoColor(item.motivo)}">
+                • Anillo: ${item.gallo.anillo} (${item.gallo.peso} g) - ${item.gallo.partido} - ${item.motivo.mensaje}
+            </div>
+        `).join('')}
+    </div>`;
+}
             
  let tablaHTML = `<div style="width: 100%; overflow-x: visible;">
     <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9px;">
