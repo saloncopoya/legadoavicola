@@ -1696,7 +1696,19 @@ setTimeout(() => {
                 
                 
                 renderizarResultadosCotejo();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Scroll solo hasta la sección COTEJO
+const cotejoSection = document.querySelector('#admin-main-container > div:last-child');
+if (cotejoSection) {
+    const offset = 80; // Espacio adicional desde arriba (ajustable)
+    const elementPosition = cotejoSection.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+    
+    window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+    });
+}
                 AppState.addNotification(`✅ Cotejo completado: ${resultado.peleas.length} peleas generadas`, 'success');
             } catch (error) {
                 console.error('Error en cotejo:', error);
