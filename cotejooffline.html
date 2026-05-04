@@ -2336,7 +2336,7 @@ const modo = modoSelect ? modoSelect.value : 'ASCENDENTE';
         const mejorDifMax = resultado.peleas.length > 0 ? Math.max(...resultado.peleas.map(p => p.diferencia)) : 0;
         
         console.log(`🎯 INTELIGENTE: Mejor tipo = ${mejor.tipo}`);
-        console.log(`   No emparejados: ${mejor.noEmparejados.length}`);
+        console.log(`   Pendiente de cruce: ${mejor.noEmparejados.length}`);
         console.log(`   Diferencia máxima: ${mejorDifMax}g`);
     }
 
@@ -2504,7 +2504,7 @@ window.scrollTo({ top: 700, behavior: 'smooth' });
         
         window.guardarCotejo = async () => {
             if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
-                AppState.addNotification('❌ Primero debes COTEJAR AHORA', 'warning');
+                AppState.addNotification('❌ Primero debes GENERAR CRUCES', 'warning');
                 return;
             }
             
@@ -2701,7 +2701,7 @@ if (resultadosCotejo.noEmparejados.length > 0) {
     };
     
     noEmparejadosHTML = `<div style="margin-top:12px; padding:20px; background:#16191c; border-radius:8px;">
-        <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
+        <div style="font-weight:600; color:#d32f2f;">⚠️ PENDIENTE DE CRUCE (${noEmparejados}):</div>
         ${resultadosCotejo.noEmparejados.map(item => `
             <div style="padding:5px 8px; margin:5px 0; border-radius:18px; ${getMotivoColor(item.motivo)}">
                 • Anillo: ${item.gallo.anillo} (${item.gallo.peso} g) - ${item.gallo.partido} - ${item.motivo.mensaje}
@@ -2816,7 +2816,7 @@ if (conflictosDetallados.length > 0) {
     conflictosHTML = `
         <div style="margin-top: 20px; margin-bottom: 10px; padding: 10px; background: #fff3e0; border-radius: 12px; border-left: 5px solid #ff9800;">
             <div style="font-weight: 800; font-size: 16px; margin-bottom: 12px; color: #e65100;">
-                ⚠️ CONFLICTOS DETECTADOS (${conflictosDetallados.length}):
+                ⚠️ REPETICIONES SEGUIDAS (${conflictosDetallados.length}):
             </div>
             <div style="max-height: 300px; overflow-y: auto;">
                 ${conflictosDetallados.map(c => `
@@ -2862,7 +2862,7 @@ container.innerHTML = `
         </div>
         <div style="background:#ffebee; padding:10px; border-radius:8px; text-align:center;">
             <div style="font-size:24px; font-weight:700;">${resultadosCotejo.metricas.conflictosConsecutivos || 0}</div>
-            <div>Conflictos</div>
+            <div>Repeticiones</div>
         </div>
     </div>
     ${noEmparejadosHTML}
@@ -4356,7 +4356,7 @@ setTimeout(() => {
                 <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
                 <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
             </select>
-            <button onclick="window.ejecutarCotejo()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 30px; font-weight: 700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
+            <button onclick="window.ejecutarCotejo()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 30px; font-weight: 700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'GENERAR CRUCES'}</button>
         </div>
     </div>
     <table style="width:100%; border-collapse:collapse;">
@@ -4435,7 +4435,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     </div>
 ` : ''}
 
-<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
+<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'GENERAR CRUCES'}</button>
 </div>
 
  
@@ -4645,12 +4645,12 @@ function renderizarTablaPosiciones() {
     // CONSTRUIR TABLA - MISMO ESTILO QUE importar.html
     // ==============================================
     let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
-    html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
-    html += `<th style="padding: 2px 2px; text-align: left;" rowspan="2">PARTIDO</th>`;
-    html += `<th style="padding: 2px 2px; text-align: center;" colspan="${gallosPorPartido * 2}"># COMBATES</th>`;
-    html += `<th style="padding: 2px 2px; text-align: center;" rowspan="2">P.T.</th>`;
-    html += `<th style="padding: 2px 2px; text-align: center;" rowspan="2">T.T.</th>`;
-    html += `</tr>`;
+   html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
+html += `<th style="padding: 2px 2px; text-align: left; vertical-align: top;" rowspan="2">NOMBRE DEL PARTIDO</th>`;
+html += `<th style="padding: 2px 2px; text-align: center;" colspan="${gallosPorPartido * 2}">📋 RESULTADOS</th>`;
+html += `<th style="padding: 2px 2px; text-align: left; vertical-align: top;" rowspan="2">P.T.</th>`;
+html += `<th style="padding: 2px 2px; text-align: left; vertical-align: top;" rowspan="2">T.T.</th>`;
+html += `</tr>`;
     html += `<tr style="background: #A0522D;">`;
     for (let i = 0; i < gallosPorPartido; i++) {
         html += `<th style="padding: 2px 2px; text-align: center;" colspan="2">GALLO ${i+1}</th>`;
