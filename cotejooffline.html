@@ -1070,6 +1070,8 @@
             if (headerPartidos) headerPartidos.textContent = contarPartidosUnicos();
             const headerGallos = document.querySelector('.header-estadisticas-gallos');
             if (headerGallos) headerGallos.textContent = partidosList.length;
+
+             actualizarListaRepresentantes();
         }
         
         // ============================================================
@@ -2120,6 +2122,27 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
             if (peleaSeleccionadaActual) select.value = peleaSeleccionadaActual.indexOriginal;
             else if (valorActual && valorActual !== '') select.value = valorActual;
         }
+
+
+        function actualizarListaRepresentantes() {
+    // Extraer representantes únicos de partidosList
+    const representantesUnicos = [...new Set(partidosList.map(p => p.representante).filter(r => r && r.trim() !== ''))];
+    representantesList = representantesUnicos;
+    
+    // Actualizar el datalist de representantes en el formulario principal
+    const datalist = document.getElementById('representantes-list');
+    if (datalist) {
+        datalist.innerHTML = representantesUnicos.map(r => `<option value="${escapeHTML(r)}">`).join('');
+    }
+    
+    // Actualizar datalist en el modal de edición (si existe)
+    const editDatalist = document.getElementById('edit-representantes-list');
+    if (editDatalist) {
+        editDatalist.innerHTML = representantesUnicos.map(r => `<option value="${escapeHTML(r)}">`).join('');
+    }
+    
+    console.log(`📋 Representantes actualizados: ${representantesUnicos.length} encontrados`);
+}
         
         function cargarCalificacionesExistentes() {
 
@@ -2823,6 +2846,8 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                         }
                         partidosList = nuevosPartidos;
                         ultimoAnillo = maxRing;
+
+                        actualizarListaRepresentantes();
                         
                         configuracion = {
                             gallosPorPartido: torneoData.config.gallosPorPartido,
@@ -3527,6 +3552,11 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
             const torneo = torneosAnteriores.find(t => t.id === torneoIdSeleccionado);
             if (!torneo) return;
 
+
+            //  LIMPIAR TEXBOX DE REPRESENTANTE PRIMERO
+    const representanteInput = document.getElementById('match-representante');
+    if (representanteInput) representanteInput.value = '';
+            
             calificacionesCargadas.clear();
     peleaSeleccionadaActual = null;
             
@@ -3563,7 +3593,10 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                 registroDetalladoActivo: torneo.config?.registroDetallado || false
             };
             puntosConfiguracion = torneo.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
-            representantesList = torneo.representantesUsados || [];
+           
+              // ACTUALIZAR LISTA DE REPRESENTANTES
+    actualizarListaRepresentantes();
+            
             serialIdActual = torneo.serialInfo?.serialId || null;
             torneosEnSerialActual = torneo.serialInfo?.torneosEnSerial || [];
             cargarNombresPartidosUnificados();
