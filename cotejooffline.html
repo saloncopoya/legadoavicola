@@ -3314,9 +3314,8 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
             <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
             <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
         </select>
-<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
-</div>
-    
+
+           
   ${hayResultadosCotejo ? `
     <!-- FILA 2: Botones GUARDAR (solo si no hay no emparejados) y LIMPIAR -->
     <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
@@ -3326,6 +3325,11 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
         <button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
     </div>
 ` : ''}
+
+<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
+</div>
+
+ 
     `}
     
     <div id="cotejo-resultados-container" style="margin-top:15px; overflow-x:auto;">
