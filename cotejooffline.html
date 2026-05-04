@@ -593,34 +593,64 @@
             return matchId;
         }
         
+
+
         function eliminarPartido(nombrePartido) {
-            if (!torneoId) return;
-            
-            // Buscar matchId
-            let matchId = null;
-            for (const id in torneoActual.REGISTRO) {
-                if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
-                    matchId = id;
-                    break;
-                }
-            }
-            
-            if (matchId) {
-                delete torneoActual.REGISTRO[matchId];
-                partidosList = partidosList.filter(p => p.partido !== nombrePartido);
-                guardarTorneoEnStorage(torneoActual);
-                
-                if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
-                    resultadosCotejo = {
-                        peleas: [],
-                        noEmparejados: [],
-                        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-                    };
-                }
-                
-                AppState.addNotification(`✅ Partido "${nombrePartido}" eliminado`, 'success');
+    if (!torneoId) return;
+    
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR PARTIDO?</h3>
+            <p style="margin-bottom:20px;">
+                Partido: <strong>${nombrePartido}</strong><br><br>
+                Se eliminarán TODOS los gallos de este partido.<br>
+                <span style="color:#d32f2f; font-weight:bold;">¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmar-eliminar').onclick = () => {
+        // Buscar matchId
+        let matchId = null;
+        for (const id in torneoActual.REGISTRO) {
+            if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
+                matchId = id;
+                break;
             }
         }
+        
+        if (matchId) {
+            delete torneoActual.REGISTRO[matchId];
+            partidosList = partidosList.filter(p => p.partido !== nombrePartido);
+            guardarTorneoEnStorage(torneoActual);
+            
+            if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
+                resultadosCotejo = {
+                    peleas: [],
+                    noEmparejados: [],
+                    metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+                };
+            }
+            
+            AppState.addNotification(`✅ Partido "${nombrePartido}" eliminado`, 'success');
+            actualizarPantalla();
+        }
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelar-eliminar').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+        
         
         function guardarEdicionPartido(nombreOriginal, nuevoNombre, nuevoRepresentante, gallosEditados) {
             if (!torneoId) return;
@@ -792,34 +822,61 @@
         }
         
         function eliminarGallo(nombrePartido, anillo) {
-            if (!torneoId) return;
-            
-            const anilloFormateado = anillo.padStart(3, '0');
-            
-            let matchId = null;
-            for (const id in torneoActual.REGISTRO) {
-                if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
-                    matchId = id;
-                    break;
-                }
-            }
-            
-            if (matchId && torneoActual.REGISTRO[matchId].gallos[anilloFormateado]) {
-                delete torneoActual.REGISTRO[matchId].gallos[anilloFormateado];
-                partidosList = partidosList.filter(p => !(p.anillo === anilloFormateado && p.partido === nombrePartido));
-                guardarTorneoEnStorage(torneoActual);
-                
-                if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
-                    resultadosCotejo = {
-                        peleas: [],
-                        noEmparejados: [],
-                        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-                    };
-                }
-                
-                AppState.addNotification(`✅ Gallo ${anillo} eliminado`, 'success');
+    if (!torneoId) return;
+    
+    const anilloFormateado = anillo.padStart(3, '0');
+    
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR GALLO?</h3>
+            <p style="margin-bottom:20px;">
+                Partido: <strong>${nombrePartido}</strong><br>
+                Anillo: <strong>${anillo}</strong><br><br>
+                <span style="color:#d32f2f; font-weight:bold;">¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmar-eliminar').onclick = () => {
+        let matchId = null;
+        for (const id in torneoActual.REGISTRO) {
+            if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
+                matchId = id;
+                break;
             }
         }
+        
+        if (matchId && torneoActual.REGISTRO[matchId].gallos[anilloFormateado]) {
+            delete torneoActual.REGISTRO[matchId].gallos[anilloFormateado];
+            partidosList = partidosList.filter(p => !(p.anillo === anilloFormateado && p.partido === nombrePartido));
+            guardarTorneoEnStorage(torneoActual);
+            
+            if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
+                resultadosCotejo = {
+                    peleas: [],
+                    noEmparejados: [],
+                    metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+                };
+            }
+            
+            AppState.addNotification(`✅ Gallo ${anillo} eliminado`, 'success');
+            actualizarPantalla();
+        }
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelar-eliminar').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
         
         // ============================================================
         // FUNCIONES DE CONFIGURACIÓN
@@ -1468,85 +1525,105 @@ window.limpiarResultadosCotejo = () => {
         AppState.addNotification('📭 No hay resultados de cotejo para limpiar', 'info');
         return;
     }
-    if (!confirm('⚠️ ¿Estás seguro de limpiar los resultados del cotejo?\n\nEsto borrará las peleas generadas y podrás registrar más partidos.')) return;
     
-    // ✅ RESTAURAR CONFIGURACIÓN DEL TORNEO ANTES DE LIMPIAR
-    if (torneoActual) {
-        configuracion = {
-            gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
-            pesoMin: torneoActual.pesoMin || 1700,
-            pesoMax: torneoActual.pesoMax || 2400,
-            rangoPeso: torneoActual.rangoPeso || 50,
-            anillosEditables: torneoActual.config?.anillosEditables || false,
-            registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿LIMPIAR RESULTADOS?</h3>
+            <p style="margin-bottom:20px;">
+                Se eliminarán:<br>
+                ⚡ <strong>${resultadosCotejo.peleas.length}</strong> peleas generadas<br>
+                🏆 <strong>${calificacionesCargadas.size}</strong> calificaciones<br><br>
+                Podrás registrar más partidos y volver a cotejar.<br>
+                <span style="color:#d32f2f; font-weight:bold;">¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-limpiar" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR</button>
+                <button id="cancelar-limpiar" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmar-limpiar').onclick = () => {
+        // RESTAURAR CONFIGURACIÓN DEL TORNEO ANTES DE LIMPIAR
+        if (torneoActual) {
+            configuracion = {
+                gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
+                pesoMin: torneoActual.pesoMin || 1700,
+                pesoMax: torneoActual.pesoMax || 2400,
+                rangoPeso: torneoActual.rangoPeso || 50,
+                anillosEditables: torneoActual.config?.anillosEditables || false,
+                registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+            };
+            
+            puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        }
+        
+        // Limpiar resultados de cotejo
+        resultadosCotejo = {
+            peleas: [],
+            noEmparejados: [],
+            metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
         };
         
-        // ✅ RESTAURAR PUNTOS CONFIGURADOS
-        puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        // Limpiar calificaciones
+        calificacionesCargadas.clear();
+        peleaSeleccionadaActual = null;
         
-        console.log(`✅ Configuración restaurada: Rango de peso = ${configuracion.rangoPeso}g, Puntos: Ganador=${puntosConfiguracion.ganador}, Empate=${puntosConfiguracion.empate}, Perdedor=${puntosConfiguracion.perdedor}`);
-    }
-    
-    // Limpiar resultados de cotejo
-    resultadosCotejo = {
-        peleas: [],
-        noEmparejados: [],
-        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+        // Si hay un cotejo guardado, también eliminarlo
+        if (torneoActual && torneoActual.cotejoId) {
+            delete torneoActual.cotejoId;
+            delete torneoActual.cotejoData;
+            guardarTorneoEnStorage(torneoActual);
+            AppState.rooster.cotejoState = false;
+        }
+        
+        // ACTUALIZAR SLIDERS Y INPUTS DE LA UI
+        setTimeout(() => {
+            const rangoSlider = document.getElementById('config-rango-peso-slider');
+            const rangoInput = document.getElementById('config-rango-peso');
+            const rangoValorActual = document.getElementById('rango-valor-actual');
+            
+            if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
+            if (rangoInput) rangoInput.value = configuracion.rangoPeso;
+            if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
+            
+            const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
+            const puntosEmpateSpan = document.getElementById('puntos-empate-info');
+            const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
+            
+            if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
+            if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
+            if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
+        }, 100);
+        
+        // RECARGAR LA PANTALLA COMPLETA
+        actualizarPantalla();
+        
+        // Hacer scroll al formulario de registro
+        setTimeout(() => {
+            const formularioRegistro = document.querySelector('#admin-main-container > div:nth-child(2)');
+            if (formularioRegistro) {
+                formularioRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            if (typeof regenerarCamposGallos === 'function') {
+                regenerarCamposGallos(configuracion.gallosPorPartido);
+            }
+        }, 100);
+        
+        overlay.remove();
+        AppState.addNotification(`🧹 Resultados de cotejo eliminados. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
+        
+        if (navigator.vibrate) navigator.vibrate(100);
     };
     
-    // Limpiar calificaciones
-    calificacionesCargadas.clear();
-    peleaSeleccionadaActual = null;
-    
-    // Si hay un cotejo guardado, también eliminarlo
-    if (torneoActual && torneoActual.cotejoId) {
-        delete torneoActual.cotejoId;
-        delete torneoActual.cotejoData;
-        guardarTorneoEnStorage(torneoActual);
-        AppState.rooster.cotejoState = false;
-    }
-    
-    // ✅ ACTUALIZAR SLIDERS Y INPUTS DE LA UI
-    setTimeout(() => {
-        const rangoSlider = document.getElementById('config-rango-peso-slider');
-        const rangoInput = document.getElementById('config-rango-peso');
-        const rangoValorActual = document.getElementById('rango-valor-actual');
-        
-        if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
-        if (rangoInput) rangoInput.value = configuracion.rangoPeso;
-        if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
-        
-        // Actualizar puntos en la UI si están visibles
-        const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
-        const puntosEmpateSpan = document.getElementById('puntos-empate-info');
-        const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
-        
-        if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
-        if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
-        if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
-    }, 100);
-    
-    // ✅ RECARGAR LA PANTALLA COMPLETA
-    actualizarPantalla();
-    
-    // ✅ Hacer scroll al formulario de registro
-    setTimeout(() => {
-        const formularioRegistro = document.querySelector('#admin-main-container > div:nth-child(2)');
-        if (formularioRegistro) {
-            formularioRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        // Regenerar campos de gallos
-        if (typeof regenerarCamposGallos === 'function') {
-            regenerarCamposGallos(configuracion.gallosPorPartido);
-        }
-    }, 100);
-    
-    AppState.addNotification(`🧹 Resultados de cotejo eliminados. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
-    
-    // Feedback háptico
-    if (navigator.vibrate) navigator.vibrate(100);
+    document.getElementById('cancelar-limpiar').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 };
-
 
         
         window.guardarCotejo = async () => {
