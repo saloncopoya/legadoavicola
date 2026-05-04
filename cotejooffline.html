@@ -3697,8 +3697,8 @@ setTimeout(() => {
             <div id="admin-main-container" style="padding:1px; max-width:1200px; margin:0 auto;">
                 <!-- HEADER -->
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                    <h1 style="margin:0 0 10px; color:#8B4513; font-size:28px; text-align:center;">🐓 ${torneoActual?.nombre || 'Torneo'}</h1>
-                    <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; font-size:13px; color:#666;">
+                    <h1 style="margin:0 0 1px; color:#8B4513; font-size:28px; text-align:center;"> ${torneoActual?.nombre || 'Torneo'}</h1>
+                    <div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font-size:13px; color:#666;">
                         <span>📅 ${torneoActual?.fecha || obtenerFechaHoy()}</span>
                         <span>🏟️ ${torneoActual?.palenque || 'Sin palenque'}</span>
                         <span>📋 Partidos: <strong class="header-estadisticas-partidos">${contarPartidosUnicos()}</strong></span>
