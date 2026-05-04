@@ -3567,7 +3567,7 @@ container.innerHTML = `
 </div>
     ` : `
     <!-- FILA 1: Selector de modo y botón COTEJAR/REINTENTAR -->
-    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+    <div style="display:flex; gap:10px; margin-bottom:1px; flex-wrap:wrap;">
       <select id="cotejo-modo" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
     <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
     <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
@@ -3578,7 +3578,7 @@ container.innerHTML = `
            
  ${hayResultadosCotejo ? `
     <!-- FILA 2: Botones LIMPIAR (izquierda) y GUARDAR (derecha) -->
-    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; justify-content: space-between;">
+    <div style="display:flex; gap:10px; margin-bottom:1px; flex-wrap:wrap; justify-content: space-between;">
         <button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
         ${resultadosCotejo.noEmparejados && resultadosCotejo.noEmparejados.length === 0 ? `
         <button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">💾 GUARDAR COTEJO</button>
