@@ -1732,14 +1732,23 @@ window.limpiarResultadosCotejo = () => {
                 </div>`;
             }
             
- let tablaHTML = `<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
-        <table style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap;">
+ let tablaHTML = `<div style="width: 100%; overflow-x: visible;">
+    <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9px;">
         <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
-                    <th style="padding:6px;">#</th><th style="text-align:left;">CINTA ROJA</th>`;
-            if (configuracion.registroDetalladoActivo) tablaHTML += `<th>COLOR 1</th>`;
-            tablaHTML += `<th>A1</th><th>P1</th><th>#</th><th>P2</th><th>A2</th><th style="text-align:left;">CINTA VERDE</th>`;
-            if (configuracion.registroDetalladoActivo) tablaHTML += `<th>COLOR 2</th>`;
-            tablaHTML += `<th>DIF</th><th>GANADOR</th><th>TIEMPO</th></tr></thead><tbody>`;
+            <th style="padding:4px 2px; width: 6%;">#</th>
+            <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA ROJA</th>`;
+if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 1</th>`;
+tablaHTML += `<th style="padding:4px 2px; width: 7%;">A1</th>
+            <th style="padding:4px 2px; width: 7%;">P1</th>
+            <th style="padding:4px 2px; width: 6%;">#</th>
+            <th style="padding:4px 2px; width: 7%;">P2</th>
+            <th style="padding:4px 2px; width: 7%;">A2</th>
+            <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA VERDE</th>`;
+if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 2</th>`;
+tablaHTML += `<th style="padding:4px 2px; width: 6%;">DIF</th>
+            <th style="padding:4px 2px; width: 10%;">GANADOR</th>
+            <th style="padding:4px 2px; width: 9%;">TIEMPO</th>
+        </tr></thead><tbody>`;
             
                         resultadosCotejo.peleas.forEach((p, index) => {
                 const calificacion = calificacionesCargadas.get(index);
@@ -2273,7 +2282,7 @@ window.limpiarResultadosCotejo = () => {
                 <select id="num-vallines-select" class="form-input">${opcionesVallines}</select>
             </div>
             <div style="margin-bottom:15px; border-top:1px solid #ddd; padding-top:15px;">
-               ${totalPeleas > 0 ? ' <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>' : ''}
+                <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>
             </div>
             <div style="display:flex; gap:10px;">
 
