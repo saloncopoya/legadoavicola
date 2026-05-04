@@ -3785,16 +3785,15 @@ setTimeout(() => {
 </div>
                 ` : ''}
                 
-              
-                <!-- MÓDULO DE CALIFICACIÓN (solo si hay cotejo guardado) -->
+              <!-- MÓDULO DE CALIFICACIÓN (solo si hay cotejo guardado) -->
 ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
 <div style="position: sticky; top: 0; z-index: 100; background: white; border-radius: 12px; padding: 12px; margin-top: 16px; border-top: 3px solid #FFD700; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-    <!-- TÍTULO + COMBOBOX EN LA MISMA LÍNEA -->
+    <!-- TÍTULO flex:1 + COMBOBOX flex:3 EN LA MISMA LÍNEA -->
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <div style="width: 20%; flex-shrink: 0;">
+        <div style="flex: 1;">
             <span style="font-weight: 700; font-size: 14px;">🏆 CALIFICACIONES</span>
         </div>
-        <div style="flex: 1;">
+        <div style="flex: 3;">
             <select id="calificacion-peleas-select" onchange="window.cambioPeleaSelect(this.value)" class="form-input" style="margin: 0; padding: 8px 12px; font-size: 13px;">
                 ${generarOpcionesComboboxCalificacion()}
             </select>
@@ -3820,6 +3819,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
 </div>
 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding: 15px; border-radius: 12px; text-align:center; font-size: 13px;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
 
+                
                <!-- MÓDULO DE COTEJO -->
 <!-- MÓDULO DE COTEJO -->
 <div id="seccion-cotejo" style="background:white; border-radius:1px; padding:1px; margin-top:16px;">    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
