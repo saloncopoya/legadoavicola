@@ -3056,40 +3056,42 @@ window.limpiarResultadosCotejo = () => {
                 </div>
                 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding:15px; border-radius:12px; text-align:center;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
                 
-                <!-- MÓDULO DE COTEJO -->
-                <div style="background:white; border-radius:16px; padding:16px; margin-top:16px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
-                    </div>
-                    
+               <!-- MÓDULO DE COTEJO -->
+<div style="background:white; border-radius:16px; padding:16px; margin-top:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
+    </div>
 
-                  ${cotejoGuardado ? `
-<div style="display:flex; gap:8px; margin-bottom:12px;">
-    <button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2;">📥 DESCARGAR PDF</button>
-    <button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1;">🗑️ ELIMINAR</button>
+    ${cotejoGuardado ? `
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:120px; padding:12px; border-radius:30px; font-weight:700;">📥 DESCARGAR PDF</button>
+<button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:12px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
 </div>
-` : `
-<div style="display:flex; gap:8px; margin-bottom:12px;">
-    ${hayResultadosCotejo ? `<button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1;">🗑️ LIMPIAR</button>` : ''}
-    <select id="cotejo-modo" style="padding:8px; border:2px solid #8B4513; border-radius:8px; font-size:13px; font-weight:500; background:white; flex:1;">
-        <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
-        <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
-        <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
-        <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
-    </select>
-    <button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:2;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
+    ` : `
+    <!-- FILA 1: Selector de modo y botón COTEJAR/REINTENTAR -->
+    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+        <select id="cotejo-modo" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
+            <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
+            <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
+            <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
+            <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
+        </select>
+<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
 </div>
-${hayResultadosCotejo ? `
-<div style="display:flex; gap:8px; margin-bottom:12px;">
-    <button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1;">💾 GUARDAR COTEJO</button>
+    
+    ${hayResultadosCotejo ? `
+    <!-- FILA 2: Botones GUARDAR y LIMPIAR juntos lado a lado -->
+    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+<button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">💾 GUARDAR COTEJO</button>
+<button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
 </div>
-` : ''}
-`}
-                    
-                    <div id="cotejo-resultados-container" style="margin-top:15px;">
-                        ${hayResultadosCotejo ? '' : `<div style="text-align:center; padding:40px; color:#999;">⚡ Presiona COTEJAR para generar enfrentamientos</div>`}
-                    </div>
-                </div>
+    ` : ''}
+    `}
+    
+    <div id="cotejo-resultados-container" style="margin-top:15px; overflow-x:auto;">
+        ${hayResultadosCotejo ? '' : `<div style="text-align:center; padding:40px; color:#999;">⚡ Presiona COTEJAR para generar enfrentamientos</div>`}
+    </div>
+</div>
             </div>
             `;
         }
