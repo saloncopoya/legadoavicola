@@ -3793,7 +3793,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     <!-- TÍTULO flex:1 + COMBOBOX flex:3 EN LA MISMA LÍNEA -->
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
         <div style="flex: 1;">
-            <span style="font-weight: 700; font-size: 13px;">🏆 CALIFICAR</span>
+            <span style="font-weight: 900; font-size: 11px;">🏆 CALIFICAR</span>
         </div>
         <div style="flex: 4;">
             <select id="calificacion-peleas-select" onchange="window.cambioPeleaSelect(this.value)" class="form-input" style="margin: 0; padding: 8px 12px; font-size: 13px;">
@@ -4014,9 +4014,18 @@ function convertirTiempoASegundos(tiempo) {
 
 function formatTiempo(segundos) {
     if (!segundos && segundos !== 0) return '00:00';
-    const minutos = Math.floor(segundos / 60);
+    
+    const horas = Math.floor(segundos / 3600);
+    const minutosRestantes = Math.floor((segundos % 3600) / 60);
     const segs = segundos % 60;
-    return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+    
+    // Si hay horas (1 hora o más), mostrar HH:MM:SS
+    if (horas > 0) {
+        return `${horas.toString().padStart(2, '0')}:${minutosRestantes.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+    }
+    
+    // Si es menos de 1 hora, mostrar MM:SS
+    return `${minutosRestantes.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
 }
 
 function renderizarTablaPosiciones() {
