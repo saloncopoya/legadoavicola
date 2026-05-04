@@ -244,15 +244,16 @@
 
 
 
-
-
-        /* ==============================================
-   MODO OSCURO (DARK MODE)
+    /* ==============================================
+   MODO OSCURO (DARK MODE) - COMPLETO
    ============================================== */
+
+/* Fondo general */
 body.dark-mode {
     background: #121212 !important;
 }
 
+/* Contenedores principales */
 body.dark-mode #admin-main-container,
 body.dark-mode .collapsible-section,
 body.dark-mode .collapsible-header,
@@ -263,14 +264,111 @@ body.dark-mode .modal-container {
     border-color: #333 !important;
 }
 
-body.dark-mode .collapsible-header h3,
-body.dark-mode .view-controls label,
-body.dark-mode .no-data p {
+/* HEADER principal (tarjeta blanca del torneo) */
+body.dark-mode #admin-main-container > div:first-child {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    box-shadow: none !important;
+}
+
+body.dark-mode #admin-main-container > div:first-child h1 {
+    color: #FFD700 !important;
+}
+
+body.dark-mode #admin-main-container > div:first-child div[style*="color:#666"] {
+    color: #aaa !important;
+}
+
+body.dark-mode #admin-main-container > div:first-child .header-estadisticas-partidos,
+body.dark-mode #admin-main-container > div:first-child .header-estadisticas-gallos {
+    color: #FFD700 !important;
+}
+
+/* Selector de torneos */
+body.dark-mode #header-torneo-selector {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+    border-color: #FFD700 !important;
+}
+
+body.dark-mode #header-torneo-selector option {
+    background-color: #2c2c2c !important;
     color: #f0f0f0 !important;
 }
 
+/* Sección Registrar Partido */
+body.dark-mode #admin-main-container > div[style*="background:white"][style*="border-radius:16px"] {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode #admin-main-container h3 {
+    color: #FFD700 !important;
+}
+
+/* Campos de formulario */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode .form-input,
+body.dark-mode button:not(.btn-primary):not(.btn-icon):not([id^="estado-"]) {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode input::placeholder {
+    color: #888 !important;
+}
+
+body.dark-mode input[readonly] {
+    background-color: #3a3a3a !important;
+    color: #f0f0f0 !important;
+}
+
+/* Botones de estado PRESENTE/PENDIENTE */
+body.dark-mode button[id^="estado-"] {
+    background-color: #2e7d32 !important;
+    color: white !important;
+}
+
+body.dark-mode button[id^="estado-"]:contains("PENDIENTE") {
+    background-color: #c62828 !important;
+}
+
+/* Información de representante */
+body.dark-mode #representante-info {
+    color: #aaa !important;
+}
+
+body.dark-mode #representante-info span {
+    color: #FFD700 !important;
+}
+
+/* Sección COTEJO */
+body.dark-mode #seccion-cotejo {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+/* Tarjetas de métricas del cotejo */
+body.dark-mode #cotejo-resultados-container > div:first-child > div {
+    background: #2c2c2c !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode #cotejo-resultados-container > div:first-child > div div:first-child {
+    color: #FFD700 !important;
+}
+
+body.dark-mode #cotejo-resultados-container > div:first-child > div div:last-child {
+    color: #aaa !important;
+}
+
 /* Tablas en modo oscuro */
-body.dark-mode table,
+body.dark-mode table {
+    background-color: #1e1e1e !important;
+}
+
 body.dark-mode th,
 body.dark-mode td {
     background-color: #1e1e1e !important;
@@ -282,15 +380,61 @@ body.dark-mode th {
     background: #2c2c2c !important;
 }
 
-/* Inputs y selects en oscuro */
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode button:not(.btn-primary):not(.btn-icon) {
-    background-color: #2c2c2c !important;
-    color: #f0f0f0 !important;
-    border-color: #555 !important;
+/* ==============================================
+   CONSERVAR COLORES ROJO Y VERDE DE TABLAS
+   (NO se cambian en modo oscuro)
+   ============================================== */
+
+/* Color ROJO - Columna # del cotejo */
+body.dark-mode .cotejo-table td:first-child,
+body.dark-mode .cotejo-table th:first-child,
+body.dark-mode table td:first-child[style*="background:#d32f2f"],
+body.dark-mode table td[style*="background:#d32f2f"],
+body.dark-mode tr td:first-child[style*="background:#d32f2f"] {
+    background: #d32f2f !important;
+    color: white !important;
 }
 
+/* Color VERDE - Columna # central del cotejo */
+body.dark-mode .cotejo-table td:nth-child(6),
+body.dark-mode .cotejo-table th:nth-child(6),
+body.dark-mode table td[style*="background:#4CAF50"] {
+    background: #4CAF50 !important;
+    color: white !important;
+}
+
+/* Tabla de posiciones - conservar colores de puntos y tiempos */
+body.dark-mode .puntos-ganador,
+body.dark-mode .tiempo-ganador {
+    background: #4CAF50 !important;
+    color: white !important;
+}
+
+body.dark-mode .puntos-empate,
+body.dark-mode .tiempo-empate {
+    background: #2196F3 !important;
+    color: white !important;
+}
+
+body.dark-mode .puntos-perdedor,
+body.dark-mode .tiempo-perdedor {
+    background: #f44336 !important;
+    color: white !important;
+}
+
+/* Asegurar textos blancos en celdas especiales */
+body.dark-mode .puntos-ganador,
+body.dark-mode .puntos-empate,
+body.dark-mode .puntos-perdedor,
+body.dark-mode .tiempo-ganador,
+body.dark-mode .tiempo-empate,
+body.dark-mode .tiempo-perdedor,
+body.dark-mode .cotejo-table td:first-child,
+body.dark-mode .cotejo-table td:nth-child(6) {
+    color: white !important;
+}
+
+/* Botones principales */
 body.dark-mode .btn-primary {
     background: #FFD700 !important;
     color: #1e1e1e !important;
@@ -299,6 +443,67 @@ body.dark-mode .btn-primary {
 body.dark-mode .btn-primary:hover {
     background: #FFC107 !important;
 }
+
+body.dark-mode .btn-success {
+    background: #2e7d32 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-danger {
+    background: #c62828 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-warning {
+    background: #f9a825 !important;
+    color: #1e1e1e !important;
+}
+
+/* Sección de configuración */
+body.dark-mode #config-content {
+    background: #2c2c2c !important;
+}
+
+body.dark-mode #config-content select,
+body.dark-mode #config-content label {
+    background: #1e1e1e !important;
+    color: #f0f0f0 !important;
+}
+
+/* Modales */
+body.dark-mode .modal-overlay {
+    background: rgba(0,0,0,0.9) !important;
+}
+
+body.dark-mode .modal-container {
+    background: #1e1e1e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-mode .modal-container h3,
+body.dark-mode .modal-container h2 {
+    color: #FFD700 !important;
+}
+
+/* Datalist options */
+body.dark-mode datalist option {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+}
+
+/* Scrollbar en modo oscuro */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #FFD700;
+    border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #FFC107;
+}    
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
