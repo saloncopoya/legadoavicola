@@ -3489,7 +3489,7 @@ window.descargarPDFPosicion = () => {
 
 // Función para descargar JPG de la tabla de posiciones
 window.descargarJPGPosicion = () => {
-    const tablaPosicion = document.getElementById('tabla-posiciones-content');
+    const tablaPosicion = document.getElementById('posiciones-container');
     if (!tablaPosicion || !tablaPosicion.querySelector('table')) {
         AppState.addNotification('❌ No hay tabla de posiciones para capturar', 'warning');
         return;
