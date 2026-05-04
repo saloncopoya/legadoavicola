@@ -2848,7 +2848,7 @@ setTimeout(() => {
             const puedeMover = !cotejoGuardado && PERMISOS_USUARIO.posicion;
             
             return `
-            <div id="admin-main-container" style="padding:12px; max-width:1200px; margin:0 auto;">
+            <div id="admin-main-container" style="padding:1px; max-width:1200px; margin:0 auto;">
                 <!-- HEADER -->
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                     <h1 style="margin:0 0 10px; color:#8B4513; font-size:28px; text-align:center;">🐓 ${torneoActual?.nombre || 'Torneo'}</h1>
@@ -2920,7 +2920,7 @@ setTimeout(() => {
                 </div>
                 
                 <!-- TABLA DE PARTIDOS -->
-                <div style="background:white; border-radius:16px; padding:16px; overflow-x:auto;">
+                <div style="background:white; border-radius:16px; padding:1px; overflow-x:auto;">
                     <h3 style="margin-bottom:15px;">📋 Tabla de Registro</h3>
                     <table style="width:100%; border-collapse:collapse;">
                         <thead>${headerColumnas}</thead>
@@ -3486,7 +3486,7 @@ ${hayResultadosCotejo ? `
     // ✅ IMPORTANTE: Asegurar que el contenedor existe antes de actualizar
     const root = document.getElementById('app-root');
     if (root) {
-        root.innerHTML = '<div id="admin-main-container" style="padding:12px; max-width:1200px; margin:0 auto;"></div>';
+        root.innerHTML = '<div id="admin-main-container" style="padding:2px; max-width:1200px; margin:0 auto;"></div>';
     }
     
     actualizarPantalla();
