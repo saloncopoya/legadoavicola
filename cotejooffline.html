@@ -1574,6 +1574,9 @@ function obtenerListaConflictosDetallada(peleas) {
                     partidosUsados.add(p.gallo2.partido);
                 });
                 puntajeTotal += partidosUsados.size * 10;
+
+                window._conflictosDetallados = [];
+
                 
                 resultados.push({
                     peleas: peleasOrdenadas,
@@ -1662,25 +1665,35 @@ function obtenerListaConflictosDetallada(peleas) {
                     if (actual.some(c => siguiente.includes(c))) conflictos++;
                 }
                 
-                resultadosCotejo = {
-                    peleas: resultado.peleas,
-                    noEmparejados: resultado.noEmparejados,
-                    metricas: {
-                        totalGallos: partidosList.filter(g => g.peso > 0).length,
-                        peleasGeneradas: resultado.peleas.length,
-                        noEmparejados: resultado.noEmparejados.length,
-                        diferenciaPromedio: resultado.peleas.length > 0 
-                            ? resultado.peleas.reduce((a, b) => a + b.diferencia, 0) / resultado.peleas.length : 0,
-                        conflictosConsecutivos: conflictos
-                    }
-                };
+                // PRIMERO: Crear las peleas
+resultadosCotejo = {
+    peleas: resultado.peleas,
+    noEmparejados: resultado.noEmparejados,
+    metricas: {
+        totalGallos: partidosList.filter(g => g.peso > 0).length,
+        peleasGeneradas: resultado.peleas.length,
+        noEmparejados: resultado.noEmparejados.length,
+        diferenciaPromedio: resultado.peleas.length > 0 
+            ? resultado.peleas.reduce((a, b) => a + b.diferencia, 0) / resultado.peleas.length : 0,
+        conflictosConsecutivos: 0  // Temporal, lo calcularemos después
+    }
+};
 
-                // Forzar que la variable local se actualice correctamente
+// SEGUNDO: Forzar recalcular conflictos (esto llena window._conflictosDetallados)
+resultadosCotejo.metricas.conflictosConsecutivos = calcularNumeroConflictos(resultadosCotejo.peleas);
+
+// TERCERO: Verificar que los conflictos detallados se hayan generado
+console.log(`🔍 CONFLICTOS CALCULADOS: ${resultadosCotejo.metricas.conflictosConsecutivos}`);
+console.log(`📋 LISTA DETALLADA: ${window._conflictosDetallados.length} conflictos encontrados`);
+
+// Forzar que la variable local se actualice correctamente
 console.log(`📊 PELEAS GENERADAS: ${resultadosCotejo.peleas.length}`);
-// Pequeño delay para asegurar que la UI se actualice
+
+// CUARTO: Actualizar la UI
 setTimeout(() => {
     actualizarPantalla();
 }, 50);
+                
                 
                 renderizarResultadosCotejo();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
