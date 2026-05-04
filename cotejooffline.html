@@ -4676,7 +4676,7 @@ datosPosicion.forEach((item, idx) => {
     
     if (numeroPosicion <= 4) {
         // Círculo amarillo para los primeros 4 lugares
-        numeroHTML = `<span style="display: inline-flex; align-items: center; justify-content: center; background: #FFD700; color: #000; width: 28px; height: 28px; border-radius: 50%;  font-size: clamp(11px, 3.5vw, 26px); font-weight: 900; margin-right: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${numeroPosicion}</span>`;
+        numeroHTML = `<span style="display: inline-flex; align-items: center; justify-content: center; background: #FFD700; color: #000; width: clamp(13px, 6vw, 34px); height: clamp(13px, 6vw, 34px); border-radius: 50%;  font-size: clamp(11px, 3.5vw, 26px); font-weight: 900; margin-right: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${numeroPosicion}</span>`;
     } else {
         // Números normales para el resto
         numeroHTML = `<span style="display: inline-block; color: #ffc107; font-weight: 900; margin-right: 1px;">${numeroPosicion}.</span>`;
