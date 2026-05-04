@@ -3793,8 +3793,8 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     <!-- TÍTULO flex:1 + COMBOBOX flex:3 EN LA MISMA LÍNEA -->
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
         <div style="flex: 1;">
-            <span style="font-weight: 900; font-size: 11px;">🏆 CALIFICAR</span>
-        </div>
+<span style="font-weight: 900; font-size: clamp(10px, 4vw, 28px);">🏆 CALIFICAR</span>
+</div>
         <div style="flex: 4;">
             <select id="calificacion-peleas-select" onchange="window.cambioPeleaSelect(this.value)" class="form-input" style="margin: 0; padding: 8px 12px; font-size: 13px;">
                 ${generarOpcionesComboboxCalificacion()}
@@ -3802,7 +3802,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
         </div>
     </div>
     
-    <div id="calificacion-usuario-info" style="font-size: 11px; color: #666; margin-bottom: 8px;"></div>
+    <div id="calificacion-usuario-info" style="font-size: 9px; color: #666;"></div>
     <div id="calificacion-detalle-pelea" style="display:none;"></div>
     <div id="calificacion-formulario" style="display:none;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
