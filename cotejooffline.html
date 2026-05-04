@@ -1710,21 +1710,20 @@ setTimeout(() => {
 
                 // Scroll a la sección COTEJO (usando el ID específico)
 setTimeout(() => {
+  // Scroll a la sección COTEJO
+setTimeout(() => {
     const cotejoSection = document.getElementById('seccion-cotejo');
     if (cotejoSection) {
-        const offset = 20; // Espacio desde arriba
-        const elementPosition = cotejoSection.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - offset;
-        
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        });
-        console.log('📍 Scroll a sección COTEJO');
+        cotejoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Ajuste adicional después del scroll
+        setTimeout(() => {
+            window.scrollBy({ top: -0, behavior: 'smooth' });
+            console.log('📍 Scroll completado a sección COTEJO');
+        }, 300);
     } else {
         console.log('⚠️ No se encontró la sección COTEJO');
     }
-}, 150);
+}, 200);
                 
                 AppState.addNotification(`✅ Cotejo completado: ${resultado.peleas.length} peleas generadas`, 'success');
             } catch (error) {
@@ -1828,24 +1827,20 @@ window.limpiarResultadosCotejo = () => {
         
 
         // Scroll a la TABLA DE REGISTRO (usando el ID específico)
+// Scroll a la TABLA DE REGISTRO
 setTimeout(() => {
     const tituloTabla = document.getElementById('titulo-tabla-registro');
     if (tituloTabla) {
         tituloTabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Ajuste fino
+        // Ajuste fino después del scroll
         setTimeout(() => {
-            window.scrollBy({ top: -15, behavior: 'smooth' });
-        }, 100);
-        console.log('📍 Scroll a Tabla de Registro');
+            window.scrollBy({ top: -0, behavior: 'smooth' });
+            console.log('📍 Scroll completado a Tabla de Registro');
+        }, 300);
     } else {
         console.log('⚠️ No se encontró la Tabla de Registro');
-        // Fallback: scroll al formulario
         const formulario = document.querySelector('#admin-main-container > div:nth-child(2)');
         if (formulario) formulario.scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    if (typeof regenerarCamposGallos === 'function') {
-        regenerarCamposGallos(configuracion.gallosPorPartido);
     }
 }, 200);
         
