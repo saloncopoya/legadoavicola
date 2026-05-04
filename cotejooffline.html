@@ -4070,30 +4070,41 @@ function renderizarTablaPosiciones() {
         
         for (let i = 1; i <= gallosPorPartido; i++) {
             const puntos = item[`gallo${i}_puntos`] || 0;
-            const tiempo = item[`gallo${i}_tiempo`] || 0;
+            const tiempoSegundos = item[`gallo${i}_tiempo`] || 0;
             
-            // ✅ NUEVA LÓGICA: Solo aplicar clases si el gallo PARTICIPÓ (puntos NO es 0)
-            // o si los puntos corresponden a ganador/empate/perdedor (pero 0 es NO PARTICIPÓ)
+            // ✅ NUEVA LÓGICA:
+            // - Si puntos = 0 → gallo NO participó → mostrar vacío, sin color
+            // - Si puntos > 0 → gallo participó → mostrar puntos y tiempo con color según resultado
+            
             let puntosClass = '';
             let tiempoClass = '';
+            let tiempoMostrar = '';
             
-            // Si el gallo tiene puntos (participó en la pelea)
             if (puntos !== 0) {
+                // El gallo SÍ participó en una pelea
                 if (puntos === puntosConfig.ganador) {
                     puntosClass = 'puntos-ganador';
                     tiempoClass = 'tiempo-ganador';
+                    tiempoMostrar = formatTiempo(tiempoSegundos);
                 } else if (puntos === puntosConfig.empate) {
                     puntosClass = 'puntos-empate';
                     tiempoClass = 'tiempo-empate';
+                    tiempoMostrar = formatTiempo(tiempoSegundos);
                 } else if (puntos === puntosConfig.perdedor) {
                     puntosClass = 'puntos-perdedor';
                     tiempoClass = 'tiempo-perdedor';
+                    // ✅ Perdedor: mostrar "00:00" con fondo rojo
+                    tiempoMostrar = '00:00';
                 }
+            } else {
+                // Gallo NO participó → celdas vacías
+                puntosClass = '';
+                tiempoClass = '';
+                tiempoMostrar = '';
             }
-            // Si puntos === 0 → NO aplicar clases (fondo transparente)
             
-            html += `<td style="padding: 8px 4px; text-align: center;" class="${puntosClass}">${puntos}</td>`;
-            html += `<td style="padding: 8px 4px; text-align: center;" class="${tiempoClass}">${formatTiempo(tiempo)}</td>`;
+            html += `<td style="padding: 8px 4px; text-align: center;" class="${puntosClass}">${puntos !== 0 ? puntos : ''}</td>`;
+            html += `<td style="padding: 8px 4px; text-align: center;" class="${tiempoClass}">${tiempoMostrar}</td>`;
         }
         
         html += `<td style="padding: 10px 8px; text-align: center; font-weight: bold; background: #e8f5e8;">${item.puntos}</td>`;
