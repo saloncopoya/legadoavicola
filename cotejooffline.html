@@ -228,7 +228,7 @@
             }
         };
         
-        let cotejoUltimoModo = 'INTELIGENTE';
+let cotejoUltimoModo = 'ASCENDENTE';
         let cotejoEnProceso = false;
         
         // Variables para serial
@@ -3545,12 +3545,12 @@ container.innerHTML = `
     ` : `
     <!-- FILA 1: Selector de modo y botón COTEJAR/REINTENTAR -->
     <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-        <select id="cotejo-modo" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
-            <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
-            <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
-            <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
-            <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
-        </select>
+      <select id="cotejo-modo" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
+    <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
+    <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
+    <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
+    <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
+</select>
 
            
   ${hayResultadosCotejo ? `
