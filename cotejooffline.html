@@ -2712,6 +2712,8 @@ container.innerHTML = `
                     <div style="margin-top:10px; display:flex; gap:10px;">
                         <button onclick="confirmarReCalificar()" style="background:#ff9800; color:white; border:none; padding:8px 16px; border-radius:8px;">✏️ RECALIFICAR</button>
                         <button onclick="eliminarCalificacionPelea(${index})" style="background:#f44336; color:white; border:none; padding:8px 16px; border-radius:8px;">🗑️ ELIMINAR</button>
+                     <button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none'; document.getElementById('calificacion-usuario-info').innerHTML='';" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">✖️ CANCELAR</button>
+                     
                     </div>
                 `;
                 document.getElementById('calificacion-formulario').style.display = 'none';
@@ -3818,9 +3820,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
 <div id="calificacion-info-anterior" style="display:none; background:#fff3cd; padding:15px; border-radius:8px; margin-top:10px;"></div>
 <div id="calificacion-todas-mensaje" style="display:none; background:#4CAF50; color:white; padding: 10px; border-radius: 8px; text-align:center; font-size: 13px;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
 </div>
-<!-- ✅ BOTÓN CANCELAR FUERA DEL BLOQUE CONDICIONAL -->
-    <button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none'; document.getElementById('calificacion-usuario-info').innerHTML='';" class="btn-secondary" style="width:100%; border-radius:30px; padding:12px; font-weight:700; margin-top:10px; background:#6c757d; color:white; border:none; cursor:pointer;">✖️ CANCELAR</button>
-    
+
 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding: 15px; border-radius: 12px; text-align:center; font-size: 13px;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
 
                 
