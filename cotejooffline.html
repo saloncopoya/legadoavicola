@@ -503,7 +503,89 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
     background: #FFC107;
-}    
+}   
+
+
+
+
+        /* ==============================================
+   COLORES ESPECÍFICOS PARA BOTONES
+   ============================================== */
+
+/* Botón ELIMINAR - SIEMPRE ROJO */
+.btn-danger,
+button.btn-danger,
+[onclick*="eliminar"],
+[onclick*="Eliminar"],
+[onclick*="ELIMINAR"],
+button[onclick*="eliminarCotejo"],
+button[onclick*="eliminarPartido"],
+button[onclick*="eliminarGallo"],
+button[onclick*="eliminarTorneo"],
+#btn-eliminar-cotejo,
+#eliminar-partido-edicion,
+#eliminar-gallo-edicion,
+.confirmar-eliminar,
+button[id*="eliminar"] {
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-danger:hover,
+button.btn-danger:hover,
+[onclick*="eliminar"]:hover,
+[onclick*="Eliminar"]:hover,
+[onclick*="ELIMINAR"]:hover,
+button[onclick*="eliminarCotejo"]:hover,
+#btn-eliminar-cotejo:hover {
+    background: #c82333 !important;
+    color: white !important;
+}
+
+/* Botón CALIFICAR PELEA - AMARILLO */
+#btn-calificar-pelea,
+button[onclick*="calificarPelea"],
+button[onclick*="Calificar"],
+button.btn-calificar {
+    background: #FFC107 !important;
+    color: #1e1e1e !important;
+    border: none !important;
+    font-weight: 700 !important;
+}
+
+#btn-calificar-pelea:hover,
+button[onclick*="calificarPelea"]:hover {
+    background: #FFB300 !important;
+    color: #1e1e1e !important;
+}
+
+/* En modo oscuro, mantener los mismos colores */
+body.dark-mode .btn-danger,
+body.dark-mode button.btn-danger,
+body.dark-mode [onclick*="eliminar"],
+body.dark-mode [onclick*="Eliminar"],
+body.dark-mode [onclick*="ELIMINAR"],
+body.dark-mode button[onclick*="eliminarCotejo"],
+body.dark-mode #btn-eliminar-cotejo {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-danger:hover,
+body.dark-mode [onclick*="eliminar"]:hover {
+    background: #c82333 !important;
+}
+
+body.dark-mode #btn-calificar-pelea,
+body.dark-mode button[onclick*="calificarPelea"] {
+    background: #FFC107 !important;
+    color: #1e1e1e !important;
+}
+
+body.dark-mode #btn-calificar-pelea:hover {
+    background: #FFB300 !important;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
@@ -2985,7 +3067,7 @@ container.innerHTML = `
                     <div>Tiempo: ${calificacionExistente.tiempo}</div>
                     <div style="margin-top:10px; display:flex; gap:10px;">
                         <button onclick="confirmarReCalificar()" style="background:#ff9800; color:white; border:none; padding:8px 16px; border-radius:8px;">✏️ RECALIFICAR</button>
-                        <button onclick="eliminarCalificacionPelea(${index})" style="background:#f44336; color:white; border:none; padding:8px 16px; border-radius:8px;">🗑️ ELIMINAR</button>
+                        <button onclick="eliminarCalificacionPelea(${index})"  class="btn-danger"  style="color:white; border:none; padding:8px 16px; border-radius:8px;">🗑️ ELIMINAR</button>
                      <button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none'; document.getElementById('calificacion-usuario-info').innerHTML='';" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">✖️ CANCELAR</button>
                      
                     </div>
