@@ -4752,8 +4752,8 @@ datosPosicion.forEach((item, idx) => {
             // 🔥 MISMA LÓGICA QUE importar.html
             // Si el gallo NO existe (puntos === undefined) → celdas vacías
             if (puntos === undefined) {
-                html += `<td style="padding: 6px 2px; text-align: center;"></td>`;
-                html += `<td style="padding: 6px 2px; text-align: center;"></td>`;
+                html += `<td style="padding: 1px 1px; text-align: center;"></td>`;
+                html += `<td style="padding: 1px 1px; text-align: center;"></td>`;
             } else {
                 // Determinar clases según el resultado
                 let clasePuntos = '';
@@ -4771,14 +4771,14 @@ datosPosicion.forEach((item, idx) => {
                 }
                 
                 // Mostrar puntos y tiempo formateado
-                html += `<td style="padding: 6px 2px; text-align: center;" class="${clasePuntos}">${puntos}</td>`;
-                html += `<td style="padding: 6px 2px; text-align: center; border-right: 2px solid black;" class="${claseTiempo}">${formatTiempo(tiempo)}</td>`;
+                html += `<td style="padding: 1px 1px; text-align: center;" class="${clasePuntos}">${puntos}</td>`;
+                html += `<td style="padding: 1px 1px; text-align: center; border-right: 2px solid black;" class="${claseTiempo}">${formatTiempo(tiempo)}</td>`;
             }
         }
         
         // Totales del partido
-        html += `<td style="padding: 6px 2px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
-        html += `<td style="padding: 6px 2px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
+        html += `<td style="padding: 1px 1px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
+        html += `<td style="padding: 1px 1px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
         html += `</tr>`;
     });
     
