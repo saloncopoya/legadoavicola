@@ -2034,8 +2034,8 @@ if (resultadosCotejo.noEmparejados.length > 0) {
 }
             
  let tablaHTML = `<div style="width: 100%; overflow-x: visible;">
-    <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9px;">
-        <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: clamp(9px, 2vw, 14px);">
+<thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
             <th style="padding:1px 1px; width: 6%;">#</th>
             <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA ROJA</th>`;
 if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 1</th>`;
