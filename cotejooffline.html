@@ -3168,12 +3168,11 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                 actualizarPantallaLigera();
             };
             document.getElementById('eliminar-partido-edicion').onclick = () => {
-                if (confirm(`¿Eliminar el partido "${partidoNombre}"?`)) {
-                    eliminarPartido(partidoNombre);
-                    overlay.remove();
-                    actualizarPantalla();
-                }
-            };
+    // Cerrar el modal de edición primero
+    overlay.remove();
+    // Llamar a eliminarPartido que YA tiene su propio modal bonito
+    eliminarPartido(partidoNombre);
+};
             document.getElementById('cancelar-edicion-partido').onclick = () => overlay.remove();
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
         }
@@ -3219,13 +3218,11 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                 overlay.remove();
                 actualizarPantallaLigera();
             };
+            
             document.getElementById('eliminar-gallo-edicion').onclick = () => {
-                if (confirm(`¿Eliminar el gallo ${gallo.anillo}?`)) {
-                    eliminarGallo(gallo.partidoNombre, gallo.anillo);
-                    overlay.remove();
-                    actualizarPantalla();
-                }
-            };
+    overlay.remove();
+    eliminarGallo(gallo.partidoNombre, gallo.anillo);
+};
             document.getElementById('cancelar-edicion-gallo').onclick = () => overlay.remove();
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
         }
