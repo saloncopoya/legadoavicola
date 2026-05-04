@@ -1726,7 +1726,7 @@ window.limpiarResultadosCotejo = () => {
 
               let noEmparejadosHTML = '';
             if (resultadosCotejo.noEmparejados.length > 0) {
-                noEmparejadosHTML = `<div style="margin-top:12px; padding:8px; background:#fff8e1; border-radius:8px;">
+                noEmparejadosHTML = `<div style="margin-top:12px; padding:2px; background:#fff8e1; border-radius:8px;">
                     <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
                     ${resultadosCotejo.noEmparejados.map(item => `<div>• A:${item.gallo.anillo} - ${item.gallo.partido} - ${item.motivo.mensaje}</div>`).join('')}
                 </div>`;
@@ -1735,24 +1735,24 @@ window.limpiarResultadosCotejo = () => {
  let tablaHTML = `<div style="width: 100%; overflow-x: visible;">
     <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9px;">
         <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
-            <th style="padding:4px 2px; width: 6%;">#</th>
+            <th style="padding:1px 1px; width: 6%;">#</th>
             <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA ROJA</th>`;
 if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 1</th>`;
-tablaHTML += `<th style="padding:4px 2px; width: 7%;">A1</th>
-            <th style="padding:4px 2px; width: 7%;">P1</th>
-            <th style="padding:4px 2px; width: 6%;">#</th>
-            <th style="padding:4px 2px; width: 7%;">P2</th>
-            <th style="padding:4px 2px; width: 7%;">A2</th>
-            <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA VERDE</th>`;
+tablaHTML += `<th style="padding:1px 1px; width: 7%;">A1</th>
+            <th style="padding:1px 1px; width: 7%;">P1</th>
+            <th style="padding:1px 1px; width: 6%;">#</th>
+            <th style="padding:1px 1px; width: 7%;">P2</th>
+            <th style="padding:1px 1px; width: 7%;">A2</th>
+            <th style="text-align:left; padding:1px 1px; width: 12%;">CINTA VERDE</th>`;
 if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 2</th>`;
-tablaHTML += `<th style="padding:4px 2px; width: 6%;">DIF</th>
+tablaHTML += `<th style="padding:1px 1px; width: 6%;">DIF</th>
 
                        `;
 
             // SOLO mostrar GANADOR y TIEMPO si hay calificaciones O hay cotejo guardado
 if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
-    tablaHTML += `<th style="padding:4px 2px; width: 10%;">GANADOR</th>
-                  <th style="padding:4px 2px; width: 9%;">TIEMPO</th>`;
+    tablaHTML += `<th style="padding:1px 1px; width: 10%;">GANADOR</th>
+                  <th style="padding:1px 1px; width: 9%;">TIEMPO</th>`;
 }
             
 tablaHTML += `
@@ -1770,25 +1770,25 @@ tablaHTML += `
                 }
                 
                 tablaHTML += `<tr style="border-bottom:1px solid #eee; background:${calificacion ? '#e8f5e8' : ''}">
-                    <td style="padding:6px; text-align:center; font-weight:700; background:#d32f2f; color:white;">${p.numero}</td>
-                    <td style="padding:6px;">${p.gallo1.partido}</td>`;
+                    <td style="padding:1px; text-align:center; font-weight:700; background:#d32f2f; color:white;">${p.numero}</td>
+                    <td style="padding:1px;">${p.gallo1.partido}</td>`;
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo1.color || '-'}</td>`;
-                tablaHTML += `<td style="padding:6px; text-align:center;">${p.gallo1.anillo}</td>
-                    <td style="padding:6px; text-align:center;">${p.gallo1.peso}</td>
-                    <td style="padding:6px; text-align:center; background:#4CAF50; color:white;">${p.numero}</td>
-                    <td style="padding:6px; text-align:center;">${p.gallo2.peso}</td>
-                    <td style="padding:6px; text-align:center;">${p.gallo2.anillo}</td>
-                    <td style="padding:6px;">${p.gallo2.partido}</td>`;
+                tablaHTML += `<td style="padding:1px; text-align:center;">${p.gallo1.anillo}</td>
+                    <td style="padding:1px; text-align:center;">${p.gallo1.peso}</td>
+                    <td style="padding:1px; text-align:center; background:#4CAF50; color:white;">${p.numero}</td>
+                    <td style="padding:1px; text-align:center;">${p.gallo2.peso}</td>
+                    <td style="padding:1px; text-align:center;">${p.gallo2.anillo}</td>
+                    <td style="padding:1px;">${p.gallo2.partido}</td>`;
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo2.color || '-'}</td>`;
 
-  tablaHTML += `<td style="padding:6px; text-align:center;">${p.diferencia}g</td>`;
+  tablaHTML += `<td style="padding:1px; text-align:center;">${p.diferencia}g</td>`;
 
                             
 if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
-    tablaHTML += `<td style="padding:6px; text-align:center;">${ganadorTexto}</td>`;
+    tablaHTML += `<td style="padding:1px; text-align:center;">${ganadorTexto}</td>`;
 }
 if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
-    tablaHTML += `<td style="padding:6px; text-align:center;">${tiempoTexto}</td>`;
+    tablaHTML += `<td style="padding:1px; text-align:center;">${tiempoTexto}</td>`;
 }
         
 
@@ -3087,7 +3087,7 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding:15px; border-radius:12px; text-align:center;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
                 
                <!-- MÓDULO DE COTEJO -->
-<div style="background:white; border-radius:1px; padding:16px; margin-top:16px;">
+<div style="background:white; border-radius:1px; padding:1px; margin-top:16px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
     </div>
