@@ -4017,11 +4017,10 @@ function renderizarTablaPosiciones() {
         return;
     }
     
-    // ✅ CORREGIDO: Verificar cotejoData (no cotejoId)
+    // Verificar si hay cotejo guardado Y calificaciones
     const tieneCotejo = torneoActual && torneoActual.cotejoData && torneoActual.cotejoData.peleas && torneoActual.cotejoData.peleas.length > 0;
     const tieneCalificaciones = calificacionesCargadas && calificacionesCargadas.size > 0;
     
-    // ✅ La tabla SOLO se muestra si hay cotejo guardado Y calificaciones
     if (!tieneCotejo || resultadosCotejo.peleas.length === 0 || !tieneCalificaciones) {
         container.style.display = 'none';
         console.log('Tabla de posiciones oculta: sin cotejo guardado o sin calificaciones');
@@ -4052,7 +4051,7 @@ function renderizarTablaPosiciones() {
     }
     html += `<th style="padding: 12px 8px;">PUNTOS</th>`;
     html += `<th style="padding: 12px 8px;">TIEMPO</th>`;
-    html += `</tr>`;
+    html += `<tr>`;
     
     html += `<tr style="background: #A0522D; color: white;">`;
     html += `<th style="padding: 8px 8px;"></th>`;
@@ -4073,15 +4072,25 @@ function renderizarTablaPosiciones() {
             const puntos = item[`gallo${i}_puntos`] || 0;
             const tiempo = item[`gallo${i}_tiempo`] || 0;
             
+            // ✅ NUEVA LÓGICA: Solo aplicar clases si el gallo PARTICIPÓ (puntos NO es 0)
+            // o si los puntos corresponden a ganador/empate/perdedor (pero 0 es NO PARTICIPÓ)
             let puntosClass = '';
-            if (puntos === puntosConfig.ganador) puntosClass = 'puntos-ganador';
-            else if (puntos === puntosConfig.empate) puntosClass = 'puntos-empate';
-            else if (puntos === puntosConfig.perdedor) puntosClass = 'puntos-perdedor';
-            
             let tiempoClass = '';
-            if (puntos === puntosConfig.ganador) tiempoClass = 'tiempo-ganador';
-            else if (puntos === puntosConfig.empate) tiempoClass = 'tiempo-empate';
-            else if (puntos === puntosConfig.perdedor) tiempoClass = 'tiempo-perdedor';
+            
+            // Si el gallo tiene puntos (participó en la pelea)
+            if (puntos !== 0) {
+                if (puntos === puntosConfig.ganador) {
+                    puntosClass = 'puntos-ganador';
+                    tiempoClass = 'tiempo-ganador';
+                } else if (puntos === puntosConfig.empate) {
+                    puntosClass = 'puntos-empate';
+                    tiempoClass = 'tiempo-empate';
+                } else if (puntos === puntosConfig.perdedor) {
+                    puntosClass = 'puntos-perdedor';
+                    tiempoClass = 'tiempo-perdedor';
+                }
+            }
+            // Si puntos === 0 → NO aplicar clases (fondo transparente)
             
             html += `<td style="padding: 8px 4px; text-align: center;" class="${puntosClass}">${puntos}</td>`;
             html += `<td style="padding: 8px 4px; text-align: center;" class="${tiempoClass}">${formatTiempo(tiempo)}</td>`;
