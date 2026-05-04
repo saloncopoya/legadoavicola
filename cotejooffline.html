@@ -2513,7 +2513,8 @@ setTimeout(() => {
                         }
                         
                         guardarTorneoEnStorage(torneoData);
-                        torneosAnteriores.unshift(torneoData);
+                       torneosAnteriores = JSON.parse(localStorage.getItem(STORAGE_KEYS.TORNEOS_LIST) || '[]');
+                        
                         torneoActual = torneoData;
                         torneoId = nuevoTorneoId;
                         
@@ -2597,6 +2598,11 @@ setTimeout(() => {
                         await importarTorneoDesdeJSON(archivoSeleccionado);
                         AppState.addNotification('✅ Torneo importado exitosamente', 'success');
                         archivoSeleccionado = null;
+
+                         //  CERRAR EL MODAL PRINCIPAL DE TORNEO
+        const modalPrincipal = document.getElementById('tournament-modal-overlay');
+        if (modalPrincipal) modalPrincipal.remove();
+                        
                     } catch (error) {
                         AppState.addNotification(`❌ ${error.message}`, 'error');
                     }
@@ -2956,7 +2962,6 @@ setTimeout(() => {
                 <div style="background:white; border-radius:16px; padding:16px; margin-top:16px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
-                        ${hayResultadosCotejo && !cotejoGuardado ? `<select id="cotejo-modo" style="padding:6px; border:2px solid red; border-radius:6px;"><option value="">CAMBIAR MODO:</option><option value="ASCENDENTE">⬆️ ASCENDENTE</option><option value="DESCENDENTE">⬇️ DESCENDENTE</option><option value="ALEATORIO">🎲 ALEATORIO</option><option value="INTELIGENTE">🤖 MENOR DIFERENCIA</option></select>` : ''}
                     </div>
                     
 
@@ -3341,6 +3346,7 @@ ${hayResultadosCotejo ? `
                 const modal = document.getElementById('tournament-modal-overlay');
                 if (modal) modal.remove();
                 actualizarPantalla();
+                AppState.addNotification(esEdicion ? '✅ Torneo actualizado' : '✅ Torneo creado', 'success');
             }
         };
         
