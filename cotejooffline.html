@@ -470,8 +470,22 @@ let cotejoUltimoModo = 'ASCENDENTE';
                 metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
             };
             
-            AppState.addNotification(`✅ Torneo "${nombre}" creado`, 'success');
-            return true;
+          AppState.addNotification(`✅ Torneo "${nombre}" creado`, 'success');
+
+//  ACTUALIZAR EL SELECTOR DE TORNEOS EN EL HEADER
+setTimeout(() => {
+    const selectorTorneos = document.getElementById('header-torneo-selector');
+    if (selectorTorneos) {
+        let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+        torneosAnteriores.forEach(t => {
+            opciones += `<option value="${t.id}" ${t.id === torneoId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+        });
+        selectorTorneos.innerHTML = opciones;
+        console.log('🔄 Selector de torneos actualizado después de crear torneo');
+    }
+}, 100);
+
+return true;
         }
         
         function actualizarTorneo(formData) {
@@ -3140,6 +3154,24 @@ container.innerHTML = `
                         }
                         
                         actualizarPantalla();
+
+                        // ACTUALIZAR EL SELECTOR DE TORNEOS EN EL HEADER
+setTimeout(() => {
+    const selectorTorneos = document.getElementById('header-torneo-selector');
+    if (selectorTorneos) {
+        // Guardar el ID del torneo actual
+        const torneoActualId = torneoActual?.id;
+        
+        // Generar nuevas opciones
+        let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+        torneosAnteriores.forEach(t => {
+            opciones += `<option value="${t.id}" ${t.id === torneoActualId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+        });
+        selectorTorneos.innerHTML = opciones;
+        console.log('🔄 Selector de torneos actualizado después de importar');
+    }
+}, 100);
+                        
                         resolve(true);
                     } catch (error) { reject(error); }
                 };
@@ -3996,8 +4028,23 @@ container.innerHTML = `
         if (modalTorneo) modalTorneo.remove();
         
         overlay.remove();
+
         actualizarPantalla();
-        AppState.addNotification('✅ Torneo eliminado completamente', 'success');
+
+//  ACTUALIZAR EL SELECTOR DE TORNEOS EN EL HEADER
+setTimeout(() => {
+    const selectorTorneos = document.getElementById('header-torneo-selector');
+    if (selectorTorneos) {
+        let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+        torneosAnteriores.forEach(t => {
+            opciones += `<option value="${t.id}" ${t.id === torneoId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+        });
+        selectorTorneos.innerHTML = opciones;
+        console.log('🔄 Selector de torneos actualizado después de eliminar torneo');
+    }
+}, 100);
+
+AppState.addNotification('✅ Torneo eliminado completamente', 'success');
         
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     };
