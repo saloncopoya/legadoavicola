@@ -1926,6 +1926,8 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
             resultadosCotejo.peleas.splice(indexOrigen, 1);
             resultadosCotejo.peleas.splice(indexDestino, 0, pelea);
             resultadosCotejo.peleas.forEach((p, idx) => { p.numero = idx + 1; });
+             //  RECALCULAR CONFLICTOS
+    resultadosCotejo.metricas.conflictosConsecutivos = calcularNumeroConflictos(resultadosCotejo.peleas);
             renderizarResultadosCotejo();
         }
         
@@ -1940,7 +1942,10 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
                 if (calificacionExistente.ganador === 'rojo') calificacionExistente.ganador = 'verde';
                 else if (calificacionExistente.ganador === 'verde') calificacionExistente.ganador = 'rojo';
             }
-            
+
+            //  RECALCULAR CONFLICTOS
+    resultadosCotejo.metricas.conflictosConsecutivos = calcularNumeroConflictos(resultadosCotejo.peleas);
+
             renderizarResultadosCotejo();
             AppState.addNotification(`🔄 Gallos intercambiados en pelea #${numeroPelea}`, 'success');
         }
