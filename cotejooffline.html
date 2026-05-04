@@ -1048,22 +1048,33 @@ let cotejoUltimoModo = 'ASCENDENTE';
             }
             
             // Limpiar campos
-            document.getElementById('match-name').value = '';
-            document.getElementById('match-representante').value = '';
-            document.getElementById('representante-info').innerHTML = '';
-            
-            // Limpiar campos de gallos (los botones de estado se regenerarán al recargar)
-            for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
-                const pesoInput = document.getElementById(`weight-${i}`);
-                const colorInput = document.getElementById(`color-${i}`);
-                const estadoBtn = document.getElementById(`estado-${i}`);
-                if (pesoInput) pesoInput.value = '';
-                if (colorInput) colorInput.value = '';
-                if (estadoBtn) {
-                    estadoBtn.textContent = 'PRESENTE';
-                    estadoBtn.style.backgroundColor = '#4CAF50';
-                }
-            }
+document.getElementById('match-name').value = '';
+document.getElementById('match-representante').value = '';
+document.getElementById('representante-info').innerHTML = '';
+
+// 🔥 ACTUALIZAR ANILLOS CONSECUTIVOS SEGÚN EL ÚLTIMO ANILLO REGISTRADO
+const siguienteAnillo = obtenerSiguienteAnillo(); // Esta función ya existe
+
+for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
+    const pesoInput = document.getElementById(`weight-${i}`);
+    const colorInput = document.getElementById(`color-${i}`);
+    const estadoBtn = document.getElementById(`estado-${i}`);
+    const anilloInput = document.getElementById(`ring-${i}`);
+    
+    if (pesoInput) pesoInput.value = '';
+    if (colorInput) colorInput.value = '';
+    if (estadoBtn) {
+        estadoBtn.textContent = 'PRESENTE';
+        estadoBtn.style.backgroundColor = '#4CAF50';
+    }
+    
+    // Actualizar el valor del anillo con el número consecutivo
+    if (anilloInput) {
+        const nuevoAnillo = (parseInt(siguienteAnillo) + (i - 1)).toString().padStart(3, '0');
+        anilloInput.value = nuevoAnillo;
+        console.log(`🔄 Anillo ${i} actualizado a: ${nuevoAnillo}`);
+    }
+}
             
             // Actualizar estadísticas
             const headerPartidos = document.querySelector('.header-estadisticas-partidos');
@@ -4130,7 +4141,13 @@ container.innerHTML = `
                 document.getElementById('match-representante').value = '';
                 document.getElementById('representante-info').innerHTML = '';
                 actualizarPantallaLigera();
-            }
+                // PONER EL FOCO EN EL CAMPO NOMBRE DEL PARTIDO
+   setTimeout(() => {
+    const nombreInput = document.getElementById('match-name');
+    if (nombreInput) nombreInput.focus();
+}, 100);
+}
+            
             boton.disabled = false;
             boton.textContent = textoOriginal;
         };
