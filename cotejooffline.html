@@ -1274,18 +1274,36 @@
         }
         
         function calcularNumeroConflictos(peleas) {
-            let conflictos = 0;
-            for (let i = 0; i < peleas.length - 1; i++) {
-                const actual = peleas[i];
-                const siguiente = peleas[i + 1];
-                const partidosActual = [actual.gallo1.partido, actual.gallo2.partido];
-                const partidosSiguiente = [siguiente.gallo1.partido, siguiente.gallo2.partido];
-                if (partidosActual.some(p => partidosSiguiente.includes(p))) {
-                    conflictos++;
-                }
-            }
-            return conflictos;
+    let conflictos = 0;
+    for (let i = 0; i < peleas.length - 1; i++) {
+        const actual = peleas[i];
+        const siguiente = peleas[i + 1];
+        
+        // Conflictos por NOMBRE DE PARTIDO (igual que antes)
+        const partidosActual = [actual.gallo1.partido, actual.gallo2.partido];
+        const partidosSiguiente = [siguiente.gallo1.partido, siguiente.gallo2.partido];
+        if (partidosActual.some(p => partidosSiguiente.includes(p))) {
+            conflictos++;
         }
+        
+        // Conflictos por REPRESENTANTE (misma lógica)
+        // Solo considerar representantes que NO estén vacíos
+        const repsActual = [];
+        if (actual.gallo1.representante && actual.gallo1.representante.trim() !== '') repsActual.push(actual.gallo1.representante);
+        if (actual.gallo2.representante && actual.gallo2.representante.trim() !== '') repsActual.push(actual.gallo2.representante);
+        
+        const repsSiguiente = [];
+        if (siguiente.gallo1.representante && siguiente.gallo1.representante.trim() !== '') repsSiguiente.push(siguiente.gallo1.representante);
+        if (siguiente.gallo2.representante && siguiente.gallo2.representante.trim() !== '') repsSiguiente.push(siguiente.gallo2.representante);
+        
+        if (repsActual.length > 0 && repsSiguiente.length > 0) {
+            if (repsActual.some(r => repsSiguiente.includes(r))) {
+                conflictos++;
+            }
+        }
+    }
+    return conflictos;
+}
         
         function distribuirPeleasInteligente(peleas) {
             if (peleas.length <= 2) return peleas;
@@ -1330,17 +1348,101 @@
                         const partidosPelea = [pelea.gallo1.partido, pelea.gallo2.partido];
                         let puntaje = 0;
                         
-                        for (let j = peleasOrdenadas.length - 1; j >= Math.max(0, peleasOrdenadas.length - 3); j--) {
-                            const peleaAnterior = peleasOrdenadas[j];
-                            if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 50;
-                            if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 50;
-                            if (partidosPelea[1] === peleaAnterior.gallo1.partido) puntaje -= 50;
-                            if (partidosPelea[0] === peleaAnterior.gallo2.partido) puntaje -= 50;
-                            
-                            const distancia = peleasOrdenadas.length - j;
-                            if (distancia === 2) puntaje -= 20;
-                            if (distancia === 3) puntaje -= 10;
-                        }
+
+                        for (let j = peleasOrdenadas.length - 1; j >= Math.max(0, peleasOrdenadas.length - 6); j--) {
+    const peleaAnterior = peleasOrdenadas[j];
+    
+    // ====== PENALIZACIONES POR NOMBRE DE PARTIDO (IGUAL QUE ANTES) ======
+    if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 60;
+    if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 60;
+    if (partidosPelea[1] === peleaAnterior.gallo1.partido) puntaje -= 60;
+    if (partidosPelea[0] === peleaAnterior.gallo2.partido) puntaje -= 60;
+    
+    // ====== PENALIZACIONES POR REPRESENTANTE (MISMAS REGLAS) ======
+    // Obtener representantes de la pelea candidata
+    const repsPelea = [];
+    if (pelea.gallo1.representante && pelea.gallo1.representante.trim() !== '') repsPelea.push(pelea.gallo1.representante);
+    if (pelea.gallo2.representante && pelea.gallo2.representante.trim() !== '') repsPelea.push(pelea.gallo2.representante);
+    
+    // Obtener representantes de la pelea anterior
+    const repsAnterior = [];
+    if (peleaAnterior.gallo1.representante && peleaAnterior.gallo1.representante.trim() !== '') repsAnterior.push(peleaAnterior.gallo1.representante);
+    if (peleaAnterior.gallo2.representante && peleaAnterior.gallo2.representante.trim() !== '') repsAnterior.push(peleaAnterior.gallo2.representante);
+    
+    // Aplicar penalizaciones por representantes (misma lógica que partidos)
+    if (repsPelea.length > 0 && repsAnterior.length > 0) {
+        if (repsPelea[0] === repsAnterior[0]) puntaje -= 50;
+        if (repsPelea[0] === repsAnterior[1]) puntaje -= 50;
+        if (repsPelea[1] === repsAnterior[0]) puntaje -= 50;
+        if (repsPelea[1] === repsAnterior[1]) puntaje -= 50;
+    }
+    
+    // ====== PENALIZACIONES POR DISTANCIA ======
+    const distancia = peleasOrdenadas.length - j;
+    
+    // Distancia 2 (IGUAL que antes)
+    if (distancia === 2) {
+        // Penalización por distancia para PARTIDOS
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 40;  // ← solo cambié de 20 a 40
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 40;  // ← solo cambié de 20 a 40
+        
+        // Penalización por distancia para REPRESENTANTES
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 35;  // ← solo cambié de 20 a 40
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 35;  // ← solo cambié de 20 a 40
+        }
+    }
+    
+    // Distancia 3 (IGUAL que antes)
+    if (distancia === 3) {
+        // Penalización por distancia para PARTIDOS
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 30;  // ← solo cambié de 10 a 30
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 30;  // ← solo cambié de 10 a 30
+        
+        // Penalización por distancia para REPRESENTANTES
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 25;  // ← solo cambié de 10 a 30
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 25;  // ← solo cambié de 10 a 30
+        }
+    }
+    
+    // ====== NUEVAS PENALIZACIONES POR DISTANCIA 4, 5 y 6 ======
+    
+    // Distancia 4 (NUEVO)
+    if (distancia === 4) {
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 20;
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 20;
+        
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 15;
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 15;
+        }
+    }
+    
+    // Distancia 5 (NUEVO)
+    if (distancia === 5) {
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 10;
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 10;
+        
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 5;
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 5;
+        }
+    }
+    
+    // Distancia 6 (NUEVO)
+    if (distancia === 6) {
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 5;
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 5;
+        
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 5;
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 5;
+        }
+    }
+}
+
+                        
                         
                         for (let pos = 0; pos < 2; pos++) {
                             const partido = partidosPelea[pos];
