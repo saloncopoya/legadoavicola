@@ -1,7 +1,7 @@
 {
-    "name": " IMPORTAR Legado Avícola",
-    "short_name": "IMPORTAR LegadoAV",
-    "description": "IMPORTAR Cotejo Computarizado - Tabla de Posiciones en Vivo",
+    "name": "COTEJO Legado Avícola",
+    "short_name": "COTEJO LegadoAV",
+    "description": "COTEJO Cotejo Computarizado - Tabla de Posiciones en Vivo",
     "start_url": "/cotejooffline.html",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
