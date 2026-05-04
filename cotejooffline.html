@@ -3441,13 +3441,39 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
         };
 
 
+      
+
         window.eliminarTorneoModal = () => {
     if (!torneoActual) {
         AppState.addNotification('❌ No hay torneo para eliminar', 'error');
         return;
     }
     
-    if (confirm(`⚠️ ¿ELIMINAR COMPLETAMENTE el torneo "${torneoActual.nombre}"?\n\nSe borrarán:\n- TODOS los partidos (${partidosList.length})\n- TODOS los gallos\n- Cotejo y calificaciones\n\n¡Esta acción NO se puede deshacer!`)) {
+    // Crear modal de confirmación personalizado
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR TORNEO?</h3>
+            <p style="margin-bottom:20px;">
+                <strong style="font-size:18px;">${torneoActual.nombre}</strong><br><br>
+                Se borrarán:<br>
+                📋 <strong>${partidosList.length}</strong> gallos registrados<br>
+                ⚡ <strong>${resultadosCotejo.peleas.length}</strong> peleas generadas<br>
+                🏆 <strong>${calificacionesCargadas.size}</strong> calificaciones<br><br>
+                <span style="color:#d32f2f; font-weight:bold;">⚠️ ¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar-torneo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar-torneo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    // Confirmar eliminar
+    document.getElementById('confirmar-eliminar-torneo').onclick = () => {
         eliminarTorneoDeStorage(torneoId);
         torneoActual = null;
         torneoId = null;
@@ -3455,14 +3481,26 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
         resultadosCotejo = { peleas: [], noEmparejados: [], metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 } };
         calificacionesCargadas.clear();
         
-        const modal = document.getElementById('tournament-modal-overlay');
-        if (modal) modal.remove();
+        // Cerrar modal de torneo si está abierto
+        const modalTorneo = document.getElementById('tournament-modal-overlay');
+        if (modalTorneo) modalTorneo.remove();
         
+        overlay.remove();
         actualizarPantalla();
         AppState.addNotification('✅ Torneo eliminado completamente', 'success');
         
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    }
+    };
+    
+    // Cancelar eliminar
+    document.getElementById('cancelar-eliminar-torneo').onclick = () => {
+        overlay.remove();
+    };
+    
+    // Cerrar al hacer clic fuera
+    overlay.onclick = (e) => {
+        if (e.target === overlay) overlay.remove();
+    };
 };
         
         window.crearTorneo = async () => {
