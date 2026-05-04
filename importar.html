@@ -3469,46 +3469,53 @@ function mostrarNotificacionSincronizacion() {
                 // ==============================================
                 // 🔥 PASO 1: PROCESAR CALIFICACIONES DEL ARRAY "calificaciones"
                 // ==============================================
-                if (datos.calificaciones && Array.isArray(datos.calificaciones) && datos.calificaciones.length > 0) {
-                    console.log(`📋 Procesando ${datos.calificaciones.length} calificaciones para ${datos.infoTorneo.nombre}`);
-                    
-                    // Asegurar que exista resultadosCotejo y peleas
-                    if (!datos.resultadosCotejo) {
-                        datos.resultadosCotejo = { peleas: [] };
-                    }
-                    if (!datos.resultadosCotejo.peleas) {
-                        datos.resultadosCotejo.peleas = [];
-                    }
-                    
-                    // Para cada calificación, agregar los campos a la pelea correspondiente
-                    datos.calificaciones.forEach(cal => {
-                        const indice = cal.indicePelea;
-                        if (datos.resultadosCotejo.peleas && datos.resultadosCotejo.peleas[indice]) {
-                            const pelea = datos.resultadosCotejo.peleas[indice];
-                            
-                            // Agregar los campos de calificación DENTRO de la pelea
-                            pelea.calificada = cal.calificada !== undefined ? cal.calificada : true;
-                            pelea.ganador = cal.ganador;
-                            pelea.tiempo = cal.tiempo;
-                            pelea.fechaCalificacion = cal.fechaCalificacion;
-                            pelea.timestamp = cal.timestamp;
-                            pelea.usuarioCalifico = cal.usuarioCalifico;
-                            pelea.usuarioId = cal.usuarioId;
-                            
-                            // También actualizar puntos en gallos si existen
-                            if (cal.gallo1 && cal.gallo1.puntos !== undefined) {
-                                pelea.gallo1.puntos = cal.gallo1.puntos;
-                            }
-                            if (cal.gallo2 && cal.gallo2.puntos !== undefined) {
-                                pelea.gallo2.puntos = cal.gallo2.puntos;
-                            }
-                            
-                            console.log(`  ✅ Pelea ${indice + 1}: ${pelea.ganador} - ${pelea.tiempo}`);
-                        } else {
-                            console.warn(`  ⚠️ Pelea índice ${indice} no encontrada para calificación`);
-                        }
-                    });
-                }
+                // ==============================================
+// 🔥 PASO 1: PROCESAR CALIFICACIONES DEL ARRAY "calificaciones"
+// ==============================================
+if (datos.calificaciones && Array.isArray(datos.calificaciones) && datos.calificaciones.length > 0) {
+    console.log(`📋 Procesando ${datos.calificaciones.length} calificaciones para ${datos.infoTorneo.nombre}`);
+    
+    // Asegurar que exista resultadosCotejo y peleas
+    if (!datos.resultadosCotejo) {
+        datos.resultadosCotejo = { peleas: [] };
+    }
+    if (!datos.resultadosCotejo.peleas) {
+        datos.resultadosCotejo.peleas = [];
+    }
+    
+    // Para cada calificación, agregar los campos a la pelea correspondiente
+    datos.calificaciones.forEach(cal => {
+        const indice = cal.indicePelea;
+        
+        if (datos.resultadosCotejo.peleas && datos.resultadosCotejo.peleas[indice]) {
+            const pelea = datos.resultadosCotejo.peleas[indice];
+            
+            // Agregar los campos de calificación DENTRO de la pelea
+            pelea.calificada = true;
+            pelea.ganador = cal.ganador;
+            pelea.tiempo = cal.tiempo;
+            pelea.fechaCalificacion = cal.fechaCalificacion || new Date().toLocaleString();
+            pelea.timestamp = cal.timestamp || Date.now();
+            pelea.usuarioCalifico = cal.usuarioCalifico || 'Importado';
+            pelea.usuarioId = cal.usuarioId || '';
+            
+            // También actualizar puntos en gallos si existen
+            if (cal.gallo1 && cal.gallo1.puntos !== undefined) {
+                if (pelea.gallo1) pelea.gallo1.puntos = cal.gallo1.puntos;
+            }
+            if (cal.gallo2 && cal.gallo2.puntos !== undefined) {
+                if (pelea.gallo2) pelea.gallo2.puntos = cal.gallo2.puntos;
+            }
+            
+            console.log(`  ✅ Pelea ${indice + 1}: ${pelea.ganador} - ${pelea.tiempo}`);
+        } else {
+            console.warn(`  ⚠️ Pelea índice ${indice} no encontrada en el torneo`);
+        }
+    });
+    
+    // 🔥 Guardar el array de calificaciones original también (por si acaso)
+    datos.calificacionesOriginal = datos.calificaciones;
+}
                 
                 // ==============================================
                 // 🔥 PASO 2: VERIFICAR SI YA EXISTE UN TORNEO CON EL MISMO ID
@@ -3581,18 +3588,18 @@ if (torneos.length > 0) {
         
         const peleas = torneo.resultadosCotejo.peleas;
 
-if (torneo.infoTorneo) {
-    console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
-} else {
-    console.warn('Torneo sin infoTorneo:', torneo);
-    return;
-}        
+        if (torneo.infoTorneo) {
+            console.log(`📂 Procesando torneo: ${torneo.infoTorneo.nombre} (${peleas.length} peleas)`);
+        } else {
+            console.warn('Torneo sin infoTorneo:', torneo);
+            return;
+        }
+        
         peleas.forEach((pelea, index) => {
-            // 🔥 BUSCAR CALIFICACIÓN EN VARIOS LUGARES
             let tieneCalificacion = false;
             let calificacionData = null;
             
-            // 1. Verificar si la pelea tiene campos de calificación directos
+            // 🔥 MÉTODO 1: Buscar calificación DENTRO de la pelea
             if (pelea.calificada === true || pelea.ganador) {
                 tieneCalificacion = true;
                 calificacionData = {
@@ -3608,39 +3615,48 @@ if (torneo.infoTorneo) {
                     gallo2: pelea.gallo2,
                     diferencia: pelea.diferencia
                 };
+                console.log(`  ✅ Pelea ${index + 1} (calificada dentro de pelea): ${calificacionData.ganador} - ${calificacionData.tiempo}`);
             }
             
-            // 2. También verificar si hay calificación en el array de calificaciones (por si acaso)
+            // 🔥 MÉTODO 2: Si no encontró, buscar en torneo.calificaciones (array externo)
             if (!tieneCalificacion && torneo.calificaciones && torneo.calificaciones[index]) {
                 const cal = torneo.calificaciones[index];
-                if (cal && cal.calificada) {
+                if (cal && (cal.calificada === true || cal.ganador)) {
                     tieneCalificacion = true;
-                    calificacionData = cal;
+                    calificacionData = {
+                        ...cal,
+                        indicePelea: index
+                    };
+                    console.log(`  ✅ Pelea ${index + 1} (desde array externo): ${calificacionData.ganador} - ${calificacionData.tiempo}`);
+                    
+                    // También actualizar la pelea directamente para futuras referencias
+                    pelea.calificada = true;
+                    pelea.ganador = cal.ganador;
+                    pelea.tiempo = cal.tiempo;
+                    pelea.fechaCalificacion = cal.fechaCalificacion;
+                    pelea.timestamp = cal.timestamp;
                 }
             }
             
-            // Si tiene calificación, guardarla en el Map global
+            // Guardar en Map global si tiene calificación
             if (tieneCalificacion && calificacionData) {
                 const calKey = `${torneo.infoTorneo.id}_${index}`;
                 calificacionesGlobales.set(calKey, calificacionData);
                 totalCalificaciones++;
-                
-                // Debug: mostrar primeras 5 calificaciones
-                if (totalCalificaciones <= 5) {
-                    console.log(`  📌 Pelea ${index + 1}: ${calificacionData.ganador} - ${calificacionData.tiempo}`);
-                }
             }
         });
     });
     
     console.log(`✅ TOTAL CALIFICACIONES CARGADAS: ${totalCalificaciones}`);
     
-    // ✅ Validación mejorada
-    const torneosConCalif = torneos.filter(t => {
-        if (!t.infoTorneo) return false;
-        return Array.from(calificacionesGlobales.keys()).some(key => key.startsWith(t.infoTorneo.id));
-    });
-    console.log(`📊 Torneos con calificaciones: ${torneosConCalif.length}`);
+    // Mostrar detalles de las primeras calificaciones para depuración
+    let count = 0;
+    for (let [key, val] of calificacionesGlobales.entries()) {
+        if (count < 5) {
+            console.log(`📌 CalKey: ${key} -> Ganador: ${val.ganador}, Tiempo: ${val.tiempo}`);
+            count++;
+        }
+    }
 }
 
     
