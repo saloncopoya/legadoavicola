@@ -1993,6 +1993,11 @@ setTimeout(() => {
     }, 100);
     
     actualizarPantalla();
+                // Asegurar que los representantes se muestran después de eliminar cotejo
+setTimeout(() => {
+    actualizarListaRepresentantes();
+    console.log('📋 Representantes actualizados después de eliminar cotejo');
+}, 200);
     overlay.remove();
     AppState.addNotification(`✅ Cotejo eliminado. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
 };
@@ -4209,7 +4214,8 @@ container.innerHTML = `
         torneosEnSerialActual = torneoActual.serialInfo?.torneosEnSerial || [];
         
         cargarNombresPartidosUnificados();
-        
+        actualizarListaRepresentantes();
+
         if (torneoActual.cotejoData) {
             resultadosCotejo = {
                 peleas: torneoActual.cotejoData.peleas || [],
