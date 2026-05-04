@@ -1461,26 +1461,51 @@ setTimeout(() => {
         };
         
         window.limpiarResultadosCotejo = () => {
-            if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
-                AppState.addNotification('📭 No hay resultados de cotejo para limpiar', 'info');
-                return;
-            }
-            if (!confirm('⚠️ ¿Estás seguro de limpiar los resultados del cotejo?')) return;
-            
-            resultadosCotejo = {
-                peleas: [],
-                noEmparejados: [],
-                metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-            };
-            
-            const container = document.getElementById('cotejo-resultados-container');
-            if (container) {
-                container.innerHTML = `<div style="text-align:center; padding:40px; background:#f9f9f9; border-radius:12px; color:#999;">
-                    <span style="font-size:40px;">⚡</span><p>Presiona COTEJAR para generar enfrentamientos</p>
-                </div>`;
-            }
-            AppState.addNotification('🧹 Resultados de cotejo eliminados', 'info');
-        };
+    if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
+        AppState.addNotification('📭 No hay resultados de cotejo para limpiar', 'info');
+        return;
+    }
+    if (!confirm('⚠️ ¿Estás seguro de limpiar los resultados del cotejo?\n\nEsto borrará las peleas generadas y podrás registrar más partidos.')) return;
+    
+    // Limpiar resultados de cotejo
+    resultadosCotejo = {
+        peleas: [],
+        noEmparejados: [],
+        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+    };
+    
+    // Limpiar calificaciones
+    calificacionesCargadas.clear();
+    peleaSeleccionadaActual = null;
+    
+    // Si hay un cotejo guardado, también eliminarlo
+    if (torneoActual && torneoActual.cotejoId) {
+        delete torneoActual.cotejoId;
+        delete torneoActual.cotejoData;
+        guardarTorneoEnStorage(torneoActual);
+        AppState.rooster.cotejoState = false;
+    }
+    
+    // ✅ RECARGAR LA PANTALLA COMPLETA
+    actualizarPantalla();
+    
+    // ✅ OPCIONAL: Hacer scroll al formulario de registro
+    setTimeout(() => {
+        const formularioRegistro = document.querySelector('#admin-main-container > div:nth-child(2)');
+        if (formularioRegistro) {
+            formularioRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Regenerar campos de gallos
+        if (typeof regenerarCamposGallos === 'function') {
+            regenerarCamposGallos(configuracion.gallosPorPartido);
+        }
+    }, 100);
+    
+    AppState.addNotification('🧹 Resultados de cotejo eliminados. Puedes registrar más partidos.', 'success');
+    
+    // Feedback háptico
+    if (navigator.vibrate) navigator.vibrate(100);
+};
         
         window.guardarCotejo = async () => {
             if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
@@ -1603,6 +1628,15 @@ setTimeout(() => {
             if (resultadosCotejo.peleas.length > 0) {
                 diferenciaMaxima = Math.max(...resultadosCotejo.peleas.map(p => p.diferencia));
             }
+
+
+              let noEmparejadosHTML = '';
+            if (resultadosCotejo.noEmparejados.length > 0) {
+                noEmparejadosHTML = `<div style="margin-top:12px; padding:8px; background:#fff8e1; border-radius:8px;">
+                    <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
+                    ${resultadosCotejo.noEmparejados.map(item => `<div>• A:${item.gallo.anillo} - ${item.gallo.partido} - ${item.motivo.mensaje}</div>`).join('')}
+                </div>`;
+            }
             
             let tablaHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:12px; min-width:600px;">
                 <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
@@ -1667,13 +1701,7 @@ setTimeout(() => {
             
             tablaHTML += `</tbody></table></div>`;
             
-            let noEmparejadosHTML = '';
-            if (resultadosCotejo.noEmparejados.length > 0) {
-                noEmparejadosHTML = `<div style="margin-top:12px; padding:8px; background:#fff8e1; border-radius:8px;">
-                    <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
-                    ${resultadosCotejo.noEmparejados.map(item => `<div>• A:${item.gallo.anillo} - ${item.gallo.partido} - ${item.motivo.mensaje}</div>`).join('')}
-                </div>`;
-            }
+          
             
             container.innerHTML = `
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:15px;">
@@ -2112,46 +2140,50 @@ setTimeout(() => {
         // ============================================================
         
         window.mostrarModalDescargaCotejo = () => {
-            if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
-                AppState.addNotification('❌ No hay resultados de cotejo para descargar', 'warning');
-                return;
-            }
-            
-            const totalPeleas = resultadosCotejo.peleas.length;
-            const maxVallines = Math.min(6, Math.ceil(totalPeleas / 2) || 1);
-            let opcionesVallines = '';
-            for (let i = 1; i <= maxVallines; i++) {
-                const peleasPorVallin = Math.ceil(totalPeleas / i);
-                opcionesVallines += `<option value="${i}">${i} Vallín${i > 1 ? 'es' : ''} (≈ ${peleasPorVallin} peleas c/u)</option>`;
-            }
-            
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
-                <div class="modal-container" style="max-width:380px;">
-                    <h3 style="text-align:center; margin-bottom:20px;">📥 DESCARGAR COTEJO</h3>
-                    <div style="margin-bottom:15px;">
-                        <label style="display:block; margin-bottom:8px; font-weight:600;">ESTILO DE TABLA</label>
-                        <div style="display:flex; gap:10px;">
-                            <label style="flex:1; padding:10px; border:2px solid #8B4513; border-radius:12px; text-align:center; cursor:pointer;" id="formato-pdf-label">
-                                <input type="radio" name="formato" value="pdf" checked style="display:none;"> 📄 NORMAL
-                            </label>
-                            <label style="flex:1; padding:10px; border:2px solid #ddd; border-radius:12px; text-align:center; cursor:pointer;" id="formato-imagen-label">
-                                <input type="radio" name="formato" value="imagen" style="display:none;"> 🖼️ EXTENDIDO
-                            </label>
-                        </div>
-                    </div>
-                    <div style="margin-bottom:20px;">
-                        <label style="display:block; margin-bottom:8px; font-weight:600;">NÚMERO DE VALLINES</label>
-                        <select id="num-vallines-select" class="form-input">${opcionesVallines}</select>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <button id="confirmar-descarga" class="btn-primary" style="flex:2;">✅ DESCARGAR</button>
-                        <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
-                    </div>
+    if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
+        AppState.addNotification('❌ No hay resultados de cotejo para descargar', 'warning');
+        return;
+    }
+    
+    const totalPeleas = resultadosCotejo.peleas.length;
+    const maxVallines = Math.min(6, Math.ceil(totalPeleas / 2) || 1);
+    let opcionesVallines = '';
+    for (let i = 1; i <= maxVallines; i++) {
+        const peleasPorVallin = Math.ceil(totalPeleas / i);
+        opcionesVallines += `<option value="${i}">${i} Vallín${i > 1 ? 'es' : ''} (≈ ${peleasPorVallin} peleas c/u)</option>`;
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:380px;">
+            <h3 style="text-align:center; margin-bottom:20px;">📥 DESCARGAR COTEJO</h3>
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">ESTILO DE TABLA</label>
+                <div style="display:flex; gap:10px;">
+                    <label style="flex:1; padding:10px; border:2px solid #8B4513; border-radius:12px; text-align:center; cursor:pointer;" id="formato-pdf-label">
+                        <input type="radio" name="formato" value="pdf" checked style="display:none;"> 📄 PDF
+                    </label>
+                    <label style="flex:1; padding:10px; border:2px solid #ddd; border-radius:12px; text-align:center; cursor:pointer;" id="formato-imagen-label">
+                        <input type="radio" name="formato" value="imagen" style="display:none;"> 🖼️ EXTENDIDO
+                    </label>
                 </div>
-            `;
-            document.body.appendChild(overlay);
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">NÚMERO DE VALLINES</label>
+                <select id="num-vallines-select" class="form-input">${opcionesVallines}</select>
+            </div>
+            <div style="margin-bottom:15px; border-top:1px solid #ddd; padding-top:15px;">
+                <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-descarga" class="btn-success" style="flex:2;">✅ DESCARGAR ${totalPeleas > 0 ? 'PDF' : ''}</button>
+                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
             
             const pdfLabel = document.getElementById('formato-pdf-label');
             const imagenLabel = document.getElementById('formato-imagen-label');
@@ -2866,7 +2898,8 @@ setTimeout(() => {
                 ` : ''}
                 
                 <!-- REGISTRO DE PARTIDOS (solo si no hay cotejo) -->
-                ${!hayResultadosCotejo ? `
+               ${(!hayResultadosCotejo || resultadosCotejo.peleas.length === 0) ? `
+
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px;">
                     <h3 style="margin-bottom:15px;">📝 Registrar Partido</h3>
                     <div style="display:flex; gap:8px; margin-bottom:15px;">
@@ -2930,7 +2963,6 @@ setTimeout(() => {
                   ${cotejoGuardado ? `
 <div style="display:flex; gap:8px; margin-bottom:12px;">
     <button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2;">📥 DESCARGAR PDF</button>
-    <button id="btn-json" onclick="window.generarDescargaCotejoJSON()" class="btn-success" style="flex:1;">📦 JSON</button>
     <button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1;">🗑️ ELIMINAR</button>
 </div>
 ` : `
@@ -2946,8 +2978,7 @@ setTimeout(() => {
 </div>
 ${hayResultadosCotejo ? `
 <div style="display:flex; gap:8px; margin-bottom:12px;">
-    <button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:2;">💾 GUARDAR COTEJO</button>
-    <button id="btn-json-temporal" onclick="window.generarDescargaCotejoJSON()" class="btn-primary" style="flex:1;">📦 JSON</button>
+    <button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1;">💾 GUARDAR COTEJO</button>
 </div>
 ` : ''}
 `}
