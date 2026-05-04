@@ -4447,9 +4447,8 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
 
     <!-- SECCIÓN TABLA DE POSICIONES -->
 <div id="posiciones-container" style="display: none; margin-top: 30px;">
-    <div class="posiciones-header">
-        <span>🏆</span> TABLA DE POSICIONES
-    </div>
+    <div class="posiciones-header" style="background: #8B4513; color: white; padding: 15px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
+</div>
     <div id="tabla-posiciones-content">
         <div class="no-posiciones">
             <span>📊</span>
@@ -4627,6 +4626,58 @@ function renderizarTablaPosiciones() {
     }
     
     container.style.display = 'block';
+
+
+    // Obtener estadísticas para el encabezado
+const totalPartidosUnicos = contarPartidosUnicos();
+const totalGallos = partidosList.length;
+
+// Calcular peso mínimo y máximo de TODOS los gallos registrados
+const pesosValidos = partidosList.filter(g => g.peso && g.peso > 0).map(g => g.peso);
+const pesoMinGlobal = pesosValidos.length > 0 ? Math.min(...pesosValidos) : 0;
+const pesoMaxGlobal = pesosValidos.length > 0 ? Math.max(...pesosValidos) : 0;
+
+// Calcular peleas calificadas vs total
+const totalPeleas = resultadosCotejo?.peleas?.length || 0;
+const peleasCalificadas = calificacionesCargadas.size;
+const peleasPendientes = totalPeleas - peleasCalificadas;
+
+// Diferencia máxima entre gallos en las peleas generadas
+const difMax = resultadosCotejo.peleas.length > 0 
+    ? Math.max(...resultadosCotejo.peleas.map(p => p.diferencia)) 
+    : 0;
+
+// Configuración de puntos
+const puntosG = puntosConfiguracion.ganador;
+const puntosE = puntosConfiguracion.empate;
+const puntosP = puntosConfiguracion.perdedor;
+
+// Modificar el encabezado dinámicamente
+const posicionesHeader = document.querySelector('#posiciones-container .posiciones-header');
+if (posicionesHeader) {
+    posicionesHeader.innerHTML = `
+        <div style="padding: 8px 16px;">
+            <div style="font-size: clamp(18px, 6vw, 28px); font-weight: 900; color: #FFD700; text-shadow: 1px 1px 2px black;">🏆 ${torneoActual?.nombre || 'TORNEO'}</div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; font-size: clamp(11px, 3.5vw, 14px); margin-top: 6px; color: white;">
+                <span>📅 ${torneoActual?.fecha || obtenerFechaHoy()}</span>
+                <span>🏟️ ${torneoActual?.palenque || 'No especificado'}</span>
+                <span>📋 Partidos: ${totalPartidosUnicos}</span>
+                <span>🐓 Gallos: ${totalGallos}</span>
+                <span>⚖️ Peso: ${pesoMinGlobal}g - ${pesoMaxGlobal}g</span>
+                <span>📏 Dif.max: ${difMax}g</span>
+                <span>🏆 Puntos: G:${puntosG} / E:${puntosE} / P:${puntosP}</span>
+                <span>⭐ Calificaciones: ${peleasCalificadas}/${totalPeleas}</span>
+            </div>
+            ${peleasPendientes > 0 ? `
+            <div style="margin-top: 8px; font-size: clamp(10px, 3vw, 12px); color: #FFD700; background: rgba(0,0,0,0.3); display: inline-block; padding: 2px 12px; border-radius: 20px;">
+                ⚠️ Pendientes: ${peleasPendientes} pelea(s) sin calificar
+            </div>` : `
+            <div style="margin-top: 8px; font-size: clamp(10px, 3vw, 12px); color: #4CAF50; background: rgba(0,0,0,0.3); display: inline-block; padding: 2px 12px; border-radius: 20px;">
+                ✅ ¡Todas las peleas calificadas!
+            </div>`}
+        </div>
+    `;
+}
     
     // Obtener datos de posiciones PROCESADOS (igual que en importar.html)
     const datosPosicion = procesarTablaPosiciones();
