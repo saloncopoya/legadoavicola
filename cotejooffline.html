@@ -3049,8 +3049,8 @@ window.limpiarResultadosCotejo = () => {
                             <span>EMPATE: <strong id="puntos-empate-info">${puntosConfiguracion.empate}</strong> pts</span>
                             <span>PERDEDOR: <strong id="puntos-perdedor-info">${puntosConfiguracion.perdedor}</strong> pts</span>
                         </div>
-                        <button id="btn-calificar-pelea" onclick="window.calificarPelea()" class="btn-success" style="width:100%;">⚡ CALIFICAR PELEA</button>
-                    </div>
+<button id="btn-calificar-pelea" onclick="window.calificarPelea()" class="btn-success" style="width:100%; border-radius:30px; padding:14px; font-weight:700; font-size:16px;">⚡ CALIFICAR PELEA</button>
+</div>
                     <div id="calificacion-info-anterior" style="display:none; background:#fff3cd; padding:15px; border-radius:8px; margin-top:10px;"></div>
                     <div id="calificacion-todas-mensaje" style="display:none; background:#4CAF50; color:white; padding:15px; border-radius:8px; text-align:center;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
                 </div>
@@ -3064,7 +3064,7 @@ window.limpiarResultadosCotejo = () => {
 
     ${cotejoGuardado ? `
     <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:120px; padding:12px; border-radius:30px; font-weight:700;">📥 DESCARGAR PDF</button>
+<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700; font-size:16px;">📥 DESCARGAR PDF</button>
 <button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:12px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
 </div>
     ` : `
@@ -3079,13 +3079,15 @@ window.limpiarResultadosCotejo = () => {
 <button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
 </div>
     
-    ${hayResultadosCotejo ? `
-    <!-- FILA 2: Botones GUARDAR y LIMPIAR juntos lado a lado -->
+  ${hayResultadosCotejo ? `
+    <!-- FILA 2: Botones GUARDAR (solo si no hay no emparejados) y LIMPIAR -->
     <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-<button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">💾 GUARDAR COTEJO</button>
-<button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
-</div>
-    ` : ''}
+        ${resultadosCotejo.noEmparejados && resultadosCotejo.noEmparejados.length === 0 ? `
+        <button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">💾 GUARDAR COTEJO</button>
+        ` : ''}
+        <button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
+    </div>
+` : ''}
     `}
     
     <div id="cotejo-resultados-container" style="margin-top:15px; overflow-x:auto;">
@@ -3261,7 +3263,7 @@ window.limpiarResultadosCotejo = () => {
                         
                        <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
     <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
-    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1;">🗑️ ELIMINAR TORNEO</button>` : ''}
+    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1; border-radius:30px; padding:12px; font-weight:700;">🗑️ ELIMINAR TORNEO</button>` : ''}
     <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
 </div>
                     </form>
