@@ -2945,6 +2945,50 @@ container.innerHTML = `
         return;
     }
     
+    // 🔥 IMPORTANTE: Reconstruir calificaciones con el índice CORRECTO basado en el número de pelea
+    const calificacionesCorregidas = [];
+    
+    for (const [indexOriginal, cal] of calificacionesCargadas.entries()) {
+        // Obtener el número de pelea de la calificación
+        const numeroPelea = cal.numero;
+        
+        // Buscar en qué posición está AHORA esa pelea (después del reordenamiento)
+        const nuevoIndex = resultadosCotejo.peleas.findIndex(p => p.numero === numeroPelea);
+        
+        if (nuevoIndex !== -1) {
+            calificacionesCorregidas.push({
+                indicePelea: nuevoIndex,  // ← Usar el índice CORRECTO
+                calificada: true,
+                diferencia: cal.diferencia || 0,
+                fechaCalificacion: cal.fechaCalificacion,
+                gallo1: {
+                    anillo: cal.gallo1?.anillo || '',
+                    color: cal.gallo1?.color || '',
+                    partido: cal.gallo1?.partido || '',
+                    partidoId: cal.gallo1?.partidoId || '',
+                    peso: cal.gallo1?.peso || 0,
+                    puntos: cal.gallo1?.puntos || 0,
+                    representante: cal.gallo1?.representante || ''
+                },
+                gallo2: {
+                    anillo: cal.gallo2?.anillo || '',
+                    color: cal.gallo2?.color || '',
+                    partido: cal.gallo2?.partido || '',
+                    partidoId: cal.gallo2?.partidoId || '',
+                    peso: cal.gallo2?.peso || 0,
+                    puntos: cal.gallo2?.puntos || 0,
+                    representante: cal.gallo2?.representante || ''
+                },
+                ganador: cal.ganador,
+                numero: cal.numero,
+                tiempo: cal.tiempo,
+                timestamp: cal.timestamp || Date.now(),
+                usuarioCalifico: cal.usuarioCalifico,
+                usuarioId: cal.usuarioId || 'admin_offline'
+            });
+        }
+    }
+    
     const datosCompletos = {
         infoTorneo: {
             id: torneoActual.id,
@@ -2985,36 +3029,7 @@ container.innerHTML = `
                 motivo: item.motivo
             }))
         } : null,
-        calificaciones: Array.from(calificacionesCargadas.entries()).map(([index, cal]) => ({
-    indicePelea: index,
-    calificada: true,                           // ← AGREGAR
-    diferencia: cal.diferencia || 0,            // ← AGREGAR
-    fechaCalificacion: cal.fechaCalificacion,
-    gallo1: {
-        anillo: cal.gallo1?.anillo || '',
-        color: cal.gallo1?.color || '',
-        partido: cal.gallo1?.partido || '',
-        partidoId: cal.gallo1?.partidoId || '',
-        peso: cal.gallo1?.peso || 0,
-        puntos: cal.gallo1?.puntos || 0,
-        representante: cal.gallo1?.representante || ''
-    },
-    gallo2: {
-        anillo: cal.gallo2?.anillo || '',
-        color: cal.gallo2?.color || '',
-        partido: cal.gallo2?.partido || '',
-        partidoId: cal.gallo2?.partidoId || '',
-        peso: cal.gallo2?.peso || 0,
-        puntos: cal.gallo2?.puntos || 0,
-        representante: cal.gallo2?.representante || ''
-    },
-    ganador: cal.ganador,
-    numero: cal.numero,
-    tiempo: cal.tiempo,
-    timestamp: cal.timestamp || Date.now(),     // ← AGREGAR
-    usuarioCalifico: cal.usuarioCalifico,
-    usuarioId: cal.usuarioId || 'admin_offline' // ← AGREGAR
-}))
+        calificaciones: calificacionesCorregidas  // ← Usar el array corregido
     };
     
     const jsonStr = JSON.stringify(datosCompletos, null, 2);
@@ -3025,7 +3040,7 @@ container.innerHTML = `
     a.download = `${torneoActual.nombre || 'torneo'}_${torneoActual.fecha || 'fecha'}_export.json`.replace(/[^a-z0-9_\-]/gi, '_');
     a.click();
     URL.revokeObjectURL(url);
-    AppState.addNotification(`✅ Datos exportados a JSON`, 'success');
+    AppState.addNotification(`✅ Datos exportados a JSON con calificaciones correctas`, 'success');
 };
         
         window.generarPDFCotejo = () => {
