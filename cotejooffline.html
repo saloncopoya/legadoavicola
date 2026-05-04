@@ -3883,7 +3883,6 @@ container.innerHTML = `
     // Forzar límites 0-100 para rangoPeso
     if (clave === 'rangoPeso') {
         if (numValor < 0) numValor = 0;
-        if (numValor > 100) numValor = 100;
     }
     
     actualizarConfiguracion(clave, numValor);
