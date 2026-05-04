@@ -1732,8 +1732,9 @@ window.limpiarResultadosCotejo = () => {
                 </div>`;
             }
             
-            let tablaHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:12px; min-width:600px;">
-                <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
+ let tablaHTML = `<div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+        <table style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap;">
+        <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
                     <th style="padding:6px;">#</th><th style="text-align:left;">CINTA ROJA</th>`;
             if (configuracion.registroDetalladoActivo) tablaHTML += `<th>COLOR 1</th>`;
             tablaHTML += `<th>A1</th><th>P1</th><th>#</th><th>P2</th><th>A2</th><th style="text-align:left;">CINTA VERDE</th>`;
