@@ -3787,7 +3787,7 @@ setTimeout(() => {
                 
               <!-- MÓDULO DE CALIFICACIÓN (solo si hay cotejo guardado) -->
 ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
-<div style="position: sticky; top: 0; z-index: 100; background: white; border-radius: 12px; padding: 12px; margin-top: 16px; border-top: 3px solid #FFD700; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+<div style="position: sticky; top: 0; z-index: 100; background: white; border-radius: 12px; padding: 2px; margin-top: 16px; border-top: 3px solid #FFD700; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
     <!-- TÍTULO flex:1 + COMBOBOX flex:3 EN LA MISMA LÍNEA -->
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
         <div style="flex: 1;">
@@ -3812,10 +3812,14 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
             <span>EMPATE: <strong id="puntos-empate-info">${puntosConfiguracion.empate}</strong> pts</span>
             <span>PERDEDOR: <strong id="puntos-perdedor-info">${puntosConfiguracion.perdedor}</strong> pts</span>
         </div>
-        <button id="btn-calificar-pelea" onclick="window.calificarPelea()" class="btn-success" style="width:100%; border-radius: 30px; padding: 10px; font-weight: 700; font-size: 14px;">⚡ CALIFICAR PELEA</button>
-    </div>
-    <div id="calificacion-info-anterior" style="display:none; background:#fff3cd; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 13px;"></div>
-    <div id="calificacion-todas-mensaje" style="display:none; background:#4CAF50; color:white; padding: 10px; border-radius: 8px; text-align:center; font-size: 13px;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
+<button id="btn-calificar-pelea" onclick="window.calificarPelea()" class="btn-success" style="width:100%; border-radius:30px; padding:14px; font-weight:700; font-size:16px;">⚡ CALIFICAR PELEA</button>
+<button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none';" class="btn-secondary" style="width:100%; border-radius:30px; padding:12px; font-weight:700; margin-top:10px; background:#6c757d; color:white; border:none; cursor:pointer;">✖️ CANCELAR</button>
+</div>
+<div id="calificacion-info-anterior" style="display:none; background:#fff3cd; padding:15px; border-radius:8px; margin-top:10px;"></div>
+<div id="calificacion-boton-cancelar" style="display:none; margin-top: 10px;">
+<button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none';" class="btn-secondary" style="width:100%; border-radius:30px; padding:12px; font-weight:700; margin-top:10px; background:#6c757d; color:white; border:none; cursor:pointer;">✖️ CANCELAR</button>
+</div>
+<div id="calificacion-todas-mensaje" style="display:none; background:#4CAF50; color:white; padding: 10px; border-radius: 8px; text-align:center; font-size: 13px;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
 </div>
 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding: 15px; border-radius: 12px; text-align:center; font-size: 13px;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
 
