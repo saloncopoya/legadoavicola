@@ -1659,94 +1659,121 @@ const modo = modoSelect ? modoSelect.value : 'ASCENDENTE';
             
             try {
                 let resultado;
-               if (modo === 'INTELIGENTE') {
+              if (modo === 'INTELIGENTE') {
     // ==============================================
     // NUEVO MODO INTELIGENTE
     // IGNORA el rango de peso
-    // Prioridad: 1) Sin no emparejados, 2) Menor diferencia total, 3) Menor diferencia máxima
+    // Prueba: ASCENDENTE, DESCENDENTE, MITAD Y MITAD, ALEATORIO
+    // 50 intentos en total
+    // Prioridad: 1) Sin no emparejados, 2) Menor diferencia máxima
     // ==============================================
     
     let gallos = partidosList.filter(g => g.peso && g.peso > 0);
-    const NUM_INTENTOS = 100;  // Repite 100 veces
-    const mejoresResultados = [];
-    
-    for (let intento = 0; intento < NUM_INTENTOS; intento++) {
-        // Mezclar gallos aleatoriamente
-        const gallosMezclados = [...gallos].sort(() => Math.random() - 0.5);
-        const peleas = [];
-        const noEmparejados = [];
-        const usados = new Set();
+    if (gallos.length < 2) {
+        resultado = { peleas: [], noEmparejados: gallos };
+    } else {
+        const mejoresResultados = [];
         
-        for (const gallo of gallosMezclados) {
-            if (usados.has(gallo.anillo)) continue;
+        // Calcular mediana para dividir en 2 grupos (pesos pequeños y grandes)
+        const pesosOrdenados = [...gallos].sort((a, b) => a.peso - b.peso);
+        const mediana = pesosOrdenados[Math.floor(pesosOrdenados.length / 2)].peso;
+        const gallosPequenos = gallos.filter(g => g.peso <= mediana);
+        const gallosGrandes = gallos.filter(g => g.peso > mediana);
+        
+        // Función de emparejamiento (ignora rango de peso)
+        function emparejar(listaGallos) {
+            const peleas = [];
+            const noEmparejados = [];
+            const usados = new Set();
             
-            let mejorPareja = null;
-            let menorDiferencia = Infinity;
-            
-            for (const posible of gallosMezclados) {
-                if (usados.has(posible.anillo) || posible.anillo === gallo.anillo) continue;
-                if (posible.partido === gallo.partido) continue;  // ❌ Mismo partido NO
-                if (posible.representante && gallo.representante && posible.representante === gallo.representante) continue;  // ❌ Mismo representante NO
+            for (const gallo of listaGallos) {
+                if (usados.has(gallo.anillo)) continue;
                 
-                const diferencia = Math.abs(posible.peso - gallo.peso);
-                if (diferencia < menorDiferencia) {
-                    menorDiferencia = diferencia;
-                    mejorPareja = posible;
+                let mejorPareja = null;
+                let menorDiferencia = Infinity;
+                
+                for (const posible of listaGallos) {
+                    if (usados.has(posible.anillo) || posible.anillo === gallo.anillo) continue;
+                    if (posible.partido === gallo.partido) continue;
+                    if (posible.representante && gallo.representante && posible.representante === gallo.representante) continue;
+                    
+                    const diferencia = Math.abs(posible.peso - gallo.peso);
+                    if (diferencia < menorDiferencia) {
+                        menorDiferencia = diferencia;
+                        mejorPareja = posible;
+                    }
+                }
+                
+                if (mejorPareja) {
+                    peleas.push({
+                        numero: peleas.length + 1,
+                        gallo1: gallo,
+                        gallo2: mejorPareja,
+                        diferencia: Math.abs(gallo.peso - mejorPareja.peso)
+                    });
+                    usados.add(gallo.anillo);
+                    usados.add(mejorPareja.anillo);
+                } else {
+                    noEmparejados.push({ gallo: gallo, motivo: { codigo: 'NO_PAREJA', mensaje: 'No hay pareja disponible' } });
                 }
             }
-            
-            if (mejorPareja) {
-                peleas.push({
-                    numero: peleas.length + 1,
-                    gallo1: gallo,
-                    gallo2: mejorPareja,
-                    diferencia: Math.abs(gallo.peso - mejorPareja.peso)
-                });
-                usados.add(gallo.anillo);
-                usados.add(mejorPareja.anillo);
-            } else {
-                noEmparejados.push({
-                    gallo: gallo,
-                    motivo: { codigo: 'NO_PAREJA', mensaje: 'No hay pareja disponible' }
-                });
+            return { peleas, noEmparejados };
+        }
+        
+        // Función para emparejar MITAD Y MITAD (pequeños con pequeños, grandes con grandes)
+        function emparejarMitadMitad() {
+            const resultadoPequenos = emparejar([...gallosPequenos]);
+            const resultadoGrandes = emparejar([...gallosGrandes]);
+            const todasPeleas = [...resultadoPequenos.peleas, ...resultadoGrandes.peleas];
+            const todosNoEmparejados = [...resultadoPequenos.noEmparejados, ...resultadoGrandes.noEmparejados];
+            todasPeleas.forEach((p, idx) => p.numero = idx + 1);
+            return { peleas: todasPeleas, noEmparejados: todosNoEmparejados };
+        }
+        
+        // ========== EJECUTAR 50 INTENTOS ==========
+        // 1. Modo ASCENDENTE (ordenar por peso ascendente)
+        const gallosAscendente = [...gallos].sort((a, b) => a.peso - b.peso);
+        mejoresResultados.push({ ...emparejar(gallosAscendente), tipo: 'ASCENDENTE' });
+        
+        // 2. Modo DESCENDENTE (ordenar por peso descendente)
+        const gallosDescendente = [...gallos].sort((a, b) => b.peso - a.peso);
+        mejoresResultados.push({ ...emparejar(gallosDescendente), tipo: 'DESCENDENTE' });
+        
+        // 3. Modo MITAD Y MITAD (pequeños con pequeños, grandes con grandes)
+        mejoresResultados.push({ ...emparejarMitadMitad(), tipo: 'MITAD_Y_MITAD' });
+        
+        // 4. Modo ALEATORIO (47 intentos restantes = 50 - 3 = 47)
+        for (let intento = 0; intento < 47; intento++) {
+            const gallosAleatorios = [...gallos].sort(() => Math.random() - 0.5);
+            mejoresResultados.push({ ...emparejar(gallosAleatorios), tipo: `ALEATORIO_${intento + 1}` });
+        }
+        
+        // ========== ORDENAR POR PRIORIDAD ==========
+        // Prioridad #1: MENOS NO EMPAREJADOS (0 es mejor)
+        // Prioridad #2: MENOR DIFERENCIA MÁXIMA
+        mejoresResultados.sort((a, b) => {
+            if (a.noEmparejados.length !== b.noEmparejados.length) {
+                return a.noEmparejados.length - b.noEmparejados.length;
             }
-        }
-        
-        // Calcular métricas
-        const totalDiferencia = peleas.reduce((sum, p) => sum + p.diferencia, 0);
-        const diferenciaMaxima = peleas.length > 0 ? Math.max(...peleas.map(p => p.diferencia)) : 0;
-        
-        mejoresResultados.push({
-            peleas: [...peleas],
-            noEmparejados: [...noEmparejados],
-            totalDiferencia: totalDiferencia,
-            diferenciaMaxima: diferenciaMaxima,
-            cantidadNoEmparejados: noEmparejados.length
+            const maxDifA = a.peleas.length > 0 ? Math.max(...a.peleas.map(p => p.diferencia)) : 0;
+            const maxDifB = b.peleas.length > 0 ? Math.max(...b.peleas.map(p => p.diferencia)) : 0;
+            return maxDifA - maxDifB;
         });
+        
+        const mejor = mejoresResultados[0];
+        resultado = {
+            peleas: mejor.peleas,
+            noEmparejados: mejor.noEmparejados
+        };
+        
+        // Calcular diferencia máxima del mejor resultado
+        const mejorDifMax = resultado.peleas.length > 0 ? Math.max(...resultado.peleas.map(p => p.diferencia)) : 0;
+        
+        console.log(`🎯 INTELIGENTE: Mejor tipo = ${mejor.tipo}`);
+        console.log(`   No emparejados: ${mejor.noEmparejados.length}`);
+        console.log(`   Diferencia máxima: ${mejorDifMax}g`);
     }
-    
-    // 📌 ORDEN DE PRIORIDAD:
-    // 1️⃣ MENOS NO EMPAREJADOS (0 es mejor)
-    // 2️⃣ MENOR DIFERENCIA TOTAL
-    // 3️⃣ MENOR DIFERENCIA MÁXIMA
-    mejoresResultados.sort((a, b) => {
-        if (a.cantidadNoEmparejados !== b.cantidadNoEmparejados) {
-            return a.cantidadNoEmparejados - b.cantidadNoEmparejados;
-        }
-        if (a.totalDiferencia !== b.totalDiferencia) {
-            return a.totalDiferencia - b.totalDiferencia;
-        }
-        return a.diferenciaMaxima - b.diferenciaMaxima;
-    });
-    
-    const mejor = mejoresResultados[0];
-    resultado = {
-        peleas: mejor.peleas,
-        noEmparejados: mejor.noEmparejados
-    };
-    
-    console.log(`🎯 INTELIGENTE: Mejor resultado - No emparejados: ${mejor.cantidadNoEmparejados}, Dif total: ${mejor.totalDiferencia}g, Dif máxima: ${mejor.diferenciaMaxima}g`);
-
+}
                 } else {
                     resultado = ejecutarModoCotejo(modo);
                 }
