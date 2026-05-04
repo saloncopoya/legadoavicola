@@ -154,26 +154,30 @@
 .posicion-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 16px;
+   font-size: clamp(12px, 3.5vw, 18px);
 }
 
 .posicion-table th {
     background: #8B4513;
     color: white;
-    padding: 12px 8px;
+    padding: 2px 2px;
     text-align: center;
     border: 1px solid #ddd;
+        font-size: clamp(11px, 3vw, 16px); /* Títulos ligeramente más pequeños */
 }
 
 .posicion-table td {
-    padding: 10px 8px;
+    padding: 2px 2px;
     text-align: center;
     border: 1px solid #ddd;
+        font-size: clamp(11px, 3.2vw, 17px);
+
 }
 
 .posicion-table td:first-child {
     font-weight: 900;
     text-align: left;
+        font-size: clamp(12px, 3.5vw, 18px); /* Nombres de partido más destacados */
 }
 
 /* Puntos y tiempos con colores */
@@ -181,33 +185,39 @@
     background: #4CAF50;
     color: white;
     font-weight: bold;
+        font-size: clamp(12px, 3.5vw, 18px);
 }
 
 .puntos-empate {
     background: #2196F3;
     color: white;
     font-weight: bold;
+        font-size: clamp(12px, 3.5vw, 18px);
 }
 
 .puntos-perdedor {
     background: #f44336;
     color: white;
     font-weight: bold;
+        font-size: clamp(12px, 3.5vw, 18px);
 }
 
 .tiempo-ganador {
     background: #4CAF50;
     color: white;
+        font-size: clamp(11px, 3.2vw, 17px);
 }
 
 .tiempo-empate {
     background: #2196F3;
     color: white;
+        font-size: clamp(11px, 3.2vw, 17px);
 }
 
 .tiempo-perdedor {
     background: #f44336;
     color: white;
+        font-size: clamp(11px, 3.2vw, 17px);
 }
 
 /* NUEVA TABLA DE POSICIONES - Sección */
@@ -217,6 +227,7 @@
     background: white;
     border-radius: 16px;
     padding: 1px;
+        font-size: clamp(16px, 5vw, 24px); /* Título responsive */
 }
 
 .posiciones-header {
@@ -230,15 +241,16 @@
 }
 
 .posiciones-header span {
-    font-size: 24px;
+    font-size: clamp(20px, 6vw, 28px); /* Icono responsive */
 }
 
 .no-posiciones {
     text-align: center;
-    padding: 60px 20px;
+    padding: 40px 10px;
     color: #999;
     background: #f9f9f9;
     border-radius: 0 0 16px 16px;
+        font-size: clamp(12px, 3vw, 16px);
 }
 
 
