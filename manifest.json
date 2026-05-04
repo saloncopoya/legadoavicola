@@ -2,7 +2,7 @@
     "name": "Legado Avícola",
     "short_name": "LegadoAV",
     "description": "Cotejo Computarizado - Tabla de Posiciones en Vivo",
-    "start_url": "/index.html",
+    "start_url": "/",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
     "theme_color": "#8B4513",
