@@ -1708,18 +1708,24 @@ setTimeout(() => {
                 
                 renderizarResultadosCotejo();
 
-                // Scroll solo hasta la sección COTEJO
-const cotejoSection = document.querySelector('#admin-main-container > div:last-child');
-if (cotejoSection) {
-    const offset = 0; // Espacio adicional desde arriba (ajustable)
-    const elementPosition = cotejoSection.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - offset;
-    
-    window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-    });
-}
+                // Scroll a la sección COTEJO (usando el ID específico)
+setTimeout(() => {
+    const cotejoSection = document.getElementById('seccion-cotejo');
+    if (cotejoSection) {
+        const offset = 20; // Espacio desde arriba
+        const elementPosition = cotejoSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+        
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+        console.log('📍 Scroll a sección COTEJO');
+    } else {
+        console.log('⚠️ No se encontró la sección COTEJO');
+    }
+}, 150);
+                
                 AppState.addNotification(`✅ Cotejo completado: ${resultado.peleas.length} peleas generadas`, 'success');
             } catch (error) {
                 console.error('Error en cotejo:', error);
@@ -1820,29 +1826,29 @@ window.limpiarResultadosCotejo = () => {
         // RECARGAR LA PANTALLA COMPLETA
         actualizarPantalla();
         
-       // Hacer scroll a la TABLA DE REGISTRO
+
+        // Scroll a la TABLA DE REGISTRO (usando el ID específico)
 setTimeout(() => {
-    // Buscar el título "📋 Tabla de Registro"
-    const tablaRegistro = document.querySelector('#admin-main-container h3');
-    
-    // Alternativa: buscar el div que contiene la tabla
-    const tablaContainer = document.querySelector('#admin-main-container table');
-    
-    if (tablaRegistro) {
-        // Scroll al título de la tabla
-        tablaRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Ajustar un poco hacia arriba para que no quede pegado
-        window.scrollBy({ top: 0, behavior: 'smooth' });
-    } else if (tablaContainer) {
-        // Si no encuentra el título, scroll al contenedor de la tabla
-        tablaContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        window.scrollBy({ top: 0, behavior: 'smooth' });
+    const tituloTabla = document.getElementById('titulo-tabla-registro');
+    if (tituloTabla) {
+        tituloTabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Ajuste fino
+        setTimeout(() => {
+            window.scrollBy({ top: -15, behavior: 'smooth' });
+        }, 100);
+        console.log('📍 Scroll a Tabla de Registro');
+    } else {
+        console.log('⚠️ No se encontró la Tabla de Registro');
+        // Fallback: scroll al formulario
+        const formulario = document.querySelector('#admin-main-container > div:nth-child(2)');
+        if (formulario) formulario.scrollIntoView({ behavior: 'smooth' });
     }
     
     if (typeof regenerarCamposGallos === 'function') {
         regenerarCamposGallos(configuracion.gallosPorPartido);
     }
-}, 150);
+}, 200);
+        
         
         overlay.remove();
         AppState.addNotification(`🧹 Resultados de cotejo eliminados. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
@@ -3531,8 +3537,8 @@ container.innerHTML = `
            <!-- TABLA DE PARTIDOS -->
 <div style="background:white; border-radius:16px; padding:1px; overflow-x:auto;">
     <div style="display: flex; flex-direction: column; margin-bottom: 15px; gap: 12px;">
-        <h3 style="margin: 0;">📋 Tabla de Registro</h3>
-        
+<h3 id="titulo-tabla-registro" style="margin: 0;">📋 Tabla de Registro</h3>
+
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <select id="cotejo-modo-header" style="width: 100%; padding: 12px; border: 2px solid #8B4513; border-radius: 8px; font-size: 14px; font-weight: 500; background: white;">
                 <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
@@ -3580,8 +3586,8 @@ container.innerHTML = `
                 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding:15px; border-radius:12px; text-align:center;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
                 
                <!-- MÓDULO DE COTEJO -->
-<div style="background:white; border-radius:1px; padding:1px; margin-top:16px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+<!-- MÓDULO DE COTEJO -->
+<div id="seccion-cotejo" style="background:white; border-radius:1px; padding:1px; margin-top:16px;">    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
     </div>
 
