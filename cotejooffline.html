@@ -1780,8 +1780,10 @@ tablaHTML += `
                     <td style="padding:6px; text-align:center;">${p.gallo2.anillo}</td>
                     <td style="padding:6px;">${p.gallo2.partido}</td>`;
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo2.color || '-'}</td>`;
-                tablaHTML += `<td style="padding:6px; text-align:center;">${p.diferencia}g</td>;
 
+  tablaHTML += `<td style="padding:6px; text-align:center;">${p.diferencia}g</td>`;
+
+                            
 if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
     tablaHTML += `<td style="padding:6px; text-align:center;">${ganadorTexto}</td>`;
 }
@@ -1789,7 +1791,7 @@ if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
     tablaHTML += `<td style="padding:6px; text-align:center;">${tiempoTexto}</td>`;
 }
         
-tablaHTML += `
+
 
                 
                 // Botones para mover peleas (solo si no hay cotejo guardado Y tiene permiso)
