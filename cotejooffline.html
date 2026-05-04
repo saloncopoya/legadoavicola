@@ -3492,14 +3492,26 @@ container.innerHTML = `
                     <button id="registrar-partido-btn" onclick="window.registrarPartido()" class="btn-success" style="width:100%; padding:16px; border-radius:12px; font-weight:700; margin-top:15px;">✅ REGISTRAR PARTIDO</button>
                 </div>
                 
-                <!-- TABLA DE PARTIDOS -->
-                <div style="background:white; border-radius:16px; padding:1px; overflow-x:auto;">
-                    <h3 style="margin-bottom:15px;">📋 Tabla de Registro</h3>
-                    <table style="width:100%; border-collapse:collapse;">
-                        <thead>${headerColumnas}</thead>
-                        <tbody>${tablaHTML}</tbody>
-                    </table>
-                </div>
+              <!-- TABLA DE PARTIDOS -->
+<div style="background:white; border-radius:16px; padding:1px; overflow-x:auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+        <h3 style="margin: 0;">📋 Tabla de Registro</h3>
+        
+        <div style="display: flex; gap: 8px;">
+            <select id="cotejo-modo-header" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
+                <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
+                <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
+                <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
+                <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
+            </select>
+            <button onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
+        </div>
+    </div>
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>${headerColumnas}</thead>
+        <tbody>${tablaHTML}</tbody>
+    </table>
+</div>
                 ` : ''}
                 
                 <!-- MÓDULO DE CALIFICACIÓN (solo si hay cotejo guardado) -->
@@ -3592,13 +3604,41 @@ container.innerHTML = `
                 container.innerHTML = renderError();
             } else if (torneoActual) {
                 container.innerHTML = renderContenidoPrincipal();
+
                 setTimeout(() => {
-                    const cotejoContainer = document.getElementById('cotejo-resultados-container');
-                    if (cotejoContainer && resultadosCotejo.peleas.length > 0) {
-                        renderizarResultadosCotejo();
-                    }
-                    regenerarCamposGallos(configuracion.gallosPorPartido);
-                }, 100);
+    const cotejoContainer = document.getElementById('cotejo-resultados-container');
+    if (cotejoContainer && resultadosCotejo.peleas.length > 0) {
+        renderizarResultadosCotejo();
+    }
+    regenerarCamposGallos(configuracion.gallosPorPartido);
+    
+    // ========================================
+    // SINCRONIZAR SELECTORES EN TIEMPO REAL
+    // ========================================
+    const modoHeader = document.getElementById('cotejo-modo-header');
+    const modoPrincipal = document.getElementById('cotejo-modo');
+    
+    if (modoHeader && modoPrincipal) {
+        // Cuando cambia el selector de ARRIBA, cambiar el de ABAJO
+        modoHeader.onchange = function() {
+            modoPrincipal.value = this.value;
+            cotejoUltimoModo = this.value;
+        };
+        
+        // Cuando cambia el selector de ABAJO, cambiar el de ARRIBA
+        modoPrincipal.onchange = function() {
+            modoHeader.value = this.value;
+            cotejoUltimoModo = this.value;
+        };
+        
+        // Sincronizar al cargar la página con el valor actual
+        if (cotejoUltimoModo) {
+            modoHeader.value = cotejoUltimoModo;
+            modoPrincipal.value = cotejoUltimoModo;
+        }
+    }
+}, 100);
+                
             } else {
                 container.innerHTML = renderSinTorneo();
                 setTimeout(() => mostrarModalTorneo(), 100);
@@ -4142,6 +4182,7 @@ container.innerHTML = `
     }
     
     actualizarPantalla();
+            
 }
         init();
         
