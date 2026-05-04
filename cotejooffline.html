@@ -1700,7 +1700,7 @@ setTimeout(() => {
                 // Scroll solo hasta la sección COTEJO
 const cotejoSection = document.querySelector('#admin-main-container > div:last-child');
 if (cotejoSection) {
-    const offset = 80; // Espacio adicional desde arriba (ajustable)
+    const offset = 0; // Espacio adicional desde arriba (ajustable)
     const elementPosition = cotejoSection.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - offset;
     
@@ -1821,11 +1821,11 @@ setTimeout(() => {
         // Scroll al título de la tabla
         tablaRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // Ajustar un poco hacia arriba para que no quede pegado
-        window.scrollBy({ top: -20, behavior: 'smooth' });
+        window.scrollBy({ top: 0, behavior: 'smooth' });
     } else if (tablaContainer) {
         // Si no encuentra el título, scroll al contenedor de la tabla
         tablaContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        window.scrollBy({ top: -20, behavior: 'smooth' });
+        window.scrollBy({ top: 0, behavior: 'smooth' });
     }
     
     if (typeof regenerarCamposGallos === 'function') {
