@@ -1014,6 +1014,9 @@ let cotejoUltimoModo = 'ASCENDENTE';
             };
             
             guardarTorneoEnStorage(torneoData);
+
+            vibrarFuerte();
+
             
             torneoActual = torneoData;
             torneoId = nuevoTorneoId;
@@ -1052,6 +1055,27 @@ setTimeout(() => {
 
 return true;
         }
+
+
+
+        // Función de vibración
+function vibrarFuerte() {
+    if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 200]);
+    }
+}
+
+function vibrarSuave() {
+    if (navigator.vibrate) {
+        navigator.vibrate(50);
+    }
+}
+
+function vibrarError() {
+    if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+    }
+}
         
         function actualizarTorneo(formData) {
             if (!torneoId) return false;
@@ -1169,6 +1193,8 @@ return true;
             }
             
             AppState.addNotification(`✅ Partido "${nombrePartido}" registrado`, 'success');
+           vibrarFuerte();
+
             return matchId;
         }
         
@@ -2391,9 +2417,11 @@ setTimeout(() => {
                 window.scrollTo({ top: 280, behavior: 'smooth' });
                 
                 AppState.addNotification(`✅ Cotejo completado: ${resultado.peleas.length} peleas generadas`, 'success');
+           vibrarFuerte();
             } catch (error) {
                 console.error('Error en cotejo:', error);
                 AppState.addNotification('❌ Error al ejecutar cotejo', 'error');
+            vibrarError();
             } finally {
                 if (btnCotejar) {
                     btnCotejar.disabled = false;
@@ -2557,6 +2585,7 @@ window.scrollTo({ top: 700, behavior: 'smooth' });
             } catch (error) {
                 console.error('Error guardando cotejo:', error);
                 AppState.addNotification('❌ Error al guardar el cotejo', 'error');
+          vibrarError();
             } finally {
                 if (btnGuardar) {
                     btnGuardar.disabled = false;
@@ -2592,6 +2621,8 @@ window.scrollTo({ top: 700, behavior: 'smooth' });
             
             document.getElementById('confirmar-eliminar-cotejo').onclick = () => {
     delete torneoActual.cotejoId;
+                vibrarFuerte();
+
     delete torneoActual.cotejoData;
     guardarTorneoEnStorage(torneoActual);
     
@@ -3291,6 +3322,8 @@ container.innerHTML = `
             }
             
             calificacionesCargadas.set(index, calificacionData);
+            vibrarFuerte();
+
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
             window.limpiarSeleccionPelea();
@@ -3327,6 +3360,8 @@ setTimeout(() => {
             }
             
             calificacionesCargadas.delete(index);
+            vibrarFuerte();
+
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
             window.limpiarSeleccionPelea();
@@ -3913,6 +3948,8 @@ window.descargarJPGPosicion = () => {
                         }
                         
                         guardarTorneoEnStorage(torneoData);
+                        vibrarFuerte();
+
                        torneosAnteriores = JSON.parse(localStorage.getItem(STORAGE_KEYS.TORNEOS_LIST) || '[]');
                         
                         torneoActual = torneoData;
@@ -4029,12 +4066,16 @@ setTimeout(() => {
                         
                     } catch (error) {
                         AppState.addNotification(`❌ ${error.message}`, 'error');
+                        vibrarError();
+
                     }
                 };
                 document.getElementById('cancelar-importar').onclick = () => overlay.remove();
                 overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
             } catch (error) {
                 AppState.addNotification(`❌ ${error.message}`, 'error');
+                vibrarError();
+
             }
         }
         
@@ -4093,6 +4134,8 @@ setTimeout(() => {
         }
         
         function mostrarModalEdicionPartido(partidoNombre, gallos) {
+                vibrarSuave();
+
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
             const representante = gallos[0]?.representante || '';
@@ -4150,10 +4193,14 @@ setTimeout(() => {
                     });
                 }
                 guardarEdicionPartido(partidoNombre, nuevoNombre, nuevoRepresentante, gallosEditados);
+                    vibrarFuerte();
+
                 overlay.remove();
                 actualizarPantallaLigera();
             };
             document.getElementById('eliminar-partido-edicion').onclick = () => {
+                    vibrarFuerte();
+
     // Cerrar el modal de edición primero
     overlay.remove();
     // Llamar a eliminarPartido que YA tiene su propio modal bonito
@@ -4164,6 +4211,8 @@ setTimeout(() => {
         }
         
         function mostrarModalEdicionGallo(gallo) {
+                vibrarSuave();
+
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
             overlay.innerHTML = `
@@ -4194,6 +4243,8 @@ setTimeout(() => {
             document.body.appendChild(overlay);
             
             document.getElementById('guardar-edicion-gallo').onclick = async () => {
+                    vibrarFuerte();
+
                 const nuevoAnillo = document.getElementById('edit-gallo-anillo').value.trim();
                 const nuevoPeso = parseInt(document.getElementById('edit-gallo-peso').value, 10) || 0;
                 const nuevoColor = document.getElementById('edit-gallo-color')?.value || '';
@@ -4206,6 +4257,8 @@ setTimeout(() => {
             };
             
             document.getElementById('eliminar-gallo-edicion').onclick = () => {
+                    vibrarFuerte();
+
     overlay.remove();
     eliminarGallo(gallo.partidoNombre, gallo.anillo);
 };
@@ -5283,10 +5336,14 @@ AppState.addNotification('✅ Torneo eliminado completamente', 'success');
             
             if (!nombre) {
                 AppState.addNotification('❌ Nombre del partido obligatorio', 'error');
+                vibrarError();
+
                 boton.disabled = false; boton.textContent = textoOriginal; return;
             }
             if (partidosList.some(p => p.partido.toLowerCase() === nombre.toLowerCase())) {
                 AppState.addNotification(`❌ El partido "${nombre}" ya existe`, 'error');
+                vibrarError();
+
                 boton.disabled = false; boton.textContent = textoOriginal; return;
             }
             
@@ -5315,12 +5372,16 @@ AppState.addNotification('✅ Torneo eliminado completamente', 'success');
                     if (isNaN(pesoNum) || pesoNum <= 0) { AppState.addNotification(`❌ Peso inválido para gallo ${i}`, 'error'); error = true; continue; }
                     if (pesoNum < configuracion.pesoMin || pesoNum > configuracion.pesoMax) {
                         AppState.addNotification(`❌ Peso debe estar entre ${configuracion.pesoMin}-${configuracion.pesoMax}g`, 'error'); error = true; continue;
+                    vibrarError();
+
                     }
                 }
                 
                 const anilloFormateado = anillo.padStart(3, '0');
                 if (anillosExistentes.has(anilloFormateado)) {
                     AppState.addNotification(`❌ Anillo ${anillo} ya registrado`, 'error'); error = true; continue;
+                vibrarError();
+
                 }
                 gallos.push({ anillo, peso: pesoNum, color });
                 anillosExistentes.add(anilloFormateado);
@@ -5471,6 +5532,8 @@ function cargarTemaGuardado() {
             if (!torneoActual) return;
             if (confirm(`¿Eliminar el torneo "${torneoActual.nombre}"? Esta acción no se puede deshacer.`)) {
                 eliminarTorneoDeStorage(torneoId);
+                vibrarFuerte();
+
                 torneoActual = null;
                 torneoId = null;
                 partidosList = [];
