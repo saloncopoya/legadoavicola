@@ -2602,84 +2602,112 @@ window.scrollTo({ top: 700, behavior: 'smooth' });
             
             mostrarModalConfirmacionEliminarCotejo();
         };
+
+
+        // Función para validar palabra ELIMINAR (detecta las letras en orden, sin importar espacios u otros caracteres)
+function contieneLetrasEliminar(texto) {
+    if (!texto) return false;
+    const textoUpper = texto.toUpperCase();
+    // Busca E, luego L, luego I, luego M, luego I, luego N, luego A, luego R en orden
+    let busqueda = "ELIMINAR";
+    let indice = 0;
+    for (let i = 0; i < textoUpper.length && indice < busqueda.length; i++) {
+        if (textoUpper[i] === busqueda[indice]) {
+            indice++;
+        }
+    }
+    return indice === busqueda.length;
+}
         
         function mostrarModalConfirmacionEliminarCotejo() {
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
-                <div class="modal-container" style="max-width:400px; text-align:center;">
-                    <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
-                    <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR COTEJO?</h3>
-                    <p style="margin-bottom:20px;">Se eliminarán todas las peleas generadas y calificaciones.</p>
-                    <div style="display:flex; gap:10px;">
-                        <button id="confirmar-eliminar-cotejo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
-                        <button id="cancelar-eliminar-cotejo" class="btn-secondary" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            
-            document.getElementById('confirmar-eliminar-cotejo').onclick = () => {
-    delete torneoActual.cotejoId;
-                vibrarFuerte();
-
-    delete torneoActual.cotejoData;
-    guardarTorneoEnStorage(torneoActual);
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR COTEJO?</h3>
+            <p style="margin-bottom:20px;">Se eliminarán todas las peleas generadas y calificaciones.</p>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="confirmar-texto-cotejo" placeholder="Escribe ELIMINAR para confirmar" 
+                    style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; font-weight:bold; text-transform:uppercase;">
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar-cotejo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;" disabled>🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar-cotejo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:8px; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
     
-    // ✅ RESTAURAR CONFIGURACIÓN DEL TORNEO
-    if (torneoActual) {
-        configuracion = {
-            gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
-            pesoMin: torneoActual.pesoMin || 1700,
-            pesoMax: torneoActual.pesoMax || 2400,
-            rangoPeso: torneoActual.rangoPeso || 50,
-            anillosEditables: torneoActual.config?.anillosEditables || false,
-            registroDetalladoActivo: torneoActual.config?.registroDetallado || false
-        };
-        
-        // ✅ RESTAURAR PUNTOS CONFIGURADOS
-        puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
-    }
+    const inputTexto = document.getElementById('confirmar-texto-cotejo');
+    const btnEliminar = document.getElementById('confirmar-eliminar-cotejo');
     
-    resultadosCotejo = {
-        peleas: [], noEmparejados: [],
-        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-    };
-    AppState.rooster.cotejoState = false;
-    calificacionesCargadas.clear();
-    peleaSeleccionadaActual = null;
-    
-    // ✅ ACTUALIZAR UI DEL RANGO Y PUNTOS
-    setTimeout(() => {
-        const rangoSlider = document.getElementById('config-rango-peso-slider');
-        const rangoInput = document.getElementById('config-rango-peso');
-        const rangoValorActual = document.getElementById('rango-valor-actual');
-        if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
-        if (rangoInput) rangoInput.value = configuracion.rangoPeso;
-        if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
-        
-        const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
-        const puntosEmpateSpan = document.getElementById('puntos-empate-info');
-        const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
-        if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
-        if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
-        if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
-    }, 100);
-    
-    actualizarPantalla();
-                // Asegurar que los representantes se muestran después de eliminar cotejo
-setTimeout(() => {
-    actualizarListaRepresentantes();
-    console.log('📋 Representantes actualizados después de eliminar cotejo');
-}, 200);
-    overlay.remove();
-    AppState.addNotification(`✅ Cotejo eliminado. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
-};
-
-            
-            document.getElementById('cancelar-eliminar-cotejo').onclick = () => overlay.remove();
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    // Validar mientras escribe
+    inputTexto.addEventListener('input', function(e) {
+        const contiene = contieneLetrasEliminar(e.target.value);
+        btnEliminar.disabled = !contiene;
+        if (contiene) {
+            btnEliminar.style.opacity = '1';
+            btnEliminar.style.cursor = 'pointer';
+        } else {
+            btnEliminar.style.opacity = '0.5';
+            btnEliminar.style.cursor = 'not-allowed';
         }
+    });
+    
+    document.getElementById('confirmar-eliminar-cotejo').onclick = () => {
+        vibrarFuerte();
+        delete torneoActual.cotejoId;
+        delete torneoActual.cotejoData;
+        guardarTorneoEnStorage(torneoActual);
+        
+        if (torneoActual) {
+            configuracion = {
+                gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
+                pesoMin: torneoActual.pesoMin || 1700,
+                pesoMax: torneoActual.pesoMax || 2400,
+                rangoPeso: torneoActual.rangoPeso || 50,
+                anillosEditables: torneoActual.config?.anillosEditables || false,
+                registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+            };
+            puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        }
+        
+        resultadosCotejo = {
+            peleas: [], noEmparejados: [],
+            metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+        };
+        AppState.rooster.cotejoState = false;
+        calificacionesCargadas.clear();
+        peleaSeleccionadaActual = null;
+        
+        setTimeout(() => {
+            const rangoSlider = document.getElementById('config-rango-peso-slider');
+            const rangoInput = document.getElementById('config-rango-peso');
+            const rangoValorActual = document.getElementById('rango-valor-actual');
+            if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
+            if (rangoInput) rangoInput.value = configuracion.rangoPeso;
+            if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
+            
+            const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
+            const puntosEmpateSpan = document.getElementById('puntos-empate-info');
+            const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
+            if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
+            if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
+            if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
+        }, 100);
+        
+        actualizarPantalla();
+        overlay.remove();
+        AppState.addNotification(`✅ Cotejo eliminado. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
+    };
+    
+    document.getElementById('cancelar-eliminar-cotejo').onclick = () => {
+        vibrarSuave();
+        overlay.remove();
+    };
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
         
         function renderizarResultadosCotejo() {
             const container = document.getElementById('cotejo-resultados-container');
@@ -5216,7 +5244,6 @@ datosPosicion.forEach((item, idx) => {
         return;
     }
     
-    // Crear modal de confirmación personalizado
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
@@ -5231,16 +5258,36 @@ datosPosicion.forEach((item, idx) => {
                 🏆 <strong>${calificacionesCargadas.size}</strong> calificaciones<br><br>
                 <span style="color:#d32f2f; font-weight:bold;">⚠️ ¡Esta acción NO se puede deshacer!</span>
             </p>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="confirmar-texto-torneo" placeholder="Escribe ELIMINAR para confirmar" 
+                    style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; font-weight:bold; text-transform:uppercase;">
+            </div>
             <div style="display:flex; gap:10px;">
-                <button id="confirmar-eliminar-torneo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+                <button id="confirmar-eliminar-torneo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;" disabled>🗑️ ELIMINAR TORNEO</button>
                 <button id="cancelar-eliminar-torneo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
             </div>
         </div>
     `;
     document.body.appendChild(overlay);
     
-    // Confirmar eliminar
+    const inputTexto = document.getElementById('confirmar-texto-torneo');
+    const btnEliminar = document.getElementById('confirmar-eliminar-torneo');
+    
+    // Validar mientras escribe
+    inputTexto.addEventListener('input', function(e) {
+        const contiene = contieneLetrasEliminar(e.target.value);
+        btnEliminar.disabled = !contiene;
+        if (contiene) {
+            btnEliminar.style.opacity = '1';
+            btnEliminar.style.cursor = 'pointer';
+        } else {
+            btnEliminar.style.opacity = '0.5';
+            btnEliminar.style.cursor = 'not-allowed';
+        }
+    });
+    
     document.getElementById('confirmar-eliminar-torneo').onclick = () => {
+        vibrarFuerte();
         eliminarTorneoDeStorage(torneoId);
         torneoActual = null;
         torneoId = null;
@@ -5248,38 +5295,32 @@ datosPosicion.forEach((item, idx) => {
         resultadosCotejo = { peleas: [], noEmparejados: [], metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 } };
         calificacionesCargadas.clear();
         
-        // Cerrar modal de torneo si está abierto
         const modalTorneo = document.getElementById('tournament-modal-overlay');
         if (modalTorneo) modalTorneo.remove();
         
         overlay.remove();
-
         actualizarPantalla();
-
-//  ACTUALIZAR EL SELECTOR DE TORNEOS EN EL HEADER
-setTimeout(() => {
-    const selectorTorneos = document.getElementById('header-torneo-selector');
-    if (selectorTorneos) {
-        let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
-        torneosAnteriores.forEach(t => {
-            opciones += `<option value="${t.id}" ${t.id === torneoId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
-        });
-        selectorTorneos.innerHTML = opciones;
-        console.log('🔄 Selector de torneos actualizado después de eliminar torneo');
-    }
-}, 100);
-
-AppState.addNotification('✅ Torneo eliminado completamente', 'success');
         
+        setTimeout(() => {
+            const selectorTorneos = document.getElementById('header-torneo-selector');
+            if (selectorTorneos) {
+                let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+                torneosAnteriores.forEach(t => {
+                    opciones += `<option value="${t.id}" ${t.id === torneoId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+                });
+                selectorTorneos.innerHTML = opciones;
+            }
+        }, 100);
+        
+        AppState.addNotification('✅ Torneo eliminado completamente', 'success');
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     };
     
-    // Cancelar eliminar
     document.getElementById('cancelar-eliminar-torneo').onclick = () => {
+        vibrarSuave();
         overlay.remove();
     };
     
-    // Cerrar al hacer clic fuera
     overlay.onclick = (e) => {
         if (e.target === overlay) overlay.remove();
     };
