@@ -1512,7 +1512,7 @@ return true;
         }
         
         function cambiarGallosPorPartido(valor) {
-                if (!valor || valor === 'disabled') return;
+    if (!valor || valor === '0') return;
 
             let num = parseInt(valor, 10);
             if (isNaN(num)) num = 3;
@@ -4299,7 +4299,7 @@ setTimeout(() => {
                     <div id="config-content" style="display:none; background:#334155; padding:16px;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                             <select id="config-gallos" onchange="window.cambiarGallosPorPartido(this.value)" class="form-input" style="background:white;">
-                                 <option disabled>🐓 GALLOS POR PARTIDO</option>
+                                 <option value="0">🐓 GALLOS POR PARTIDO</option>
                                 <option value="1">1 GALLO (Agregar Comodin)</option>
                                 <option value="2">2 GALLOS</option>
                                 <option value="3" ${configuracion.gallosPorPartido === 3 ? 'selected' : ''}>3 GALLOS</option>
