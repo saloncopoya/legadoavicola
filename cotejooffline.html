@@ -707,78 +707,56 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 }
 
 
+
 /* ==============================================
-   CONTROL DE VISIBILIDAD DE TABLAS - VERSIÓN DEFINITIVA
+   LAYOUT RESPONSIVO: COTEJO + POSICIONES
    ============================================== */
 
-/* Clases de visibilidad - FORZADAS con !important */
-.cotejo-visible {
-    display: block !important;
-}
-
-.cotejo-oculto {
-    display: none !important;
-}
-
-.posiciones-visible {
-    display: block !important;
-}
-
-.posiciones-oculto {
-    display: none !important;
-}
-
-/* Contenedor de posiciones - asegurar que se muestra cuando tiene clase visible */
-#posiciones-container {
+/* Contenedor principal que envuelve ambas tablas */
+.cotejo-posiciones-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
     margin-top: 20px;
-    overflow-x: auto;
-    background: white;
-    border-radius: 16px;
-    padding: 1px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* FORZAR visibilidad cuando tiene la clase posiciones-visible */
-#posiciones-container.posiciones-visible {
-    display: block !important;
-}
-
-/* FORZAR ocultar cuando tiene la clase posiciones-oculto */
-#posiciones-container.posiciones-oculto {
-    display: none !important;
-}
-
-/* MODO AMBAS - PC: lado a lado */
-@media (min-width: 769px) {
-    .ambas-container-wrapper {
-        display: flex !important;
-        flex-direction: row !important;
-        gap: 20px !important;
-        align-items: flex-start !important;
+/* En pantallas grandes (PC, TV, tablets horizontales) */
+@media (min-width: 800px) {
+   .cotejo-posiciones-wrapper {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        gap: 20px;
+        width: 100%;
     }
     
-    .ambas-container-wrapper #seccion-cotejo,
-    .ambas-container-wrapper #posiciones-container {
-        flex: 1 !important;
-        min-width: 0 !important;
-        width: 100% !important;
-        display: block !important;
+    /* Asegurar que cada contenedor no se desborde y ocupe todo el ancho */
+    #seccion-cotejo,
+    #posiciones-container {
+        overflow-x: auto;
+        min-width: 0;
+        width: 100%;
+    }
+    
+    /* Forzar que el contenido interno también ocupe todo el ancho */
+    #seccion-cotejo > div,
+    #posiciones-container > div,
+    .cotejo-posiciones-wrapper > div {
+        width: 100%;
     }
 }
 
-/* MODO AMBAS - MÓVIL: arriba y abajo */
-@media (max-width: 768px) {
-    .ambas-container-wrapper {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 20px !important;
-    }
-    
-    .ambas-container-wrapper #seccion-cotejo,
-    .ambas-container-wrapper #posiciones-container {
-        width: 100% !important;
-        display: block !important;
+/* Ajustes para tablets (768px - 1023px) - opcional */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .cotejo-posiciones-wrapper {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        width: 100%;
     }
 }
+      
+        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1659,7 +1637,7 @@ function vibrarError() {
                             oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                     </div>
                     <div>
-                        <input type="text" inputmode="numeric" id="weight-${i}" placeholder="0000" autocomplete="off" value="" 
+                        <input type="tel" inputmode="numeric" id="weight-${i}" placeholder="0000" autocomplete="off" value="" 
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4);"
                             style="width: 100%; padding: 14px 8px; border: 1px solid #ddd; border-radius: 8px; box-sizing:border-box; font-size: 15px; text-align: center;">
                     </div>
@@ -4386,7 +4364,7 @@ setTimeout(() => {
                 <div style="display: grid; grid-template-columns: ${configuracion.registroDetalladoActivo ? '1fr 0.8fr 0.8fr 1.2fr' : '1fr 0.8fr 0.8fr'}; gap: 8px; margin-bottom: 12px; align-items: center;">
                     <div><button type="button" id="estado-${i}" onclick="window.toggleEstadoGallo(${i})" style="width:100%; padding:14px 4px; border:none; border-radius:30px; font-weight:700; background:#4CAF50; color:white;">PRESENTE</button></div>
                     <div><input type="text" id="ring-${i}" placeholder="000" value="${anilloValue}" ${readonlyAttr} style="width:100%; padding:8px 5px; border:1px solid #ddd; border-radius:8px; background:${bgColorAnillo}; text-align:center; font-size:20px; font-weight:900;" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
-                    <div><input type="text" inputmode="numeric" id="weight-${i}" placeholder="0000" value="" style="width:100%; padding:14px 8px; border:1px solid #ddd; border-radius:8px; text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
+                    <div><input type="tel" inputmode="numeric" id="weight-${i}" placeholder="0000" value="" style="width:100%; padding:14px 8px; border:1px solid #ddd; border-radius:8px; text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
                     ${configuracion.registroDetalladoActivo ? `<div><input type="text" id="color-${i}" list="color-list-${i}" placeholder="Color" style="width:100%; padding:14px 8px; border:1px solid #ddd; border-radius:8px;"><datalist id="color-list-${i}">${coloresGallosList.map(c => `<option value="${c}">`).join('')}</datalist></div>` : ''}
                 </div>`;
             }
@@ -4423,8 +4401,8 @@ setTimeout(() => {
             const puedeMover = !cotejoGuardado && PERMISOS_USUARIO.posicion;
             
             return `
-            <div id="admin-main-container" style="padding:1px; max-width:1200px; margin:0 auto;">
-                <!-- HEADER -->
+<div id="admin-main-container" style="padding:1px; width:100%; max-width:1400px; margin:0 auto; box-sizing:border-box;">
+<!-- HEADER -->
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                     <h1 style="margin:0 0 1px; color:#8B4513; font-size:28px; text-align:center;"> ${torneoActual?.nombre || 'Torneo'}</h1>
                     <div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font-size:13px; color:#666;">
@@ -4543,7 +4521,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     <div id="calificacion-detalle-pelea" style="display:none;"></div>
     <div id="calificacion-formulario" style="display:none;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px;">
-            <div><label style="font-size: 12px;">⏱️ TIEMPO</label><input type="text" id="calificacion-tiempo" placeholder="MM:SS" maxlength="5" class="form-input" style="font-size: 22px; text-align:center; padding: 8px;" onkeyup="formatearTiempo(this)"></div>
+            <div><label style="font-size: 12px;">⏱️ TIEMPO</label><input type="tel"  inputmode="numeric" id="calificacion-tiempo" placeholder="MM:SS" maxlength="5" class="form-input" style="font-size: 22px; text-align:center; padding: 8px;" onkeyup="formatearTiempo(this)"></div>
             <div><label style="font-size: 12px;">🏆 GANADOR</label><select id="calificacion-ganador" class="form-input" style="padding: 8px;"></select></div>
         </div>
         <div style="background:#f8f9fa; padding: 8px; border-radius: 6px; display: flex; justify-content: space-around; margin-bottom: 12px; font-size: 12px;">
@@ -4560,9 +4538,13 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
 
 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding: 15px; border-radius: 12px; text-align:center; font-size: 13px;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
 
-                
+
+                <!-- WRAPPER RESPONSIVO: en móvil vertical, en PC lado a lado -->
+<div class="cotejo-posiciones-wrapper">
+
                <!-- MÓDULO DE COTEJO -->
 <!-- MÓDULO DE COTEJO -->
+
 <div id="seccion-cotejo" style="background:white; border-radius:1px; padding:1px; margin-top:16px;">    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
     </div>
@@ -4571,12 +4553,6 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
 <button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700;">📥 DESCARGAR</button>
 <button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:15px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
-<!-- NUEVOS BOTONES -->
-<div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-    <button onclick="mostrarSoloCotejo()" class="btn-primary" style="flex:1; padding:12px; border-radius:30px; font-weight:700;">👁️ VER COTEJO</button>
-    <button onclick="mostrarSoloPosiciones()" class="btn-primary" style="flex:1; padding:12px; border-radius:30px; font-weight:700;">👁️ VER POSICIONES</button>
-    <button onclick="mostrarAmbasTablas()" class="btn-success" style="flex:2; padding:12px; border-radius:30px; font-weight:700;">👁️ VER AMBAS TABLAS</button>
-</div>
 </div>
     ` : `
     <!-- FILA 1: Selector de modo y botón COTEJAR/REINTENTAR -->
@@ -4610,8 +4586,8 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     </div>
 
     <!-- SECCIÓN TABLA DE POSICIONES -->
-<div id="posiciones-container" style="display: none; margin-top: 30px;">
-    <div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
+<div id="posiciones-container">
+<div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
 </div>
     <div id="tabla-posiciones-content">
         <div class="no-posiciones">
@@ -4620,9 +4596,8 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
         </div>
     </div>
 </div>
-
-
 </div>
+
             </div>
             `;
         }
@@ -4814,7 +4789,7 @@ function renderizarTablaPosiciones() {
     const tieneCalificaciones = calificacionesCargadas && calificacionesCargadas.size > 0;
     
     if (!tieneCotejo || resultadosCotejo.peleas.length === 0 || !tieneCalificaciones) {
-        container.style.display = 'none';
+container.style.display = 'none';
         console.log('Tabla de posiciones oculta: sin cotejo guardado o sin calificaciones');
         return;
     }
@@ -5618,164 +5593,7 @@ function cargarTemaGuardado() {
         }
     }
 }
-function mostrarSoloCotejo() {
-    document.getElementById('seccion-cotejo').style.display = 'block';
-    document.getElementById('posiciones-container').style.display = 'none';
-}
-
-function mostrarSoloPosiciones() {
-    document.getElementById('seccion-cotejo').style.display = 'none';
-    document.getElementById('posiciones-container').style.display = 'block';
-    if (typeof renderizarTablaPosiciones === 'function') renderizarTablaPosiciones();
-}
-
-function mostrarAmbasTablas() {
-    document.getElementById('seccion-cotejo').style.display = 'block';
-    document.getElementById('posiciones-container').style.display = 'block';
-}
-   
-        // ============================================================
-// FUNCIONES PARA CONTROLAR VISIBILIDAD DE TABLAS (VERSIÓN CORREGIDA 2)
-// ============================================================
-
-// Variable para guardar el estado actual
-let modoVisibilidadActual = 'ambas';
-
-window.controlarVisibilidadTablas = function(modo) {
-    const cotejoContainer = document.getElementById('seccion-cotejo');
-    const posicionesContainer = document.getElementById('posiciones-container');
-    
-    if (!cotejoContainer || !posicionesContainer) {
-        console.warn('No se encontraron los contenedores');
-        return;
-    }
-    
-    // Guardar el modo actual
-    modoVisibilidadActual = modo;
-    
-    // Limpiar clases existentes primero
-    cotejoContainer.classList.remove('cotejo-visible', 'cotejo-oculto');
-    posicionesContainer.classList.remove('posiciones-visible', 'posiciones-oculto');
-    
-    // Remover cualquier estilo inline que pueda interferir
-    cotejoContainer.style.display = '';
-    posicionesContainer.style.display = '';
-    
-    // Aplicar visibilidad según el modo
-    if (modo === 'cotejo') {
-        // Mostrar solo cotejo, ocultar posiciones
-        cotejoContainer.classList.add('cotejo-visible');
-        posicionesContainer.classList.add('posiciones-oculto');
-        cotejoContainer.style.display = 'block';
-        posicionesContainer.style.display = 'none';
-        AppState.addNotification('👁️ Mostrando solo tabla de COTEJO', 'info');
-    } 
-    else if (modo === 'posiciones') {
-        // Mostrar solo posiciones, ocultar cotejo
-        cotejoContainer.classList.add('cotejo-oculto');
-        posicionesContainer.classList.add('posiciones-visible');
-        cotejoContainer.style.display = 'none';
-        posicionesContainer.style.display = 'block';
         
-        // FORZAR ACTUALIZACIÓN DE LA TABLA DE POSICIONES
-        if (typeof renderizarTablaPosiciones === 'function') {
-            setTimeout(() => {
-                renderizarTablaPosiciones();
-            }, 50);
-        }
-        
-        AppState.addNotification('👁️ Mostrando solo tabla de POSICIONES', 'info');
-    }
-    else if (modo === 'ambas') {
-        // Mostrar ambas
-        cotejoContainer.classList.add('cotejo-visible');
-        posicionesContainer.classList.add('posiciones-visible');
-        cotejoContainer.style.display = 'block';
-        posicionesContainer.style.display = 'block';
-        
-        // En PC, poner en grid; en móvil, bloque
-        if (window.innerWidth > 768) {
-            // Crear un wrapper flexible si es necesario
-            const padre = cotejoContainer.parentNode;
-            if (!padre.classList.contains('ambas-container-wrapper')) {
-                padre.style.display = 'flex';
-                padre.style.flexWrap = 'wrap';
-                padre.style.gap = '20px';
-                padre.classList.add('ambas-container-wrapper');
-            }
-            cotejoContainer.style.flex = '1';
-            cotejoContainer.style.minWidth = '300px';
-            posicionesContainer.style.flex = '1';
-            posicionesContainer.style.minWidth = '300px';
-        } else {
-            cotejoContainer.style.width = '100%';
-            posicionesContainer.style.width = '100%';
-        }
-        
-        AppState.addNotification('👁️ Mostrando ambas tablas', 'success');
-    }
-};
-
-// Función para remover el wrapper si existe
-function removerWrapperAmbas() {
-    const padre = document.getElementById('seccion-cotejo')?.parentNode;
-    if (padre && padre.classList && padre.classList.contains('ambas-container-wrapper')) {
-        padre.style.display = '';
-        padre.style.flexWrap = '';
-        padre.style.gap = '';
-        padre.classList.remove('ambas-container-wrapper');
-        
-        // Resetear estilos de los hijos
-        const cotejo = document.getElementById('seccion-cotejo');
-        const posiciones = document.getElementById('posiciones-container');
-        if (cotejo) {
-            cotejo.style.flex = '';
-            cotejo.style.minWidth = '';
-            cotejo.style.width = '';
-        }
-        if (posiciones) {
-            posiciones.style.flex = '';
-            posiciones.style.minWidth = '';
-            posiciones.style.width = '';
-        }
-    }
-}
-
-// Función para inicializar el estado de visibilidad
-window.inicializarVisibilidadTablas = function() {
-    const cotejoContainer = document.getElementById('seccion-cotejo');
-    const posicionesContainer = document.getElementById('posiciones-container');
-    
-    if (cotejoContainer && posicionesContainer) {
-        // Limpiar clases y estilos
-        cotejoContainer.classList.remove('cotejo-oculto', 'cotejo-visible');
-        posicionesContainer.classList.remove('posiciones-oculto', 'posiciones-visible');
-        cotejoContainer.style.display = '';
-        posicionesContainer.style.display = '';
-        
-        removerWrapperAmbas();
-        
-        // Por defecto, mostrar ambas
-        cotejoContainer.classList.add('cotejo-visible');
-        posicionesContainer.classList.add('posiciones-visible');
-        cotejoContainer.style.display = 'block';
-        posicionesContainer.style.display = 'block';
-        modoVisibilidadActual = 'ambas';
-    }
-};
-
-// Modificar actualizarPantalla para preservar el modo de visibilidad
-const originalActualizarPantalla = actualizarPantalla;
-actualizarPantalla = function() {
-    originalActualizarPantalla();
-    setTimeout(() => {
-        window.inicializarVisibilidadTablas();
-        // Restaurar el modo anterior si había uno guardado y no es 'ambas'
-        if (modoVisibilidadActual && modoVisibilidadActual !== 'ambas') {
-            window.controlarVisibilidadTablas(modoVisibilidadActual);
-        }
-    }, 150);
-};
         // ============================================================
         // INICIALIZACIÓN
         // ============================================================
@@ -5845,7 +5663,7 @@ actualizarPantalla = function() {
     // ✅ IMPORTANTE: Asegurar que el contenedor existe antes de actualizar
     const root = document.getElementById('app-root');
     if (root) {
-        root.innerHTML = '<div id="admin-main-container" style="padding:2px; max-width:1200px; margin:0 auto;"></div>';
+root.innerHTML = '<div id="admin-main-container" style="padding:2px; width:100%; max-width:1400px; margin:0 auto; box-sizing:border-box;"></div>';
     }
     
     actualizarPantalla();
