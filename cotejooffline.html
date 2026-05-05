@@ -4586,8 +4586,8 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     </div>
 
     <!-- SECCIÓN TABLA DE POSICIONES -->
-<div id="posiciones-container" style="display: none; margin-top: 30px;">
-    <div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
+<div id="posiciones-container" style="margin-top: 30px;">
+<div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
 </div>
     <div id="tabla-posiciones-content">
         <div class="no-posiciones">
@@ -4790,7 +4790,7 @@ function renderizarTablaPosiciones() {
     const tieneCalificaciones = calificacionesCargadas && calificacionesCargadas.size > 0;
     
     if (!tieneCotejo || resultadosCotejo.peleas.length === 0 || !tieneCalificaciones) {
-        container.style.display = 'none';
+container.style.display = 'block';
         console.log('Tabla de posiciones oculta: sin cotejo guardado o sin calificaciones');
         return;
     }
