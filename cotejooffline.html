@@ -707,12 +707,12 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 }
 
 
-/* Contenedores con visibilidad controlada */
-.cotejo-visible {
-    display: block !important;
-}
+     /* ==============================================
+   CONTROL DE VISIBILIDAD DE TABLAS
+   ============================================== */
 
-.posiciones-visible {
+/* Clases base de visibilidad */
+.cotejo-visible {
     display: block !important;
 }
 
@@ -720,39 +720,67 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     display: none !important;
 }
 
+.posiciones-visible {
+    display: block !important;
+}
+
 .posiciones-oculto {
     display: none !important;
 }
 
-/* Estilos responsivos para cuando se muestran ambas */
-#seccion-cotejo.cotejo-visible,
-#posiciones-container.posiciones-visible {
-    width: 100%;
+/* Estilos base de los contenedores */
+#seccion-cotejo,
+#posiciones-container {
+    transition: all 0.3s ease;
 }
 
-/* En pantallas grandes, si se muestran ambas, usar grid */
+/* Estilos responsive para MODO AMBAS en PC */
 @media (min-width: 769px) {
-    body:has(.cotejo-visible.posiciones-visible) #seccion-cotejo.cotejo-visible,
-    body:has(.cotejo-visible.posiciones-visible) #posiciones-container.posiciones-visible {
-        display: inline-block !important;
-        width: 48% !important;
-        vertical-align: top;
+    /* Cuando el padre tiene la clase ambas-container-wrapper */
+    .ambas-container-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+        align-items: flex-start !important;
     }
     
-    body:has(.cotejo-visible.posiciones-visible) #seccion-cotejo.cotejo-visible {
-        margin-right: 2%;
-    }
-}
-
-/* En móviles, mantener bloque uno tras otro */
-@media (max-width: 768px) {
-    #seccion-cotejo.cotejo-visible,
-    #posiciones-container.posiciones-visible {
+    .ambas-container-wrapper #seccion-cotejo,
+    .ambas-container-wrapper #posiciones-container {
+        flex: 1 !important;
+        min-width: 0 !important;
         width: 100% !important;
         display: block !important;
     }
 }
-     
+
+/* Estilos responsive para MODO AMBAS en móvil */
+@media (max-width: 768px) {
+    .ambas-container-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+    
+    .ambas-container-wrapper #seccion-cotejo,
+    .ambas-container-wrapper #posiciones-container {
+        width: 100% !important;
+        display: block !important;
+    }
+}
+
+/* Asegurar que posiciones-container tenga fondo blanco y sea visible */
+#posiciones-container {
+    margin-top: 20px;
+    overflow-x: auto;
+    background: white;
+    border-radius: 16px;
+    padding: 1px;
+}
+
+/* Forzar visibilidad cuando tenga contenido */
+#posiciones-container.posiciones-visible {
+    display: block !important;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -5593,8 +5621,9 @@ function cargarTemaGuardado() {
     }
 }
 
-    // ============================================================
-// FUNCIONES PARA CONTROLAR VISIBILIDAD DE TABLAS (VERSIÓN CORREGIDA)
+   
+        // ============================================================
+// FUNCIONES PARA CONTROLAR VISIBILIDAD DE TABLAS (VERSIÓN CORREGIDA 2)
 // ============================================================
 
 // Variable para guardar el estado actual
@@ -5616,46 +5645,89 @@ window.controlarVisibilidadTablas = function(modo) {
     cotejoContainer.classList.remove('cotejo-visible', 'cotejo-oculto');
     posicionesContainer.classList.remove('posiciones-visible', 'posiciones-oculto');
     
-    // Remover cualquier wrapper anterior que pueda existir
-    const wrapperExistente = document.querySelector('.ambas-tablas-container');
-    if (wrapperExistente) {
-        // Restaurar los contenedores a su posición original
-        const padre = wrapperExistente.parentNode;
-        const cotejoDiv = document.getElementById('seccion-cotejo');
-        const posicionesDiv = document.getElementById('posiciones-container');
-        
-        if (cotejoDiv && posicionesDiv) {
-            padre.insertBefore(cotejoDiv, wrapperExistente);
-            padre.insertBefore(posicionesDiv, wrapperExistente.nextSibling);
-        }
-        wrapperExistente.remove();
-    }
+    // Remover cualquier estilo inline que pueda interferir
+    cotejoContainer.style.display = '';
+    posicionesContainer.style.display = '';
     
     // Aplicar visibilidad según el modo
     if (modo === 'cotejo') {
         // Mostrar solo cotejo, ocultar posiciones
         cotejoContainer.classList.add('cotejo-visible');
         posicionesContainer.classList.add('posiciones-oculto');
+        cotejoContainer.style.display = 'block';
+        posicionesContainer.style.display = 'none';
         AppState.addNotification('👁️ Mostrando solo tabla de COTEJO', 'info');
     } 
     else if (modo === 'posiciones') {
         // Mostrar solo posiciones, ocultar cotejo
         cotejoContainer.classList.add('cotejo-oculto');
         posicionesContainer.classList.add('posiciones-visible');
+        cotejoContainer.style.display = 'none';
+        posicionesContainer.style.display = 'block';
+        
+        // FORZAR ACTUALIZACIÓN DE LA TABLA DE POSICIONES
+        if (typeof renderizarTablaPosiciones === 'function') {
+            setTimeout(() => {
+                renderizarTablaPosiciones();
+            }, 50);
+        }
+        
         AppState.addNotification('👁️ Mostrando solo tabla de POSICIONES', 'info');
     }
     else if (modo === 'ambas') {
-        // Mostrar ambas sin wrapper (ya están visibles por defecto)
+        // Mostrar ambas
         cotejoContainer.classList.add('cotejo-visible');
         posicionesContainer.classList.add('posiciones-visible');
-        
-        // Aplicar estilos responsivos con CSS (sin mover el DOM)
         cotejoContainer.style.display = 'block';
         posicionesContainer.style.display = 'block';
+        
+        // En PC, poner en grid; en móvil, bloque
+        if (window.innerWidth > 768) {
+            // Crear un wrapper flexible si es necesario
+            const padre = cotejoContainer.parentNode;
+            if (!padre.classList.contains('ambas-container-wrapper')) {
+                padre.style.display = 'flex';
+                padre.style.flexWrap = 'wrap';
+                padre.style.gap = '20px';
+                padre.classList.add('ambas-container-wrapper');
+            }
+            cotejoContainer.style.flex = '1';
+            cotejoContainer.style.minWidth = '300px';
+            posicionesContainer.style.flex = '1';
+            posicionesContainer.style.minWidth = '300px';
+        } else {
+            cotejoContainer.style.width = '100%';
+            posicionesContainer.style.width = '100%';
+        }
         
         AppState.addNotification('👁️ Mostrando ambas tablas', 'success');
     }
 };
+
+// Función para remover el wrapper si existe
+function removerWrapperAmbas() {
+    const padre = document.getElementById('seccion-cotejo')?.parentNode;
+    if (padre && padre.classList && padre.classList.contains('ambas-container-wrapper')) {
+        padre.style.display = '';
+        padre.style.flexWrap = '';
+        padre.style.gap = '';
+        padre.classList.remove('ambas-container-wrapper');
+        
+        // Resetear estilos de los hijos
+        const cotejo = document.getElementById('seccion-cotejo');
+        const posiciones = document.getElementById('posiciones-container');
+        if (cotejo) {
+            cotejo.style.flex = '';
+            cotejo.style.minWidth = '';
+            cotejo.style.width = '';
+        }
+        if (posiciones) {
+            posiciones.style.flex = '';
+            posiciones.style.minWidth = '';
+            posiciones.style.width = '';
+        }
+    }
+}
 
 // Función para inicializar el estado de visibilidad
 window.inicializarVisibilidadTablas = function() {
@@ -5663,18 +5735,20 @@ window.inicializarVisibilidadTablas = function() {
     const posicionesContainer = document.getElementById('posiciones-container');
     
     if (cotejoContainer && posicionesContainer) {
-        // Limpiar clases
+        // Limpiar clases y estilos
         cotejoContainer.classList.remove('cotejo-oculto', 'cotejo-visible');
         posicionesContainer.classList.remove('posiciones-oculto', 'posiciones-visible');
+        cotejoContainer.style.display = '';
+        posicionesContainer.style.display = '';
+        
+        removerWrapperAmbas();
         
         // Por defecto, mostrar ambas
         cotejoContainer.classList.add('cotejo-visible');
         posicionesContainer.classList.add('posiciones-visible');
-        modoVisibilidadActual = 'ambas';
-        
-        // Asegurar que los estilos display estén correctos
         cotejoContainer.style.display = 'block';
         posicionesContainer.style.display = 'block';
+        modoVisibilidadActual = 'ambas';
     }
 };
 
@@ -5684,13 +5758,12 @@ actualizarPantalla = function() {
     originalActualizarPantalla();
     setTimeout(() => {
         window.inicializarVisibilidadTablas();
-        // Restaurar el modo anterior si había uno guardado
+        // Restaurar el modo anterior si había uno guardado y no es 'ambas'
         if (modoVisibilidadActual && modoVisibilidadActual !== 'ambas') {
             window.controlarVisibilidadTablas(modoVisibilidadActual);
         }
     }, 150);
 };
-        
         // ============================================================
         // INICIALIZACIÓN
         // ============================================================
