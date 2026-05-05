@@ -707,11 +707,11 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 }
 
 
-     /* ==============================================
-   CONTROL DE VISIBILIDAD DE TABLAS
+/* ==============================================
+   CONTROL DE VISIBILIDAD DE TABLAS - VERSIÓN DEFINITIVA
    ============================================== */
 
-/* Clases base de visibilidad */
+/* Clases de visibilidad - FORZADAS con !important */
 .cotejo-visible {
     display: block !important;
 }
@@ -728,15 +728,27 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     display: none !important;
 }
 
-/* Estilos base de los contenedores */
-#seccion-cotejo,
+/* Contenedor de posiciones - asegurar que se muestra cuando tiene clase visible */
 #posiciones-container {
-    transition: all 0.3s ease;
+    margin-top: 20px;
+    overflow-x: auto;
+    background: white;
+    border-radius: 16px;
+    padding: 1px;
 }
 
-/* Estilos responsive para MODO AMBAS en PC */
+/* FORZAR visibilidad cuando tiene la clase posiciones-visible */
+#posiciones-container.posiciones-visible {
+    display: block !important;
+}
+
+/* FORZAR ocultar cuando tiene la clase posiciones-oculto */
+#posiciones-container.posiciones-oculto {
+    display: none !important;
+}
+
+/* MODO AMBAS - PC: lado a lado */
 @media (min-width: 769px) {
-    /* Cuando el padre tiene la clase ambas-container-wrapper */
     .ambas-container-wrapper {
         display: flex !important;
         flex-direction: row !important;
@@ -753,7 +765,7 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     }
 }
 
-/* Estilos responsive para MODO AMBAS en móvil */
+/* MODO AMBAS - MÓVIL: arriba y abajo */
 @media (max-width: 768px) {
     .ambas-container-wrapper {
         display: flex !important;
@@ -765,37 +777,6 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     .ambas-container-wrapper #posiciones-container {
         width: 100% !important;
         display: block !important;
-    }
-}
-
-/* Asegurar que posiciones-container tenga fondo blanco y sea visible */
-#posiciones-container {
-    margin-top: 20px;
-    overflow-x: auto;
-    background: white;
-    border-radius: 16px;
-    padding: 1px;
-}
-
-/* Forzar visibilidad cuando tenga contenido */
-#posiciones-container.posiciones-visible {
-    display: block !important;
-}
-        /* Asegurar que en PC se vean lado a lado */
-@media (min-width: 769px) {
-    .ambas-container-wrapper {
-        display: flex !important;
-        flex-direction: row !important;
-        gap: 20px !important;
-        align-items: flex-start !important;
-    }
-    
-    .ambas-container-wrapper #seccion-cotejo,
-    .ambas-container-wrapper #posiciones-container {
-        flex: 1 !important;
-        min-width: 0 !important;
-        width: 100% !important;
-        max-width: 50% !important;  /* 👈 ESTO asegura que ocupen la mitad cada una */
     }
 }
     </style>
@@ -4590,11 +4571,11 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
 <button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700;">📥 DESCARGAR</button>
 <button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:15px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
-<!-- NUEVOS BOTONES PARA CONTROLAR VISIBILIDAD -->
+<!-- NUEVOS BOTONES -->
 <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-    <button id="btn-ver-cotejo" onclick="window.controlarVisibilidadTablas('cotejo')" class="btn-primary" style="flex:1; min-width:100px; padding:12px; border-radius:30px; font-weight:700;">👁️ VER COTEJO</button>
-    <button id="btn-ver-posiciones" onclick="window.controlarVisibilidadTablas('posiciones')" class="btn-primary" style="flex:1; min-width:100px; padding:12px; border-radius:30px; font-weight:700;">👁️ VER POSICIONES</button>
-    <button id="btn-ver-ambas" onclick="window.controlarVisibilidadTablas('ambas')" class="btn-success" style="flex:2; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">👁️ VER AMBAS TABLAS</button>
+    <button onclick="mostrarSoloCotejo()" class="btn-primary" style="flex:1; padding:12px; border-radius:30px; font-weight:700;">👁️ VER COTEJO</button>
+    <button onclick="mostrarSoloPosiciones()" class="btn-primary" style="flex:1; padding:12px; border-radius:30px; font-weight:700;">👁️ VER POSICIONES</button>
+    <button onclick="mostrarAmbasTablas()" class="btn-success" style="flex:2; padding:12px; border-radius:30px; font-weight:700;">👁️ VER AMBAS TABLAS</button>
 </div>
 </div>
     ` : `
@@ -5637,7 +5618,21 @@ function cargarTemaGuardado() {
         }
     }
 }
+function mostrarSoloCotejo() {
+    document.getElementById('seccion-cotejo').style.display = 'block';
+    document.getElementById('posiciones-container').style.display = 'none';
+}
 
+function mostrarSoloPosiciones() {
+    document.getElementById('seccion-cotejo').style.display = 'none';
+    document.getElementById('posiciones-container').style.display = 'block';
+    if (typeof renderizarTablaPosiciones === 'function') renderizarTablaPosiciones();
+}
+
+function mostrarAmbasTablas() {
+    document.getElementById('seccion-cotejo').style.display = 'block';
+    document.getElementById('posiciones-container').style.display = 'block';
+}
    
         // ============================================================
 // FUNCIONES PARA CONTROLAR VISIBILIDAD DE TABLAS (VERSIÓN CORREGIDA 2)
