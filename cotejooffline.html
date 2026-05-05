@@ -781,6 +781,23 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 #posiciones-container.posiciones-visible {
     display: block !important;
 }
+        /* Asegurar que en PC se vean lado a lado */
+@media (min-width: 769px) {
+    .ambas-container-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+        align-items: flex-start !important;
+    }
+    
+    .ambas-container-wrapper #seccion-cotejo,
+    .ambas-container-wrapper #posiciones-container {
+        flex: 1 !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 50% !important;  /* 👈 ESTO asegura que ocupen la mitad cada una */
+    }
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
