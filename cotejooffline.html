@@ -707,28 +707,7 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 }
 
 
-
-        /* Contenedor para ambas tablas (PC: lado a lado, Móvil: arriba/abajo) */
-.ambas-tablas-container {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.ambas-tablas-container > div {
-    flex: 1;
-    min-width: 0; /* Para que respete el flex en móvil */
-}
-
-/* En móviles, poner una arriba y otra abajo */
-@media (max-width: 768px) {
-    .ambas-tablas-container {
-        flex-direction: column;
-    }
-}
-
-/* Estilos para los contenedores individuales */
+/* Contenedores con visibilidad controlada */
 .cotejo-visible {
     display: block !important;
 }
@@ -744,6 +723,36 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 .posiciones-oculto {
     display: none !important;
 }
+
+/* Estilos responsivos para cuando se muestran ambas */
+#seccion-cotejo.cotejo-visible,
+#posiciones-container.posiciones-visible {
+    width: 100%;
+}
+
+/* En pantallas grandes, si se muestran ambas, usar grid */
+@media (min-width: 769px) {
+    body:has(.cotejo-visible.posiciones-visible) #seccion-cotejo.cotejo-visible,
+    body:has(.cotejo-visible.posiciones-visible) #posiciones-container.posiciones-visible {
+        display: inline-block !important;
+        width: 48% !important;
+        vertical-align: top;
+    }
+    
+    body:has(.cotejo-visible.posiciones-visible) #seccion-cotejo.cotejo-visible {
+        margin-right: 2%;
+    }
+}
+
+/* En móviles, mantener bloque uno tras otro */
+@media (max-width: 768px) {
+    #seccion-cotejo.cotejo-visible,
+    #posiciones-container.posiciones-visible {
+        width: 100% !important;
+        display: block !important;
+    }
+}
+     
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -5584,9 +5593,13 @@ function cargarTemaGuardado() {
     }
 }
 
-        // ============================================================
-// FUNCIONES PARA CONTROLAR VISIBILIDAD DE TABLAS
+    // ============================================================
+// FUNCIONES PARA CONTROLAR VISIBILIDAD DE TABLAS (VERSIÓN CORREGIDA)
 // ============================================================
+
+// Variable para guardar el estado actual
+let modoVisibilidadActual = 'ambas';
+
 window.controlarVisibilidadTablas = function(modo) {
     const cotejoContainer = document.getElementById('seccion-cotejo');
     const posicionesContainer = document.getElementById('posiciones-container');
@@ -5596,111 +5609,87 @@ window.controlarVisibilidadTablas = function(modo) {
         return;
     }
     
-    // Obtener el contenedor padre que envuelve ambas secciones
-    const padreCotejo = cotejoContainer.parentNode;
+    // Guardar el modo actual
+    modoVisibilidadActual = modo;
     
-    // Eliminar clase existente de ambas tablas si existe
-    if (padreCotejo.classList && padreCotejo.classList.contains('ambas-tablas-container')) {
+    // Limpiar clases existentes primero
+    cotejoContainer.classList.remove('cotejo-visible', 'cotejo-oculto');
+    posicionesContainer.classList.remove('posiciones-visible', 'posiciones-oculto');
+    
+    // Remover cualquier wrapper anterior que pueda existir
+    const wrapperExistente = document.querySelector('.ambas-tablas-container');
+    if (wrapperExistente) {
         // Restaurar los contenedores a su posición original
-        const oldContainer = padreCotejo;
+        const padre = wrapperExistente.parentNode;
         const cotejoDiv = document.getElementById('seccion-cotejo');
         const posicionesDiv = document.getElementById('posiciones-container');
         
-        // Mover los contenedores fuera del wrapper
-        oldContainer.parentNode.insertBefore(cotejoDiv, oldContainer);
-        oldContainer.parentNode.insertBefore(posicionesDiv, oldContainer.nextSibling);
-        oldContainer.remove();
+        if (cotejoDiv && posicionesDiv) {
+            padre.insertBefore(cotejoDiv, wrapperExistente);
+            padre.insertBefore(posicionesDiv, wrapperExistente.nextSibling);
+        }
+        wrapperExistente.remove();
     }
     
     // Aplicar visibilidad según el modo
     if (modo === 'cotejo') {
         // Mostrar solo cotejo, ocultar posiciones
-        cotejoContainer.classList.remove('cotejo-oculto');
         cotejoContainer.classList.add('cotejo-visible');
-        posicionesContainer.classList.remove('posiciones-visible');
         posicionesContainer.classList.add('posiciones-oculto');
-        
         AppState.addNotification('👁️ Mostrando solo tabla de COTEJO', 'info');
     } 
     else if (modo === 'posiciones') {
         // Mostrar solo posiciones, ocultar cotejo
-        cotejoContainer.classList.remove('cotejo-visible');
         cotejoContainer.classList.add('cotejo-oculto');
-        posicionesContainer.classList.remove('posiciones-oculto');
         posicionesContainer.classList.add('posiciones-visible');
-        
         AppState.addNotification('👁️ Mostrando solo tabla de POSICIONES', 'info');
     }
     else if (modo === 'ambas') {
-        // Crear wrapper para ambas tablas lado a lado
-        const wrapper = document.createElement('div');
-        wrapper.className = 'ambas-tablas-container';
+        // Mostrar ambas sin wrapper (ya están visibles por defecto)
+        cotejoContainer.classList.add('cotejo-visible');
+        posicionesContainer.classList.add('posiciones-visible');
         
-        // Obtener los elementos actuales
-        const cotejoDiv = document.getElementById('seccion-cotejo');
-        const posicionesDiv = document.getElementById('posiciones-container');
+        // Aplicar estilos responsivos con CSS (sin mover el DOM)
+        cotejoContainer.style.display = 'block';
+        posicionesContainer.style.display = 'block';
         
-        // Guardar referencia al padre original
-        const padreOriginal = cotejoDiv.parentNode;
-        
-        // Crear contenedores internos para mantener estructura
-        const cotejoWrapper = document.createElement('div');
-        const posicionesWrapper = document.createElement('div');
-        
-        // Mover los elementos a los wrappers
-        cotejoDiv.parentNode.insertBefore(cotejoWrapper, cotejoDiv);
-        cotejoWrapper.appendChild(cotejoDiv);
-        
-        posicionesDiv.parentNode.insertBefore(posicionesWrapper, posicionesDiv);
-        posicionesWrapper.appendChild(posicionesDiv);
-        
-        // Agregar los wrappers al wrapper principal
-        wrapper.appendChild(cotejoWrapper);
-        wrapper.appendChild(posicionesWrapper);
-        
-        // Insertar el wrapper en el lugar del cotejo
-        padreOriginal.insertBefore(wrapper, cotejoWrapper);
-        
-        // Asegurar que ambos sean visibles
-        cotejoDiv.classList.remove('cotejo-oculto');
-        cotejoDiv.classList.add('cotejo-visible');
-        posicionesDiv.classList.remove('posiciones-oculto');
-        posicionesDiv.classList.add('posiciones-visible');
-        
-        AppState.addNotification('👁️ Mostrando ambas tablas (PC: lado a lado | Móvil: arriba/abajo)', 'success');
+        AppState.addNotification('👁️ Mostrando ambas tablas', 'success');
     }
 };
 
-// Función para inicializar el estado de visibilidad (por defecto mostrar ambas)
+// Función para inicializar el estado de visibilidad
 window.inicializarVisibilidadTablas = function() {
     const cotejoContainer = document.getElementById('seccion-cotejo');
     const posicionesContainer = document.getElementById('posiciones-container');
     
     if (cotejoContainer && posicionesContainer) {
-        // Por defecto, mostrar ambas (sin clases de oculto)
-        cotejoContainer.classList.remove('cotejo-oculto');
-        cotejoContainer.classList.add('cotejo-visible');
-        posicionesContainer.classList.remove('posiciones-oculto');
-        posicionesContainer.classList.add('posiciones-visible');
+        // Limpiar clases
+        cotejoContainer.classList.remove('cotejo-oculto', 'cotejo-visible');
+        posicionesContainer.classList.remove('posiciones-oculto', 'posiciones-visible');
         
-        // Si ya existen resultados de cotejo, configurar modo ambas
-        if (resultadosCotejo && resultadosCotejo.peleas && resultadosCotejo.peleas.length > 0) {
-            setTimeout(() => {
-                window.controlarVisibilidadTablas('ambas');
-            }, 100);
-        }
+        // Por defecto, mostrar ambas
+        cotejoContainer.classList.add('cotejo-visible');
+        posicionesContainer.classList.add('posiciones-visible');
+        modoVisibilidadActual = 'ambas';
+        
+        // Asegurar que los estilos display estén correctos
+        cotejoContainer.style.display = 'block';
+        posicionesContainer.style.display = 'block';
     }
 };
 
-// Modificar la función actualizarPantalla para aplicar la visibilidad después de renderizar
+// Modificar actualizarPantalla para preservar el modo de visibilidad
 const originalActualizarPantalla = actualizarPantalla;
 actualizarPantalla = function() {
     originalActualizarPantalla();
     setTimeout(() => {
         window.inicializarVisibilidadTablas();
+        // Restaurar el modo anterior si había uno guardado
+        if (modoVisibilidadActual && modoVisibilidadActual !== 'ambas') {
+            window.controlarVisibilidadTablas(modoVisibilidadActual);
+        }
     }, 150);
 };
-
         
         // ============================================================
         // INICIALIZACIÓN
