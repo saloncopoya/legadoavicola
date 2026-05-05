@@ -1705,8 +1705,8 @@ for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
             });
             
             if (partidosUnicos.size > 0) {
-                const nombres = Array.from(partidosUnicos).join(', ');
-                info.innerHTML = `<span style="color:#000; font-weight:500;">Partidos con el mismo representante (${partidosUnicos.size}):</span><br><span style="color:#2196F3;">${nombres}</span>`;
+                const nombres = Array.from(partidosUnicos).join(' -→ ');
+                info.innerHTML = `<span style="color:#000; font-weight:500;">Partidos con el mismo representante (${partidosUnicos.size}):</span><br><span style="color:#2196F3; font-weight:900;">${nombres}</span>`;
                 document.getElementById('match-representante').style.borderColor = '#2196F3';
             } else {
                 info.innerHTML = '';
@@ -4335,7 +4335,7 @@ setTimeout(() => {
                 <!-- REGISTRO DE PARTIDOS (solo si no hay cotejo) -->
                ${(!hayResultadosCotejo || resultadosCotejo.peleas.length === 0) ? `
 
-                <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px;">
+                <div style="background:white; border-radius:16px; padding:16px; margin-bottom:60px;">
                     <h3 style="margin-bottom:15px;">📝 Registrar Partido</h3>
                     <div style="display:flex; gap:8px; margin-bottom:15px;">
                         <input type="text" id="match-name" list="match-names-list-${serialIdActual || 'general'}" placeholder="Nombre del Partido *" class="form-input" style="flex:2;" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
