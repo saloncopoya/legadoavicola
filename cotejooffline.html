@@ -708,8 +708,7 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
 
 
 
-
-        /* ==============================================
+/* ==============================================
    LAYOUT RESPONSIVO: COTEJO + POSICIONES
    ============================================== */
 
@@ -719,21 +718,32 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     grid-template-columns: 1fr;
     gap: 20px;
     margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* En pantallas grandes (PC, TV, tablets horizontales) */
 @media (min-width: 1024px) {
     .cotejo-posiciones-wrapper {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: 20px;
         align-items: start;
+        width: 100%;
     }
     
-    /* Asegurar que cada contenedor no se desborde */
+    /* Asegurar que cada contenedor no se desborde y ocupe todo el ancho */
     #seccion-cotejo,
     #posiciones-container {
         overflow-x: auto;
-        min-width: 0; /* Permite que se encoja */
+        min-width: 0;
+        width: 100%;
+    }
+    
+    /* Forzar que el contenido interno también ocupe todo el ancho */
+    #seccion-cotejo > div,
+    #posiciones-container > div,
+    .cotejo-posiciones-wrapper > div {
+        width: 100%;
     }
 }
 
@@ -742,8 +752,10 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     .cotejo-posiciones-wrapper {
         grid-template-columns: 1fr;
         gap: 20px;
+        width: 100%;
     }
 }
+      
         
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -4389,8 +4401,8 @@ setTimeout(() => {
             const puedeMover = !cotejoGuardado && PERMISOS_USUARIO.posicion;
             
             return `
-            <div id="admin-main-container" style="padding:1px; max-width:1200px; margin:0 auto;">
-                <!-- HEADER -->
+<div id="admin-main-container" style="padding:1px; width:100%; max-width:1400px; margin:0 auto; box-sizing:border-box;">
+<!-- HEADER -->
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                     <h1 style="margin:0 0 1px; color:#8B4513; font-size:28px; text-align:center;"> ${torneoActual?.nombre || 'Torneo'}</h1>
                     <div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font-size:13px; color:#666;">
