@@ -705,57 +705,6 @@ body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
     background-color: #2c2c2c !important;
     border-color: #FFD700 !important;
 }
-
-
-
-/* ==============================================
-   LAYOUT RESPONSIVO: COTEJO + POSICIONES
-   ============================================== */
-
-/* Contenedor principal que envuelve ambas tablas */
-.cotejo-posiciones-wrapper {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    margin-top: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* En pantallas grandes (PC, TV, tablets horizontales) */
-@media (min-width: 800px) {
-   .cotejo-posiciones-wrapper {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-        gap: 20px;
-        width: 100%;
-    }
-    
-    /* Asegurar que cada contenedor no se desborde y ocupe todo el ancho */
-    #seccion-cotejo,
-    #posiciones-container {
-        overflow-x: auto;
-        min-width: 0;
-        width: 100%;
-    }
-    
-    /* Forzar que el contenido interno también ocupe todo el ancho */
-    #seccion-cotejo > div,
-    #posiciones-container > div,
-    .cotejo-posiciones-wrapper > div {
-        width: 100%;
-    }
-}
-
-/* Ajustes para tablets (768px - 1023px) - opcional */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .cotejo-posiciones-wrapper {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        width: 100%;
-    }
-}
-      
         
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -1637,7 +1586,7 @@ function vibrarError() {
                             oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                     </div>
                     <div>
-                        <input type="tel" inputmode="numeric" id="weight-${i}" placeholder="0000" autocomplete="off" value="" 
+                        <input type="text" inputmode="numeric" id="weight-${i}" placeholder="0000" autocomplete="off" value="" 
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,4);"
                             style="width: 100%; padding: 14px 8px; border: 1px solid #ddd; border-radius: 8px; box-sizing:border-box; font-size: 15px; text-align: center;">
                     </div>
@@ -4364,7 +4313,7 @@ setTimeout(() => {
                 <div style="display: grid; grid-template-columns: ${configuracion.registroDetalladoActivo ? '1fr 0.8fr 0.8fr 1.2fr' : '1fr 0.8fr 0.8fr'}; gap: 8px; margin-bottom: 12px; align-items: center;">
                     <div><button type="button" id="estado-${i}" onclick="window.toggleEstadoGallo(${i})" style="width:100%; padding:14px 4px; border:none; border-radius:30px; font-weight:700; background:#4CAF50; color:white;">PRESENTE</button></div>
                     <div><input type="text" id="ring-${i}" placeholder="000" value="${anilloValue}" ${readonlyAttr} style="width:100%; padding:8px 5px; border:1px solid #ddd; border-radius:8px; background:${bgColorAnillo}; text-align:center; font-size:20px; font-weight:900;" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
-                    <div><input type="tel" inputmode="numeric" id="weight-${i}" placeholder="0000" value="" style="width:100%; padding:14px 8px; border:1px solid #ddd; border-radius:8px; text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
+                    <div><input type="text" inputmode="numeric" id="weight-${i}" placeholder="0000" value="" style="width:100%; padding:14px 8px; border:1px solid #ddd; border-radius:8px; text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
                     ${configuracion.registroDetalladoActivo ? `<div><input type="text" id="color-${i}" list="color-list-${i}" placeholder="Color" style="width:100%; padding:14px 8px; border:1px solid #ddd; border-radius:8px;"><datalist id="color-list-${i}">${coloresGallosList.map(c => `<option value="${c}">`).join('')}</datalist></div>` : ''}
                 </div>`;
             }
@@ -4401,8 +4350,8 @@ setTimeout(() => {
             const puedeMover = !cotejoGuardado && PERMISOS_USUARIO.posicion;
             
             return `
-<div id="admin-main-container" style="padding:1px; width:100%; max-width:1400px; margin:0 auto; box-sizing:border-box;">
-<!-- HEADER -->
+            <div id="admin-main-container" style="padding:1px; max-width:1200px; margin:0 auto;">
+                <!-- HEADER -->
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                     <h1 style="margin:0 0 1px; color:#8B4513; font-size:28px; text-align:center;"> ${torneoActual?.nombre || 'Torneo'}</h1>
                     <div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font-size:13px; color:#666;">
@@ -4521,7 +4470,7 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     <div id="calificacion-detalle-pelea" style="display:none;"></div>
     <div id="calificacion-formulario" style="display:none;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px;">
-            <div><label style="font-size: 12px;">⏱️ TIEMPO</label><input type="tel"  inputmode="numeric" id="calificacion-tiempo" placeholder="MM:SS" maxlength="5" class="form-input" style="font-size: 22px; text-align:center; padding: 8px;" onkeyup="formatearTiempo(this)"></div>
+            <div><label style="font-size: 12px;">⏱️ TIEMPO</label><input type="text" id="calificacion-tiempo" placeholder="MM:SS" maxlength="5" class="form-input" style="font-size: 22px; text-align:center; padding: 8px;" onkeyup="formatearTiempo(this)"></div>
             <div><label style="font-size: 12px;">🏆 GANADOR</label><select id="calificacion-ganador" class="form-input" style="padding: 8px;"></select></div>
         </div>
         <div style="background:#f8f9fa; padding: 8px; border-radius: 6px; display: flex; justify-content: space-around; margin-bottom: 12px; font-size: 12px;">
@@ -4538,13 +4487,9 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
 
 ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding: 15px; border-radius: 12px; text-align:center; font-size: 13px;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
 
-
-                <!-- WRAPPER RESPONSIVO: en móvil vertical, en PC lado a lado -->
-<div class="cotejo-posiciones-wrapper">
-
+                
                <!-- MÓDULO DE COTEJO -->
 <!-- MÓDULO DE COTEJO -->
-
 <div id="seccion-cotejo" style="background:white; border-radius:1px; padding:1px; margin-top:16px;">    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
     </div>
@@ -4586,8 +4531,8 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
     </div>
 
     <!-- SECCIÓN TABLA DE POSICIONES -->
-<div id="posiciones-container">
-<div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
+<div id="posiciones-container" style="display: none; margin-top: 30px;">
+    <div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
 </div>
     <div id="tabla-posiciones-content">
         <div class="no-posiciones">
@@ -4596,8 +4541,9 @@ ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
         </div>
     </div>
 </div>
-</div>
 
+
+</div>
             </div>
             `;
         }
@@ -4789,7 +4735,7 @@ function renderizarTablaPosiciones() {
     const tieneCalificaciones = calificacionesCargadas && calificacionesCargadas.size > 0;
     
     if (!tieneCotejo || resultadosCotejo.peleas.length === 0 || !tieneCalificaciones) {
-container.style.display = 'none';
+        container.style.display = 'none';
         console.log('Tabla de posiciones oculta: sin cotejo guardado o sin calificaciones');
         return;
     }
@@ -5663,7 +5609,7 @@ function cargarTemaGuardado() {
     // ✅ IMPORTANTE: Asegurar que el contenedor existe antes de actualizar
     const root = document.getElementById('app-root');
     if (root) {
-root.innerHTML = '<div id="admin-main-container" style="padding:2px; width:100%; max-width:1400px; margin:0 auto; box-sizing:border-box;"></div>';
+        root.innerHTML = '<div id="admin-main-container" style="padding:2px; max-width:1200px; margin:0 auto;"></div>';
     }
     
     actualizarPantalla();
