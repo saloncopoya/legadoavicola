@@ -220,7 +220,8 @@
             // ========== USUARIO CON PERMISOS (TRUE POR DEFECTO) ==========
             let currentUser = { uid: 'local_user_001', displayName: 'Administrador' };
             let userProfile = { subasta: true, ventas: true, activated: true, partyName: 'PALENQUE LOCAL' };
-            
+            let uid = 'local_user_001';
+
             window.AppState = {
                 user: { current: currentUser, profile: userProfile },
                 addNotification: (msg, type, duration = 3000) => {
@@ -256,14 +257,20 @@
         let partidosSet = new Set();
         let modoVista = 'cliente';
         let tablaDetalle = null;
+
+          
         let tablasVentas = [];
-        let partidosEditor = [{ nombre: '', montos: [''], compradores: [''], colores: [''] }];
-        let columnasEditor = [];
-        let siguienteIdColumna = 0;
-        let palenqueSeleccionado = null;
-        let tablaCompartidaId = null;
-        let uid = 'local_user_001';
-        let porcentajeDescuento = 0;
+let partidosEditor = [{ nombre: '', montos: [''], compradores: [''], colores: [''] }];
+let columnasEditor = [];
+let siguienteIdColumna = 0;
+let palenqueSeleccionado = null;
+let tablaCompartidaId = null;
+let uid = 'local_user_001';
+let porcentajeDescuento = 0;
+let currentUser = { uid: 'local_user_001', displayName: 'Administrador' };
+let userProfile = { subasta: true, ventas: true, activated: true, partyName: 'PALENQUE LOCAL' };
+
+          
         let ultimoHashTablaDetalle = '';
         let ultimoHTMLTablaDetalle = '';
         let ultimoHashListaTablas = '';
