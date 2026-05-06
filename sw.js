@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cotejo-offline-v1.0.0.181'; 
+const CACHE_NAME = 'cotejo-offline-v1.0.0.183'; 
 const urlsToCache = [
     '/',
     '/index.html',
@@ -21,9 +21,17 @@ self.addEventListener('install', event => {
             .then(async cache => {
                 // 1. Cachear los archivos normales de urlsToCache
                 console.log('📦 Cacheando archivos base:', urlsToCache);
-                await cache.addAll(urlsToCache).catch(err => {
-                    console.warn('⚠️ Error cacheando algunos archivos:', err);
-                });
+               
+                // Cachear TODOS los archivos, si uno falla, que no detenga todo
+for (const url of urlsToCache) {
+    try {
+        await cache.add(url);
+        console.log('✅ Cacheado:', url);
+    } catch (err) {
+        console.warn('⚠️ No se pudo cachear:', url, err);
+    }
+}
+                
                             })
     );
     self.skipWaiting();
