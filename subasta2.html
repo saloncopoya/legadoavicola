@@ -334,40 +334,59 @@ let userProfile = { subasta: true, ventas: true, activated: true, partyName: 'PA
             partidosSet = new Set(partidosDisponibles);
         }
         
-        async function guardarTablaVentas(datos) {
-            const db = window.getAdminDatabase();
-            const newRef = db.ref('VENTAS').child(uid).push();
-            const id = newRef.key;
-            const nueva = { 
-                id, 
-                titulo: datos.titulo, 
-                fecha: datos.fecha, 
-                palenque: datos.palenque, 
-                organizador: datos.organizador, 
-                telefonoCreador: datos.telefono, 
-                descuento: datos.descuento || 0, 
-                partidos: datos.partidos, 
-                columnas: datos.columnas, 
-                createdAt: Date.now(), 
-                createdBy: uid 
-            };
-            await newRef.set(nueva);
-            await cargarTablasVentas();
-            return true;
-        }
-        
+       async function guardarTablaVentas(datos) {
+    const db = window.getAdminDatabase();
+    const id = generateId();
+    const nuevaTabla = { 
+        id: id,
+        uid: uid,
+        titulo: datos.titulo, 
+        fecha: datos.fecha, 
+        palenque: datos.palenque, 
+        organizador: datos.organizador, 
+        telefonoCreador: datos.telefono, 
+        descuento: datos.descuento || 0, 
+        partidos: datos.partidos, 
+        columnas: datos.columnas, 
+        createdAt: Date.now(), 
+        createdBy: uid 
+    };
+    
+    // Guardar directamente en el arreglo
+    datosAlmacenados.tablasVentas.push(nuevaTabla);
+    saveToLocalStorage();
+    
+    // También guardar en la estructura simulada de Firebase
+    const ventasPath = `VENTAS/${uid}/${id}`;
+    const dbRef = db.ref(ventasPath);
+    await dbRef.set(nuevaTabla);
+    
+    return true;
+}
+          
         async function actualizarTablaVentas(tablaId, datos) {
-            const db = window.getAdminDatabase();
-            await db.ref('VENTAS').child(uid).child(tablaId).update({ ...datos, updatedAt: Date.now() });
-            await cargarTablasVentas();
-            return true;
-        }
+    const db = window.getAdminDatabase();
+    const index = datosAlmacenados.tablasVentas.findIndex(t => t.id === tablaId && t.uid === uid);
+    if(index !== -1) {
+        datosAlmacenados.tablasVentas[index] = { 
+            ...datosAlmacenados.tablasVentas[index], 
+            ...datos, 
+            updatedAt: Date.now() 
+        };
+        saveToLocalStorage();
+    }
+    await db.ref(`VENTAS/${uid}/${tablaId}`).update({ ...datos, updatedAt: Date.now() });
+    await cargarTablasVentas();
+    return true;
+}
         
         async function eliminarTablaVentas(tablaId) {
-            const db = window.getAdminDatabase();
-            await db.ref('VENTAS').child(uid).child(tablaId).remove();
-            await cargarTablasVentas();
-        }
+    const db = window.getAdminDatabase();
+    datosAlmacenados.tablasVentas = datosAlmacenados.tablasVentas.filter(t => !(t.id === tablaId && t.uid === uid));
+    saveToLocalStorage();
+    await db.ref(`VENTAS/${uid}/${tablaId}`).remove();
+    await cargarTablasVentas();
+}
         
         // =====================================================
         // FUNCIONES DE EDICIÓN (COLORES, PARTIDOS, COLUMNAS)
