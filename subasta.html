@@ -658,15 +658,22 @@
                 renderUI();
             };
             
-            window.ventasKiller = function() { ventasDb = null; tablasVentas = []; tablaDetalle = null; partidosEditor = []; columnasEditor = []; partidosSet.clear(); partidosDisponibles = []; palenquesList = []; };
-            
-            init();
-            
-            return `<div id="ventas-main-container" style="min-height:100vh; background:#f8f9fa; margin:0; padding:0;">${window.renderMobileNavBar ? window.renderMobileNavBar() : ''}<div style="padding-top:0;"><div style="min-height:100vh;"><div style="max-width:800px; margin:0 auto; padding:20px;"><div style="text-align:center; padding:40px;"><div class="loading-spinner"></div><p>Cargando ventas...</p></div></div></div></div></div>`;
-        };
-        
-        // Renderizar la aplicación en el contenedor principal
-        document.addEventListener('DOMContentLoaded', () => {
+          window.ventasKiller = function() { ventasDb = null; tablasVentas = []; tablaDetalle = null; partidosEditor = []; columnasEditor = []; partidosSet.clear(); partidosDisponibles = []; palenquesList = []; };
+
+init();
+
+// NO pongas return aquí, en su lugar, define la función que renderizará la pantalla
+window.renderVentasScreen = function() {
+    return `<div id="ventas-main-container" style="min-height:100vh; background:#f8f9fa; margin:0; padding:0;">${window.renderMobileNavBar ? window.renderMobileNavBar() : ''}<div style="padding-top:0;"><div style="min-height:100vh;"><div style="max-width:800px; margin:0 auto; padding:20px;"><div style="text-align:center; padding:40px;"><div class="loading-spinner"></div><p>Cargando ventas...</p></div></div></div></div></div>`;
+};
+
+// Renderizar la aplicación en el contenedor principal
+document.addEventListener('DOMContentLoaded', () => {
+    const appRoot = document.getElementById('app-root');
+    if (appRoot) {
+        appRoot.innerHTML = window.renderVentasScreen();
+    }
+});
             const appRoot = document.getElementById('app-root');
             if (appRoot) {
                 // Determinar qué pantalla mostrar (por defecto ventas)
