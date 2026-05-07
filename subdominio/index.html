@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>COTEJO PANEL</title>
-      <link rel="manifest" href="/manifest2.json">
+    <title>Panel Premium Cotejos - Admin OFFLINE</title>
+      <link rel="manifest" href="/manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Legado Avícola">
@@ -86,11 +86,15 @@
         .btn-success {
             background: #28a745;
             color: white;
+            border-radius: 30px;
+                padding: 12px;
         }
         
         .btn-danger {
             background: #dc3545;
             color: white;
+             border-radius: 30px;
+                padding: 12px;
         }
         
         .btn-warning {
@@ -142,8 +146,569 @@
                 width: 100%;
             }
         }
+
+
+
+
+        /* Estilos para Tabla de Posiciones */
+.posicion-table {
+    width: 100%;
+    border-collapse: collapse;
+   font-size: clamp(12px, 3.5vw, 25px);
+}
+
+.posicion-table th {
+    background: #8B4513;
+    color: white;
+    padding: 2px 2px;
+    text-align: center;
+    border: 1px solid #ddd;
+        font-size: clamp(11px, 3vw, 24px); /* Títulos ligeramente más pequeños */
+}
+
+.posicion-table td {
+    padding: 2px 2px;
+    text-align: center;
+    border: 1px solid #ddd;
+        font-size: clamp(13px, 3.5vw, 34px);
+
+}
+
+.posicion-table td:first-child {
+    font-weight: 900;
+    text-align: left;
+        font-size: clamp(11px, 3vw, 20px); /* Nombres de partido más destacados */
+}
+
+/* Puntos y tiempos con colores */
+.puntos-ganador {
+    background: #4CAF50;
+    color: white;
+    font-weight: bold;
+        font-size: clamp(12px, 3.5vw, 20px);
+}
+
+.puntos-empate {
+    background: #2196F3;
+    color: white;
+    font-weight: bold;
+        font-size: clamp(12px, 3.5vw, 20px);
+}
+
+.puntos-perdedor {
+    background: #f44336;
+    color: white;
+    font-weight: bold;
+        font-size: clamp(12px, 3.5vw, 20px);
+}
+
+.tiempo-ganador {
+    background: #4CAF50;
+    color: white;
+        font-size: clamp(9px, 3.5vw, 26px);
+}
+
+.tiempo-empate {
+    background: #2196F3;
+    color: white;
+        font-size: clamp(10px, 3vw, 22px);
+}
+
+.tiempo-perdedor {
+    background: #f44336;
+    color: white;
+        font-size: clamp(10px, 2.5vw, 20px);
+}
+
+/* NUEVA TABLA DE POSICIONES - Sección */
+#posiciones-container {
+    margin-top: 20px;
+    overflow-x: auto;
+    background: white;
+    border-radius: 16px;
+    padding: 1px;
+        font-size: clamp(16px, 5vw, 28px); /* Título responsive */
+}
+
+.posiciones-header {
+    background: #8B4513;
+    color: white;
+    padding: 15px;
+    border-radius: 16px 16px 0 0;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+}
+
+.posiciones-header span {
+    font-size: clamp(9px, 2.5vw, 22px); /* Icono responsive */
+}
+
+.no-posiciones {
+    text-align: center;
+    padding: 40px 10px;
+    color: #999;
+    background: #f9f9f9;
+    border-radius: 0 0 16px 16px;
+        font-size: clamp(12px, 3vw, 18px);
+}
+
+
+
+
+    /* ==============================================
+   MODO OSCURO (DARK MODE) - COMPLETO
+   ============================================== */
+
+/* Fondo general */
+body.dark-mode {
+    background: #121212 !important;
+}
+
+/* Contenedores principales */
+body.dark-mode #admin-main-container,
+body.dark-mode .collapsible-section,
+body.dark-mode .collapsible-header,
+body.dark-mode .table-container,
+body.dark-mode .btn-secondary,
+body.dark-mode .modal-container {
+    background: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+/* HEADER principal (tarjeta blanca del torneo) */
+body.dark-mode #admin-main-container > div:first-child {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    box-shadow: none !important;
+}
+
+body.dark-mode #admin-main-container > div:first-child h1 {
+    color: #FFD700 !important;
+}
+
+body.dark-mode #admin-main-container > div:first-child div[style*="color:#666"] {
+    color: #aaa !important;
+}
+
+body.dark-mode #admin-main-container > div:first-child .header-estadisticas-partidos,
+body.dark-mode #admin-main-container > div:first-child .header-estadisticas-gallos {
+    color: #FFD700 !important;
+}
+
+/* Selector de torneos */
+body.dark-mode #header-torneo-selector {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+    border-color: #FFD700 !important;
+}
+
+body.dark-mode #header-torneo-selector option {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+}
+
+/* Sección Registrar Partido */
+body.dark-mode #admin-main-container > div[style*="background:white"][style*="border-radius:16px"] {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode #admin-main-container h3 {
+    color: #FFD700 !important;
+}
+
+/* Campos de formulario */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode .form-input {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode input::placeholder {
+    color: #888 !important;
+}
+
+body.dark-mode input[readonly] {
+    background-color: #3a3a3a !important;
+    color: #f0f0f0 !important;
+}
+
+/* Botones de estado PRESENTE/PENDIENTE */
+body.dark-mode button[id^="estado-"] {
+    background-color: #2e7d32 !important;
+    color: white !important;
+}
+
+body.dark-mode button[id^="estado-"]:contains("PENDIENTE") {
+    background-color: #c62828 !important;
+}
+
+/* Información de representante */
+body.dark-mode #representante-info {
+    color: #aaa !important;
+}
+
+body.dark-mode #representante-info span {
+    color: #FFD700 !important;
+}
+
+/* Sección COTEJO */
+body.dark-mode #seccion-cotejo {
+    background: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+/* Tarjetas de métricas del cotejo */
+body.dark-mode #cotejo-resultados-container > div:first-child > div {
+    background: #2c2c2c !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode #cotejo-resultados-container > div:first-child > div div:first-child {
+    color: #FFD700 !important;
+}
+
+body.dark-mode #cotejo-resultados-container > div:first-child > div div:last-child {
+    color: #aaa !important;
+}
+
+/* Tablas en modo oscuro */
+body.dark-mode table {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border-color: #ffd700 !important;
+}
+
+body.dark-mode th {
+    background: #2c2c2c !important;
+}
+
+/* ==============================================
+   CONSERVAR COLORES ROJO Y VERDE DE TABLAS
+   (NO se cambian en modo oscuro)
+   ============================================== */
+
+/* Color ROJO - Columna # del cotejo */
+body.dark-mode .cotejo-table td:first-child,
+body.dark-mode .cotejo-table th:first-child,
+body.dark-mode table td:first-child[style*="background:#d32f2f"],
+body.dark-mode table td[style*="background:#d32f2f"],
+body.dark-mode tr td:first-child[style*="background:#d32f2f"] {
+    background: #d32f2f !important;
+    color: white !important;
+}
+
+/* Color VERDE - Columna # central del cotejo */
+body.dark-mode .cotejo-table td:nth-child(6),
+body.dark-mode .cotejo-table th:nth-child(6),
+body.dark-mode table td[style*="background:#4CAF50"] {
+    background: #4CAF50 !important;
+    color: white !important;
+}
+
+/* Tabla de posiciones - conservar colores de puntos y tiempos */
+body.dark-mode .puntos-ganador,
+body.dark-mode .tiempo-ganador {
+    background: #4CAF50 !important;
+    color: white !important;
+}
+
+body.dark-mode .puntos-empate,
+body.dark-mode .tiempo-empate {
+    background: #2196F3 !important;
+    color: white !important;
+}
+
+body.dark-mode .puntos-perdedor,
+body.dark-mode .tiempo-perdedor {
+    background: #f44336 !important;
+    color: white !important;
+}
+
+/* Asegurar textos blancos en celdas especiales */
+body.dark-mode .puntos-ganador,
+body.dark-mode .puntos-empate,
+body.dark-mode .puntos-perdedor,
+body.dark-mode .tiempo-ganador,
+body.dark-mode .tiempo-empate,
+body.dark-mode .tiempo-perdedor,
+body.dark-mode .cotejo-table td:first-child,
+body.dark-mode .cotejo-table td:nth-child(6) {
+    color: white !important;
+}
+
+/* Botones principales */
+body.dark-mode .btn-primary {
+    background: #FFD700 !important;
+    color: #1e1e1e !important;
+}
+
+body.dark-mode .btn-primary:hover {
+    background: #FFC107 !important;
+}
+
+body.dark-mode .btn-success {
+    background: #2e7d32 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-danger {
+    background: #c62828 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-warning {
+    background: #f9a825 !important;
+    color: #1e1e1e !important;
+}
+
+/* Sección de configuración */
+body.dark-mode #config-content {
+    background: #2c2c2c !important;
+}
+
+body.dark-mode #config-content select,
+body.dark-mode #config-content label {
+    background: #1e1e1e !important;
+    color: #f0f0f0 !important;
+}
+
+/* Modales */
+body.dark-mode .modal-overlay {
+    background: rgba(0,0,0,0.9) !important;
+}
+
+body.dark-mode .modal-container {
+    background: #1e1e1e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-mode .modal-container h3,
+body.dark-mode .modal-container h2 {
+    color: #FFD700 !important;
+}
+
+/* Datalist options */
+body.dark-mode datalist option {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+}
+
+/* Scrollbar en modo oscuro */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #FFD700;
+    border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #FFC107;
+}   
+
+
+
+
+        /* ==============================================
+   COLORES ESPECÍFICOS PARA BOTONES
+   ============================================== */
+
+/* Botón ELIMINAR - SIEMPRE ROJO */
+.btn-danger,
+button.btn-danger,
+[onclick*="eliminar"],
+[onclick*="Eliminar"],
+[onclick*="ELIMINAR"],
+button[onclick*="eliminarCotejo"],
+button[onclick*="eliminarPartido"],
+button[onclick*="eliminarGallo"],
+button[onclick*="eliminarTorneo"],
+#btn-eliminar-cotejo,
+#eliminar-partido-edicion,
+#eliminar-gallo-edicion,
+.confirmar-eliminar,
+button[id*="eliminar"] {
+    background: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-danger:hover,
+button.btn-danger:hover,
+[onclick*="eliminar"]:hover,
+[onclick*="Eliminar"]:hover,
+[onclick*="ELIMINAR"]:hover,
+button[onclick*="eliminarCotejo"]:hover,
+#btn-eliminar-cotejo:hover {
+    background: #c82333 !important;
+    color: white !important;
+}
+
+/* Botón CALIFICAR PELEA - AMARILLO */
+#btn-calificar-pelea,
+button[onclick*="calificarPelea"],
+button[onclick*="Calificar"],
+button.btn-calificar {
+    background: #FFC107 !important;
+    color: #1e1e1e !important;
+    border: none !important;
+    font-weight: 700 !important;
+}
+
+#btn-calificar-pelea:hover,
+button[onclick*="calificarPelea"]:hover {
+    background: #FFB300 !important;
+    color: #1e1e1e !important;
+}
+
+/* En modo oscuro, mantener los mismos colores */
+body.dark-mode .btn-danger,
+body.dark-mode button.btn-danger,
+body.dark-mode [onclick*="eliminar"],
+body.dark-mode [onclick*="Eliminar"],
+body.dark-mode [onclick*="ELIMINAR"],
+body.dark-mode button[onclick*="eliminarCotejo"],
+body.dark-mode #btn-eliminar-cotejo {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+body.dark-mode .btn-danger:hover,
+body.dark-mode [onclick*="eliminar"]:hover {
+    background: #c82333 !important;
+}
+
+body.dark-mode #btn-calificar-pelea,
+body.dark-mode button[onclick*="calificarPelea"] {
+    background: #FFC107 !important;
+    color: #1e1e1e !important;
+}
+
+body.dark-mode #btn-calificar-pelea:hover {
+    background: #FFB300 !important;
+}
+
+
+
+
+        /* ==============================================
+   MODAL DE TORNEO - MODO OSCURO
+   ============================================== */
+
+/* Modal completo */
+body.dark-mode #tournament-modal-overlay .modal-container {
+    background: #1e1e1e !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-mode #tournament-modal-overlay h2 {
+    color: #FFD700 !important;
+}
+
+body.dark-mode #tournament-modal-overlay label {
+    color: #f0f0f0 !important;
+}
+
+/* Inputs del modal */
+body.dark-mode #tournament-modal-overlay input,
+body.dark-mode #tournament-modal-overlay select {
+    background-color: #2c2c2c !important;
+    color: #f0f0f0 !important;
+    border-color: #555 !important;
+}
+
+/* Sección PUNTOS POR PELEA */
+body.dark-mode #tournament-modal-overlay div[style*="background:#f9f9f9"] {
+    background: #2c2c2c !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode #tournament-modal-overlay div[style*="background:#f9f9f9"] span {
+    color: #FFD700 !important;
+}
+
+/* Sección TORNEO SERIAL */
+body.dark-mode #tournament-modal-overlay div[style*="background:#e8f5e9"] {
+    background: #2c2c2c !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode #tournament-modal-overlay div[style*="background:#e8f5e9"] span {
+    color: #FFD700 !important;
+}
+
+body.dark-mode #tournament-modal-overlay #serial-visibility-badge {
+    background: #1e1e1e !important;
+    color: #FFD700 !important;
+    border: 1px solid #FFD700 !important;
+}
+
+/* Contenedor de checkboxes del serial */
+body.dark-mode #tournament-modal-overlay div[style*="max-height:200px"] {
+    background: #1e1e1e !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode #tournament-modal-overlay div[style*="max-height:200px"] label {
+    background: #1e1e1e !important;
+    border-bottom-color: #444 !important;
+    color: #f0f0f0 !important;
+}
+
+body.dark-mode #tournament-modal-overlay div[style*="max-height:200px"] input[type="checkbox"] {
+    accent-color: #FFD700 !important;
+}
+
+/* Sección IMPORTAR TORNEO DESDE JSON */
+body.dark-mode #tournament-modal-overlay div[style*="background:#e3f2fd"] {
+    background: #2c2c2c !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode #tournament-modal-overlay div[style*="background:#e3f2fd"] div[style*="font-weight:700"] {
+    color: #FFD700 !important;
+}
+
+/* Botón CANCELAR del modal */
+body.dark-mode #tournament-modal-overlay button[onclick*="cerrarModalTorneo"] {
+    background: #495057 !important;
+    color: white !important;
+}
+
+body.dark-mode #tournament-modal-overlay button[onclick*="cerrarModalTorneo"]:hover {
+    background: #5a6268 !important;
+}
+
+/* Botón VINCULAR y DESVINCULAR */
+body.dark-mode #tournament-modal-overlay .btn-success {
+    background: #2e7d32 !important;
+    color: white !important;
+}
+
+body.dark-mode #tournament-modal-overlay .btn-danger {
+    background: #c62828 !important;
+    color: white !important;
+}
+
+/* checkbox en general */
+body.dark-mode #tournament-modal-overlay input[type="checkbox"] {
+    background-color: #2c2c2c !important;
+    border-color: #FFD700 !important;
+}
+        
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div id="app-root">
@@ -228,7 +793,7 @@
             }
         };
         
-        let cotejoUltimoModo = 'INTELIGENTE';
+let cotejoUltimoModo = 'ASCENDENTE';
         let cotejoEnProceso = false;
         
         // Variables para serial
@@ -449,6 +1014,9 @@
             };
             
             guardarTorneoEnStorage(torneoData);
+
+            vibrarFuerte();
+
             
             torneoActual = torneoData;
             torneoId = nuevoTorneoId;
@@ -470,9 +1038,44 @@
                 metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
             };
             
-            AppState.addNotification(`✅ Torneo "${nombre}" creado`, 'success');
-            return true;
+          AppState.addNotification(`✅ Torneo "${nombre}" creado`, 'success');
+
+//  ACTUALIZAR EL SELECTOR DE TORNEOS EN EL HEADER
+setTimeout(() => {
+    const selectorTorneos = document.getElementById('header-torneo-selector');
+    if (selectorTorneos) {
+        let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+        torneosAnteriores.forEach(t => {
+            opciones += `<option value="${t.id}" ${t.id === torneoId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+        });
+        selectorTorneos.innerHTML = opciones;
+        console.log('🔄 Selector de torneos actualizado después de crear torneo');
+    }
+}, 100);
+
+return true;
         }
+
+
+
+        // Función de vibración
+function vibrarFuerte() {
+    if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 200]);
+    }
+}
+
+function vibrarSuave() {
+    if (navigator.vibrate) {
+        navigator.vibrate(50);
+    }
+}
+
+function vibrarError() {
+    if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+    }
+}
         
         function actualizarTorneo(formData) {
             if (!torneoId) return false;
@@ -590,37 +1193,69 @@
             }
             
             AppState.addNotification(`✅ Partido "${nombrePartido}" registrado`, 'success');
+           vibrarFuerte();
+
             return matchId;
         }
         
+
+
         function eliminarPartido(nombrePartido) {
-            if (!torneoId) return;
-            
-            // Buscar matchId
-            let matchId = null;
-            for (const id in torneoActual.REGISTRO) {
-                if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
-                    matchId = id;
-                    break;
-                }
-            }
-            
-            if (matchId) {
-                delete torneoActual.REGISTRO[matchId];
-                partidosList = partidosList.filter(p => p.partido !== nombrePartido);
-                guardarTorneoEnStorage(torneoActual);
-                
-                if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
-                    resultadosCotejo = {
-                        peleas: [],
-                        noEmparejados: [],
-                        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-                    };
-                }
-                
-                AppState.addNotification(`✅ Partido "${nombrePartido}" eliminado`, 'success');
+    if (!torneoId) return;
+    
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR PARTIDO?</h3>
+            <p style="margin-bottom:20px;">
+                Partido: <strong>${nombrePartido}</strong><br><br>
+                Se eliminarán TODOS los gallos de este partido.<br>
+                <span style="color:#d32f2f; font-weight:bold;">¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmar-eliminar').onclick = () => {
+        // Buscar matchId
+        let matchId = null;
+        for (const id in torneoActual.REGISTRO) {
+            if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
+                matchId = id;
+                break;
             }
         }
+        
+        if (matchId) {
+            delete torneoActual.REGISTRO[matchId];
+            partidosList = partidosList.filter(p => p.partido !== nombrePartido);
+            guardarTorneoEnStorage(torneoActual);
+            
+            if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
+                resultadosCotejo = {
+                    peleas: [],
+                    noEmparejados: [],
+                    metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+                };
+            }
+            
+            AppState.addNotification(`✅ Partido "${nombrePartido}" eliminado`, 'success');
+            actualizarPantalla();
+        }
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelar-eliminar').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+        
         
         function guardarEdicionPartido(nombreOriginal, nuevoNombre, nuevoRepresentante, gallosEditados) {
             if (!torneoId) return;
@@ -792,34 +1427,61 @@
         }
         
         function eliminarGallo(nombrePartido, anillo) {
-            if (!torneoId) return;
-            
-            const anilloFormateado = anillo.padStart(3, '0');
-            
-            let matchId = null;
-            for (const id in torneoActual.REGISTRO) {
-                if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
-                    matchId = id;
-                    break;
-                }
-            }
-            
-            if (matchId && torneoActual.REGISTRO[matchId].gallos[anilloFormateado]) {
-                delete torneoActual.REGISTRO[matchId].gallos[anilloFormateado];
-                partidosList = partidosList.filter(p => !(p.anillo === anilloFormateado && p.partido === nombrePartido));
-                guardarTorneoEnStorage(torneoActual);
-                
-                if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
-                    resultadosCotejo = {
-                        peleas: [],
-                        noEmparejados: [],
-                        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-                    };
-                }
-                
-                AppState.addNotification(`✅ Gallo ${anillo} eliminado`, 'success');
+    if (!torneoId) return;
+    
+    const anilloFormateado = anillo.padStart(3, '0');
+    
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR GALLO?</h3>
+            <p style="margin-bottom:20px;">
+                Partido: <strong>${nombrePartido}</strong><br>
+                Anillo: <strong>${anillo}</strong><br><br>
+                <span style="color:#d32f2f; font-weight:bold;">¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmar-eliminar').onclick = () => {
+        let matchId = null;
+        for (const id in torneoActual.REGISTRO) {
+            if (torneoActual.REGISTRO[id].nombre === nombrePartido) {
+                matchId = id;
+                break;
             }
         }
+        
+        if (matchId && torneoActual.REGISTRO[matchId].gallos[anilloFormateado]) {
+            delete torneoActual.REGISTRO[matchId].gallos[anilloFormateado];
+            partidosList = partidosList.filter(p => !(p.anillo === anilloFormateado && p.partido === nombrePartido));
+            guardarTorneoEnStorage(torneoActual);
+            
+            if (resultadosCotejo.peleas.length > 0 && !torneoActual.cotejoId) {
+                resultadosCotejo = {
+                    peleas: [],
+                    noEmparejados: [],
+                    metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+                };
+            }
+            
+            AppState.addNotification(`✅ Gallo ${anillo} eliminado`, 'success');
+            actualizarPantalla();
+        }
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelar-eliminar').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
         
         // ============================================================
         // FUNCIONES DE CONFIGURACIÓN
@@ -876,6 +1538,8 @@
         }
         
         function cambiarGallosPorPartido(valor) {
+    if (!valor || valor === '0') return;
+
             let num = parseInt(valor, 10);
             if (isNaN(num)) num = 3;
             if (num < 1) num = 1;
@@ -991,28 +1655,42 @@
             }
             
             // Limpiar campos
-            document.getElementById('match-name').value = '';
-            document.getElementById('match-representante').value = '';
-            document.getElementById('representante-info').innerHTML = '';
-            
-            // Limpiar campos de gallos (los botones de estado se regenerarán al recargar)
-            for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
-                const pesoInput = document.getElementById(`weight-${i}`);
-                const colorInput = document.getElementById(`color-${i}`);
-                const estadoBtn = document.getElementById(`estado-${i}`);
-                if (pesoInput) pesoInput.value = '';
-                if (colorInput) colorInput.value = '';
-                if (estadoBtn) {
-                    estadoBtn.textContent = 'PRESENTE';
-                    estadoBtn.style.backgroundColor = '#4CAF50';
-                }
-            }
+document.getElementById('match-name').value = '';
+document.getElementById('match-representante').value = '';
+document.getElementById('representante-info').innerHTML = '';
+
+// 🔥 ACTUALIZAR ANILLOS CONSECUTIVOS SEGÚN EL ÚLTIMO ANILLO REGISTRADO
+const siguienteAnillo = obtenerSiguienteAnillo(); // Esta función ya existe
+
+for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
+    const pesoInput = document.getElementById(`weight-${i}`);
+    const colorInput = document.getElementById(`color-${i}`);
+    const estadoBtn = document.getElementById(`estado-${i}`);
+    const anilloInput = document.getElementById(`ring-${i}`);
+    
+    if (pesoInput) pesoInput.value = '';
+    if (colorInput) colorInput.value = '';
+    if (estadoBtn) {
+        estadoBtn.textContent = 'PRESENTE';
+        estadoBtn.style.backgroundColor = '#4CAF50';
+    }
+    
+    // Actualizar el valor del anillo con el número consecutivo
+    if (anilloInput) {
+        const nuevoAnillo = (parseInt(siguienteAnillo) + (i - 1)).toString().padStart(3, '0');
+        anilloInput.value = nuevoAnillo;
+        console.log(`🔄 Anillo ${i} actualizado a: ${nuevoAnillo}`);
+    }
+}
             
             // Actualizar estadísticas
             const headerPartidos = document.querySelector('.header-estadisticas-partidos');
             if (headerPartidos) headerPartidos.textContent = contarPartidosUnicos();
             const headerGallos = document.querySelector('.header-estadisticas-gallos');
             if (headerGallos) headerGallos.textContent = partidosList.length;
+
+             actualizarListaRepresentantes();
+            renderizarTablaPosiciones();
         }
         
         // ============================================================
@@ -1053,8 +1731,8 @@
             });
             
             if (partidosUnicos.size > 0) {
-                const nombres = Array.from(partidosUnicos).join(', ');
-                info.innerHTML = `<span style="color:#000; font-weight:500;">Partidos con el mismo representante (${partidosUnicos.size}):</span><br><span style="color:#2196F3;">${nombres}</span>`;
+                const nombres = Array.from(partidosUnicos).join(' -→ ');
+                info.innerHTML = `<span style="color:#000; font-weight:500;">Partidos con el mismo representante (${partidosUnicos.size}):</span><br><span style="color:#2196F3; font-weight:900;">${nombres}</span>`;
                 document.getElementById('match-representante').style.borderColor = '#2196F3';
             } else {
                 info.innerHTML = '';
@@ -1215,18 +1893,112 @@
         }
         
         function calcularNumeroConflictos(peleas) {
-            let conflictos = 0;
-            for (let i = 0; i < peleas.length - 1; i++) {
-                const actual = peleas[i];
-                const siguiente = peleas[i + 1];
-                const partidosActual = [actual.gallo1.partido, actual.gallo2.partido];
-                const partidosSiguiente = [siguiente.gallo1.partido, siguiente.gallo2.partido];
-                if (partidosActual.some(p => partidosSiguiente.includes(p))) {
-                    conflictos++;
-                }
-            }
-            return conflictos;
+    let conflictos = 0;
+    
+    // Crear una lista para almacenar los conflictos (opcional)
+    if (!window._conflictosDetallados) window._conflictosDetallados = [];
+    window._conflictosDetallados = [];
+    
+    for (let i = 0; i < peleas.length - 1; i++) {
+        const actual = peleas[i];
+        const siguiente = peleas[i + 1];
+        
+        // Conflictos por NOMBRE DE PARTIDO
+        const partidosActual = [actual.gallo1.partido, actual.gallo2.partido];
+        const partidosSiguiente = [siguiente.gallo1.partido, siguiente.gallo2.partido];
+        
+        const partidoRepetido = partidosActual.find(p => partidosSiguiente.includes(p));
+        if (partidoRepetido) {
+            conflictos++;
+            window._conflictosDetallados.push({
+                tipo: 'PARTIDO',
+                pelea1: actual.numero,
+                pelea2: siguiente.numero,
+                valor: partidoRepetido,
+                mensaje: `Partido "${partidoRepetido}" aparece en peleas #${actual.numero} y #${siguiente.numero}`
+            });
         }
+        
+        // Conflictos por REPRESENTANTE
+        const repsActual = [];
+        if (actual.gallo1.representante && actual.gallo1.representante.trim() !== '') repsActual.push(actual.gallo1.representante);
+        if (actual.gallo2.representante && actual.gallo2.representante.trim() !== '') repsActual.push(actual.gallo2.representante);
+        
+        const repsSiguiente = [];
+        if (siguiente.gallo1.representante && siguiente.gallo1.representante.trim() !== '') repsSiguiente.push(siguiente.gallo1.representante);
+        if (siguiente.gallo2.representante && siguiente.gallo2.representante.trim() !== '') repsSiguiente.push(siguiente.gallo2.representante);
+        
+        if (repsActual.length > 0 && repsSiguiente.length > 0) {
+            const repRepetido = repsActual.find(r => repsSiguiente.includes(r));
+            if (repRepetido) {
+                conflictos++;
+                window._conflictosDetallados.push({
+                    tipo: 'REPRESENTANTE',
+                    pelea1: actual.numero,
+                    pelea2: siguiente.numero,
+                    valor: repRepetido,
+                    mensaje: `Representante "${repRepetido}" aparece en peleas #${actual.numero} y #${siguiente.numero}`
+                });
+            }
+        }
+    }
+    
+    return conflictos;
+}
+
+
+        // ============================================================
+// NUEVA FUNCIÓN: Obtener lista detallada de conflictos
+// ============================================================
+function obtenerListaConflictosDetallada(peleas) {
+    const conflictos = [];
+    
+    for (let i = 0; i < peleas.length - 1; i++) {
+        const actual = peleas[i];
+        const siguiente = peleas[i + 1];
+        
+        // Obtener partidos de ambas peleas
+        const partidosActual = [actual.gallo1.partido, actual.gallo2.partido];
+        const partidosSiguiente = [siguiente.gallo1.partido, siguiente.gallo2.partido];
+        
+        // Verificar conflictos por PARTIDO
+        const partidoRepetido = partidosActual.find(p => partidosSiguiente.includes(p));
+        if (partidoRepetido) {
+            conflictos.push({
+                tipo: 'PARTIDO',
+                pelea1: actual.numero,
+                pelea2: siguiente.numero,
+                valor: partidoRepetido,
+                mensaje: `⚠️ Mismo partido "${partidoRepetido}" en pelea #${actual.numero} y #${siguiente.numero}`
+            });
+        }
+        
+        // Obtener representantes (solo los que no estén vacíos)
+        const repsActual = [];
+        if (actual.gallo1.representante && actual.gallo1.representante.trim() !== '') repsActual.push(actual.gallo1.representante);
+        if (actual.gallo2.representante && actual.gallo2.representante.trim() !== '') repsActual.push(actual.gallo2.representante);
+        
+        const repsSiguiente = [];
+        if (siguiente.gallo1.representante && siguiente.gallo1.representante.trim() !== '') repsSiguiente.push(siguiente.gallo1.representante);
+        if (siguiente.gallo2.representante && siguiente.gallo2.representante.trim() !== '') repsSiguiente.push(siguiente.gallo2.representante);
+        
+        // Verificar conflictos por REPRESENTANTE
+        if (repsActual.length > 0 && repsSiguiente.length > 0) {
+            const repRepetido = repsActual.find(r => repsSiguiente.includes(r));
+            if (repRepetido) {
+                conflictos.push({
+                    tipo: 'REPRESENTANTE',
+                    pelea1: actual.numero,
+                    pelea2: siguiente.numero,
+                    valor: repRepetido,
+                    mensaje: `⚠️ Mismo representante "${repRepetido}" en pelea #${actual.numero} y #${siguiente.numero}`
+                });
+            }
+        }
+    }
+    
+    return conflictos;
+}
         
         function distribuirPeleasInteligente(peleas) {
             if (peleas.length <= 2) return peleas;
@@ -1271,17 +2043,101 @@
                         const partidosPelea = [pelea.gallo1.partido, pelea.gallo2.partido];
                         let puntaje = 0;
                         
-                        for (let j = peleasOrdenadas.length - 1; j >= Math.max(0, peleasOrdenadas.length - 3); j--) {
-                            const peleaAnterior = peleasOrdenadas[j];
-                            if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 50;
-                            if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 50;
-                            if (partidosPelea[1] === peleaAnterior.gallo1.partido) puntaje -= 50;
-                            if (partidosPelea[0] === peleaAnterior.gallo2.partido) puntaje -= 50;
-                            
-                            const distancia = peleasOrdenadas.length - j;
-                            if (distancia === 2) puntaje -= 20;
-                            if (distancia === 3) puntaje -= 10;
-                        }
+
+                        for (let j = peleasOrdenadas.length - 1; j >= Math.max(0, peleasOrdenadas.length - 6); j--) {
+    const peleaAnterior = peleasOrdenadas[j];
+    
+    // ====== PENALIZACIONES POR NOMBRE DE PARTIDO (IGUAL QUE ANTES) ======
+    if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 100;
+    if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 100;
+    if (partidosPelea[1] === peleaAnterior.gallo1.partido) puntaje -= 100;
+    if (partidosPelea[0] === peleaAnterior.gallo2.partido) puntaje -= 100;
+    
+    // ====== PENALIZACIONES POR REPRESENTANTE (MISMAS REGLAS) ======
+    // Obtener representantes de la pelea candidata
+    const repsPelea = [];
+    if (pelea.gallo1.representante && pelea.gallo1.representante.trim() !== '') repsPelea.push(pelea.gallo1.representante);
+    if (pelea.gallo2.representante && pelea.gallo2.representante.trim() !== '') repsPelea.push(pelea.gallo2.representante);
+    
+    // Obtener representantes de la pelea anterior
+    const repsAnterior = [];
+    if (peleaAnterior.gallo1.representante && peleaAnterior.gallo1.representante.trim() !== '') repsAnterior.push(peleaAnterior.gallo1.representante);
+    if (peleaAnterior.gallo2.representante && peleaAnterior.gallo2.representante.trim() !== '') repsAnterior.push(peleaAnterior.gallo2.representante);
+    
+    // Aplicar penalizaciones por representantes (misma lógica que partidos)
+    if (repsPelea.length > 0 && repsAnterior.length > 0) {
+        if (repsPelea[0] === repsAnterior[0]) puntaje -= 50;
+        if (repsPelea[0] === repsAnterior[1]) puntaje -= 50;
+        if (repsPelea[1] === repsAnterior[0]) puntaje -= 50;
+        if (repsPelea[1] === repsAnterior[1]) puntaje -= 50;
+    }
+    
+    // ====== PENALIZACIONES POR DISTANCIA ======
+    const distancia = peleasOrdenadas.length - j;
+    
+    // Distancia 2 (IGUAL que antes)
+    if (distancia === 2) {
+        // Penalización por distancia para PARTIDOS
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 55;  // ← solo cambié de 20 a 40
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 55;  // ← solo cambié de 20 a 40
+        
+        // Penalización por distancia para REPRESENTANTES
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 40;  // ← solo cambié de 20 a 40
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 40;  // ← solo cambié de 20 a 40
+        }
+    }
+    
+    // Distancia 3 (IGUAL que antes)
+    if (distancia === 3) {
+        // Penalización por distancia para PARTIDOS
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 50;  // ← solo cambié de 10 a 30
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 50;  // ← solo cambié de 10 a 30
+        
+        // Penalización por distancia para REPRESENTANTES
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 35;  // ← solo cambié de 10 a 30
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 35;  // ← solo cambié de 10 a 30
+        }
+    }
+    
+    // ====== NUEVAS PENALIZACIONES POR DISTANCIA 4, 5 y 6 ======
+    
+    // Distancia 4 (NUEVO)
+    if (distancia === 4) {
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 30;
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 30;
+        
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 15;
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 15;
+        }
+    }
+    
+    // Distancia 5 (NUEVO)
+    if (distancia === 5) {
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 20;
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 20;
+        
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 8;
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 8;
+        }
+    }
+    
+    // Distancia 6 (NUEVO)
+    if (distancia === 6) {
+        if (partidosPelea[0] === peleaAnterior.gallo1.partido) puntaje -= 10;
+        if (partidosPelea[1] === peleaAnterior.gallo2.partido) puntaje -= 10;
+        
+        if (repsPelea.length > 0 && repsAnterior.length > 0) {
+            if (repsPelea[0] === repsAnterior[0]) puntaje -= 5;
+            if (repsPelea[1] === repsAnterior[1]) puntaje -= 5;
+        }
+    }
+}
+
+                        
                         
                         for (let pos = 0; pos < 2; pos++) {
                             const partido = partidosPelea[pos];
@@ -1336,7 +2192,10 @@
                     partidosUsados.add(p.gallo1.partido);
                     partidosUsados.add(p.gallo2.partido);
                 });
-                puntajeTotal += partidosUsados.size * 10;
+                puntajeTotal += partidosUsados.size * 20;
+
+                window._conflictosDetallados = [];
+
                 
                 resultados.push({
                     peleas: peleasOrdenadas,
@@ -1381,7 +2240,7 @@
             }
             
             const modoSelect = document.getElementById('cotejo-modo');
-            const modo = modoSelect ? modoSelect.value : 'INTELIGENTE';
+const modo = modoSelect ? modoSelect.value : 'ASCENDENTE';
             
             const btnCotejar = document.getElementById('btn-cotejar');
             if (btnCotejar) {
@@ -1394,24 +2253,121 @@
             
             try {
                 let resultado;
-                if (modo === 'INTELIGENTE') {
-                    const resultados = [
-                        { modo: 'ASCENDENTE', ...ejecutarModoCotejo('ASCENDENTE') },
-                        { modo: 'DESCENDENTE', ...ejecutarModoCotejo('DESCENDENTE') },
-                        { modo: 'ALEATORIO', ...ejecutarModoCotejo('ALEATORIO') }
-                    ];
+              if (modo === 'INTELIGENTE') {
+    // ==============================================
+    // NUEVO MODO INTELIGENTE
+    // IGNORA el rango de peso
+    // Prueba: ASCENDENTE, DESCENDENTE, MITAD Y MITAD, ALEATORIO
+    // 50 intentos en total
+    // Prioridad: 1) Sin no emparejados, 2) Menor diferencia máxima
+    // ==============================================
+    
+    let gallos = partidosList.filter(g => g.peso && g.peso > 0);
+    if (gallos.length < 2) {
+        resultado = { peleas: [], noEmparejados: gallos };
+    } else {
+        const mejoresResultados = [];
+        
+        // Calcular mediana para dividir en 2 grupos (pesos pequeños y grandes)
+        const pesosOrdenados = [...gallos].sort((a, b) => a.peso - b.peso);
+        const mediana = pesosOrdenados[Math.floor(pesosOrdenados.length / 2)].peso;
+        const gallosPequenos = gallos.filter(g => g.peso <= mediana);
+        const gallosGrandes = gallos.filter(g => g.peso > mediana);
+        
+        // Función de emparejamiento (ignora rango de peso)
+        function emparejar(listaGallos) {
+            const peleas = [];
+            const noEmparejados = [];
+            const usados = new Set();
+            
+            for (const gallo of listaGallos) {
+                if (usados.has(gallo.anillo)) continue;
+                
+                let mejorPareja = null;
+                let menorDiferencia = Infinity;
+                
+                for (const posible of listaGallos) {
+                    if (usados.has(posible.anillo) || posible.anillo === gallo.anillo) continue;
+                    if (posible.partido === gallo.partido) continue;
+                    if (posible.representante && gallo.representante && posible.representante === gallo.representante) continue;
                     
-                    resultados.forEach(r => {
-                        if (r.peleas.length > 0) {
-                            const diferencias = r.peleas.map(p => p.diferencia);
-                            r.diferenciaPromedio = diferencias.reduce((a, b) => a + b, 0) / diferencias.length;
-                        } else {
-                            r.diferenciaPromedio = Infinity;
-                        }
+                    const diferencia = Math.abs(posible.peso - gallo.peso);
+                    if (diferencia < menorDiferencia) {
+                        menorDiferencia = diferencia;
+                        mejorPareja = posible;
+                    }
+                }
+                
+                if (mejorPareja) {
+                    peleas.push({
+                        numero: peleas.length + 1,
+                        gallo1: gallo,
+                        gallo2: mejorPareja,
+                        diferencia: Math.abs(gallo.peso - mejorPareja.peso)
                     });
-                    
-                    resultados.sort((a, b) => a.diferenciaPromedio - b.diferenciaPromedio);
-                    resultado = resultados[0];
+                    usados.add(gallo.anillo);
+                    usados.add(mejorPareja.anillo);
+                } else {
+                    noEmparejados.push({ gallo: gallo, motivo: { codigo: 'NO_PAREJA', mensaje: 'No hay pareja disponible' } });
+                }
+            }
+            return { peleas, noEmparejados };
+        }
+        
+        // Función para emparejar MITAD Y MITAD (pequeños con pequeños, grandes con grandes)
+        function emparejarMitadMitad() {
+            const resultadoPequenos = emparejar([...gallosPequenos]);
+            const resultadoGrandes = emparejar([...gallosGrandes]);
+            const todasPeleas = [...resultadoPequenos.peleas, ...resultadoGrandes.peleas];
+            const todosNoEmparejados = [...resultadoPequenos.noEmparejados, ...resultadoGrandes.noEmparejados];
+            todasPeleas.forEach((p, idx) => p.numero = idx + 1);
+            return { peleas: todasPeleas, noEmparejados: todosNoEmparejados };
+        }
+        
+        // ========== EJECUTAR 50 INTENTOS ==========
+        // 1. Modo ASCENDENTE (ordenar por peso ascendente)
+        const gallosAscendente = [...gallos].sort((a, b) => a.peso - b.peso);
+        mejoresResultados.push({ ...emparejar(gallosAscendente), tipo: 'ASCENDENTE' });
+        
+        // 2. Modo DESCENDENTE (ordenar por peso descendente)
+        const gallosDescendente = [...gallos].sort((a, b) => b.peso - a.peso);
+        mejoresResultados.push({ ...emparejar(gallosDescendente), tipo: 'DESCENDENTE' });
+        
+        // 3. Modo MITAD Y MITAD (pequeños con pequeños, grandes con grandes)
+        mejoresResultados.push({ ...emparejarMitadMitad(), tipo: 'MITAD_Y_MITAD' });
+        
+        // 4. Modo ALEATORIO (47 intentos restantes = 50 - 3 = 47)
+        for (let intento = 0; intento < 47; intento++) {
+            const gallosAleatorios = [...gallos].sort(() => Math.random() - 0.5);
+            mejoresResultados.push({ ...emparejar(gallosAleatorios), tipo: `ALEATORIO_${intento + 1}` });
+        }
+        
+        // ========== ORDENAR POR PRIORIDAD ==========
+        // Prioridad #1: MENOS NO EMPAREJADOS (0 es mejor)
+        // Prioridad #2: MENOR DIFERENCIA MÁXIMA
+        mejoresResultados.sort((a, b) => {
+            if (a.noEmparejados.length !== b.noEmparejados.length) {
+                return a.noEmparejados.length - b.noEmparejados.length;
+            }
+            const maxDifA = a.peleas.length > 0 ? Math.max(...a.peleas.map(p => p.diferencia)) : 0;
+            const maxDifB = b.peleas.length > 0 ? Math.max(...b.peleas.map(p => p.diferencia)) : 0;
+            return maxDifA - maxDifB;
+        });
+        
+        const mejor = mejoresResultados[0];
+        resultado = {
+            peleas: mejor.peleas,
+            noEmparejados: mejor.noEmparejados
+        };
+        
+        // Calcular diferencia máxima del mejor resultado
+        const mejorDifMax = resultado.peleas.length > 0 ? Math.max(...resultado.peleas.map(p => p.diferencia)) : 0;
+        
+        console.log(`🎯 INTELIGENTE: Mejor tipo = ${mejor.tipo}`);
+        console.log(`   Pendiente de cruce: ${mejor.noEmparejados.length}`);
+        console.log(`   Diferencia máxima: ${mejorDifMax}g`);
+    }
+
                 } else {
                     resultado = ejecutarModoCotejo(modo);
                 }
@@ -1425,32 +2381,47 @@
                     if (actual.some(c => siguiente.includes(c))) conflictos++;
                 }
                 
-                resultadosCotejo = {
-                    peleas: resultado.peleas,
-                    noEmparejados: resultado.noEmparejados,
-                    metricas: {
-                        totalGallos: partidosList.filter(g => g.peso > 0).length,
-                        peleasGeneradas: resultado.peleas.length,
-                        noEmparejados: resultado.noEmparejados.length,
-                        diferenciaPromedio: resultado.peleas.length > 0 
-                            ? resultado.peleas.reduce((a, b) => a + b.diferencia, 0) / resultado.peleas.length : 0,
-                        conflictosConsecutivos: conflictos
-                    }
-                };
+                // PRIMERO: Crear las peleas
+resultadosCotejo = {
+    peleas: resultado.peleas,
+    noEmparejados: resultado.noEmparejados,
+    metricas: {
+        totalGallos: partidosList.filter(g => g.peso > 0).length,
+        peleasGeneradas: resultado.peleas.length,
+        noEmparejados: resultado.noEmparejados.length,
+        diferenciaPromedio: resultado.peleas.length > 0 
+            ? resultado.peleas.reduce((a, b) => a + b.diferencia, 0) / resultado.peleas.length : 0,
+        conflictosConsecutivos: 0  // Temporal, lo calcularemos después
+    }
+};
 
-                // Forzar que la variable local se actualice correctamente
+// SEGUNDO: Forzar recalcular conflictos (esto llena window._conflictosDetallados)
+resultadosCotejo.metricas.conflictosConsecutivos = calcularNumeroConflictos(resultadosCotejo.peleas);
+
+// TERCERO: Verificar que los conflictos detallados se hayan generado
+console.log(`🔍 CONFLICTOS CALCULADOS: ${resultadosCotejo.metricas.conflictosConsecutivos}`);
+console.log(`📋 LISTA DETALLADA: ${window._conflictosDetallados.length} conflictos encontrados`);
+
+// Forzar que la variable local se actualice correctamente
 console.log(`📊 PELEAS GENERADAS: ${resultadosCotejo.peleas.length}`);
-// Pequeño delay para asegurar que la UI se actualice
+
+// CUARTO: Actualizar la UI
 setTimeout(() => {
     actualizarPantalla();
 }, 50);
                 
+                
                 renderizarResultadosCotejo();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+             
+                window.scrollTo({ top: 280, behavior: 'smooth' });
+                
                 AppState.addNotification(`✅ Cotejo completado: ${resultado.peleas.length} peleas generadas`, 'success');
+           vibrarFuerte();
             } catch (error) {
                 console.error('Error en cotejo:', error);
                 AppState.addNotification('❌ Error al ejecutar cotejo', 'error');
+            vibrarError();
             } finally {
                 if (btnCotejar) {
                     btnCotejar.disabled = false;
@@ -1468,90 +2439,102 @@ window.limpiarResultadosCotejo = () => {
         AppState.addNotification('📭 No hay resultados de cotejo para limpiar', 'info');
         return;
     }
-    if (!confirm('⚠️ ¿Estás seguro de limpiar los resultados del cotejo?\n\nEsto borrará las peleas generadas y podrás registrar más partidos.')) return;
     
-    // ✅ RESTAURAR CONFIGURACIÓN DEL TORNEO ANTES DE LIMPIAR
-    if (torneoActual) {
-        configuracion = {
-            gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
-            pesoMin: torneoActual.pesoMin || 1700,
-            pesoMax: torneoActual.pesoMax || 2400,
-            rangoPeso: torneoActual.rangoPeso || 50,
-            anillosEditables: torneoActual.config?.anillosEditables || false,
-            registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿LIMPIAR RESULTADOS?</h3>
+            <p style="margin-bottom:20px;">
+                Se eliminarán:<br>
+                ⚡ <strong>${resultadosCotejo.peleas.length}</strong> peleas generadas<br>
+                🏆 <strong>${calificacionesCargadas.size}</strong> calificaciones<br><br>
+                Podrás registrar más partidos y volver a cotejar.<br>
+                <span style="color:#d32f2f; font-weight:bold;">¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-limpiar" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR</button>
+                <button id="cancelar-limpiar" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmar-limpiar').onclick = () => {
+        // RESTAURAR CONFIGURACIÓN DEL TORNEO ANTES DE LIMPIAR
+        if (torneoActual) {
+            configuracion = {
+                gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
+                pesoMin: torneoActual.pesoMin || 1700,
+                pesoMax: torneoActual.pesoMax || 2400,
+                rangoPeso: torneoActual.rangoPeso || 50,
+                anillosEditables: torneoActual.config?.anillosEditables || false,
+                registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+            };
+            
+            puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        }
+        
+        // Limpiar resultados de cotejo
+        resultadosCotejo = {
+            peleas: [],
+            noEmparejados: [],
+            metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
         };
         
-        // ✅ RESTAURAR PUNTOS CONFIGURADOS
-        puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        // Limpiar calificaciones
+        calificacionesCargadas.clear();
+        peleaSeleccionadaActual = null;
         
-        console.log(`✅ Configuración restaurada: Rango de peso = ${configuracion.rangoPeso}g, Puntos: Ganador=${puntosConfiguracion.ganador}, Empate=${puntosConfiguracion.empate}, Perdedor=${puntosConfiguracion.perdedor}`);
-    }
-    
-    // Limpiar resultados de cotejo
-    resultadosCotejo = {
-        peleas: [],
-        noEmparejados: [],
-        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+        // Si hay un cotejo guardado, también eliminarlo
+        if (torneoActual && torneoActual.cotejoId) {
+            delete torneoActual.cotejoId;
+            delete torneoActual.cotejoData;
+            guardarTorneoEnStorage(torneoActual);
+            AppState.rooster.cotejoState = false;
+        }
+        
+        // ACTUALIZAR SLIDERS Y INPUTS DE LA UI
+        setTimeout(() => {
+            const rangoSlider = document.getElementById('config-rango-peso-slider');
+            const rangoInput = document.getElementById('config-rango-peso');
+            const rangoValorActual = document.getElementById('rango-valor-actual');
+            
+            if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
+            if (rangoInput) rangoInput.value = configuracion.rangoPeso;
+            if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
+            
+            const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
+            const puntosEmpateSpan = document.getElementById('puntos-empate-info');
+            const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
+            
+            if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
+            if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
+            if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
+        }, 100);
+        
+        // RECARGAR LA PANTALLA COMPLETA
+        actualizarPantalla();
+        
+window.scrollTo({ top: 700, behavior: 'smooth' });
+
+        
+        overlay.remove();
+        AppState.addNotification(`🧹 Resultados de cotejo eliminados. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
+        
+        if (navigator.vibrate) navigator.vibrate(100);
     };
     
-    // Limpiar calificaciones
-    calificacionesCargadas.clear();
-    peleaSeleccionadaActual = null;
-    
-    // Si hay un cotejo guardado, también eliminarlo
-    if (torneoActual && torneoActual.cotejoId) {
-        delete torneoActual.cotejoId;
-        delete torneoActual.cotejoData;
-        guardarTorneoEnStorage(torneoActual);
-        AppState.rooster.cotejoState = false;
-    }
-    
-    // ✅ ACTUALIZAR SLIDERS Y INPUTS DE LA UI
-    setTimeout(() => {
-        const rangoSlider = document.getElementById('config-rango-peso-slider');
-        const rangoInput = document.getElementById('config-rango-peso');
-        const rangoValorActual = document.getElementById('rango-valor-actual');
-        
-        if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
-        if (rangoInput) rangoInput.value = configuracion.rangoPeso;
-        if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
-        
-        // Actualizar puntos en la UI si están visibles
-        const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
-        const puntosEmpateSpan = document.getElementById('puntos-empate-info');
-        const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
-        
-        if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
-        if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
-        if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
-    }, 100);
-    
-    // ✅ RECARGAR LA PANTALLA COMPLETA
-    actualizarPantalla();
-    
-    // ✅ Hacer scroll al formulario de registro
-    setTimeout(() => {
-        const formularioRegistro = document.querySelector('#admin-main-container > div:nth-child(2)');
-        if (formularioRegistro) {
-            formularioRegistro.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        // Regenerar campos de gallos
-        if (typeof regenerarCamposGallos === 'function') {
-            regenerarCamposGallos(configuracion.gallosPorPartido);
-        }
-    }, 100);
-    
-    AppState.addNotification(`🧹 Resultados de cotejo eliminados. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
-    
-    // Feedback háptico
-    if (navigator.vibrate) navigator.vibrate(100);
+    document.getElementById('cancelar-limpiar').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 };
-
 
         
         window.guardarCotejo = async () => {
             if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
-                AppState.addNotification('❌ Primero debes COTEJAR AHORA', 'warning');
+                AppState.addNotification('❌ Primero debes GENERAR CRUCES', 'warning');
                 return;
             }
             
@@ -1602,6 +2585,7 @@ window.limpiarResultadosCotejo = () => {
             } catch (error) {
                 console.error('Error guardando cotejo:', error);
                 AppState.addNotification('❌ Error al guardar el cotejo', 'error');
+          vibrarError();
             } finally {
                 if (btnGuardar) {
                     btnGuardar.disabled = false;
@@ -1618,77 +2602,112 @@ window.limpiarResultadosCotejo = () => {
             
             mostrarModalConfirmacionEliminarCotejo();
         };
+
+
+        // Función para validar palabra ELIMINAR (detecta las letras en orden, sin importar espacios u otros caracteres)
+function contieneLetrasEliminar(texto) {
+    if (!texto) return false;
+    const textoUpper = texto.toUpperCase();
+    // Busca E, luego L, luego I, luego M, luego I, luego N, luego A, luego R en orden
+    let busqueda = "ELIMINAR";
+    let indice = 0;
+    for (let i = 0; i < textoUpper.length && indice < busqueda.length; i++) {
+        if (textoUpper[i] === busqueda[indice]) {
+            indice++;
+        }
+    }
+    return indice === busqueda.length;
+}
         
         function mostrarModalConfirmacionEliminarCotejo() {
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
-                <div class="modal-container" style="max-width:400px; text-align:center;">
-                    <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
-                    <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR COTEJO?</h3>
-                    <p style="margin-bottom:20px;">Se eliminarán todas las peleas generadas y calificaciones.</p>
-                    <div style="display:flex; gap:10px;">
-                        <button id="confirmar-eliminar-cotejo" class="btn-danger" style="flex:2; padding:14px;">🗑️ ELIMINAR</button>
-                        <button id="cancelar-eliminar-cotejo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            
-            document.getElementById('confirmar-eliminar-cotejo').onclick = () => {
-    delete torneoActual.cotejoId;
-    delete torneoActual.cotejoData;
-    guardarTorneoEnStorage(torneoActual);
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR COTEJO?</h3>
+            <p style="margin-bottom:20px;">Se eliminarán todas las peleas generadas y calificaciones.</p>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="confirmar-texto-cotejo" placeholder="Escribe ELIMINAR para confirmar" 
+                    style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; font-weight:bold; text-transform:uppercase;">
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar-cotejo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;" disabled>🗑️ ELIMINAR</button>
+                <button id="cancelar-eliminar-cotejo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:8px; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
     
-    // ✅ RESTAURAR CONFIGURACIÓN DEL TORNEO
-    if (torneoActual) {
-        configuracion = {
-            gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
-            pesoMin: torneoActual.pesoMin || 1700,
-            pesoMax: torneoActual.pesoMax || 2400,
-            rangoPeso: torneoActual.rangoPeso || 50,
-            anillosEditables: torneoActual.config?.anillosEditables || false,
-            registroDetalladoActivo: torneoActual.config?.registroDetallado || false
-        };
-        
-        // ✅ RESTAURAR PUNTOS CONFIGURADOS
-        puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
-    }
+    const inputTexto = document.getElementById('confirmar-texto-cotejo');
+    const btnEliminar = document.getElementById('confirmar-eliminar-cotejo');
     
-    resultadosCotejo = {
-        peleas: [], noEmparejados: [],
-        metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
-    };
-    AppState.rooster.cotejoState = false;
-    calificacionesCargadas.clear();
-    peleaSeleccionadaActual = null;
-    
-    // ✅ ACTUALIZAR UI DEL RANGO Y PUNTOS
-    setTimeout(() => {
-        const rangoSlider = document.getElementById('config-rango-peso-slider');
-        const rangoInput = document.getElementById('config-rango-peso');
-        const rangoValorActual = document.getElementById('rango-valor-actual');
-        if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
-        if (rangoInput) rangoInput.value = configuracion.rangoPeso;
-        if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
-        
-        const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
-        const puntosEmpateSpan = document.getElementById('puntos-empate-info');
-        const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
-        if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
-        if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
-        if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
-    }, 100);
-    
-    actualizarPantalla();
-    overlay.remove();
-    AppState.addNotification(`✅ Cotejo eliminado. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
-};
-
-            
-            document.getElementById('cancelar-eliminar-cotejo').onclick = () => overlay.remove();
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    // Validar mientras escribe
+    inputTexto.addEventListener('input', function(e) {
+        const contiene = contieneLetrasEliminar(e.target.value);
+        btnEliminar.disabled = !contiene;
+        if (contiene) {
+            btnEliminar.style.opacity = '1';
+            btnEliminar.style.cursor = 'pointer';
+        } else {
+            btnEliminar.style.opacity = '0.5';
+            btnEliminar.style.cursor = 'not-allowed';
         }
+    });
+    
+    document.getElementById('confirmar-eliminar-cotejo').onclick = () => {
+        vibrarFuerte();
+        delete torneoActual.cotejoId;
+        delete torneoActual.cotejoData;
+        guardarTorneoEnStorage(torneoActual);
+        
+        if (torneoActual) {
+            configuracion = {
+                gallosPorPartido: torneoActual.config?.gallosPorPartido || 3,
+                pesoMin: torneoActual.pesoMin || 1700,
+                pesoMax: torneoActual.pesoMax || 2400,
+                rangoPeso: torneoActual.rangoPeso || 50,
+                anillosEditables: torneoActual.config?.anillosEditables || false,
+                registroDetalladoActivo: torneoActual.config?.registroDetallado || false
+            };
+            puntosConfiguracion = torneoActual.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+        }
+        
+        resultadosCotejo = {
+            peleas: [], noEmparejados: [],
+            metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 }
+        };
+        AppState.rooster.cotejoState = false;
+        calificacionesCargadas.clear();
+        peleaSeleccionadaActual = null;
+        
+        setTimeout(() => {
+            const rangoSlider = document.getElementById('config-rango-peso-slider');
+            const rangoInput = document.getElementById('config-rango-peso');
+            const rangoValorActual = document.getElementById('rango-valor-actual');
+            if (rangoSlider) rangoSlider.value = configuracion.rangoPeso;
+            if (rangoInput) rangoInput.value = configuracion.rangoPeso;
+            if (rangoValorActual) rangoValorActual.innerText = configuracion.rangoPeso;
+            
+            const puntosGanadorSpan = document.getElementById('puntos-ganador-info');
+            const puntosEmpateSpan = document.getElementById('puntos-empate-info');
+            const puntosPerdedorSpan = document.getElementById('puntos-perdedor-info');
+            if (puntosGanadorSpan) puntosGanadorSpan.innerText = puntosConfiguracion.ganador;
+            if (puntosEmpateSpan) puntosEmpateSpan.innerText = puntosConfiguracion.empate;
+            if (puntosPerdedorSpan) puntosPerdedorSpan.innerText = puntosConfiguracion.perdedor;
+        }, 100);
+        
+        actualizarPantalla();
+        overlay.remove();
+        AppState.addNotification(`✅ Cotejo eliminado. Rango: ${configuracion.rangoPeso}g | Puntos: G${puntosConfiguracion.ganador} E${puntosConfiguracion.empate} P${puntosConfiguracion.perdedor}`, 'success');
+    };
+    
+    document.getElementById('cancelar-eliminar-cotejo').onclick = () => {
+        vibrarSuave();
+        overlay.remove();
+    };
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
         
         function renderizarResultadosCotejo() {
             const container = document.getElementById('cotejo-resultados-container');
@@ -1724,21 +2743,60 @@ window.limpiarResultadosCotejo = () => {
             }
 
 
-              let noEmparejadosHTML = '';
-            if (resultadosCotejo.noEmparejados.length > 0) {
-                noEmparejadosHTML = `<div style="margin-top:12px; padding:8px; background:#fff8e1; border-radius:8px;">
-                    <div style="font-weight:600; color:#d32f2f;">⚠️ NO EMPAREJADOS (${noEmparejados}):</div>
-                    ${resultadosCotejo.noEmparejados.map(item => `<div>• A:${item.gallo.anillo} - ${item.gallo.partido} - ${item.motivo.mensaje}</div>`).join('')}
-                </div>`;
-            }
+             let noEmparejadosHTML = '';
+if (resultadosCotejo.noEmparejados.length > 0) {
+    // Función para obtener color según el motivo
+    const getMotivoColor = (motivo) => {
+        const mensaje = motivo.mensaje || '';
+        if (mensaje.includes('Supera rango de peso') || mensaje.includes('RANGO_EXCEDIDO')) {
+            return 'background:#ffebee; border-left:6px solid #d32f2f;';
+        } else if (mensaje.includes('Mismo nombre') || mensaje.includes('MISMO_PARTIDO')) {
+            return 'background:#fff3e0; border-left:6px solid #ff9800;';
+        } else if (mensaje.includes('Mismo representante') || mensaje.includes('MISMO_REPRESENTANTE')) {
+            return 'background:#e3f2fd; border-left:6px solid #2196f3;';
+        } else if (mensaje.includes('Peso no registrado') || mensaje.includes('PESO_CERO')) {
+            return 'background:#f3e5f5; border-left:6px solid #9c27b0;';
+        } else {
+            return 'background:#fff8e1; border-left:4px solid #ffc107;';
+        }
+    };
+    
+    noEmparejadosHTML = `<div style="margin-top:12px; padding:20px; background:#16191c; border-radius:8px;">
+        <div style="font-weight:600; color:#d32f2f;">⚠️ PENDIENTE DE CRUCE (${noEmparejados}):</div>
+        ${resultadosCotejo.noEmparejados.map(item => `
+            <div style="padding:5px 8px; margin:5px 0; border-radius:18px; ${getMotivoColor(item.motivo)}">
+                • Anillo: ${item.gallo.anillo} (${item.gallo.peso} g) - ${item.gallo.partido} - ${item.motivo.mensaje}
+            </div>
+        `).join('')}
+    </div>`;
+}
             
-            let tablaHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:12px; min-width:600px;">
-                <thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
-                    <th style="padding:6px;">#</th><th style="text-align:left;">CINTA ROJA</th>`;
-            if (configuracion.registroDetalladoActivo) tablaHTML += `<th>COLOR 1</th>`;
-            tablaHTML += `<th>A1</th><th>P1</th><th>#</th><th>P2</th><th>A2</th><th style="text-align:left;">CINTA VERDE</th>`;
-            if (configuracion.registroDetalladoActivo) tablaHTML += `<th>COLOR 2</th>`;
-            tablaHTML += `<th>DIF</th><th>GANADOR</th><th>TIEMPO</th></tr></thead><tbody>`;
+ let tablaHTML = `<div style="width: 100%; overflow-x: visible;">
+<table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: clamp(9px, 2vw, 14px);">
+<thead><tr style="background:#f0f0f0; border-bottom:2px solid #8B4513;">
+            <th style="padding:1px 1px; width: 6%;">#</th>
+            <th style="text-align:left; padding:4px 2px; width: 12%;">CINTA ROJA</th>`;
+if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 1</th>`;
+tablaHTML += `<th style="padding:1px 1px; width: 7%;">A1</th>
+            <th style="padding:1px 1px; width: 7%;">P1</th>
+            <th style="padding:1px 1px; width: 6%;">#</th>
+            <th style="padding:1px 1px; width: 7%;">P2</th>
+            <th style="padding:1px 1px; width: 7%;">A2</th>
+            <th style="text-align:left; padding:1px 1px; width: 12%;">CINTA VERDE</th>`;
+if (configuracion.registroDetalladoActivo) tablaHTML += `<th style="padding:4px 2px; width: 8%;">COLOR 2</th>`;
+tablaHTML += `<th style="padding:1px 1px; width: 6%;">DIF</th>
+
+                       `;
+
+            // SOLO mostrar GANADOR y TIEMPO si hay calificaciones O hay cotejo guardado
+if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
+    tablaHTML += `<th style="padding:1px 1px; width: 10%;">GANADOR</th>
+                  <th style="padding:1px 1px; width: 9%;">TIEMPO</th>`;
+}
+            
+tablaHTML += `
+
+        </tr></thead><tbody>`;
             
                         resultadosCotejo.peleas.forEach((p, index) => {
                 const calificacion = calificacionesCargadas.get(index);
@@ -1751,20 +2809,30 @@ window.limpiarResultadosCotejo = () => {
                 }
                 
                 tablaHTML += `<tr style="border-bottom:1px solid #eee; background:${calificacion ? '#e8f5e8' : ''}">
-                    <td style="padding:6px; text-align:center; font-weight:700; background:#d32f2f; color:white;">${p.numero}</td>
-                    <td style="padding:6px;">${p.gallo1.partido}</td>`;
+                    <td style="padding:1px; text-align:center; font-weight:700; background:#d32f2f; color:white;">${p.numero}</td>
+                    <td style="padding:1px;">${p.gallo1.partido}</td>`;
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo1.color || '-'}</td>`;
-                tablaHTML += `<td style="padding:6px; text-align:center;">${p.gallo1.anillo}</td>
-                    <td style="padding:6px; text-align:center;">${p.gallo1.peso}</td>
-                    <td style="padding:6px; text-align:center; background:#4CAF50; color:white;">${p.numero}</td>
-                    <td style="padding:6px; text-align:center;">${p.gallo2.peso}</td>
-                    <td style="padding:6px; text-align:center;">${p.gallo2.anillo}</td>
-                    <td style="padding:6px;">${p.gallo2.partido}</td>`;
+                tablaHTML += `<td style="padding:1px; text-align:center;">${p.gallo1.anillo}</td>
+                    <td style="padding:1px; text-align:center;">${p.gallo1.peso}</td>
+                    <td style="padding:1px; text-align:center; background:#4CAF50; color:white;">${p.numero}</td>
+                    <td style="padding:1px; text-align:center;">${p.gallo2.peso}</td>
+                    <td style="padding:1px; text-align:center;">${p.gallo2.anillo}</td>
+                    <td style="padding:1px;">${p.gallo2.partido}</td>`;
                 if (configuracion.registroDetalladoActivo) tablaHTML += `<td style="padding:6px;">${p.gallo2.color || '-'}</td>`;
-                tablaHTML += `<td style="padding:6px; text-align:center;">${p.diferencia}g</td>
-                    <td style="padding:6px; text-align:center;">${ganadorTexto}</td>
-                    <td style="padding:6px; text-align:center;">${tiempoTexto}</td>`;
 
+  tablaHTML += `<td style="padding:1px; text-align:center;">${p.diferencia}g</td>`;
+
+                            
+if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
+    tablaHTML += `<td style="padding:1px; text-align:center;">${ganadorTexto}</td>`;
+}
+if (calificacionesCargadas.size > 0 || torneoActual?.cotejoId) {
+    tablaHTML += `<td style="padding:1px; text-align:center;">${tiempoTexto}</td>`;
+}
+        
+
+
+                
                 // Botones para mover peleas (solo si no hay cotejo guardado Y tiene permiso)
                 const cotejoGuardadoEnFirebase = torneoActual?.cotejoId ? true : false;
                 const puedeMover = !cotejoGuardadoEnFirebase && PERMISOS_USUARIO.posicion === true;
@@ -1796,18 +2864,73 @@ window.limpiarResultadosCotejo = () => {
             tablaHTML += `</tbody></table></div>`;
             
           
-            
-            container.innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:15px;">
-                    <div style="background:#f0f7ff; padding:10px; border-radius:8px; text-align:center;"><div style="font-size:24px; font-weight:700;">${peleas}</div><div>Peleas</div></div>
-                    <div style="background:#fff3e0; padding:10px; border-radius:8px; text-align:center;"><div style="font-size:24px; font-weight:700;">${noEmparejados}</div><div>No emp.</div></div>
-                    <div style="background:#e8f5e8; padding:10px; border-radius:8px; text-align:center;"><div style="font-size:24px; font-weight:700;">${diferenciaMaxima}g</div><div>Dif. máx</div></div>
-                    <div style="background:#ffebee; padding:10px; border-radius:8px; text-align:center;"><div style="font-size:24px; font-weight:700;">${resultadosCotejo.metricas.conflictosConsecutivos || 0}</div><div>Conflictos</div></div>
-                </div>
-                 ${noEmparejadosHTML}
-                ${tablaHTML}
-               
-            `;
+          // Generar lista de conflictos detallada
+const conflictosDetallados = window._conflictosDetallados || [];
+let conflictosHTML = '';
+
+            //  CONDICIÓN: Ocultar conflictos si el cotejo está guardado
+const cotejoGuardado = torneoActual?.cotejoId ? true : false;
+//  SOLO mostrar si NO está guardado
+if (!cotejoGuardado) {
+    
+if (conflictosDetallados.length > 0) {
+    conflictosHTML = `
+        <div style="margin-top: 20px; margin-bottom: 10px; padding: 10px; background: #fff3e0; border-radius: 12px; border-left: 5px solid #ff9800;">
+            <div style="font-weight: 800; font-size: 16px; margin-bottom: 12px; color: #e65100;">
+                ⚠️ REPETICIONES SEGUIDAS (${conflictosDetallados.length}):
+            </div>
+            <div style="max-height: 300px; overflow-y: auto;">
+                ${conflictosDetallados.map(c => `
+                    <div style="padding: 3px; margin-bottom: 8px; background: white; border-radius: 8px; border-left: 6px solid ${c.tipo === 'PARTIDO' ? '#d32f2f' : '#2196f3'};">
+                        <div style="display: flex; align-items: center; gap: 1px; flex-wrap: wrap;">
+                            <span style="font-weight: 700; color: ${c.tipo === 'PARTIDO' ? '#d32f2f' : '#2196f3'}; min-width: 80px;">
+                                ${c.tipo === 'PARTIDO' ? '📋 PARTIDO' : '👤 REPRESENTANTE'}
+                            </span>
+                            <span style="font-family: monospace; font-size: 11px;">
+                                ${c.mensaje}
+                            </span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div style="margin-top: 10px; padding: 8px; background: #ffcc80; border-radius: 8px; font-size: 12px; text-align: center;">
+                💡 Sugerencia: Use los botones ▲▼🔄↗️ para reorganizar las peleas y evitar conflictos
+            </div>
+        </div>
+    `;
+} else if (resultadosCotejo.peleas.length > 0) {
+    conflictosHTML = `
+        <div style="margin-top: 20px; padding: 12px; background: #e8f5e9; border-radius: 12px; border-left: 5px solid #4caf50; text-align: center;">
+            Las peleas ya están ordenadas.
+        </div>
+    `;
+  }
+}
+
+container.innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:15px;">
+        <div style="background:#f0f7ff; padding:10px; border-radius:8px; text-align:center;">
+            <div style="font-size:24px; font-weight:700;">${peleas}</div>
+            <div>Peleas</div>
+        </div>
+        <div style="background:#fff3e0; padding:10px; border-radius:8px; text-align:center;">
+            <div style="font-size:24px; font-weight:700;">${noEmparejados}</div>
+            <div>No emp.</div>
+        </div>
+        <div style="background:#e8f5e8; padding:10px; border-radius:8px; text-align:center;">
+            <div style="font-size:24px; font-weight:700;">${diferenciaMaxima}g</div>
+            <div>Dif. máx</div>
+        </div>
+        <div style="background:#ffebee; padding:10px; border-radius:8px; text-align:center;">
+            <div style="font-size:24px; font-weight:700;">${resultadosCotejo.metricas.conflictosConsecutivos || 0}</div>
+            <div>Repeticiones</div>
+        </div>
+    </div>
+    ${noEmparejadosHTML}
+    ${tablaHTML}
+    ${conflictosHTML}
+`;  
+       
         }
         
         // ============================================================
@@ -1820,6 +2943,8 @@ window.limpiarResultadosCotejo = () => {
             resultadosCotejo.peleas.splice(indexOrigen, 1);
             resultadosCotejo.peleas.splice(indexDestino, 0, pelea);
             resultadosCotejo.peleas.forEach((p, idx) => { p.numero = idx + 1; });
+             //  RECALCULAR CONFLICTOS
+    resultadosCotejo.metricas.conflictosConsecutivos = calcularNumeroConflictos(resultadosCotejo.peleas);
             renderizarResultadosCotejo();
         }
         
@@ -1834,7 +2959,10 @@ window.limpiarResultadosCotejo = () => {
                 if (calificacionExistente.ganador === 'rojo') calificacionExistente.ganador = 'verde';
                 else if (calificacionExistente.ganador === 'verde') calificacionExistente.ganador = 'rojo';
             }
-            
+
+            //  RECALCULAR CONFLICTOS
+    resultadosCotejo.metricas.conflictosConsecutivos = calcularNumeroConflictos(resultadosCotejo.peleas);
+
             renderizarResultadosCotejo();
             AppState.addNotification(`🔄 Gallos intercambiados en pelea #${numeroPelea}`, 'success');
         }
@@ -2009,6 +3137,27 @@ window.limpiarResultadosCotejo = () => {
             if (peleaSeleccionadaActual) select.value = peleaSeleccionadaActual.indexOriginal;
             else if (valorActual && valorActual !== '') select.value = valorActual;
         }
+
+
+        function actualizarListaRepresentantes() {
+    // Extraer representantes únicos de partidosList
+    const representantesUnicos = [...new Set(partidosList.map(p => p.representante).filter(r => r && r.trim() !== ''))];
+    representantesList = representantesUnicos;
+    
+    // Actualizar el datalist de representantes en el formulario principal
+    const datalist = document.getElementById('representantes-list');
+    if (datalist) {
+        datalist.innerHTML = representantesUnicos.map(r => `<option value="${escapeHTML(r)}">`).join('');
+    }
+    
+    // Actualizar datalist en el modal de edición (si existe)
+    const editDatalist = document.getElementById('edit-representantes-list');
+    if (editDatalist) {
+        editDatalist.innerHTML = representantesUnicos.map(r => `<option value="${escapeHTML(r)}">`).join('');
+    }
+    
+    console.log(`📋 Representantes actualizados: ${representantesUnicos.length} encontrados`);
+}
         
         function cargarCalificacionesExistentes() {
 
@@ -2030,6 +3179,13 @@ window.limpiarResultadosCotejo = () => {
             }
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
+
+        setTimeout(() => {
+    if (typeof renderizarTablaPosiciones === 'function') {
+        renderizarTablaPosiciones();
+    }
+}, 100);
+        
         }
         
         window.cambioPeleaSelect = (indexStr) => {
@@ -2093,7 +3249,9 @@ window.limpiarResultadosCotejo = () => {
                     <div>Tiempo: ${calificacionExistente.tiempo}</div>
                     <div style="margin-top:10px; display:flex; gap:10px;">
                         <button onclick="confirmarReCalificar()" style="background:#ff9800; color:white; border:none; padding:8px 16px; border-radius:8px;">✏️ RECALIFICAR</button>
-                        <button onclick="eliminarCalificacionPelea(${index})" style="background:#f44336; color:white; border:none; padding:8px 16px; border-radius:8px;">🗑️ ELIMINAR</button>
+                        <button onclick="eliminarCalificacionPelea(${index})"  class="btn-danger"  style="color:white; border:none; padding:8px 16px; border-radius:8px;">🗑️ ELIMINAR</button>
+                     <button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none'; document.getElementById('calificacion-usuario-info').innerHTML='';" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">✖️ CANCELAR</button>
+                     
                     </div>
                 `;
                 document.getElementById('calificacion-formulario').style.display = 'none';
@@ -2192,9 +3350,18 @@ window.limpiarResultadosCotejo = () => {
             }
             
             calificacionesCargadas.set(index, calificacionData);
+            vibrarFuerte();
+
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
             window.limpiarSeleccionPelea();
+
+            // Después de calificacionesCargadas.set(index, calificacionData);
+setTimeout(() => {
+    if (typeof renderizarTablaPosiciones === 'function') {
+        renderizarTablaPosiciones();
+    }
+}, 50);
             
             if (calificacionesCargadas.size === resultadosCotejo.peleas.length) {
                 AppState.addNotification('✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!', 'success', 5000);
@@ -2221,9 +3388,18 @@ window.limpiarResultadosCotejo = () => {
             }
             
             calificacionesCargadas.delete(index);
+            vibrarFuerte();
+
             actualizarComboboxCalificacion();
             renderizarResultadosCotejo();
             window.limpiarSeleccionPelea();
+            
+            setTimeout(() => {
+    if (typeof renderizarTablaPosiciones === 'function') {
+        renderizarTablaPosiciones();
+    }
+}, 50);
+            
             AppState.addNotification('✅ Calificación eliminada', 'success');
         };
         
@@ -2237,7 +3413,7 @@ window.limpiarResultadosCotejo = () => {
         // FUNCIONES DE PDF Y DESCARGA
         // ============================================================
         
-        window.mostrarModalDescargaCotejo = () => {
+      window.mostrarModalDescargaCotejo = () => {
     if (!resultadosCotejo || resultadosCotejo.peleas.length === 0) {
         AppState.addNotification('❌ No hay resultados de cotejo para descargar', 'warning');
         return;
@@ -2254,57 +3430,154 @@ window.limpiarResultadosCotejo = () => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-        <div class="modal-container" style="max-width:380px;">
-            <h3 style="text-align:center; margin-bottom:20px;">📥 DESCARGAR COTEJO</h3>
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">ESTILO DE TABLA</label>
-                <div style="display:flex; gap:10px;">
-                    <label style="flex:1; padding:10px; border:2px solid #8B4513; border-radius:12px; text-align:center; cursor:pointer;" id="formato-pdf-label">
-                        <input type="radio" name="formato" value="pdf" checked style="display:none;"> 📄 PDF
+        <div class="modal-container" style="max-width:400px;">
+            <h3 style="text-align:center; margin-bottom:20px;">📥 DESCARGAR ARCHIVOS</h3>
+            
+            <!-- SECCIÓN 1: ESTILO TABLA COTEJO -->
+            <div style="margin-bottom:20px; border:1px solid #ddd; border-radius:12px; padding:12px;">
+                <div style="font-weight:700; margin-bottom:12px;">ESTILO DE TABLA COTEJO</div>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom: 20px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="radio" name="formato" value="pdf" checked style="margin:0;"> 📄 NORMAL
                     </label>
-                    <label style="flex:1; padding:10px; border:2px solid #ddd; border-radius:12px; text-align:center; cursor:pointer;" id="formato-imagen-label">
-                        <input type="radio" name="formato" value="imagen" style="display:none;"> 🖼️ EXTENDIDO
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="radio" name="formato" value="imagen" style="margin:0;"> 🖼️ EXTENDIDO
                     </label>
+                    <select id="num-vallines-select" class="form-input" style="width:auto; flex:1; min-width:140px; margin:0;">
+                        ${opcionesVallines}
+                    </select>
+                </div>
+
+                <!-- BOTONES FINALES -->
+            <div style="display:flex; gap:10px; ">
+                <button id="confirmar-descarga" class="btn-success" style="flex:1; padding:12px; border-radius:30px; font-weight:900;">✅ DESCARGAR</button>
+                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:30px; font-weight:900; cursor:pointer;">❌ CANCELAR</button>
+            </div>
+            </div>
+            
+            <!-- SECCIÓN 2: ESTILO TABLA POSICIÓN -->
+            <div style="margin-bottom:20px; border:1px solid #ddd; border-radius:12px; padding:12px;">
+                <div style="font-weight:700; margin-bottom:12px;">TABLA POSICIÓN</div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button id="btn-descargar-pdf-posicion" class="btn-primary" style="flex:1; background:#2196F3;">📄 PDF</button>
+                    <button id="btn-descargar-jpg-posicion" class="btn-primary" style="flex:1; background:#4CAF50;">🖼️  JPG</button>
                 </div>
             </div>
+            
+            <!-- BOTÓN EXPORTAR JSON -->
             <div style="margin-bottom:20px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">NÚMERO DE VALLINES</label>
-                <select id="num-vallines-select" class="form-input">${opcionesVallines}</select>
+                <button id="btn-json-modal" class="btn-primary" style="width:100%; background:#FF9800; padding:12px;">📦 EXPORTAR JSON</button>
             </div>
-            <div style="margin-bottom:15px; border-top:1px solid #ddd; padding-top:15px;">
-                <button id="btn-json-modal" onclick="window.generarDescargaCotejoJSON(); this.closest('.modal-overlay').remove();" class="btn-primary" style="width:100%; padding:12px; background:#2196F3;">📦 EXPORTAR JSON</button>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button id="confirmar-descarga" class="btn-success" style="flex:2;">✅ DESCARGAR ${totalPeleas > 0 ? 'PDF' : ''}</button>
-                <button id="cancelar-descarga" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
-            </div>
+            
+             
         </div>
     `;
     document.body.appendChild(overlay);
+    
+    // Manejar botón PDF de tabla posición (función placeholder)
+    document.getElementById('btn-descargar-pdf-posicion').onclick = () => {
+        AppState.addNotification('📄 Descargar PDF de tabla posición - Función en desarrollo', 'info');
+        // Aquí puedes llamar a tu función existente de PDF de posición
+        if (typeof window.descargarPDFPosicion === 'function') {
+            window.descargarPDFPosicion();
+        }
+    };
+    
+    // Manejar botón JPG de tabla posición (función placeholder)
+    document.getElementById('btn-descargar-jpg-posicion').onclick = () => {
+        AppState.addNotification('🖼️ Descargar JPG de tabla posición - Función en desarrollo', 'info');
+        if (typeof window.descargarJPGPosicion === 'function') {
+            window.descargarJPGPosicion();
+        }
+    };
+    
+    // Manejar botón JSON
+    document.getElementById('btn-json-modal').onclick = () => {
+        if (typeof window.generarDescargaCotejoJSON === 'function') {
+            window.generarDescargaCotejoJSON();
+        }
+        overlay.remove();
+    };
+    
+    // Manejar botón PDF principal
+    document.getElementById('confirmar-descarga').onclick = () => {
+        const formato = document.querySelector('input[name="formato"]:checked')?.value || 'pdf';
+        const numVallines = parseInt(document.getElementById('num-vallines-select').value, 10);
+        if (typeof window.generarPDFNativo === 'function') {
+            window.generarPDFNativo(numVallines, formato);
+        }
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelar-descarga').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+};
 
-            
-            const pdfLabel = document.getElementById('formato-pdf-label');
-            const imagenLabel = document.getElementById('formato-imagen-label');
-            pdfLabel.onclick = () => {
-                document.querySelector('input[name="formato"][value="pdf"]').checked = true;
-                pdfLabel.style.borderColor = '#8B4513';
-                imagenLabel.style.borderColor = '#ddd';
-            };
-            imagenLabel.onclick = () => {
-                document.querySelector('input[name="formato"][value="imagen"]').checked = true;
-                imagenLabel.style.borderColor = '#8B4513';
-                pdfLabel.style.borderColor = '#ddd';
-            };
-            
-            document.getElementById('confirmar-descarga').onclick = () => {
-                const formato = document.querySelector('input[name="formato"]:checked')?.value || 'pdf';
-                const numVallines = parseInt(document.getElementById('num-vallines-select').value, 10);
-                generarPDFNativo(numVallines, formato);
-                overlay.remove();
-            };
-            document.getElementById('cancelar-descarga').onclick = () => overlay.remove();
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-        };
+
+
+        // Función para descargar PDF de la tabla de posiciones
+window.descargarPDFPosicion = () => {
+    const tablaPosicion = document.getElementById('tabla-posiciones-content');
+    if (!tablaPosicion || !tablaPosicion.querySelector('table')) {
+        AppState.addNotification('❌ No hay tabla de posiciones para descargar', 'warning');
+        return;
+    }
+    
+    const ventana = window.open('', '_blank');
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Tabla de Posiciones - ${torneoActual?.nombre || 'Torneo'}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .titulo { text-align: center; margin-bottom: 20px; }
+                .titulo h1 { margin: 0; color: #8B4513; }
+                .fecha { text-align: center; color: #666; margin-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+                th { background: #8B4513; color: white; }
+                @media print { body { margin: 0; padding: 10px; } }
+            </style>
+        </head>
+        <body>
+            <div class="titulo"><h1>${torneoActual?.nombre || 'TORNEO'}</h1></div>
+            <div class="fecha">Fecha: ${torneoActual?.fecha || obtenerFechaHoy()} | Palenque: ${torneoActual?.palenque || 'No especificado'}</div>
+            ${tablaPosicion.querySelector('table').outerHTML}
+        </body>
+        </html>
+    `;
+    ventana.document.write(html);
+    ventana.document.close();
+    setTimeout(() => ventana.print(), 500);
+};
+
+// Función para descargar JPG de la tabla de posiciones
+window.descargarJPGPosicion = () => {
+    const tablaPosicion = document.getElementById('posiciones-container');
+    if (!tablaPosicion || !tablaPosicion.querySelector('table')) {
+        AppState.addNotification('❌ No hay tabla de posiciones para capturar', 'warning');
+        return;
+    }
+    
+    AppState.addNotification('📸 Capturando tabla de posiciones...', 'info');
+    
+    html2canvas(tablaPosicion, {
+        scale: 2,
+        backgroundColor: '#ffffff'
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `tabla_posiciones_${torneoActual?.nombre || 'torneo'}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        AppState.addNotification('✅ JPG descargado correctamente', 'success');
+    }).catch(error => {
+        console.error('Error al capturar:', error);
+        AppState.addNotification('❌ Error al generar la imagen', 'error');
+    });
+};
+
+
         
         function generarPDFNativo(numVallines, estilo) {
             const totalPeleas = resultadosCotejo.peleas.length;
@@ -2428,6 +3701,50 @@ window.limpiarResultadosCotejo = () => {
         return;
     }
     
+    // 🔥 IMPORTANTE: Reconstruir calificaciones con el índice CORRECTO basado en el número de pelea
+    const calificacionesCorregidas = [];
+    
+    for (const [indexOriginal, cal] of calificacionesCargadas.entries()) {
+        // Obtener el número de pelea de la calificación
+        const numeroPelea = cal.numero;
+        
+        // Buscar en qué posición está AHORA esa pelea (después del reordenamiento)
+        const nuevoIndex = resultadosCotejo.peleas.findIndex(p => p.numero === numeroPelea);
+        
+        if (nuevoIndex !== -1) {
+            calificacionesCorregidas.push({
+                indicePelea: nuevoIndex,  // ← Usar el índice CORRECTO
+                calificada: true,
+                diferencia: cal.diferencia || 0,
+                fechaCalificacion: cal.fechaCalificacion,
+                gallo1: {
+                    anillo: cal.gallo1?.anillo || '',
+                    color: cal.gallo1?.color || '',
+                    partido: cal.gallo1?.partido || '',
+                    partidoId: cal.gallo1?.partidoId || '',
+                    peso: cal.gallo1?.peso || 0,
+                    puntos: cal.gallo1?.puntos || 0,
+                    representante: cal.gallo1?.representante || ''
+                },
+                gallo2: {
+                    anillo: cal.gallo2?.anillo || '',
+                    color: cal.gallo2?.color || '',
+                    partido: cal.gallo2?.partido || '',
+                    partidoId: cal.gallo2?.partidoId || '',
+                    peso: cal.gallo2?.peso || 0,
+                    puntos: cal.gallo2?.puntos || 0,
+                    representante: cal.gallo2?.representante || ''
+                },
+                ganador: cal.ganador,
+                numero: cal.numero,
+                tiempo: cal.tiempo,
+                timestamp: cal.timestamp || Date.now(),
+                usuarioCalifico: cal.usuarioCalifico,
+                usuarioId: cal.usuarioId || 'admin_offline'
+            });
+        }
+    }
+    
     const datosCompletos = {
         infoTorneo: {
             id: torneoActual.id,
@@ -2468,16 +3785,7 @@ window.limpiarResultadosCotejo = () => {
                 motivo: item.motivo
             }))
         } : null,
-        calificaciones: Array.from(calificacionesCargadas.entries()).map(([index, cal]) => ({
-            indicePelea: index,
-            numero: cal.numero,
-            ganador: cal.ganador,
-            tiempo: cal.tiempo,
-            usuarioCalifico: cal.usuarioCalifico,
-            fechaCalificacion: cal.fechaCalificacion,
-            puntosGallo1: cal.gallo1?.puntos,
-            puntosGallo2: cal.gallo2?.puntos
-        }))
+        calificaciones: calificacionesCorregidas  // ← Usar el array corregido
     };
     
     const jsonStr = JSON.stringify(datosCompletos, null, 2);
@@ -2488,7 +3796,7 @@ window.limpiarResultadosCotejo = () => {
     a.download = `${torneoActual.nombre || 'torneo'}_${torneoActual.fecha || 'fecha'}_export.json`.replace(/[^a-z0-9_\-]/gi, '_');
     a.click();
     URL.revokeObjectURL(url);
-    AppState.addNotification(`✅ Datos exportados a JSON`, 'success');
+    AppState.addNotification(`✅ Datos exportados a JSON con calificaciones correctas`, 'success');
 };
         
         window.generarPDFCotejo = () => {
@@ -2608,9 +3916,68 @@ window.limpiarResultadosCotejo = () => {
                                 noEmparejados: datos.resultadosCotejo.noEmparejados || [],
                                 configuracion: torneoData.config
                             };
+
+                                                        // ========== INICIO: IMPORTAR CALIFICACIONES ==========
+                            if (datos.calificaciones && datos.calificaciones.length > 0) {
+                                console.log(`📝 Importando ${datos.calificaciones.length} calificaciones...`);
+                                
+                                datos.calificaciones.forEach(calImport => {
+                                    const indicePelea = calImport.indicePelea;
+                                    
+                                    if (indicePelea >= 0 && indicePelea < torneoData.cotejoData.peleas.length) {
+                                        const peleaExistente = torneoData.cotejoData.peleas[indicePelea];
+                                        
+                                        // Asignar puntos según el ganador
+                                        let puntosRojo = 0, puntosVerde = 0;
+                                        const puntosConfig = torneoData.puntosConfig;
+                                        
+                                        if (calImport.ganador === 'rojo') {
+                                            puntosRojo = puntosConfig.ganador;
+                                            puntosVerde = puntosConfig.perdedor;
+                                        } else if (calImport.ganador === 'verde') {
+                                            puntosRojo = puntosConfig.perdedor;
+                                            puntosVerde = puntosConfig.ganador;
+                                        } else if (calImport.ganador === 'empate') {
+                                            puntosRojo = puntosConfig.empate;
+                                            puntosVerde = puntosConfig.empate;
+                                        }
+                                        
+                                        // Actualizar la pelea con la calificación
+                                        torneoData.cotejoData.peleas[indicePelea] = {
+                                            ...peleaExistente,
+                                            calificada: true,
+                                            diferencia: calImport.diferencia || peleaExistente.diferencia,
+                                            fechaCalificacion: calImport.fechaCalificacion || new Date().toLocaleString(),
+                                            ganador: calImport.ganador,
+                                            tiempo: calImport.tiempo,
+                                            timestamp: calImport.timestamp || Date.now(),
+                                            usuarioCalifico: calImport.usuarioCalifico || 'Importado',
+                                            usuarioId: calImport.usuarioId || 'importado',
+                                            gallo1: {
+                                                ...peleaExistente.gallo1,
+                                                puntos: puntosRojo
+                                            },
+                                            gallo2: {
+                                                ...peleaExistente.gallo2,
+                                                puntos: puntosVerde
+                                            }
+                                        };
+                                    }
+                                });
+                                
+                                // Actualizar métrica de peleas calificadas
+                                const calificadasCount = torneoData.cotejoData.peleas.filter(p => p.calificada === true).length;
+                                torneoData.cotejoData.metricas.peleasCalificadas = calificadasCount;
+                                console.log(`🏆 Total de peleas calificadas importadas: ${calificadasCount}`);
+                            }
+                            // ========== FIN: IMPORTAR CALIFICACIONES ==========
+
+                            
                         }
                         
                         guardarTorneoEnStorage(torneoData);
+                        vibrarFuerte();
+
                        torneosAnteriores = JSON.parse(localStorage.getItem(STORAGE_KEYS.TORNEOS_LIST) || '[]');
                         
                         torneoActual = torneoData;
@@ -2634,6 +4001,8 @@ window.limpiarResultadosCotejo = () => {
                         }
                         partidosList = nuevosPartidos;
                         ultimoAnillo = maxRing;
+
+                        actualizarListaRepresentantes();
                         
                         configuracion = {
                             gallosPorPartido: torneoData.config.gallosPorPartido,
@@ -2655,6 +4024,24 @@ window.limpiarResultadosCotejo = () => {
                         }
                         
                         actualizarPantalla();
+
+                        // ACTUALIZAR EL SELECTOR DE TORNEOS EN EL HEADER
+setTimeout(() => {
+    const selectorTorneos = document.getElementById('header-torneo-selector');
+    if (selectorTorneos) {
+        // Guardar el ID del torneo actual
+        const torneoActualId = torneoActual?.id;
+        
+        // Generar nuevas opciones
+        let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+        torneosAnteriores.forEach(t => {
+            opciones += `<option value="${t.id}" ${t.id === torneoActualId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+        });
+        selectorTorneos.innerHTML = opciones;
+        console.log('🔄 Selector de torneos actualizado después de importar');
+    }
+}, 100);
+                        
                         resolve(true);
                     } catch (error) { reject(error); }
                 };
@@ -2662,7 +4049,11 @@ window.limpiarResultadosCotejo = () => {
                 reader.readAsText(archivo);
             });
         }
-        
+
+
+
+
+    
         async function mostrarModalPreviewImportacion() {
             if (!archivoSeleccionado) {
                 AppState.addNotification('❌ Primero selecciona un archivo JSON', 'error');
@@ -2683,8 +4074,8 @@ window.limpiarResultadosCotejo = () => {
                             <div><strong>⚡ Peleas:</strong> ${preview.cantidadPeleas}</div>
                         </div>
                         <div style="display:flex; gap:10px;">
-                            <button id="confirmar-importar" class="btn-success" style="flex:2;">✅ IMPORTAR</button>
-                            <button id="cancelar-importar" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
+                            <button id="confirmar-importar" class="btn-success" style="flex:2; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">✅ IMPORTAR</button>
+                            <button id="cancelar-importar" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">CANCELAR</button>
                         </div>
                     </div>
                 `;
@@ -2703,12 +4094,16 @@ window.limpiarResultadosCotejo = () => {
                         
                     } catch (error) {
                         AppState.addNotification(`❌ ${error.message}`, 'error');
+                        vibrarError();
+
                     }
                 };
                 document.getElementById('cancelar-importar').onclick = () => overlay.remove();
                 overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
             } catch (error) {
                 AppState.addNotification(`❌ ${error.message}`, 'error');
+                vibrarError();
+
             }
         }
         
@@ -2767,6 +4162,8 @@ window.limpiarResultadosCotejo = () => {
         }
         
         function mostrarModalEdicionPartido(partidoNombre, gallos) {
+                vibrarSuave();
+
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
             const representante = gallos[0]?.representante || '';
@@ -2824,21 +4221,26 @@ window.limpiarResultadosCotejo = () => {
                     });
                 }
                 guardarEdicionPartido(partidoNombre, nuevoNombre, nuevoRepresentante, gallosEditados);
+                    vibrarFuerte();
+
                 overlay.remove();
                 actualizarPantallaLigera();
             };
             document.getElementById('eliminar-partido-edicion').onclick = () => {
-                if (confirm(`¿Eliminar el partido "${partidoNombre}"?`)) {
-                    eliminarPartido(partidoNombre);
-                    overlay.remove();
-                    actualizarPantalla();
-                }
-            };
+                    vibrarFuerte();
+
+    // Cerrar el modal de edición primero
+    overlay.remove();
+    // Llamar a eliminarPartido que YA tiene su propio modal bonito
+    eliminarPartido(partidoNombre);
+};
             document.getElementById('cancelar-edicion-partido').onclick = () => overlay.remove();
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
         }
         
         function mostrarModalEdicionGallo(gallo) {
+                vibrarSuave();
+
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
             overlay.innerHTML = `
@@ -2869,6 +4271,8 @@ window.limpiarResultadosCotejo = () => {
             document.body.appendChild(overlay);
             
             document.getElementById('guardar-edicion-gallo').onclick = async () => {
+                    vibrarFuerte();
+
                 const nuevoAnillo = document.getElementById('edit-gallo-anillo').value.trim();
                 const nuevoPeso = parseInt(document.getElementById('edit-gallo-peso').value, 10) || 0;
                 const nuevoColor = document.getElementById('edit-gallo-color')?.value || '';
@@ -2879,13 +4283,13 @@ window.limpiarResultadosCotejo = () => {
                 overlay.remove();
                 actualizarPantallaLigera();
             };
+            
             document.getElementById('eliminar-gallo-edicion').onclick = () => {
-                if (confirm(`¿Eliminar el gallo ${gallo.anillo}?`)) {
-                    eliminarGallo(gallo.partidoNombre, gallo.anillo);
-                    overlay.remove();
-                    actualizarPantalla();
-                }
-            };
+                    vibrarFuerte();
+
+    overlay.remove();
+    eliminarGallo(gallo.partidoNombre, gallo.anillo);
+};
             document.getElementById('cancelar-edicion-gallo').onclick = () => overlay.remove();
             overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
         }
@@ -2949,8 +4353,8 @@ window.limpiarResultadosCotejo = () => {
             <div id="admin-main-container" style="padding:1px; max-width:1200px; margin:0 auto;">
                 <!-- HEADER -->
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                    <h1 style="margin:0 0 10px; color:#8B4513; font-size:28px; text-align:center;">🐓 ${torneoActual?.nombre || 'Torneo'}</h1>
-                    <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; font-size:13px; color:#666;">
+                    <h1 style="margin:0 0 1px; color:#8B4513; font-size:28px; text-align:center;"> ${torneoActual?.nombre || 'Torneo'}</h1>
+                    <div style="display:flex; flex-wrap:wrap; gap:3px; justify-content:center; font-size:13px; color:#666;">
                         <span>📅 ${torneoActual?.fecha || obtenerFechaHoy()}</span>
                         <span>🏟️ ${torneoActual?.palenque || 'Sin palenque'}</span>
                         <span>📋 Partidos: <strong class="header-estadisticas-partidos">${contarPartidosUnicos()}</strong></span>
@@ -2976,13 +4380,21 @@ window.limpiarResultadosCotejo = () => {
                     <div id="config-content" style="display:none; background:#334155; padding:16px;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                             <select id="config-gallos" onchange="window.cambiarGallosPorPartido(this.value)" class="form-input" style="background:white;">
-                                <option value="1">1 GALLO</option><option value="2">2 GALLOS</option>
+                                 <option value="0">🐓 GALLOS POR PARTIDO</option>
+                                <option value="1">1 GALLO (Agregar Comodin)</option>
+                                <option value="2">2 GALLOS</option>
                                 <option value="3" ${configuracion.gallosPorPartido === 3 ? 'selected' : ''}>3 GALLOS</option>
                                 <option value="4">4 GALLOS</option><option value="5">5 GALLOS</option><option value="6">6 GALLOS</option>
                             </select>
                             <label style="display:flex; align-items:center; gap:8px; background:white; padding:10px; border-radius:8px;">
                                 <input type="checkbox" id="config-anillos-editables" ${configuracion.anillosEditables ? 'checked' : ''} onchange="window.actualizarAnillosEditables(this.checked)"> ✏️ EDITAR ANILLOS
                             </label>
+                            
+                             <!-- 🌙 BOTÓN MODO DÍA/NOCHE -->
+    <button id="darkModeToggleBtn" onclick="window.toggleDarkMode()" style="background:white; border:1px solid #8B4513; border-radius:8px; padding:10px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <span id="darkModeIcon">🌙</span> MODO NOCHE
+    </button>
+    
                             <label style="display:flex; align-items:center; gap:8px; background:white; padding:10px; border-radius:8px;">
                                 <input type="checkbox" id="config-registro-detallado" ${configuracion.registroDetalladoActivo ? 'checked' : ''} onchange="window.actualizarRegistroDetallado(this.checked)"> 🎨 AGREGAR COLOR
                             </label>
@@ -3004,7 +4416,7 @@ window.limpiarResultadosCotejo = () => {
                 <!-- REGISTRO DE PARTIDOS (solo si no hay cotejo) -->
                ${(!hayResultadosCotejo || resultadosCotejo.peleas.length === 0) ? `
 
-                <div style="background:white; border-radius:16px; padding:16px; margin-bottom:16px;">
+                <div style="background:white; border-radius:16px; padding:16px; margin-bottom:60px;">
                     <h3 style="margin-bottom:15px;">📝 Registrar Partido</h3>
                     <div style="display:flex; gap:8px; margin-bottom:15px;">
                         <input type="text" id="match-name" list="match-names-list-${serialIdActual || 'general'}" placeholder="Nombre del Partido *" class="form-input" style="flex:2;" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
@@ -3017,86 +4429,506 @@ window.limpiarResultadosCotejo = () => {
                     <button id="registrar-partido-btn" onclick="window.registrarPartido()" class="btn-success" style="width:100%; padding:16px; border-radius:12px; font-weight:700; margin-top:15px;">✅ REGISTRAR PARTIDO</button>
                 </div>
                 
-                <!-- TABLA DE PARTIDOS -->
-                <div style="background:white; border-radius:16px; padding:1px; overflow-x:auto;">
-                    <h3 style="margin-bottom:15px;">📋 Tabla de Registro</h3>
-                    <table style="width:100%; border-collapse:collapse;">
-                        <thead>${headerColumnas}</thead>
-                        <tbody>${tablaHTML}</tbody>
-                    </table>
-                </div>
+           <!-- TABLA DE PARTIDOS -->
+<div style="background:white; border-radius:16px; padding:1px; overflow-x:auto;">
+    <div style="display: flex; flex-direction: column; margin-bottom: 15px; gap: 12px;">
+<h3 id="titulo-tabla-registro" style="margin: 0;">📋 Tabla de Registro</h3>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <select id="cotejo-modo-header" style="width: 100%; padding: 12px; border: 2px solid #8B4513; border-radius: 8px; font-size: 14px; font-weight: 500; background: white;">
+                <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
+                <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
+                <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
+                <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Urgente)</option>
+            </select>
+            <button onclick="window.ejecutarCotejo()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 30px; font-weight: 700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'GENERAR CRUCES'}</button>
+        </div>
+    </div>
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>${headerColumnas}</thead>
+        <tbody>${tablaHTML}</tbody>
+    </table>
+</div>
                 ` : ''}
                 
-                <!-- MÓDULO DE CALIFICACIÓN (solo si hay cotejo guardado) -->
-                ${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
-                <div style="background:white; border-radius:16px; padding:16px; margin-top:16px; border-top:4px solid #FFD700;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <span style="font-weight:700;">🏆 CALIFICACIONES:</span>
-                        <span style="background:#4CAF50; color:white; padding:4px 10px; border-radius:20px; font-size:12px;">ACTIVO</span>
-                    </div>
-                    <select id="calificacion-peleas-select" onchange="window.cambioPeleaSelect(this.value)" class="form-input" style="margin-bottom:15px;">
-                        ${generarOpcionesComboboxCalificacion()}
-                    </select>
-                    <div id="calificacion-usuario-info" style="font-size:12px; color:#666; margin-bottom:10px;"></div>
-                    <div id="calificacion-detalle-pelea" style="display:none;"></div>
-                    <div id="calificacion-formulario" style="display:none;">
-                        <div class="grid-2" style="gap:15px; margin-bottom:15px;">
-                            <div><label>⏱️ TIEMPO:</label><input type="text" id="calificacion-tiempo" placeholder="MM:SS" maxlength="5" class="form-input" style="font-size:24px; text-align:center;" onkeyup="formatearTiempo(this)"></div>
-                            <div><label>🏆 GANADOR:</label><select id="calificacion-ganador" class="form-input"></select></div>
-                        </div>
-                        <div style="background:#f8f9fa; padding:12px; border-radius:8px; display:flex; justify-content:space-around; margin-bottom:15px;">
-                            <span>GANADOR: <strong id="puntos-ganador-info">${puntosConfiguracion.ganador}</strong> pts</span>
-                            <span>EMPATE: <strong id="puntos-empate-info">${puntosConfiguracion.empate}</strong> pts</span>
-                            <span>PERDEDOR: <strong id="puntos-perdedor-info">${puntosConfiguracion.perdedor}</strong> pts</span>
-                        </div>
-<button id="btn-calificar-pelea" onclick="window.calificarPelea()" class="btn-success" style="width:100%; border-radius:30px; padding:14px; font-weight:700; font-size:16px;">⚡ CALIFICAR PELEA</button>
+              <!-- MÓDULO DE CALIFICACIÓN (solo si hay cotejo guardado) -->
+${cotejoGuardado && PERMISOS_USUARIO.cotejo ? `
+<div style="position: sticky; top: 0; z-index: 100; background: blue; border-radius: 12px; padding: 2px; margin-top: 16px; border-top: 3px solid #FFD700; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+    <!-- TÍTULO flex:1 + COMBOBOX flex:3 EN LA MISMA LÍNEA -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1px;">
+        <div style="flex: 1.7;">
+<span style="font-weight: 900; font-size: clamp(8px, 4vw, 28px);">🏆CALIFICAR</span>
 </div>
-                    <div id="calificacion-info-anterior" style="display:none; background:#fff3cd; padding:15px; border-radius:8px; margin-top:10px;"></div>
-                    <div id="calificacion-todas-mensaje" style="display:none; background:#4CAF50; color:white; padding:15px; border-radius:8px; text-align:center;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
-                </div>
-                ` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding:15px; border-radius:12px; text-align:center;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
+        <div style="flex: 4;">
+            <select id="calificacion-peleas-select" onchange="window.cambioPeleaSelect(this.value)" class="form-input" style="margin: 0; padding: 9px 17px 7px 1px; font-size: 15px;">
+                ${generarOpcionesComboboxCalificacion()}
+            </select>
+        </div>
+    </div>
+    
+    <div id="calificacion-usuario-info" style="font-size: 9px; color: #666;"></div>
+    <div id="calificacion-detalle-pelea" style="display:none;"></div>
+    <div id="calificacion-formulario" style="display:none;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px;">
+            <div><label style="font-size: 12px;">⏱️ TIEMPO</label><input type="text" id="calificacion-tiempo" placeholder="MM:SS" maxlength="5" class="form-input" style="font-size: 22px; text-align:center; padding: 8px;" onkeyup="formatearTiempo(this)"></div>
+            <div><label style="font-size: 12px;">🏆 GANADOR</label><select id="calificacion-ganador" class="form-input" style="padding: 8px;"></select></div>
+        </div>
+        <div style="background:#f8f9fa; padding: 8px; border-radius: 6px; display: flex; justify-content: space-around; margin-bottom: 12px; font-size: 12px;">
+            <span>GANADOR: <strong id="puntos-ganador-info">${puntosConfiguracion.ganador}</strong> pts</span>
+            <span>EMPATE: <strong id="puntos-empate-info">${puntosConfiguracion.empate}</strong> pts</span>
+            <span>PERDEDOR: <strong id="puntos-perdedor-info">${puntosConfiguracion.perdedor}</strong> pts</span>
+        </div>
+<button id="btn-calificar-pelea" onclick="window.calificarPelea()" class="btn-success" style="width:100%; border-radius:30px; padding:14px; font-weight:700; font-size:16px;">⚡ CALIFICAR PELEA</button>
+<button onclick="document.getElementById('calificacion-peleas-select').value=''; document.getElementById('calificacion-detalle-pelea').style.display='none'; document.getElementById('calificacion-formulario').style.display='none'; document.getElementById('calificacion-info-anterior').style.display='none'; document.getElementById('calificacion-usuario-info').innerHTML='';" class="btn-secondary" style="width:100%; border-radius:30px; padding:12px; font-weight:700; margin-top:10px; background: red; color:white; border:none; cursor:pointer;">✖️ CANCELAR</button>
+</div>
+<div id="calificacion-info-anterior" style="display:none; background:#fff3cd; padding:15px; border-radius:8px; margin-top:10px;"></div>
+<div id="calificacion-todas-mensaje" style="display:none; background:#4CAF50; color:white; padding: 10px; border-radius: 8px; text-align:center; font-size: 13px;">✅ ¡TODAS LAS PELEAS FUERON CALIFICADAS!</div>
+</div>
+
+` : (hayResultadosCotejo && !PERMISOS_USUARIO.cotejo ? `<div style="background:#f0f0f0; padding: 15px; border-radius: 12px; text-align:center; font-size: 13px;">🔒 No tienes permiso para calificar peleas.</div>` : '')}
+
                 
                <!-- MÓDULO DE COTEJO -->
-<div style="background:white; border-radius:16px; padding:16px; margin-top:16px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+<!-- MÓDULO DE COTEJO -->
+<div id="seccion-cotejo" style="background:white; border-radius:1px; padding:1px; margin-top:16px;">    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
         <div><span style="font-weight:700;">⚡ COTEJO</span> ${PERMISOS_USUARIO.cotejo ? '<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ACTIVO</span>' : '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">SIN SALDO</span>'}</div>
     </div>
 
     ${cotejoGuardado ? `
-    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700; font-size:16px;">📥 DESCARGAR PDF</button>
-<button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:12px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+<button id="btn-pdf" onclick="window.generarPDFCotejo()" class="btn-primary" style="flex:2; min-width:160px; padding:15px; border-radius:30px; font-weight:700;">📥 DESCARGAR</button>
+<button id="btn-eliminar-cotejo" onclick="window.eliminarCotejoGuardado()" class="btn-danger" style="flex:1; min-width:100px; padding:15px; border-radius:30px; font-weight:700;">🗑️ ELIMINAR</button>
 </div>
     ` : `
     <!-- FILA 1: Selector de modo y botón COTEJAR/REINTENTAR -->
-    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
-        <select id="cotejo-modo" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
-            <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
-            <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
-            <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
-            <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
-        </select>
-<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'COTEJAR AHORA'}</button>
-</div>
-    
-  ${hayResultadosCotejo ? `
-    <!-- FILA 2: Botones GUARDAR (solo si no hay no emparejados) y LIMPIAR -->
-    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+    <div style="display:flex; gap:10px; margin-bottom:1px; flex-wrap:wrap;">
+      <select id="cotejo-modo" style="flex:2; min-width:180px; padding:12px; border:2px solid #8B4513; border-radius:8px; font-size:14px; font-weight:500; background:white;">
+    <option value="ASCENDENTE" ${cotejoUltimoModo === 'ASCENDENTE' ? 'selected' : ''}>⬆️ ASCENDENTE (Livianos primero)</option>
+    <option value="DESCENDENTE" ${cotejoUltimoModo === 'DESCENDENTE' ? 'selected' : ''}>⬇️ DESCENDENTE (Pesados primero)</option>
+    <option value="ALEATORIO" ${cotejoUltimoModo === 'ALEATORIO' ? 'selected' : ''}>🎲 ALEATORIO</option>
+    <option value="INTELIGENTE" ${cotejoUltimoModo === 'INTELIGENTE' ? 'selected' : ''}>🤖 INTELIGENTE (Menor diferencia)</option>
+</select>
+
+           
+ ${hayResultadosCotejo ? `
+    <!-- FILA 2: Botones LIMPIAR (izquierda) y GUARDAR (derecha) -->
+    <div style="display:flex; gap:10px; margin-bottom:1px; flex-wrap:wrap; justify-content: space-between;">
+        <button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
         ${resultadosCotejo.noEmparejados && resultadosCotejo.noEmparejados.length === 0 ? `
         <button id="btn-guardar" onclick="window.guardarCotejo()" class="btn-success" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">💾 GUARDAR COTEJO</button>
         ` : ''}
-        <button id="btn-limpiar" onclick="window.limpiarResultadosCotejo()" class="btn-danger" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">🗑️ LIMPIAR RESULTADOS</button>
     </div>
 ` : ''}
+
+<button id="btn-cotejar" onclick="window.ejecutarCotejo()" class="btn-primary" style="flex:1; min-width:140px; padding:12px; border-radius:30px; font-weight:700;">⚡ ${hayResultadosCotejo ? 'REINTENTAR' : 'GENERAR CRUCES'}</button>
+</div>
+
+ 
     `}
     
     <div id="cotejo-resultados-container" style="margin-top:15px; overflow-x:auto;">
         ${hayResultadosCotejo ? '' : `<div style="text-align:center; padding:40px; color:#999;">⚡ Presiona COTEJAR para generar enfrentamientos</div>`}
     </div>
+
+    <!-- SECCIÓN TABLA DE POSICIONES -->
+<div id="posiciones-container" style="display: none; margin-top: 30px;">
+    <div class="posiciones-header" style="background: #333; color: white; padding: 1px; border-radius: 16px 16px 0 0; font-weight: bold; text-align: center;">
+</div>
+    <div id="tabla-posiciones-content">
+        <div class="no-posiciones">
+            <span>📊</span>
+            <p>Califica peleas para ver la tabla de posiciones</p>
+        </div>
+    </div>
+</div>
+
+
 </div>
             </div>
             `;
         }
+
+
+
+// ============================================================
+// FUNCIONES PARA TABLA DE POSICIONES
+// ============================================================
+function procesarTablaPosiciones() {
+    if (!resultadosCotejo || !resultadosCotejo.peleas || resultadosCotejo.peleas.length === 0) {
+        return [];
+    }
+    
+    const peleas = resultadosCotejo.peleas;
+    const partidoMap = new Map();
+    
+    // Obtener configuración de puntos del torneo
+    const puntosConfig = torneoActual?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+    
+    peleas.forEach((pelea, index) => {
+        // Buscar calificación (desde calificacionesCargadas)
+        const calificacion = calificacionesCargadas.get(index);
+        if (!calificacion) return;
+        
+        const gallo1 = pelea.gallo1;
+        const gallo2 = pelea.gallo2;
+        
+        // Función para inicializar partido en el mapa
+        const initPartido = (nombre) => {
+            if (!nombre) return null;
+            if (!partidoMap.has(nombre)) {
+                partidoMap.set(nombre, {
+                    puntos: 0,
+                    tiempo: 0,
+                    contadorGallos: 0  // ← SOLO contar gallos que SÍ pelearon
+                });
+            }
+            return partidoMap.get(nombre);
+        };
+        
+        // Convertir tiempo a segundos
+        const tiempoSegundos = convertirTiempoASegundos(calificacion.tiempo);
+        
+        // Procesar gallo1 (rojo) - SOLO si el gallo existe y tiene partido
+        if (gallo1 && gallo1.partido) {
+            const data = initPartido(gallo1.partido);
+            if (data) {
+                data.contadorGallos++;  // ← Incrementar SOLO cuando el gallo pelea
+                const numGallo = data.contadorGallos;
+                let puntosGallo = 0;
+                
+                if (calificacion.ganador === 'rojo') {
+                    puntosGallo = puntosConfig.ganador;
+                    data.tiempo += tiempoSegundos;
+                } else if (calificacion.ganador === 'empate') {
+                    puntosGallo = puntosConfig.empate;
+                    data.tiempo += tiempoSegundos;
+                } else {
+                    puntosGallo = puntosConfig.perdedor;
+                }
+                
+                data.puntos += puntosGallo;
+                // ✅ Guardar SOLO para el número de gallo que corresponde
+                data[`gallo${numGallo}_puntos`] = puntosGallo;
+                data[`gallo${numGallo}_tiempo`] = (calificacion.ganador === 'rojo' || calificacion.ganador === 'empate') ? tiempoSegundos : 0;
+            }
+        }
+        
+        // Procesar gallo2 (verde) - SOLO si el gallo existe y tiene partido
+        if (gallo2 && gallo2.partido) {
+            const data = initPartido(gallo2.partido);
+            if (data) {
+                data.contadorGallos++;  // ← Incrementar SOLO cuando el gallo pelea
+                const numGallo = data.contadorGallos;
+                let puntosGallo = 0;
+                
+                if (calificacion.ganador === 'verde') {
+                    puntosGallo = puntosConfig.ganador;
+                    data.tiempo += tiempoSegundos;
+                } else if (calificacion.ganador === 'empate') {
+                    puntosGallo = puntosConfig.empate;
+                    data.tiempo += tiempoSegundos;
+                } else {
+                    puntosGallo = puntosConfig.perdedor;
+                }
+                
+                data.puntos += puntosGallo;
+                // ✅ Guardar SOLO para el número de gallo que corresponde
+                data[`gallo${numGallo}_puntos`] = puntosGallo;
+                data[`gallo${numGallo}_tiempo`] = (calificacion.ganador === 'verde' || calificacion.ganador === 'empate') ? tiempoSegundos : 0;
+            }
+        }
+    });
+    
+    // Convertir mapa a array
+    let resultados = Array.from(partidoMap.entries()).map(([nombre, data]) => {
+        const resultado = {
+            nombre: nombre,
+            puntos: data.puntos,
+            tiempo: data.tiempo
+        };
+        
+        // ✅ SOLO agregar datos para los gallos que SÍ pelearon (hasta contadorGallos)
+        for (let i = 1; i <= data.contadorGallos; i++) {
+            resultado[`gallo${i}_puntos`] = data[`gallo${i}_puntos`] || 0;
+            resultado[`gallo${i}_tiempo`] = data[`gallo${i}_tiempo`] || 0;
+        }
+        // ⚠️ NO crear propiedades para gallos que no pelearon
+        
+        return resultado;
+    });
+    
+    // Ordenar: por puntos (mayor primero) y luego por tiempo (menor primero)
+    resultados.sort((a, b) => {
+        if (a.puntos !== b.puntos) return b.puntos - a.puntos;
+        return a.tiempo - b.tiempo;
+    });
+    
+    return resultados;
+}
+
+function convertirTiempoASegundos(tiempo) {
+    if (!tiempo) return 0;
+    const partes = tiempo.split(':');
+    if (partes.length === 2) {
+        return parseInt(partes[0]) * 60 + parseInt(partes[1]);
+    }
+    return 0;
+}
+
+function formatTiempo(segundos) {
+    if (!segundos && segundos !== 0) return '00:00';
+    
+    const horas = Math.floor(segundos / 3600);
+    const minutosRestantes = Math.floor((segundos % 3600) / 60);
+    const segs = segundos % 60;
+    
+    // Si hay horas (1 hora o más), mostrar HH:MM:SS
+    if (horas > 0) {
+        return `${horas.toString().padStart(2, '0')}:${minutosRestantes.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+    }
+    
+    // Si es menos de 1 hora, mostrar MM:SS
+    return `${minutosRestantes.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+}
+
+
+// Función para obtener los TOP N tiempos más rápidos de GANADORES
+function obtenerTopTiemposRapidos(partidosGanadores, topN = 4) {
+    // Recopilar todos los tiempos de los gallos que GANARON
+    const tiemposGanadores = [];
+    
+    for (const partido of partidosGanadores) {
+        for (let i = 1; i <= configuracion.gallosPorPartido; i++) {
+            const puntos = partido[`gallo${i}_puntos`];
+            const tiempo = partido[`gallo${i}_tiempo`];
+            
+            // Solo contar si el gallo GANÓ (puntos === puntosConfiguracion.ganador)
+            if (puntos !== undefined && puntos === puntosConfiguracion.ganador && tiempo > 0) {
+                tiemposGanadores.push({
+                    tiempo: tiempo,
+                    nombrePartido: partido.nombre,
+                    galloNum: i
+                });
+            }
+        }
+    }
+    
+    // Ordenar de menor a mayor (más rápido primero)
+    tiemposGanadores.sort((a, b) => a.tiempo - b.tiempo);
+    
+    // Devolver los top N (solo los tiempos, no los objetos completos)
+    return tiemposGanadores.slice(0, topN).map(t => t.tiempo);
+}
+
+        
+function renderizarTablaPosiciones() {
+    const container = document.getElementById('posiciones-container');
+    const contentDiv = document.getElementById('tabla-posiciones-content');
+    
+    if (!container || !contentDiv) {
+        console.log('⚠️ Elementos de posiciones no encontrados en el DOM');
+        return;
+    }
+    
+    // Verificar si hay cotejo guardado Y calificaciones
+    const tieneCotejo = torneoActual && torneoActual.cotejoData && torneoActual.cotejoData.peleas && torneoActual.cotejoData.peleas.length > 0;
+    const tieneCalificaciones = calificacionesCargadas && calificacionesCargadas.size > 0;
+    
+    if (!tieneCotejo || resultadosCotejo.peleas.length === 0 || !tieneCalificaciones) {
+        container.style.display = 'none';
+        console.log('Tabla de posiciones oculta: sin cotejo guardado o sin calificaciones');
+        return;
+    }
+    
+    container.style.display = 'block';
+
+
+  // Obtener estadísticas para el encabezado
+const totalPartidosUnicos = contarPartidosUnicos();
+const totalGallos = partidosList.length;
+
+// Calcular peso mínimo y máximo de TODOS los gallos registrados
+const pesosValidos = partidosList.filter(g => g.peso && g.peso > 0).map(g => g.peso);
+const pesoMinGlobal = pesosValidos.length > 0 ? Math.min(...pesosValidos) : 0;
+const pesoMaxGlobal = pesosValidos.length > 0 ? Math.max(...pesosValidos) : 0;
+
+// Calcular peleas calificadas vs total
+const totalPeleas = resultadosCotejo?.peleas?.length || 0;
+const peleasCalificadas = calificacionesCargadas.size;
+const peleasPendientes = totalPeleas - peleasCalificadas;
+
+// Diferencia máxima entre gallos en las peleas generadas
+const difMax = resultadosCotejo.peleas.length > 0 
+    ? Math.max(...resultadosCotejo.peleas.map(p => p.diferencia)) 
+    : 0;
+
+// Configuración de puntos
+const puntosG = puntosConfiguracion.ganador;
+const puntosE = puntosConfiguracion.empate;
+const puntosP = puntosConfiguracion.perdedor;
+
+// Modificar el encabezado dinámicamente
+const posicionesHeader = document.querySelector('#posiciones-container .posiciones-header');
+if (posicionesHeader) {
+    posicionesHeader.innerHTML = `
+        <div style="padding: 3px 8px;">
+            <!-- Título grande -->
+            <div style="font-size: clamp(20px, 6vw, 30px); font-weight: 900; color: #FFD700; text-shadow: 2px 2px 3px black; text-align: center; margin-bottom: 6px;">🏆 ${torneoActual?.nombre || 'TORNEO'}</div>
+            
+            <!-- FILA 1: 5 items -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px 8px; justify-items: center; font-size: clamp(8px, 2.8vw, 11px); color: #f0f0f0; background: rgba(0,0,0,0.2); padding: 2px 2px; border-radius: 25px; margin-bottom: 3px;">
+                <span>${torneoActual?.fecha || obtenerFechaHoy()}</span>
+                <span>${torneoActual?.palenque?.substring(0, 12) || 'No'}</span>
+                <span>Partidos: ${totalPartidosUnicos}</span>
+                <span>Gallos: ${totalGallos}</span>
+                <span> ${pesoMinGlobal}-${pesoMaxGlobal}g</span>
+            </div>
+            
+            <!-- FILA 2: 5 items -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 3px; justify-items: center; font-size: clamp(8px, 2.8vw, 11px); color: #f0f0f0; background: rgba(0,0,0,0.15); padding: 1px 2px; border-radius: 25px; margin-bottom: 6px;">
+                <span>Dif: ${difMax}g</span>
+                <span>Puntos: ${puntosG}/${puntosE}/${puntosP}</span>
+                <span>Peleas: ${totalPeleas}</span>
+                                <span>⭐Calificadas: ${peleasCalificadas}</span>
+       <span>⚠️${peleasPendientes} pendientes.</span>
+
+            </div>
+            
+            <!-- FILA 3: Slogan a todo lo ancho -->
+            <div style="text-align: center; font-size: clamp(8px, 2.8vw, 15px); color: #FFD700; background: rgba(0,0,0,0.3); padding: 2px 2px; border-radius: 20px;">
+                🔒 LEGALIDAD QUE RESPALDA TU PASIÓN - IMPARCIALIDAD EN CADA DATO | 💻 COTEJO COMPUTARIZADO 📞 9611150394 |
+            </div>
+        </div>
+    `;
+}
+    
+    // Obtener datos de posiciones PROCESADOS (igual que en importar.html)
+    const datosPosicion = procesarTablaPosiciones();
+    const gallosPorPartido = configuracion.gallosPorPartido || 3;
+    const puntosConf = torneoActual?.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
+    
+    if (datosPosicion.length === 0) {
+        contentDiv.innerHTML = `<div class="no-posiciones">
+            <span>📊</span>
+            <p>Califica peleas para ver la tabla de posiciones</p>
+        </div>`;
+        return;
+    }
+    
+    // ==============================================
+    // CONSTRUIR TABLA - MISMO ESTILO QUE importar.html
+    // ==============================================
+    let html = `<table class="posicion-table" style="width:100%; border-collapse: collapse;">`;
+   html += `<thead><tr style="border-top: 2px solid black; border-bottom: 2px solid black;">`;
+html += `<th style="padding: 2px 2px; text-align: left; vertical-align: top;" rowspan="2">NOMBRE DEL PARTIDO</th>`;
+html += `<th style="padding: 2px 2px; text-align: center;" colspan="${gallosPorPartido * 2}">📋 RESULTADOS</th>`;
+html += `<th style="padding: 2px 2px; text-align: left; vertical-align: top;" rowspan="2">P.T.</th>`;
+html += `<th style="padding: 2px 2px; text-align: left; vertical-align: top;" rowspan="2">T.T.</th>`;
+html += `</tr>`;
+    html += `<tr>`;
+    for (let i = 0; i < gallosPorPartido; i++) {
+        html += `<th style="padding: 2px 2px; text-align: center;" colspan="2">GALLO ${i+1}</th>`;
+    }
+    html += `</tr>`;
+    html += `<tr style="background: #CD853F;">`;
+    html += `<th style="padding: 2px 2px;"></th>`;
+    for (let i = 0; i < gallosPorPartido; i++) {
+        html += `<th style="padding: 2px 2px; text-align: center;">Pts</th>`;
+        html += `<th style="padding: 2px 2px; text-align: center;">Tpo</th>`;
+    }
+    html += `<th style="padding: 4px 8px;"></th><th style="padding: 2px 2px;"></th>`;
+    html += `</tr></thead><tbody>`;
+    
+ // Recorrer cada partido
+datosPosicion.forEach((item, idx) => {
+    const bgColor = idx % 2 === 0 ? '#ffffff' : '#f9f9f9';
+    html += `<tr style="border-top: 2px solid black; border-bottom: 2px solid black; background-color: ${bgColor};">`;
+    
+    // Número de posición (con círculo amarillo para los primeros 3)
+    const numeroPosicion = idx + 1;
+    let numeroHTML = '';
+    
+    if (numeroPosicion <= 4) {
+        // Círculo amarillo para los primeros 4 lugares
+        numeroHTML = `<span style="display: inline-flex; align-items: center; justify-content: center; background: #fff; color: #000; width: clamp(11px, 4vw, 28px); height: clamp(11px, 4vw, 28px); border-radius: 50%;  font-size: clamp(11px, 3.5vw, 26px); font-weight: 900; margin-right: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${numeroPosicion}</span>`;
+    } else {
+        // Números normales para el resto
+        numeroHTML = `<span style="display: inline-block; color: #8b4513; font-weight: 900; margin-right: 1px;">${numeroPosicion}.</span>`;
+    }
+    
+    html += `<td style="padding: 1px 1px; font-weight: 700; text-align: left;">${numeroHTML} ${escapeHTML(item.nombre)}</td>`;
+    
+    // Recorrer cada gallo del partido (1 a gallosPorPartido)
+    for (let i = 1; i <= gallosPorPartido; i++) {
+        const puntos = item[`gallo${i}_puntos`];
+        const tiempo = item[`gallo${i}_tiempo`];
+        
+            
+            // 🔥 MISMA LÓGICA QUE importar.html
+            // Si el gallo NO existe (puntos === undefined) → celdas vacías
+            if (puntos === undefined) {
+                html += `<td style="padding: 1px 1px; text-align: center;"></td>`;
+                html += `<td style="padding: 1px 1px; text-align: center;"></td>`;
+            } else {
+                // Determinar clases según el resultado
+                let clasePuntos = '';
+                let claseTiempo = '';
+                
+                if (puntos === puntosConf.ganador) {
+                    clasePuntos = 'puntos-ganador';
+                    claseTiempo = 'tiempo-ganador';
+                } else if (puntos === puntosConf.empate) {
+                    clasePuntos = 'puntos-empate';
+                    claseTiempo = 'tiempo-empate';
+                } else if (puntos === puntosConf.perdedor) {
+                    clasePuntos = 'puntos-perdedor';
+                    claseTiempo = 'tiempo-perdedor';
+                }
+                
+                // Mostrar puntos y tiempo formateado
+            // Mostrar puntos
+html += `<td style="padding: 1px 1px; text-align: center;" class="${clasePuntos}">${puntos}</td>`;
+
+// Mostrar tiempo - con posible color amarillo si es top rápido
+let tiempoClass = claseTiempo;
+let tiempoStyle = '';
+
+// Solo aplicar color amarillo si hay más de 6 peleas calificadas
+const totalPeleasCalificadas = calificacionesCargadas.size;
+if (totalPeleasCalificadas > 6) {
+    // Verificar si este tiempo está en el top de ganadores
+    // Primero, necesitamos los datos completos de los partidos
+    const datosPosicionGlobal = procesarTablaPosiciones();
+    const topTiempos = obtenerTopTiemposRapidos(datosPosicionGlobal, 4);
+    
+    if (puntos === puntosConfiguracion.ganador && topTiempos.includes(tiempo)) {
+        tiempoClass = ''; // Quitar clase original
+        tiempoStyle = 'background: #FFD700; color: #1e1e1e; font-weight: 900;'; // Amarillo dorado
+    }
+}
+
+html += `<td style="padding: 1px 1px; text-align: center; border-right: 2px solid black; ${tiempoStyle}" class="${tiempoClass}">${formatTiempo(tiempo)}</td>`;
+                
+            }
+        }
+        
+        // Totales del partido
+        html += `<td style="padding: 1px 1px; text-align: center; font-weight: 700; background: #e8f5e8;">${item.puntos}</td>`;
+        html += `<td style="padding: 1px 1px; text-align: center; font-weight: 700;">${formatTiempo(item.tiempo)}</td>`;
+        html += `</tr>`;
+    });
+    
+    html += `</tbody></table>`;
+    contentDiv.innerHTML = html;
+    
+    // Aplicar estilos guardados
+    const savedFontSize = localStorage.getItem('tablaPosicionFontSize');
+    if (savedFontSize && contentDiv.querySelector('table')) {
+        contentDiv.querySelector('table').style.fontSize = savedFontSize + 'px';
+    }
+    
+    console.log(`✅ Tabla de posiciones renderizada: ${datosPosicion.length} partidos`);
+}
         
         // ============================================================
 
@@ -3113,13 +4945,43 @@ window.limpiarResultadosCotejo = () => {
                 container.innerHTML = renderError();
             } else if (torneoActual) {
                 container.innerHTML = renderContenidoPrincipal();
+
                 setTimeout(() => {
-                    const cotejoContainer = document.getElementById('cotejo-resultados-container');
-                    if (cotejoContainer && resultadosCotejo.peleas.length > 0) {
-                        renderizarResultadosCotejo();
-                    }
-                    regenerarCamposGallos(configuracion.gallosPorPartido);
-                }, 100);
+    const cotejoContainer = document.getElementById('cotejo-resultados-container');
+    if (cotejoContainer && resultadosCotejo.peleas.length > 0) {
+        renderizarResultadosCotejo();
+        renderizarTablaPosiciones();
+
+    }
+    regenerarCamposGallos(configuracion.gallosPorPartido);
+    
+    // ========================================
+    // SINCRONIZAR SELECTORES EN TIEMPO REAL
+    // ========================================
+    const modoHeader = document.getElementById('cotejo-modo-header');
+    const modoPrincipal = document.getElementById('cotejo-modo');
+    
+    if (modoHeader && modoPrincipal) {
+        // Cuando cambia el selector de ARRIBA, cambiar el de ABAJO
+        modoHeader.onchange = function() {
+            modoPrincipal.value = this.value;
+            cotejoUltimoModo = this.value;
+        };
+        
+        // Cuando cambia el selector de ABAJO, cambiar el de ARRIBA
+        modoPrincipal.onchange = function() {
+            modoHeader.value = this.value;
+            cotejoUltimoModo = this.value;
+        };
+        
+        // Sincronizar al cargar la página con el valor actual
+        if (cotejoUltimoModo) {
+            modoHeader.value = cotejoUltimoModo;
+            modoPrincipal.value = cotejoUltimoModo;
+        }
+    }
+}, 100);
+                
             } else {
                 container.innerHTML = renderSinTorneo();
                 setTimeout(() => mostrarModalTorneo(), 100);
@@ -3236,7 +5098,14 @@ window.limpiarResultadosCotejo = () => {
                             <div><label>Peso Mín (g)</label><input type="text" inputmode="numeric" id="tournament-peso-min" value="${pesoMinValor}" class="form-input" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
                             <div><label>Peso Máx (g)</label><input type="text" inputmode="numeric" id="tournament-peso-max" value="${pesoMaxValor}" class="form-input" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"></div>
                         </div>
-                        <div style="margin-bottom:12px;"><label><input type="checkbox" id="tournament-anillos-editables" ${anillosEditablesValor ? 'checked' : ''}> ✏️ Permitir editar anillos manualmente</label></div>
+
+                  <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+    <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
+    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1; border-radius:30px; padding:12px; font-weight:700;">🗑️ ELIMINAR TORNEO</button>` : ''}
+    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#e7e7e7; padding:22px; border:none; border-radius:8px; font-weight:700;">CANCELAR</button>
+</div>
+
+                    
                         
                         <div style="margin:15px 0; padding:12px; background:#f9f9f9; border-radius:12px;">
                             <div onclick="window.togglePuntosSection()" style="display:flex; justify-content:space-between; cursor:pointer;">
@@ -3247,6 +5116,10 @@ window.limpiarResultadosCotejo = () => {
                                     <div><label>GANADOR</label><input type="number" id="tournament-puntos-ganador" value="${torneoEditar?.puntosConfig?.ganador || 2}" min="0" max="10" class="form-input"></div>
                                     <div><label>EMPATE</label><input type="number" id="tournament-puntos-empate" value="${torneoEditar?.puntosConfig?.empate || 1}" min="0" max="10" class="form-input"></div>
                                     <div><label>PERDEDOR</label><input type="number" id="tournament-puntos-perdedor" value="${torneoEditar?.puntosConfig?.perdedor || 0}" min="0" max="10" class="form-input"></div>
+                                      <!-- 🌙 BOTÓN MODO DÍA/NOCHE -->
+    <button id="darkModeToggleBtn" onclick="window.toggleDarkMode()" style="background:white; border:1px solid #8B4513; border-radius:8px; padding:10px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <span id="darkModeIcon">🌙</span> MODO NOCHE
+    </button>
                                 </div>
                             </div>
                         </div>
@@ -3261,11 +5134,7 @@ window.limpiarResultadosCotejo = () => {
                             </div>
                         </div>
                         
-                       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-    <button type="submit" id="submit-tournament-btn" class="btn-primary" style="flex:2;">${esEdicion ? 'ACTUALIZAR TORNEO' : 'CREAR TORNEO'}</button>
-    ${esEdicion ? `<button type="button" id="eliminar-torneo-modal-btn" onclick="window.eliminarTorneoModal()" class="btn-danger" style="flex:1; border-radius:30px; padding:12px; font-weight:700;">🗑️ ELIMINAR TORNEO</button>` : ''}
-    <button type="button" onclick="window.cerrarModalTorneo()" style="flex:1; background:#f0f2f5; border:none; border-radius:8px;">CANCELAR</button>
-</div>
+             
                     </form>
                 </div>
             `;
@@ -3314,7 +5183,6 @@ window.limpiarResultadosCotejo = () => {
     // Forzar límites 0-100 para rangoPeso
     if (clave === 'rangoPeso') {
         if (numValor < 0) numValor = 0;
-        if (numValor > 100) numValor = 100;
     }
     
     actualizarConfiguracion(clave, numValor);
@@ -3331,6 +5199,11 @@ window.limpiarResultadosCotejo = () => {
             const torneo = torneosAnteriores.find(t => t.id === torneoIdSeleccionado);
             if (!torneo) return;
 
+
+            //  LIMPIAR TEXBOX DE REPRESENTANTE PRIMERO
+    const representanteInput = document.getElementById('match-representante');
+    if (representanteInput) representanteInput.value = '';
+            
             calificacionesCargadas.clear();
     peleaSeleccionadaActual = null;
             
@@ -3367,7 +5240,10 @@ window.limpiarResultadosCotejo = () => {
                 registroDetalladoActivo: torneo.config?.registroDetallado || false
             };
             puntosConfiguracion = torneo.puntosConfig || { ganador: 2, empate: 1, perdedor: 0 };
-            representantesList = torneo.representantesUsados || [];
+           
+              // ACTUALIZAR LISTA DE REPRESENTANTES
+    actualizarListaRepresentantes();
+            
             serialIdActual = torneo.serialInfo?.serialId || null;
             torneosEnSerialActual = torneo.serialInfo?.torneosEnSerial || [];
             cargarNombresPartidosUnificados();
@@ -3411,13 +5287,58 @@ window.limpiarResultadosCotejo = () => {
         };
 
 
+      
+
         window.eliminarTorneoModal = () => {
     if (!torneoActual) {
         AppState.addNotification('❌ No hay torneo para eliminar', 'error');
         return;
     }
     
-    if (confirm(`⚠️ ¿ELIMINAR COMPLETAMENTE el torneo "${torneoActual.nombre}"?\n\nSe borrarán:\n- TODOS los partidos (${partidosList.length})\n- TODOS los gallos\n- Cotejo y calificaciones\n\n¡Esta acción NO se puede deshacer!`)) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+            <h3 style="margin:0 0 12px; color:#d32f2f;">¿ELIMINAR TORNEO?</h3>
+            <p style="margin-bottom:20px;">
+                <strong style="font-size:18px;">${torneoActual.nombre}</strong><br><br>
+                Se borrarán:<br>
+                📋 <strong>${partidosList.length}</strong> gallos registrados<br>
+                ⚡ <strong>${resultadosCotejo.peleas.length}</strong> peleas generadas<br>
+                🏆 <strong>${calificacionesCargadas.size}</strong> calificaciones<br><br>
+                <span style="color:#d32f2f; font-weight:bold;">⚠️ ¡Esta acción NO se puede deshacer!</span>
+            </p>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="confirmar-texto-torneo" placeholder="Escribe ELIMINAR para confirmar" 
+                    style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; font-weight:bold; text-transform:uppercase;">
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmar-eliminar-torneo" class="btn-danger" style="flex:2; padding:14px; border-radius:30px; font-weight:700;" disabled>🗑️ ELIMINAR TORNEO</button>
+                <button id="cancelar-eliminar-torneo" style="flex:1; padding:14px; background:#f0f2f5; border:none; border-radius:30px; font-weight:700; cursor:pointer;">CANCELAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const inputTexto = document.getElementById('confirmar-texto-torneo');
+    const btnEliminar = document.getElementById('confirmar-eliminar-torneo');
+    
+    // Validar mientras escribe
+    inputTexto.addEventListener('input', function(e) {
+        const contiene = contieneLetrasEliminar(e.target.value);
+        btnEliminar.disabled = !contiene;
+        if (contiene) {
+            btnEliminar.style.opacity = '1';
+            btnEliminar.style.cursor = 'pointer';
+        } else {
+            btnEliminar.style.opacity = '0.5';
+            btnEliminar.style.cursor = 'not-allowed';
+        }
+    });
+    
+    document.getElementById('confirmar-eliminar-torneo').onclick = () => {
+        vibrarFuerte();
         eliminarTorneoDeStorage(torneoId);
         torneoActual = null;
         torneoId = null;
@@ -3425,14 +5346,35 @@ window.limpiarResultadosCotejo = () => {
         resultadosCotejo = { peleas: [], noEmparejados: [], metricas: { totalGallos: 0, peleasGeneradas: 0, noEmparejados: 0, diferenciaPromedio: 0, conflictosConsecutivos: 0 } };
         calificacionesCargadas.clear();
         
-        const modal = document.getElementById('tournament-modal-overlay');
-        if (modal) modal.remove();
+        const modalTorneo = document.getElementById('tournament-modal-overlay');
+        if (modalTorneo) modalTorneo.remove();
         
+        overlay.remove();
         actualizarPantalla();
-        AppState.addNotification('✅ Torneo eliminado completamente', 'success');
         
+        setTimeout(() => {
+            const selectorTorneos = document.getElementById('header-torneo-selector');
+            if (selectorTorneos) {
+                let opciones = '<option value="">📋 Seleccionar Torneo:</option>';
+                torneosAnteriores.forEach(t => {
+                    opciones += `<option value="${t.id}" ${t.id === torneoId ? 'selected' : ''}>${t.nombre || 'Torneo'} (${t.fecha || 'sin fecha'})</option>`;
+                });
+                selectorTorneos.innerHTML = opciones;
+            }
+        }, 100);
+        
+        AppState.addNotification('✅ Torneo eliminado completamente', 'success');
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    }
+    };
+    
+    document.getElementById('cancelar-eliminar-torneo').onclick = () => {
+        vibrarSuave();
+        overlay.remove();
+    };
+    
+    overlay.onclick = (e) => {
+        if (e.target === overlay) overlay.remove();
+    };
 };
         
         window.crearTorneo = async () => {
@@ -3486,10 +5428,14 @@ window.limpiarResultadosCotejo = () => {
             
             if (!nombre) {
                 AppState.addNotification('❌ Nombre del partido obligatorio', 'error');
+                vibrarError();
+
                 boton.disabled = false; boton.textContent = textoOriginal; return;
             }
             if (partidosList.some(p => p.partido.toLowerCase() === nombre.toLowerCase())) {
                 AppState.addNotification(`❌ El partido "${nombre}" ya existe`, 'error');
+                vibrarError();
+
                 boton.disabled = false; boton.textContent = textoOriginal; return;
             }
             
@@ -3518,12 +5464,16 @@ window.limpiarResultadosCotejo = () => {
                     if (isNaN(pesoNum) || pesoNum <= 0) { AppState.addNotification(`❌ Peso inválido para gallo ${i}`, 'error'); error = true; continue; }
                     if (pesoNum < configuracion.pesoMin || pesoNum > configuracion.pesoMax) {
                         AppState.addNotification(`❌ Peso debe estar entre ${configuracion.pesoMin}-${configuracion.pesoMax}g`, 'error'); error = true; continue;
+                    vibrarError();
+
                     }
                 }
                 
                 const anilloFormateado = anillo.padStart(3, '0');
                 if (anillosExistentes.has(anilloFormateado)) {
                     AppState.addNotification(`❌ Anillo ${anillo} ya registrado`, 'error'); error = true; continue;
+                vibrarError();
+
                 }
                 gallos.push({ anillo, peso: pesoNum, color });
                 anillosExistentes.add(anilloFormateado);
@@ -3537,10 +5487,58 @@ window.limpiarResultadosCotejo = () => {
                 document.getElementById('match-representante').value = '';
                 document.getElementById('representante-info').innerHTML = '';
                 actualizarPantallaLigera();
-            }
+                // PONER EL FOCO EN EL CAMPO NOMBRE DEL PARTIDO
+   setTimeout(() => {
+    const nombreInput = document.getElementById('match-name');
+    if (nombreInput) nombreInput.focus();
+}, 100);
+}
+            
             boton.disabled = false;
             boton.textContent = textoOriginal;
         };
+
+
+
+        // ==============================================
+// FUNCIONES PARA MODO OSCURO / CLARO
+// ==============================================
+window.toggleDarkMode = function() {
+    const body = document.body;
+    const toggleBtn = document.getElementById('darkModeToggleBtn');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    
+    if (body.classList.contains('dark-mode')) {
+        body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<span id="darkModeIcon">🌙</span> MODO NOCHE';
+        }
+    } else {
+        body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<span id="darkModeIcon">☀️</span> MODO DÍA';
+        }
+    }
+};
+
+function cargarTemaGuardado() {
+    const temaGuardado = localStorage.getItem('theme');
+    const toggleBtn = document.getElementById('darkModeToggleBtn');
+    
+    if (temaGuardado === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<span id="darkModeIcon">☀️</span> MODO DÍA';
+        }
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<span id="darkModeIcon">🌙</span> MODO NOCHE';
+        }
+    }
+}
         
         // ============================================================
         // INICIALIZACIÓN
@@ -3593,7 +5591,8 @@ window.limpiarResultadosCotejo = () => {
         torneosEnSerialActual = torneoActual.serialInfo?.torneosEnSerial || [];
         
         cargarNombresPartidosUnificados();
-        
+        actualizarListaRepresentantes();
+
         if (torneoActual.cotejoData) {
             resultadosCotejo = {
                 peleas: torneoActual.cotejoData.peleas || [],
@@ -3614,6 +5613,7 @@ window.limpiarResultadosCotejo = () => {
     }
     
     actualizarPantalla();
+      cargarTemaGuardado();       
 }
         init();
         
@@ -3624,6 +5624,8 @@ window.limpiarResultadosCotejo = () => {
             if (!torneoActual) return;
             if (confirm(`¿Eliminar el torneo "${torneoActual.nombre}"? Esta acción no se puede deshacer.`)) {
                 eliminarTorneoDeStorage(torneoId);
+                vibrarFuerte();
+
                 torneoActual = null;
                 torneoId = null;
                 partidosList = [];
