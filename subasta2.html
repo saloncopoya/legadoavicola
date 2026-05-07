@@ -181,39 +181,22 @@
         };
         
         // Escuchar cambios en auth
-                firebase.auth().onAuthStateChanged(async (user) => {
+        firebase.auth().onAuthStateChanged(async (user) => {
             AppState.user.current = user;
             if (user) {
-                console.log("👤 Usuario autenticado:", user.email, "UID:", user.uid);
                 try {
                     const adminDb = getAdminDatabase();
                     if (adminDb) {
-                        console.log("🔍 Buscando perfil en USUARIOS/" + user.uid);
                         const snapshot = await adminDb.ref(`USUARIOS/${user.uid}`).once('value');
                         if (snapshot.exists()) {
                             AppState.user.profile = snapshot.val();
-                            console.log("✅ Perfil de usuario CARGADO:", AppState.user.profile);
-                            
-                            // Log gear para depuración
-                            if (AppState.user.profile.subasta === true) {
-                                console.log("👑 USUARIO TIENE PERMISO SUBASTA = TRUE");
-                            }
-                            if (AppState.user.profile.ventas === true) {
-                                console.log("👑 USUARIO TIENE PERMISO VENTAS = TRUE");
-                            }
-                        } else {
-                            console.warn("⚠️ No existe perfil para este usuario en USUARIOS/" + user.uid);
-                            console.log("💡 Crea un nodo en Firebase Realtime Database con la estructura:");
-                            console.log(`USUARIOS/${user.uid} = { "subasta": true, "ventas": true, "displayName": "Nombre" }`);
-                            AppState.user.profile = { subasta: false, ventas: false };
+                            console.log("✅ Perfil de usuario cargado:", AppState.user.profile);
                         }
                     }
                 } catch(e) {
                     console.error("Error cargando perfil:", e);
-                    AppState.user.profile = { subasta: false, ventas: false };
                 }
             } else {
-                console.log("👤 Usuario NO autenticado (invitado)");
                 AppState.user.profile = null;
             }
             
@@ -224,7 +207,8 @@
                     container.innerHTML = window.currentRenderFunction();
                 }
             }
-        });
+        });   
+
 
                 
         // ==============================================
@@ -936,68 +920,6 @@
                 if (isLoading) { container.innerHTML = renderLoading(); return; }
                 if (errorMessage) { container.innerHTML = renderError(); return; }
                 let botonModoHtml = '';
-
-
-    // ==============================================
-    // BOTÓN DE INICIO DE SESIÓN AGREGADO
-    // ==============================================
-    const usuarioActual = AppState.user.current;
-    const estaLogueado = usuarioActual !== null;
-    
-    // HTML para el panel de usuario (login/logout + info)
-    let panelUsuarioHtml = '';
-    
-    if (!estaLogueado) {
-        // Mostrar botones de login si NO está logueado
-        panelUsuarioHtml = `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 28px;">🔐</span>
-                        <span style="color: white; font-weight: 600;">Inicia sesión para crear y administrar tablas</span>
-                    </div>
-                    <button id="btn-iniciar-sesion" style="background: white; color: #667eea; border: none; padding: 10px 24px; border-radius: 50px; font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                        🚪 INICIAR SESIÓN
-                    </button>
-                </div>
-                <div style="background: rgba(255,255,255,0.2); border-radius: 12px; padding: 10px; font-size: 12px; color: white; text-align: center;">
-                    💡 Para crear y administrar tablas, debes iniciar sesión con una cuenta que tenga permisos de administrador
-                </div>
-            </div>
-        `;
-    } else {
-        // Mostrar información del usuario si está logueado
-        const emailUsuario = usuarioActual.email || 'Usuario';
-        const nombreUsuario = AppState.user.profile?.displayName || emailUsuario.split('@')[0] || 'Usuario';
-        const tienePermisoAdmin = AppState.user.profile?.subasta === true || AppState.user.profile?.ventas === true;
-        
-        panelUsuarioHtml = `
-            <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); border-radius: 16px; padding: 16px; margin-bottom: 24px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                            👤
-                        </div>
-                        <div style="color: white;">
-                            <div style="font-weight: 800; font-size: 16px;">${Utils.escapeHTML(nombreUsuario)}</div>
-                            <div style="font-size: 11px; opacity: 0.8;">${Utils.escapeHTML(emailUsuario)}</div>
-                            ${tienePermisoAdmin ? '<div style="font-size: 10px; background: #FFD700; color: #333; display: inline-block; padding: 2px 8px; border-radius: 20px; margin-top: 4px;">👑 ADMINISTRADOR</div>' : '<div style="font-size: 10px; opacity: 0.7;">Sin permisos de administrador</div>'}
-                        </div>
-                    </div>
-                    <button id="btn-cerrar-sesion" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 14px; cursor: pointer;">
-                        🚪 CERRAR SESIÓN
-                    </button>
-                </div>
-               ${!tienePermisoAdmin && estaLogueado ? `
-                <div style="background: rgba(255,255,255,0.15); border-radius: 12px; padding: 10px; margin-top: 12px; font-size: 12px; color: #FFE0B2; text-align: center;">
-                    ⚠️ Tu cuenta no tiene permisos de administrador. Contacta al administrador para obtener acceso.
-                </div>
-                ` : ''}
-            </div>
-        `;
-    }
-                
-                
                 if (userProfile && userProfile.subasta === true) {
                     botonModoHtml = `<div style="display:flex;gap:16px;margin-bottom:24px;padding:0 8px;"><button onclick="window.ventasCambiarModo('cliente')" style="flex:1;background:linear-gradient(145deg,#2E7D32,#1B5E20);color:white;border:2px solid #FFD700;border-radius:16px;padding:14px 8px;font-weight:800;">👀 TABLAS GUARDADAS.</button><button onclick="window.limpiarEditorCompleto(); window.ventasCambiarModo('admin')" style="flex:1;background:linear-gradient(145deg,#C62828,#B71C1C);color:white;border:2px solid #FFD700;border-radius:16px;padding:14px 8px;font-weight:800;">✍️ ADMINISTRADOR</button></div>`;
                 }
@@ -1008,8 +930,7 @@
                     contenido = `<div id="ventas-editor-container"></div>`;
                     setTimeout(() => actualizarVistaEditor(), 10);
                 }
-
-                    container.innerHTML = `<div style="max-width:1200px;margin:0 auto;">${panelUsuarioHtml}${botonModoHtml}${contenido}</div>`;
+                container.innerHTML = `<div style="max-width:1200px;margin:0 auto;">${botonModoHtml}${contenido}</div>`;
                 
                 if (modoVista === 'cliente' && tablaDetalle) {
                     setTimeout(() => {
@@ -1018,45 +939,6 @@
                             const nombrePartido = fila.getAttribute('data-partido-nombre');
                             if (!nombrePartido) return;
                             if (esSeleccionable) fila.style.cursor = 'pointer';
-
-                                // ==============================================
-    // EVENTOS DE LOS BOTONES DE LOGIN/LOGOUT
-    // ==============================================
-    const btnIniciarSesion = document.getElementById('btn-iniciar-sesion');
-    if (btnIniciarSesion) {
-        btnIniciarSesion.addEventListener('click', () => {
-            // Usar el proveedor de Google para iniciar sesión
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-                .then((result) => {
-                    console.log("✅ Usuario logueado:", result.user.email);
-                    AppState.addNotification(`✅ Bienvenido ${result.user.displayName || result.user.email}`, 'success', 3000);
-                    // Recargar la página para actualizar el estado
-                    setTimeout(() => location.reload(), 500);
-                })
-                .catch((error) => {
-                    console.error("Error de login:", error);
-                    AppState.addNotification(`❌ Error al iniciar sesión: ${error.message}`, 'error', 4000);
-                });
-        });
-    }
-    
-    const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
-    if (btnCerrarSesion) {
-        btnCerrarSesion.addEventListener('click', () => {
-            firebase.auth().signOut()
-                .then(() => {
-                    console.log("✅ Sesión cerrada");
-                    AppState.addNotification('✅ Sesión cerrada correctamente', 'success', 2000);
-                    setTimeout(() => location.reload(), 500);
-                })
-                .catch((error) => {
-                    console.error("Error al cerrar sesión:", error);
-                    AppState.addNotification('❌ Error al cerrar sesión', 'error');
-                });
-        });
-    }
-                            
                             fila.addEventListener('click', (e) => {
                                 if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
                                 if (!esSeleccionable) {
