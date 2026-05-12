@@ -739,6 +739,7 @@ function setupAuthListener() {
             else { AppState.setScreen('public'); window.history.pushState({}, '', '/'); }
             AppState.clearUser();
             hideLoadingScreen();
+             }
         AppState.setLoading(false);
     });
 }
