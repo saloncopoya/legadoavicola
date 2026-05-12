@@ -1900,6 +1900,160 @@ window.toggleUserGallo = async function(uid, setGallo) {
     } catch(error) { AppState.addNotification('Error al cambiar rol', 'error'); }
 };
 
+    // ==============================================
+// REGISTRO COMPLETO - handleCompleteRegister
+// ==============================================
+window.handleCompleteRegister = async function() {
+    console.log("🟩 BOTÓN CREAR CUENTA presionado");
+
+    // Validar que Firebase esté activado
+    if (!AppState.firebase.isEnabled) {
+        AppState.addNotification('Firebase no está inicializado. Intenta de nuevo.', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('registerSubmitBtn');
+    const errorDiv = document.getElementById('registerError');
+    const successDiv = document.getElementById('registerSuccess');
+
+    const fullName = document.getElementById('registerFullName')?.value || '';
+    const partyName = document.getElementById('registerPartyName')?.value || '';
+    const representative = document.getElementById('registerRepresentative')?.value || '';
+    const municipioSelect = document.getElementById('registerMunicipio');
+    const customMunicipio = document.getElementById('registerCustomMunicipio')?.value || '';
+    const phonePrefix = document.getElementById('registerPhonePrefix')?.value || '+52 961';
+    const phoneNumber = document.getElementById('registerPhone')?.value.trim() || '';
+    const password = document.getElementById('registerPassword')?.value || '';
+    const confirmPassword = document.getElementById('registerConfirmPassword')?.value || '';
+    const termsAccepted = document.getElementById('registerTerms')?.checked || false;
+    const realEmail = document.getElementById('registerRealEmail')?.value.trim() || '';
+    
+    if (errorDiv) errorDiv.textContent = '';
+    if (successDiv) successDiv.textContent = '';
+
+    // Validaciones
+    if (!fullName) { AppState.addNotification('Nombre completo requerido', 'error'); return; }
+    if (!realEmail) { AppState.addNotification('Email real requerido', 'error'); return; }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(realEmail)) { AppState.addNotification('Email inválido', 'error'); return; }
+
+    let municipioFinal = '';
+    if (municipioSelect) {
+        if (municipioSelect.value === 'otro') {
+            if (!customMunicipio) { AppState.addNotification('Debes escribir tu ubicación', 'error'); return; }
+            municipioFinal = customMunicipio;
+        } else if (municipioSelect.value) { 
+            municipioFinal = municipioSelect.options[municipioSelect.selectedIndex]?.text || ''; 
+        }
+    }
+
+    if (phoneNumber && (phoneNumber.length !== 7 || !/^\d+$/.test(phoneNumber))) { 
+        AppState.addNotification('El teléfono debe tener 7 dígitos', 'error');
+        return; 
+    }
+    
+    if (password.length < 6) { AppState.addNotification('Contraseña mínimo 6 caracteres', 'error'); return; }
+    if (password !== confirmPassword) { AppState.addNotification('Las contraseñas no coinciden', 'error'); return; }
+    if (!termsAccepted) { AppState.addNotification('Debes aceptar los términos', 'error'); return; }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Registrando...'; }
+
+    try {
+        const auth = AppState.firebase.auth;
+        showLoadingScreen('Registrando cuenta...', 20);
+        
+        const cleanPrefix = phonePrefix.replace(/\D/g, '');
+        const fullPhone = `${cleanPrefix}${phoneNumber}`;
+        
+        const userCredential = await auth.createUserWithEmailAndPassword(realEmail, password);
+        
+        if (!AppState.firebase.database) {
+            AppState.firebase.database = firebase.database();
+        }
+        
+        const database = AppState.firebase.database;
+        const user = userCredential.user;
+        
+        updateLoadingProgress(30, 'Creando cuenta...');
+        
+        let defaultPermissions = { activated: false, gallo: false, isJudge: false, publicaciones: false, pedigri: false, ventas: false };
+        try {
+            const configSnapshot = await database.ref('config/defaultPermissions').once('value');
+            if (configSnapshot.exists()) defaultPermissions = configSnapshot.val();
+        } catch(e) {}
+        
+        let defaultMaxDevices = 1;
+        try {
+            const maxDevicesSnapshot = await database.ref('config/defaultMaxDevices').once('value');
+            if (maxDevicesSnapshot.exists()) defaultMaxDevices = maxDevicesSnapshot.val();
+        } catch(e) {}
+        
+        await user.updateProfile({ displayName: fullName });
+        
+        await database.ref('users/' + user.uid).set({
+            uid: user.uid,
+            displayName: fullName,
+            realEmail: realEmail,
+            phone: fullPhone,
+            formattedPhone: cleanPrefix.slice(-3) + phoneNumber,
+            phonePrefix: phonePrefix,
+            registeredAt: Date.now(),
+            registeredWith: 'email',
+            maxDevices: defaultMaxDevices,
+            activated: defaultPermissions.activated,
+            gallo: defaultPermissions.gallo,
+            isJudge: defaultPermissions.isJudge,
+            publicaciones: defaultPermissions.publicaciones,
+            ventas: defaultPermissions.ventas,
+            pedigri: defaultPermissions.pedigri,
+            ...(partyName && { partyName }),
+            ...(representative && { representative }),
+            ...(municipioFinal && { municipio: municipioFinal })
+        });
+        
+        await loadUserProfile(user.uid);
+        updateLoadingProgress(100, '¡Registro completo!');
+        
+        if (successDiv) successDiv.textContent = '✅ Cuenta creada. Pendiente de activación.';
+        
+        AppState.ui.formData.register = {};
+        AppState.setLoading(false);
+        hideLoadingScreen();
+        
+        if (loadingTimeoutId) { clearTimeout(loadingTimeoutId); loadingTimeoutId = null; }
+        
+        const esperarPerfil = () => {
+            return new Promise((resolve) => {
+                if (AppState.user.profile) return resolve(true);
+                const unsubscribe = AppState.subscribe((propiedadCambiada) => {
+                    if (propiedadCambiada === 'user' && AppState.user.profile) {
+                        unsubscribe();
+                        resolve(true);
+                    }
+                });
+                setTimeout(() => { unsubscribe(); resolve(false); }, 5000);
+            });
+        };
+        
+        await esperarPerfil();
+        
+        AppState.setUser(user, { id: user.uid, displayName: fullName });
+        AppState.setScreen('public');
+        window.history.pushState({}, '', '/?section=public');
+        
+    } catch(error) {
+        console.error('❌ Error registro:', error);
+        let errorMessage = 'Error al registrar';
+        if (error.code === 'auth/email-already-in-use') errorMessage = 'Este email ya está registrado';
+        else if (error.code === 'auth/weak-password') errorMessage = 'Contraseña muy débil';
+        else if (error.code === 'auth/invalid-email') errorMessage = 'Email inválido';
+        AppState.addNotification(errorMessage, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+        hideLoadingScreen();
+    }
+};
+    
 window.toggleUserJudge = async function(uid, setJudge) {
     const currentUser = AppState.user.current;
     const database = AppState.firebase.database;
