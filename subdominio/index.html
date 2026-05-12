@@ -793,6 +793,7 @@ function checkIfEverythingLoaded() {
         if (intentos >= MAX_INTENTOS && AppState.ui.isLoading) {
             clearInterval(loadingInterval); loadingInterval = null;
             AppState.setLoading(false);
+            renderApp('timeout');
             const loadingScreen = document.getElementById('loading-screen');
             const socialApp = document.getElementById('social-app');
             if (loadingScreen) { loadingScreen.style.opacity = '0'; setTimeout(() => { loadingScreen.style.display = 'none'; if (socialApp) socialApp.style.display = 'block'; }, 500); }
