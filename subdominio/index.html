@@ -548,7 +548,7 @@ window.navigateTo = function(section) {
     const user = AppState.user.current, profile = AppState.user.profile;
     if (['public', 'login', 'share', 'ventas', 'rooster'].includes(section)) { AppState.setScreen(section); return; }
     if (section === 'activation_pending') { if (user && profile && profile.activated === false) AppState.setScreen('activation_pending'); else navigateTo('login'); return; }
-    if (!user) { AppState.addNotification('Debes iniciar sesión', 'warning'); if (!AppState.firebase.isEnabled) AppState.ui.pendingScreen = section; initializeFirebase(); else AppState.setScreen('login'); return; }
+if (!user) { AppState.addNotification('Debes iniciar sesión', 'warning'); if (!AppState.firebase.isEnabled) { AppState.ui.pendingScreen = section; initializeFirebase(); } else { AppState.setScreen('login'); } return; }
     const permisoRequerido = { 'admin': 'gallo', 'publicaciones': 'publicaciones', 'pedigri': 'pedigri', 'juez': 'isJudge', 'ventas': 'ventas', 'rooster': 'todos', 'perfil': 'todos', 'configuraciones': 'todos' };
     const permisoNecesario = permisoRequerido[section];
     if (permisoNecesario === 'todos') { if (profile && profile.activated === true) AppState.setScreen(section); else { AppState.addNotification('Tu cuenta está pendiente de activación', 'warning'); AppState.setScreen('activation_pending'); } return; }
