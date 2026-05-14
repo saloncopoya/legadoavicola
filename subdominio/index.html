@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#8B4513">
+    <meta name="description" content="Legado Avícola - Plataforma profesional para gallos de pelea, torneos y comunidad">
     <link rel="manifest" href="manifest.json">
-    <title>Legado Avícola · Gallos de Fuego</title>
+    <title>Legado Avícola | Élite Gallística</title>
     <style>
         * {
             margin: 0;
@@ -14,206 +15,201 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            --primary-brown: #8B4513;
+            --secondary-brown: #D2691E;
+            --gold: #FFD700;
+            --gold-dark: #D4AF37;
+            --success: #2e7d32;
+            --error: #d93025;
+            --warning: #ff9800;
+            --info: #2196F3;
+            --dark-bg: #1a1a2e;
+            --offline: #626466;
+        }
+
         body {
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
             background: #fef7e8;
             overflow-x: hidden;
         }
 
-        /* LOADING SCREEN */
+        /* LOADING SCREEN PROFESIONAL */
         #loading-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fff7ed;
-            z-index: 10000;
+            inset: 0;
+            background: linear-gradient(145deg, #fff7ed 0%, #f3e9d2 100%);
+            z-index: 20000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.4s;
+            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        .loader-spinner {
-            width: 55px;
-            height: 55px;
-            border: 5px solid #f3d9b1;
-            border-top: 5px solid #8B4513;
+        .loader-gallo {
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, var(--gold) 0%, var(--primary-brown) 100%);
             border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 20px 35px rgba(139,69,19,0.3);
+            animation: pulseGlow 1.2s infinite alternate;
+            margin-bottom: 24px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loader-text {
-            color: #5a2e0e;
-            font-weight: 500;
-            letter-spacing: 1px;
+        @keyframes pulseGlow {
+            0% { transform: scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+            100% { transform: scale(1.05); box-shadow: 0 20px 40px rgba(139,69,19,0.5);}
         }
-        .progress-bar-container {
-            width: 220px;
+        .progress-elegant {
+            width: 260px;
             height: 6px;
-            background: #e9dccd;
+            background: #e0d3c0;
             border-radius: 10px;
-            margin-top: 18px;
             overflow: hidden;
+            margin-top: 25px;
         }
-        .progress-fill {
+        .progress-fill-senior {
             width: 0%;
             height: 100%;
-            background: #D2691E;
-            transition: width 0.2s;
+            background: linear-gradient(90deg, var(--primary-brown), var(--gold));
+            transition: width 0.2s ease;
         }
 
         /* APP ROOT */
-        #social-app {
+        #app-root {
             display: none;
             min-height: 100vh;
             background: #faf5ea;
         }
 
-        /* NOTIFICACIONES TOAST */
-        .toast-notification {
+        /* TOAST NOTIFICATIONS */
+        .toast-senior {
             position: fixed;
-            bottom: 30px;
+            bottom: 28px;
             left: 20px;
             right: 20px;
-            max-width: 380px;
-            background: #1f2937;
+            max-width: 400px;
+            background: #1e293b;
+            backdrop-filter: blur(12px);
             color: white;
             padding: 14px 20px;
             border-radius: 60px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 12000;
             display: flex;
             align-items: center;
             gap: 12px;
-            backdrop-filter: blur(10px);
-            animation: slideIn 0.2s ease;
+            z-index: 15000;
             font-weight: 500;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
             cursor: pointer;
+            animation: slideUpToast 0.25s ease;
         }
-        .toast-notification.success { background: #2e7d32; }
-        .toast-notification.error { background: #b71c1c; }
-        .toast-notification.warning { background: #f57c00; }
-        .toast-notification.info { background: #0b5e9e; }
-        .toast-notification.blue { background: #1e3a8a; }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideUpToast {
+            from { opacity: 0; transform: translateY(50px);}
+            to { opacity: 1; transform: translateY(0);}
         }
-        .fadeOutClean {
-            animation: fadeOutClean 0.25s forwards;
-        }
-        @keyframes fadeOutClean {
-            to { opacity: 0; transform: translateY(30px); visibility: hidden; }
-        }
+        .toast-senior.success { background: #2e7d32; border-left: 6px solid var(--gold);}
+        .toast-senior.error { background: #b71c1c; }
+        .toast-senior.warning { background: #f57c00; }
 
-        /* SIDEBAR */
-        .side-menu {
+        /* SIDEBAR MODERNO */
+        .sidebar-modern {
             position: fixed;
             top: 0;
-            right: -350px;
-            width: 280px;
+            right: -380px;
+            width: 300px;
             height: 100vh;
-            background: white;
-            box-shadow: -5px 0 30px rgba(0,0,0,0.2);
-            transition: right 0.3s ease;
-            z-index: 11000;
-            padding: 20px 0;
+            background: #ffffffea;
+            backdrop-filter: blur(20px);
+            box-shadow: -8px 0 32px rgba(0,0,0,0.2);
+            transition: right 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 12000;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            border-left: 1px solid rgba(139,69,19,0.2);
         }
-        .side-menu.open {
-            right: 0;
-        }
-        .side-overlay {
+        .sidebar-modern.open { right: 0; }
+        .overlay-dark {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 10999;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            z-index: 11999;
             display: none;
         }
-        .side-overlay.active {
-            display: block;
-        }
-        .side-profile {
+        .overlay-dark.active { display: block; }
+        .side-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary-brown), var(--secondary-brown));
+            color: white;
             text-align: center;
-            padding: 16px;
-            border-bottom: 1px solid #eee;
         }
-        .side-avatar {
-            width: 70px;
-            height: 70px;
+        .side-avatar-xl {
+            width: 80px;
+            height: 80px;
+            background: white;
             border-radius: 50%;
-            background: #8B4513;
-            margin: 0 auto 10px;
+            margin: 0 auto 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 36px;
             font-weight: bold;
-            color: white;
+            color: var(--primary-brown);
+            border: 3px solid var(--gold);
         }
-        .side-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        .side-menu-item {
-            padding: 12px 24px;
+        .side-item {
+            padding: 14px 24px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.1s;
-            color: #2c2c2c;
+            transition: 0.2s;
+            color: #2c241a;
         }
-        .side-menu-item:hover {
-            background: #f3ede3;
-        }
+        .side-item:hover { background: #f3ede3; padding-left: 28px; }
 
-        /* BOTONES SUPERIORES */
-        .mobile-nav-bar, .public-top-bar {
+        /* TOP BARS */
+        .nav-top-logged {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            height: 64px;
             background: white;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
+            padding: 0 20px;
             z-index: 1000;
+            border-bottom: 1px solid rgba(139,69,19,0.15);
         }
-        .public-top-bar {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-            color: white;
-        }
-        .nav-buttons {
+        .nav-buttons-scroll {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             overflow-x: auto;
-            white-space: nowrap;
+            scrollbar-width: thin;
         }
-        .nav-btn {
+        .nav-btn-senior {
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
+            padding: 8px 0;
             cursor: pointer;
-            padding: 6px 0;
-            color: #333;
+            color: #3b2a1f;
+            transition: 0.1s;
+            white-space: nowrap;
         }
-        .profile-icon {
-            width: 40px;
-            height: 40px;
-            background: #8B4513;
+        .nav-btn-senior:hover { color: var(--primary-brown); border-bottom: 2px solid var(--gold);}
+        .avatar-circle {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-brown);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -221,88 +217,95 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        /* PANTALLA PRINCIPAL Y SCREENS */
-        .screen-container {
-            padding-top: 70px;
-            padding-bottom: 30px;
+        /* PUBLIC BAR */
+        .public-top-senior {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 2px solid var(--gold);
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        /* SCREEN CONTAINER */
+        .screen-senior {
+            padding-top: 80px;
+            padding-bottom: 40px;
             min-height: 100vh;
         }
 
-        /* skeleton */
-        .skeleton-card {
-            background: #e2e8f0;
-            border-radius: 20px;
-            height: 120px;
-            margin: 12px;
-            animation: loading 1.5s infinite;
+        /* FORMULARIOS PROFESIONALES */
+        .card-glass {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+            padding: 28px;
+            margin: 20px;
         }
-        @keyframes loading {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        /* MODALES */
-        .modal-generic {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .input-senior {
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 13000;
+            padding: 14px 18px;
+            margin: 12px 0;
+            border: 1px solid #e2d9ce;
+            border-radius: 60px;
+            font-size: 1rem;
+            transition: 0.2s;
         }
-        .modal-content {
-            background: white;
-            max-width: 90%;
-            width: 400px;
-            border-radius: 28px;
-            padding: 24px;
-            text-align: center;
-        }
-        .hidden { display: none; }
-        .btn-primary {
-            background: #8B4513;
+        .input-senior:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(255,215,0,0.2);}
+        .btn-gold {
+            background: var(--primary-brown);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
+            padding: 12px 28px;
+            border-radius: 60px;
             font-weight: bold;
+            width: 100%;
             cursor: pointer;
+            transition: 0.2s;
         }
-        .flex { display: flex; gap: 10px; justify-content: center; }
-        .bg-warning { background: #fff3cd; padding: 12px; border-radius: 16px; margin: 16px 0; }
+        .btn-gold:hover { background: var(--secondary-brown); transform: scale(0.98);}
+
+        /* skeleton */
+        .skeleton-senior { background: linear-gradient(90deg, #e2e0db 25%, #f0ece5 50%, #e2e0db 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 20px; height: 110px; margin: 12px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* FOOTER ACCORDION */
+        .footer-legal { background: #1e1b16; color: #ccc; padding: 30px 20px; margin-top: 60px; }
+        .accordion-item { border-bottom: 1px solid #444; padding: 12px 0; cursor: pointer; }
+        .hidden-content { display: none; padding-top: 12px; }
     </style>
 </head>
 <body>
 
 <div id="loading-screen">
-    <div class="loader-spinner"></div>
-    <div class="loader-text">Cargando legado...</div>
-    <div class="progress-bar-container"><div class="progress-fill" id="load-progress-fill"></div></div>
-    <button id="force-reload-btn" style="margin-top:20px; display:none; background:#8B4513; color:white; border:none; padding:8px 20px; border-radius:40px;">RECARGAR PÁGINA</button>
+    <div class="loader-gallo">🐓</div>
+    <div style="font-weight: 600; color:#5a2e0e;">Cargando arena digital</div>
+    <div class="progress-elegant"><div class="progress-fill-senior" id="senior-progress-fill"></div></div>
+    <button id="emergency-reload" style="margin-top: 30px; background:#8B4513; color:white; border:none; padding:8px 24px; border-radius:40px; display:none;">RECARGAR</button>
 </div>
-<div id="social-app"></div>
-
-<!-- SIDEBAR -->
-<div class="side-overlay" id="side-overlay"></div>
-<div class="side-menu" id="side-menu">
-    <div class="side-profile">
-        <div class="side-avatar" id="side-avatar">?</div>
-        <div class="side-name" id="side-name">Usuario</div>
+<div id="app-root"></div>
+<div class="overlay-dark" id="global-overlay"></div>
+<div class="sidebar-modern" id="senior-sidebar">
+    <div class="side-header">
+        <div class="side-avatar-xl" id="sideAvatar">👤</div>
+        <div id="sideFullName">Invitado</div>
+        <small>Legado Avícola</small>
     </div>
-    <div id="side-menu-items"></div>
+    <div id="sideMenuDynamic"></div>
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // 0. FIREBASE CONFIGS (CUENTAS Y CONFIGURACIONES EXTERNAS)
-    // --------------------------------------------------------------
+    // =============================== 1. CONFIGURACIONES EXTERNAS COMPLETAS ===================================
     window.FIREBASE_CONFIG = {
         apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
         authDomain: "galloslivebadge.firebaseapp.com",
@@ -321,105 +324,112 @@
         appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
     };
     const GOOGLE_CLIENT_ID = '979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com';
+    const SOCIAL_LINKS = { whatsapp:"https://wa.me/5219611150394", facebook:"https://facebook.com/legadoavicola", instagram:"https://instagram.com/legadoavicola", tiktok:"https://tiktok.com/@legadoavicola", email:"lg.w@gmail.com" };
 
-    // ---------- STATE MANAGER (AppState)
+    // =============================== 2. STATE MANAGER AVANZADO =============================================
     const AppState = {
-        user: null, profile: null, currentScreen: 'login', isLoading: true, listeners: [],
+        user: null, profile: null, currentScreen: 'public', isLoading: false, listeners: [],
         firebase: { auth: null, db: null, adminDb: null },
-        cotejoState: null,
-        setUser(userData, profileData) { this.user = userData; this.profile = profileData; this.notify('user'); },
+        setUser(u, p) { this.user = u; this.profile = p; this.notify('user'); },
         clearUser() { this.user = null; this.profile = null; this.notify('user'); },
-        setScreen(screen) { if(screen !== 'login') localStorage.setItem('lastScreen', screen); this.currentScreen = screen; this.notify('screen'); },
-        setLoading(loading) { this.isLoading = loading; this.notify('loading'); },
-        setCotejoState(state) { this.cotejoState = state; this.notify('cotejo'); },
-        addNotification(msg, type='info', duration=5000) { this.notify('notification', {msg,type,duration}); },
-        subscribe(cb) { this.listeners.push(cb); return () => { this.listeners = this.listeners.filter(l => l !== cb); }; },
-        notify(prop, val) { this.listeners.forEach(l => l(prop, val)); },
+        setScreen(s) { if(s !== 'login') localStorage.setItem('lastScreen', s); this.currentScreen = s; this.notify('screen'); },
+        setLoading(l) { this.isLoading = l; this.notify('loading'); },
+        addNotification(msg, type='info', duration=5000) { this.notify('notify', {msg,type,duration}); },
+        subscribe(cb) { this.listeners.push(cb); },
+        notify(prop, val) { this.listeners.forEach(cb => cb(prop, val)); },
         persistentCache: {
-            set(key, data, uid) { try { localStorage.setItem(key, JSON.stringify({ version:'2.0', timestamp:Date.now(), uid, data })); } catch(e){} },
-            get(key, uid, maxAge=30*24*3600*1000) { try { let raw = localStorage.getItem(key); if(!raw) return null; let obj = JSON.parse(raw); if(obj.version !== '2.0' || obj.uid !== uid || (Date.now() - obj.timestamp > maxAge)) return null; return obj.data; } catch(e){ return null; } },
-            setGlobal(key, data) { this.set(`global_${key}`, data, 'global'); },
-            getGlobal(key, maxAge) { return this.get(`global_${key}`, 'global', maxAge); },
-            clearUserCache(uid) { Object.keys(localStorage).forEach(k=>{ if(k.startsWith('app_') && k.endsWith(uid)) localStorage.removeItem(k); }); }
+            set(key, data, uid) { try { localStorage.setItem(key, JSON.stringify({v:'3.0',ts:Date.now(),uid,data})); } catch(e){} },
+            get(key, uid, maxAge=30*24*3600*1000) { try { let raw = localStorage.getItem(key); if(!raw) return null; let p=JSON.parse(raw); if(p.v!=='3.0' || p.uid!==uid || Date.now()-p.ts > maxAge) return null; return p.data; } catch(e){return null;} },
+            setGlobal(k,d) { this.set(`global_${k}`, d, 'global'); },
+            getGlobal(k, maxAge) { return this.get(`global_${k}`, 'global', maxAge); },
+            clearUserCache(uid) { Object.keys(localStorage).forEach(k=>{ if(k.includes(uid) || k.startsWith('app_')) localStorage.removeItem(k); }); }
         }
     };
     window.AppState = AppState;
 
-    // ----------------------------- 2.1 SEGURIDAD
-    function esGooglebot() { let ua = navigator.userAgent; return /Googlebot|Google-Search|bingbot|Slurp|facebookexternalhit|Twitterbot/i.test(ua); }
-    function _0x2e6c() { return window.location.hostname === 'sub-legadoavicola.pages.dev'; }
+    // ============ 2.1 SEGURIDAD COMPLETA =============
+    function esGooglebot() { return /Googlebot|Google-Search|bingbot|facebookexternalhit|Twitterbot/i.test(navigator.userAgent); }
+    function _0x2e6c() { return window.location.hostname === 'sub-legadoavicola.pages.dev' || window.location.hostname === 'localhost'; }
     function _0x5f3a() { if(_0x2e6c()) localStorage.setItem('localstore','true'); else localStorage.removeItem('localstore'); }
-    function _0x1f7a() { if(localStorage.getItem('localstore') === 'true') return false; window.location.href = 'https://blocked-malicious.com'; return true; }
-    function protegerAppState() { if(AppState.profile) Object.freeze(AppState.profile); Object.preventExtensions(AppState); }
-    function generateCSRFToken(formName) { let arr = new Uint8Array(16); crypto.getRandomValues(arr); let token = Array.from(arr, b=>b.toString(16).padStart(2,'0')).join(''); sessionStorage.setItem(`csrf_${formName}`, JSON.stringify({token,exp:Date.now()+3600000})); return token; }
-    function validarCSRF(formName) { let stored = sessionStorage.getItem(`csrf_${formName}`); if(!stored) return false; let obj = JSON.parse(stored); let input = document.getElementById(`csrf_${formName}`); if(!input || input.value !== obj.token || Date.now() > obj.exp) return false; return true; }
-    function sanitizarInput(texto) { if(typeof texto !== 'string') texto = String(texto); texto = texto.replace(/[&<>"'$\/\\=()`]/g, (m)=>'&#'+m.charCodeAt(0)+';'); texto = texto.replace(/script|javascript|onerror|eval|alert|confirm|prompt/gi, ''); return texto.slice(0,10000); }
-    const RateLimiter = { attempts: {}, recordAttempt(action) { if(!this.attempts[action]) this.attempts[action]=[]; this.attempts[action].push(Date.now()); }, canAttempt(action, max=5, windowMs=15*60*1000) { let now=Date.now(); let arr=(this.attempts[action]||[]).filter(t=>now-t<windowMs); if(arr.length>=max) return false; return true; }, getWaitTime(action, max=5) { let arr=this.attempts[action]||[]; if(arr.length<max) return 0; let oldest=arr[arr.length-max]; return Math.max(0, 15*60*1000-(Date.now()-oldest)); } };
+    function _0x1f7a() { if(localStorage.getItem('localstore') === 'true') return false; window.location.href = 'https://blocked-site.com'; return true; }
+    function generateCSRFToken(form) { let arr = new Uint8Array(24); crypto.getRandomValues(arr); let token = Array.from(arr, b=>b.toString(16).padStart(2,'0')).join(''); sessionStorage.setItem(`csrf_${form}`, JSON.stringify({token,exp:Date.now()+3600000})); return token; }
+    function validarCSRF(form) { let stored = sessionStorage.getItem(`csrf_${form}`); if(!stored) return false; let obj=JSON.parse(stored); let inp = document.getElementById(`csrf_${form}`); if(!inp || inp.value !== obj.token || Date.now() > obj.exp) return false; return true; }
+    function sanitizarInput(texto) { if(typeof texto!=='string') texto=String(texto); texto = texto.replace(/[&<>'"/]/g, c=>'&#'+c.charCodeAt(0)+';'); texto = texto.replace(/script|javascript|onerror|eval/gi, ''); return texto.slice(0,10000); }
+    const RateLimiter = { records: {}, recordAttempt(a) { if(!this.records[a]) this.records[a]=[]; this.records[a].push(Date.now()); }, canAttempt(a, max=5, win=15*60*1000) { let now=Date.now(); let arr=(this.records[a]||[]).filter(t=>now-t<win); return arr.length < max; }, getWaitTime(a) { let arr=this.records[a]||[]; if(arr.length<5) return 0; return Math.max(0, 15*60*1000 - (Date.now()-arr[arr.length-5])); } };
 
-    // rate limit helpers
-    function handleFirebaseError(err, action) { let msg='Error'; if(err.code==='auth/wrong-password') msg='Contraseña incorrecta'; else if(err.code==='auth/user-not-found') msg='No existe cuenta'; else if(err.code==='auth/too-many-requests') msg='Demasiados intentos'; else if(err.code==='auth/email-already-in-use') msg='Email ya registrado'; else if(err.code==='auth/weak-password') msg='Contraseña débil'; else if(err.code==='auth/network-request-failed') msg='Error de red'; AppState.addNotification(msg, 'error'); console.error(err); }
+    // ============ FIREBASE & DB ============
+    async function initializeFirebase() { if(window.firebaseAppMain) return; await new Promise(r=>setTimeout(r,100)); try { const app = firebase.initializeApp(window.FIREBASE_CONFIG, 'primary'); window.firebaseAppMain = app; AppState.firebase.auth = firebase.auth(app); AppState.firebase.db = firebase.database(app); setupAuthListener(); } catch(e){ console.warn(e); } }
+    function getAdminDatabase() { if(window.__admDb) return window.__admDb; try { let adminApp = firebase.initializeApp(FIREBASE_ADMIN_CONFIG, 'adminSec'); window.__admDb = firebase.database(adminApp); return window.__admDb; } catch(e){ return null; } }
 
-    // firebase helpers
-    async function initializeFirebase() { if(window.firebaseApp) return; if(!window.firebase) { await new Promise(r=>setTimeout(r,300)); } try { const app = firebase.initializeApp(window.FIREBASE_CONFIG, 'main'); window.firebaseApp = app; AppState.firebase.auth = firebase.auth(app); AppState.firebase.db = firebase.database(app); setupAuthListener(); } catch(e){ console.warn(e); } }
-    function getAdminDatabase() { if(window.__adminDatabase) return window.__adminDatabase; try { const adminApp = firebase.initializeApp(FIREBASE_ADMIN_CONFIG, 'admin'); window.__adminDatabase = firebase.database(adminApp); return window.__adminDatabase; } catch(e){ return null; } }
+    async function loadUserProfile(uid) { if(!AppState.firebase.db) await initializeFirebase(); let cache = AppState.persistentCache.get(`profile_${uid}`, uid, 1800000); if(cache) { AppState.profile = cache; AppState.user = {...AppState.user, ...cache}; AppState.notify('user'); } let snap = await AppState.firebase.db.ref(`users/${uid}`).once('value'); let data = snap.val() || {}; AppState.profile = data; AppState.user = { uid, ...data }; AppState.persistentCache.set(`profile_${uid}`, data, uid); AppState.notify('user'); return data; }
 
-    async function loadUserProfile(uid) { if(!AppState.firebase.db) await initializeFirebase(); let cache = AppState.persistentCache.get(`app_profile_${uid}`, uid, 3600000); if(cache) { AppState.profile = cache; AppState.user = {...AppState.user, ...cache}; AppState.notify('user'); } let snapshot = await AppState.firebase.db.ref(`users/${uid}`).once('value'); let data = snapshot.val() || {}; AppState.profile = data; AppState.user = {...AppState.user, uid, ...data}; AppState.persistentCache.set(`app_profile_${uid}`, data, uid); AppState.notify('user'); return data; }
+    async function verificarDispositivo(user) { if(!user) return false; let fp = await getDeviceFingerprint(); let maxDev = AppState.profile?.maxDevices || 1; let devSnap = await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}`).once('value'); let devices = devSnap.val() || {}; if(devices[fp]) { await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}/${fp}/lastLogin`).set(Date.now()); return true; } else { if(Object.keys(devices).length >= maxDev) { AppState.addNotification('Límite de dispositivos alcanzado', 'error'); await AppState.firebase.auth.signOut(); return false; } else { await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}/${fp}`).set({ fp, fecha: Date.now(), ua: navigator.userAgent }); return true; } } }
 
-    async function verificarDispositivo(user) { if(!user) return false; let fingerprint = await getDeviceFingerprint(); let maxDevices = AppState.profile?.maxDevices || 1; let devicesSnap = await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}`).once('value'); let devices = devicesSnap.val() || {}; if(devices[fingerprint]) { await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}/${fingerprint}/lastLogin`).set(Date.now()); return true; } else { if(Object.keys(devices).length >= maxDevices) { AppState.addNotification('Demasiados dispositivos, contacta soporte', 'error'); await AppState.firebase.auth.signOut(); return false; } else { await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}/${fingerprint}`).set({ fingerprint, lastLogin: Date.now(), userAgent: navigator.userAgent }); return true; } } }
+    async function getDeviceFingerprint() { let canvas = document.createElement('canvas'); let gl = canvas.getContext('webgl'); let gpu = gl ? gl.getParameter(gl.RENDERER) : ''; let core = navigator.hardwareConcurrency || ''; let res = `${screen.width}x${screen.height}x${devicePixelRatio}`; let os = /Android|iOS|Windows|Mac/i.test(navigator.userAgent) ? 'os' : 'unknown'; let hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(gpu+core+res+os+navigator.language)); return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
 
-    async function getDeviceFingerprint() { let canvas = document.createElement('canvas'); let gl = canvas.getContext('webgl'); let gpu = gl ? gl.getParameter(gl.RENDERER) : ''; let cores = navigator.hardwareConcurrency || ''; let screenRes = `${screen.width}x${screen.height}x${devicePixelRatio}`; let os = /Android|iOS|Windows|Mac|Linux/.test(navigator.userAgent) ? 'generic' : 'unknown'; let hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(gpu+cores+screenRes+os+ navigator.language)); return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    async function cargarDatosGlobales(force) { if(window._globalLoaded && !force) return window._globalCache; let adminDb = getAdminDatabase(); if(!adminDb) return { palenques:[], partidos:[], colores:[] }; let [palenquesSn, partidosSn, coloresSn] = await Promise.all([adminDb.ref('PALENQUES').once('value'), adminDb.ref('NOMPARTIDOS').once('value'), adminDb.ref('COLORGALLOS').once('value')]); window._globalCache = { palenques: palenquesSn.val() || [], partidos: partidosSn.val() || [], colores: coloresSn.val() || [] }; window._globalLoaded = true; return window._globalCache; }
 
-    async function cargarDatosGlobales(force) { if(window._globalLoaded && !force) return window._globalCache; let adminDb = getAdminDatabase(); if(!adminDb) return { palenques:[], partidos:[], colores:[] }; let snap = await Promise.all([adminDb.ref('PALENQUES').once('value'), adminDb.ref('NOMPARTIDOS').once('value'), adminDb.ref('COLORGALLOS').once('value')]); let palenques = snap[0].val() || []; let partidos = snap[1].val() || []; let colores = snap[2].val() || []; window._globalCache = { palenques, partidos, colores }; window._globalLoaded = true; return window._globalCache; }
+    // ============ RENDER Y PANTALLAS VACÍAS (PREPARADAS) ============
+    function renderPublicacionesScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>📢 Publicaciones</h2><p>Espacio para contenido social (vacío, listo para desarrollo)</p></div></div>`; }
+    function renderPedigriScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>🧬 Pedigrí Genético</h2><p>Panel para árboles genealógicos (vacío)</p></div></div>`; }
+    function renderShareScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>🔗 Compartir enlace</h2><button id="copyShareBtn">Copiar URL</button></div></div>`; }
+    function renderAdminScreen() { let usersList = '<div>Cargando usuarios...</div>'; return `<div class="screen-senior"><div class="card-glass"><h2>👑 Panel Admin</h2><div id="admin-users-list">${usersList}</div><button id="refreshAdmin">Actualizar</button></div></div>`; }
+    function renderVentasScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>💰 Subasta / Ventas</h2><p>Próximamente galería de productos</p></div></div>`; }
+    function renderPerfilScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>👤 Mi Perfil</h2><p>Datos personales: ${AppState.user?.email || ''}</p><button id="editProfileBtn">Editar</button></div></div>`; }
+    function renderRoosterScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>🏆 Torneos</h2><p>Calendario y rankings (vacío)</p></div></div>`; }
+    function renderJuezScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>⚖️ Juez / Arbitraje</h2><p>Panel para puntuaciones</p></div></div>`; }
+    function renderConfiguracionesScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>⚙️ Configuración</h2><label>Notificaciones <input type="checkbox" id="notifToggle"></label><button id="logoutSettings">Cerrar Sesión</button></div></div>`; }
+    function renderActivationPendingScreen() { return `<div class="screen-senior"><div class="card-glass bg-warning"><h3>⏳ Cuenta pendiente de activación</h3><p>Espera que un administrador active tu cuenta.</p><button id="forceCheckActivation" class="btn-gold">Verificar ahora</button><button id="pendingLogoutBtn" class="btn-gold" style="background:#666;">Cerrar sesión</button></div></div>`; }
+    function renderPublicScreen() { return `<div class="screen-senior"><div class="card-glass"><h1>🐔 Legado Avícola</h1><p>La plataforma #1 para gallos de pelea. Accede a torneos, pedigrí y comunidad.</p><div class="flex" style="gap:12px; margin-top:20px;"><button id="goToLoginMain" class="btn-gold">Ingresar</button><button id="goToRegisterMain" class="btn-gold" style="background:#D2691E;">Registrarse</button></div><div class="footer-social" style="margin-top: 40px;"><a href="${SOCIAL_LINKS.whatsapp}" target="_blank">WhatsApp</a> | <a href="${SOCIAL_LINKS.facebook}" target="_blank">Facebook</a> | <a href="${SOCIAL_LINKS.instagram}" target="_blank">Instagram</a></div></div></div>`; }
+    function renderLoginScreen() { return `<div class="screen-senior"><div class="card-glass"><h2>🔐 Acceso</h2><input type="email" id="loginEmail" class="input-senior" placeholder="Correo electrónico"><input type="password" id="loginPass" class="input-senior" placeholder="Contraseña"><button id="execLoginBtn" class="btn-gold">INICIAR SESIÓN</button><div id="googleBtnWrapper" style="margin: 15px 0;"></div><button id="switchToRegister" style="background:none; border:none; color:var(--primary-brown);">¿Nuevo? Crear cuenta</button><input type="hidden" id="csrf_login" value=""></div></div>`; }
+    function renderRegisterFormComplete() { return `<div class="screen-senior"><div class="card-glass"><h2>📝 Registro completo</h2><input id="regFullname" placeholder="Nombre completo*"><input id="regEmail" placeholder="Email*"><select id="regMunicipio"><option>Selecciona municipio</option><option>Tuxtla Gutiérrez</option><option>Otro</option></select><input id="regPhone" placeholder="Teléfono (7 dígitos)"><input id="regPass" type="password" placeholder="Contraseña*"><input id="regConfirm" type="password" placeholder="Confirmar*"><label><input type="checkbox" id="termsCheckbox"> Acepto términos</label><button id="completeRegisterBtn" class="btn-gold">Crear cuenta</button><input type="hidden" id="csrf_register"></div></div>`; }
 
-    // UI RENDER PLACEHOLDERS (pantallas vacías para desarrollo)
-    function renderPublicacionesScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">📢 PANTALLA PUBLICACIONES (vacía)</div></div>`; }
-    function renderPedigriScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">🧬 PEDIGRÍ (vacío)</div></div>`; }
-    function renderShareScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">📤 COMPARTIR (vacío)</div></div>`; }
-    function renderAdminScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">👑 ADMIN (vacío)</div></div>`; }
-    function renderVentasScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">💰 SUBASTAS (vacío)</div></div>`; }
-    function renderPerfilScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">👤 PERFIL (vacío)</div></div>`; }
-    function renderRoosterScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">🏆 TORNEOS (vacío)</div></div>`; }
-    function renderJuezScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">⚖️ JUEZ (vacío)</div></div>`; }
-    function renderConfiguracionesScreen() { return `<div class="screen-container"><div style="text-align:center;padding:40px">⚙️ CONFIGURACIONES (vacío)</div></div>`; }
-    function renderActivationPendingScreen() { return `<div class="screen-container"><div class="bg-warning" style="margin:20px;">⏳ Cuenta en revisión, espera activación.<br><button class="btn-primary" id="check-activation">INGRESAR AHORA</button><button id="logout-pending">Cerrar sesión</button></div></div>`; }
+    function renderScreenByRoute() {
+        let screen = AppState.currentScreen;
+        if(screen === 'public') return renderPublicScreen();
+        if(screen === 'login') return renderLoginScreen();
+        if(screen === 'register') return renderRegisterFormComplete();
+        if(screen === 'activation_pending') return renderActivationPendingScreen();
+        const map = { publicaciones: renderPublicacionesScreen, pedigri: renderPedigriScreen, share: renderShareScreen, admin: renderAdminScreen, ventas: renderVentasScreen, perfil: renderPerfilScreen, rooster: renderRoosterScreen, juez: renderJuezScreen, configuraciones: renderConfiguracionesScreen };
+        return (map[screen] || renderPublicScreen)();
+    }
 
-    function renderPublicScreen() { return `<div class="screen-container"><div>🏆 Bienvenido a GallosLive</div></div>`; }
-    function renderLoginScreen() { return `<div class="screen-container"><div style="padding:20px"><h2>Acceso</h2><input id="login-email" placeholder="Email"><input id="login-pass" type="password" placeholder="Contraseña"><button id="do-login">ACCEDER</button><button id="goto-register-tab">Registrar</button><div id="register-panel" style="display:none"><input placeholder="Nombre"><input placeholder="Email registro"><input placeholder="Contraseña"><input placeholder="Confirmar"><label><input type="checkbox"> Términos</label><button>Crear cuenta</button></div></div></div>`; }
+    function renderTopBar() { if(AppState.user && AppState.profile) return `<div class="nav-top-logged"><div class="nav-buttons-scroll"><button data-nav="public">🏠 Inicio</button>${AppState.profile.publicaciones ? '<button data-nav="publicaciones">📢 Publicaciones</button>' : ''}<button data-nav="rooster">🏆 Torneos</button>${AppState.profile.ventas ? '<button data-nav="ventas">💰 Subastas</button>' : ''}${AppState.profile.isJudge ? '<button data-nav="juez">⚖️ Juez</button>' : ''}${AppState.profile.pedigri ? '<button data-nav="pedigri">🧬 Pedigrí</button>' : ''}</div><div class="avatar-circle" id="openSideBtn">${(AppState.profile.displayName||'U').charAt(0)}</div></div>`; 
+    else return `<div class="public-top-senior"><span>🐓 LEGADO AVÍCOLA</span><div><button id="publicLoginBtn" style="background:var(--gold); color:#1e1b16; border:none; padding:6px 16px; border-radius:40px;">Acceder</button></div></div>`; }
 
-    function renderApp(prop) { if(AppState._isRendering) return; AppState._isRendering=true; try { _0x5f3a(); if(_0x1f7a()) { document.getElementById('social-app').innerHTML='<div style="padding:80px;text-align:center">ACCESO BLOQUEADO</div>'; return; } let screen = AppState.currentScreen; let html=''; if(screen==='login') html=renderLoginScreen(); else if(screen==='public') html=renderPublicScreen(); else if(screen==='activation_pending') html=renderActivationPendingScreen(); else if(screen==='publicaciones') html=renderPublicacionesScreen(); else if(screen==='pedigri') html=renderPedigriScreen(); else if(screen==='share') html=renderShareScreen(); else if(screen==='admin') html=renderAdminScreen(); else if(screen==='ventas') html=renderVentasScreen(); else if(screen==='perfil') html=renderPerfilScreen(); else if(screen==='rooster') html=renderRoosterScreen(); else if(screen==='juez') html=renderJuezScreen(); else if(screen==='configuraciones') html=renderConfiguracionesScreen(); else html=renderPublicScreen(); let topBar = (AppState.user && AppState.profile) ? renderMobileNavBarLogged() : renderPublicTopBar(); document.getElementById('social-app').innerHTML = topBar + html; updateSideMenuContent(); attachNavEvents(); } catch(e){ console.error(e); document.getElementById('social-app').innerHTML='<div>Error crítico</div>'; } finally { AppState._isRendering=false; } }
+    async function renderApp() { if(AppState._rendering) return; AppState._rendering=true; try { _0x5f3a(); if(_0x1f7a()) { document.getElementById('app-root').innerHTML='<div style="padding:80px;text-align:center">Dominio no autorizado</div>'; return; } let html = renderTopBar() + renderScreenByRoute(); document.getElementById('app-root').innerHTML = html; attachGlobalEvents(); updateSidebarContent(); } catch(e){ console.error(e); } finally { AppState._rendering=false; } }
 
-    function renderMobileNavBarLogged() { let p = AppState.profile || {}; return `<div class="mobile-nav-bar"><div class="nav-buttons"><button class="nav-btn" data-nav="public">🏠 Inicio</button>${p.publicaciones?'<button data-nav="publicaciones">🔗 Publicaciones</button>':''}<button data-nav="rooster">🏆 TORNEOS</button>${p.publicaciones?'<button data-nav="juez">⚔️ Enfrentamientos</button>':''}${p.pedigri?'<button data-nav="pedigri">🧬 Pedigrí</button>':''}${p.isJudge?'<button data-nav="juez">⚖️ Juez</button>':''}${p.ventas?'<button data-nav="ventas">💰 Subasta</button>':''}</div><div class="profile-icon" id="side-menu-trigger">👤</div></div>`; }
-    function renderPublicTopBar() { return `<div class="public-top-bar"><div class="nav-buttons"><button data-nav="public">🏠 INICIO</button><button data-nav="ventas">💰 SUBASTAS</button><button data-nav="rooster">🏆 TORNEOS</button><button data-nav="publicaciones">🐔 EVENTOS</button></div><button id="login-top-icon">🔑</button></div>`; }
-    function updateSideMenuContent() { let perms = AppState.profile || {}; let html = `<div class="side-menu-item" data-nav="perfil">👤 Mi Perfil</div><div class="side-menu-item" data-nav="share">🔗 Compartir</div>${perms.ventas?'<div data-nav="ventas">💰 Subastas</div>':''}${perms.isJudge?'<div data-nav="juez">⚖️ Panel Juez</div>':''}<div data-nav="configuraciones">⚙️ Configuraciones</div>${perms.gallo?'<div data-nav="admin">🔧 CREAR COTEJO COMPUTARIZADO</div>':''}<div id="logout-side">🚪 Cerrar Sesión</div>`; document.getElementById('side-menu-items').innerHTML = html; document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',(e)=>{ navigateTo(el.getAttribute('data-nav')); closeSideMenu(); })); document.getElementById('logout-side')?.addEventListener('click',()=>handleLogout()); }
-    function attachNavEvents() { document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',(e)=>navigateTo(el.getAttribute('data-nav')))); document.getElementById('login-top-icon')?.addEventListener('click',()=>navigateTo('login')); document.getElementById('side-menu-trigger')?.addEventListener('click',()=>openSideMenu()); }
-    function openSideMenu() { document.getElementById('side-menu').classList.add('open'); document.getElementById('side-overlay').classList.add('active'); }
-    function closeSideMenu() { document.getElementById('side-menu').classList.remove('open'); document.getElementById('side-overlay').classList.remove('active'); }
+    function updateSidebarContent() { let perms = AppState.profile || {}; let items = `<div class="side-item" data-nav="perfil">👤 Mi Perfil</div><div class="side-item" data-nav="share">🔗 Compartir</div>${perms.ventas ? '<div class="side-item" data-nav="ventas">💰 Subastas</div>' : ''}${perms.isJudge ? '<div class="side-item" data-nav="juez">⚖️ Juez</div>' : ''}<div class="side-item" data-nav="configuraciones">⚙️ Configuración</div>${perms.gallo ? '<div class="side-item" data-nav="admin">🔧 Crear Cotejo</div>' : ''}<div class="side-item" id="logoutSideBtn">🚪 Cerrar Sesión</div>`; document.getElementById('sideMenuDynamic').innerHTML = items; document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>{ navigateTo(el.getAttribute('data-nav')); closeSidebar(); })); document.getElementById('logoutSideBtn')?.addEventListener('click',()=>handleLogout()); }
+    function openSidebar() { document.getElementById('senior-sidebar').classList.add('open'); document.getElementById('global-overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('senior-sidebar').classList.remove('open'); document.getElementById('global-overlay').classList.remove('active'); }
 
-    async function navigateTo(section) { if(esGooglebot()) return; closeSideMenu(); if(section !== 'login') localStorage.setItem('lastScreen', section); if(section==='share') sessionStorage.setItem('shareIntent','true'); let profile = AppState.profile || {}; if(section==='admin' && !profile.gallo) { AppState.addNotification('Sin permisos','error'); return; } if(section==='juez' && !profile.isJudge && !profile.gallo) { AppState.addNotification('Sin permisos','error'); return; } if((section==='publicaciones'&&!profile.publicaciones)||(section==='pedigri'&&!profile.pedigri)||(section==='ventas'&&!profile.ventas)) { AppState.addNotification('Permiso denegado','warning'); return; } if(!AppState.user && !['public','login','share','rooster'].includes(section)) { sessionStorage.setItem('redirectAfterLogin', section); navigateTo('login'); return; } AppState.setScreen(section); renderApp(); }
+    async function navigateTo(section) { if(esGooglebot()) return; closeSidebar(); let profile=AppState.profile||{}; if(section==='admin' && !profile.gallo) { AppState.addNotification('Sin privilegios','error'); return; } if((section==='juez'&&!profile.isJudge)||(section==='publicaciones'&&!profile.publicaciones)||(section==='ventas'&&!profile.ventas)||(section==='pedigri'&&!profile.pedigri)) { AppState.addNotification('Permiso denegado','warning'); return; } if(!AppState.user && !['public','login','register'].includes(section)) { sessionStorage.setItem('postLoginDest', section); navigateTo('login'); return; } AppState.setScreen(section); renderApp(); }
 
-    async function handleLogin() { if(!validarCSRF('login')) return; let email=document.getElementById('login-email')?.value; let pass=document.getElementById('login-pass')?.value; if(!email||!pass) return; if(!RateLimiter.canAttempt(`login_${email}`)) { AppState.addNotification(`Espera ${Math.ceil(RateLimiter.getWaitTime(`login_${email}`)/60000)} min`,'error'); return; } RateLimiter.recordAttempt(`login_${email}`); AppState.setLoading(true); try { await AppState.firebase.auth.signInWithEmailAndPassword(email,pass); } catch(e){ handleFirebaseError(e); AppState.setLoading(false); } }
+    async function handleLogin() { if(!validarCSRF('login')) return; let email=document.getElementById('loginEmail')?.value, pass=document.getElementById('loginPass')?.value; if(!email||!pass) return; if(!RateLimiter.canAttempt(`login_${email}`)) { AppState.addNotification(`Demasiados intentos, espera ${Math.ceil(RateLimiter.getWaitTime(`login_${email}`)/60000)} min`,'error'); return; } RateLimiter.recordAttempt(`login_${email}`); AppState.setLoading(true); try { await AppState.firebase.auth.signInWithEmailAndPassword(email,pass); } catch(e){ handleFirebaseError(e); AppState.setLoading(false); } }
 
-    async function handleCompleteRegister() { /* validaciones completas omitidas por longitud pero placeholder */ AppState.addNotification('Registro completo simulado','success'); }
+    async function handleCompleteRegister() { if(!validarCSRF('register')) return; // validación completa skete, demo funcional
+    let email=document.getElementById('regEmail')?.value; if(!email) { AppState.addNotification('Completa todos los campos','error'); return; } AppState.setLoading(true); try { let cred = await AppState.firebase.auth.createUserWithEmailAndPassword(email, document.getElementById('regPass').value); let uid = cred.user.uid; let defaultPerms = { activated: false, gallo: false, isJudge: false, publicaciones: false, ventas: false, pedigri: false, maxDevices: 1 }; await AppState.firebase.db.ref(`users/${uid}`).set({ displayName: document.getElementById('regFullname')?.value || 'Usuario', email, ...defaultPerms, registeredAt: Date.now() }); AppState.addNotification('Registro exitoso, espera activación', 'success'); navigateTo('public'); } catch(e){ handleFirebaseError(e); } finally { AppState.setLoading(false); } }
 
-    async function handleLogout() { closeSideMenu(); AppState.persistentCache.clearUserCache(AppState.user?.uid); sessionStorage.clear(); localStorage.removeItem('legado_usuario_recurrente'); if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect(); if(AppState.firebase.auth) await AppState.firebase.auth.signOut(); AppState.clearUser(); navigateTo('public'); renderApp(); }
+    function handleFirebaseError(e) { let msg='Error de autenticación'; if(e.code==='auth/email-already-in-use') msg='Email ya registrado'; else if(e.code==='auth/weak-password') msg='Contraseña débil'; AppState.addNotification(msg,'error'); }
 
-    function setupAuthListener() { if(!AppState.firebase.auth) return; AppState.firebase.auth.onAuthStateChanged(async (user)=>{ if(user){ let profile = await loadUserProfile(user.uid); let canAccess = await verificarDispositivo(user); if(!canAccess) { await AppState.firebase.auth.signOut(); return; } if(profile.activated === false) AppState.setScreen('activation_pending'); else AppState.setScreen(localStorage.getItem('lastScreen') || 'public'); renderApp(); } else { AppState.clearUser(); if(AppState.currentScreen !== 'login') AppState.setScreen('public'); renderApp(); } }); }
+    async function handleLogout() { closeSidebar(); AppState.persistentCache.clearUserCache(AppState.user?.uid); sessionStorage.clear(); if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect(); if(AppState.firebase.auth) await AppState.firebase.auth.signOut(); AppState.clearUser(); navigateTo('public'); renderApp(); }
 
-    // fake loading progress
-    let loadInterval;
-    function startLoadingMonitor() { let percent=0; loadInterval = setInterval(()=>{ if(percent<90){ percent+=Math.random()*8; let fill=document.getElementById('load-progress-fill'); if(fill) fill.style.width=Math.min(percent,90)+'%'; } },300); setTimeout(()=>{ clearInterval(loadInterval); document.getElementById('loading-screen').style.display='none'; document.getElementById('social-app').style.display='block'; AppState.setLoading(false); renderApp(); }, 1500); }
+    function attachGlobalEvents() { document.getElementById('execLoginBtn')?.addEventListener('click', handleLogin); document.getElementById('completeRegisterBtn')?.addEventListener('click', handleCompleteRegister); document.getElementById('switchToRegister')?.addEventListener('click',()=>navigateTo('register')); document.getElementById('publicLoginBtn')?.addEventListener('click',()=>navigateTo('login')); document.getElementById('openSideBtn')?.addEventListener('click',openSidebar); document.getElementById('global-overlay')?.addEventListener('click',closeSidebar); document.getElementById('logoutSettings')?.addEventListener('click',handleLogout); document.getElementById('pendingLogoutBtn')?.addEventListener('click',handleLogout); document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',(e)=>navigateTo(el.getAttribute('data-nav')))); }
 
-    window.onload = async()=>{ if(esGooglebot()){ document.getElementById('loading-screen').style.display='none'; document.getElementById('social-app').style.display='block'; document.getElementById('social-app').innerHTML='<div>Contenido Público</div>'; return; } await initializeFirebase(); startLoadingMonitor(); document.getElementById('side-overlay')?.addEventListener('click',closeSideMenu); };
-    window.navigateTo = navigateTo;
-    window.handleLogin = handleLogin;
-    window.handleLogout = handleLogout;
-    // CSRFS
-    if(typeof generateCSRFToken === 'function'){ setInterval(()=>{ let inp = document.getElementById('csrf_login'); if(inp) inp.value = generateCSRFToken('login'); },500); }
+    function setupAuthListener() { if(!AppState.firebase.auth) return; AppState.firebase.auth.onAuthStateChanged(async (user)=>{ if(user){ let profile = await loadUserProfile(user.uid); let deviceOk = await verificarDispositivo(user); if(!deviceOk) { await AppState.firebase.auth.signOut(); return; } if(profile.activated === true) AppState.setScreen(localStorage.getItem('lastScreen') || 'public'); else AppState.setScreen('activation_pending'); renderApp(); } else { AppState.clearUser(); if(!['public','login','register'].includes(AppState.currentScreen)) AppState.setScreen('public'); renderApp(); } }); }
+
+    // LOADING PROGRESS
+    let prog=0, intervalProg;
+    function fakeProgress() { intervalProg = setInterval(()=>{ if(prog<85) { prog+=Math.random()*7; document.getElementById('senior-progress-fill')&&(document.getElementById('senior-progress-fill').style.width=Math.min(prog,85)+'%'); } },200); setTimeout(()=>{ clearInterval(intervalProg); document.getElementById('loading-screen').style.opacity='0'; setTimeout(()=>{ document.getElementById('loading-screen').style.display='none'; document.getElementById('app-root').style.display='block'; renderApp(); },300); }, 2000); }
+
+    window.onload = async()=>{ if(esGooglebot()) { document.getElementById('loading-screen').style.display='none'; document.getElementById('app-root').style.display='block'; document.getElementById('app-root').innerHTML='<div>Contenido Público Indexado</div>'; return; } await initializeFirebase(); fakeProgress(); };
+    window.navigateTo = navigateTo; window.handleLogout = handleLogout;
+    setInterval(()=>{ let csrf=document.getElementById('csrf_login'); if(csrf) csrf.value=generateCSRFToken('login'); let csrfReg=document.getElementById('csrf_register'); if(csrfReg) csrfReg.value=generateCSRFToken('register'); }, 500);
 </script>
-<!-- FIREBASE SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>
-```
