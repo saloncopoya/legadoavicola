@@ -1,1251 +1,1899 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#8B4513">
-    <meta name="description" content="Legado Avícola - Plataforma Profesional para la Élite Gallística - Sistema Completo de Gestión">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/galloslivebadge.appspot.com/o/icon-192.png">
-    <title>Legado Avícola | Sistema Integral de Gestión Gallística - Torneos, Pedigrí, Subastas</title>
+    <meta name="description" content="LEGADO AVICOLA - La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
+    <meta name="keywords" content="gallos, pelea, torneo, cotejo, subasta, palenque, avícola">
+    <meta name="author" content="Legado Avícola">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://legadoavicola.com/">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%238B4513'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white'%3E🐓%3C/text%3E%3C/svg%3E">
+    <title>LEGADO AVICOLA - Torneos Gallísticos Profesionales</title>
+    
     <style>
-        /* ================================================================================= */
-        /* BLOQUE 1: SISTEMA DE DISEÑO EXTREMO - MÁS DE 800 LÍNEAS DE CSS PROFESIONAL */
-        /* ================================================================================= */
+        /* ==============================================
+           ESTILOS GLOBALES - LEGADO AVICOLA
+           ============================================== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --primary-brown: #8B4513;
-            --primary-dark: #5a2e0e;
-            --primary-light: #D2691E;
-            --gold: #FFD700;
-            --gold-dark: #D4AF37;
-            --gold-light: #FFE44D;
-            --success: #2e7d32;
-            --success-dark: #1b5e20;
-            --error: #d93025;
-            --error-dark: #b71c1c;
-            --warning: #ff9800;
-            --warning-dark: #f57c00;
-            --info: #2196F3;
-            --info-dark: #0b5e9e;
-            --dark-bg: #1a1a2e;
-            --dark-bg-2: #16213e;
-            --gray-light: #faf5ea;
-            --gray-medium: #e8e0d3;
-            --card-radius: 32px;
-            --btn-radius: 60px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 8px 25px rgba(0,0,0,0.1);
-            --shadow-lg: 0 20px 40px rgba(0,0,0,0.15);
-            --shadow-xl: 0 30px 60px rgba(0,0,0,0.2);
-            --transition-fast: 0.15s ease;
-            --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--gray-light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f8f9fa;
             overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
-        /* ================= LOADING SCREEN ÉPICO ================= */
-        #loading-screen {
+        /* ==============================================
+           NOTIFICACIONES APILADAS - CON SALIDA LIMPIA
+           ============================================== */
+        #toast-container {
             position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center, #fff7ed 0%, #f3e9d2 100%);
-            z-index: 999999;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999999;
             display: flex;
-            flex-direction: column;
+            flex-direction: column-reverse;
             align-items: center;
-            justify-content: center;
-            transition: opacity 0.6s var(--transition-slow);
+            gap: 5px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 350px;
         }
-        .loader-epic {
-            text-align: center;
-        }
-        .gallo-loader {
-            width: 140px;
-            height: 140px;
-            background: linear-gradient(145deg, var(--gold) 0%, var(--primary-brown) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-            margin: 0 auto 30px;
-            animation: galloEpicPulse 0.9s infinite alternate ease-in-out;
-            box-shadow: 0 30px 50px rgba(139,69,19,0.4);
-        }
-        @keyframes galloEpicPulse {
-            0% { transform: scale(0.92) rotate(-5deg); box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
-            100% { transform: scale(1.1) rotate(5deg); box-shadow: 0 40px 70px rgba(139,69,19,0.6);}
-        }
-        .progress-epic {
-            width: 350px;
-            height: 10px;
-            background: #d4c5b0;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 30px auto;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .progress-epic-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-brown), var(--gold), var(--primary-light));
-            transition: width 0.15s linear;
-            border-radius: 20px;
-        }
-        .loading-status {
-            color: var(--primary-dark);
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            margin-top: 15px;
-            font-weight: 500;
-        }
-        #emergency-reload-btn {
-            margin-top: 35px;
-            background: var(--primary-brown);
+
+        .toast-message {
+            background: #323232;
             color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            display: none;
-            transition: var(--transition-normal);
-        }
-        #emergency-reload-btn:hover { background: var(--primary-light); transform: scale(1.02);}
-
-        /* ================= APP ROOT ================= */
-        #app-root {
-            display: none;
-            min-height: 100vh;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            width: 100%;
+            text-align: center;
+            pointer-events: auto;
+            border-left: 5px solid;
+            box-sizing: border-box;
+            margin-bottom: -5px;
+            transition: all 0.2s ease;
+            animation: fadeIn 0.15s ease forwards;
             position: relative;
+            z-index: 1;
+            cursor: pointer;
         }
 
-        /* ================= TOAST NOTIFICATION SYSTEM ================= */
-        .toast-container-senior {
-            position: fixed;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
-            z-index: 200000;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .toast-message:last-child {
+            margin-bottom: 0;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .toast-success { background: #42b72a; border-left-color: #2e7d32; }
+        .toast-error { background: #d93025; border-left-color: #b71c1c; }
+        .toast-warning { background: #ff9800; border-left-color: #f57c00; }
+        .toast-info { background: #8B4513; border-left-color: #5e2e0e; }
+        .toast-blue { background: #2196F3; border-left-color: #0b5e9e; }
+
+        .toast-message:hover {
+            opacity: 0.95;
+            transform: scale(1.02);
+        }
+
+        .toast-message.fade-out {
+            animation: fadeOutClean 0.25s ease forwards !important;
             pointer-events: none;
         }
-        .toast-senior {
-            pointer-events: auto;
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(16px);
-            color: white;
-            padding: 16px 22px;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-weight: 500;
-            box-shadow: var(--shadow-lg);
-            cursor: pointer;
-            animation: toastEpicIn 0.3s var(--transition-normal);
-            border-left: 5px solid var(--gold);
-            transition: var(--transition-fast);
-        }
-        .toast-senior:hover { transform: translateX(5px);}
-        @keyframes toastEpicIn {
-            from { opacity: 0; transform: translateX(-50px) scale(0.9);}
-            to { opacity: 1; transform: translateX(0) scale(1);}
-        }
-        .toast-senior.success { background: linear-gradient(135deg, var(--success), var(--success-dark)); border-left-color: var(--gold);}
-        .toast-senior.error { background: linear-gradient(135deg, var(--error), var(--error-dark)); border-left-color: var(--gold);}
-        .toast-senior.warning { background: linear-gradient(135deg, var(--warning), var(--warning-dark));}
-        .toast-senior.info { background: linear-gradient(135deg, var(--info), var(--info-dark));}
 
-        /* ================= SIDEBAR PROFESIONAL ================= */
-        .sidebar-senior {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOutClean {
+            0% { opacity: 1; transform: scale(1); margin-bottom: -35px; }
+            100% { opacity: 0; transform: scale(0.8); margin-bottom: -35px; }
+        }
+
+        /* ==============================================
+           PANTALLA DE CARGA
+           ============================================== */
+        #loading-screen {
             position: fixed;
             top: 0;
-            right: -420px;
-            width: 340px;
-            height: 100vh;
-            background: #ffffff;
-            box-shadow: -15px 0 45px rgba(0,0,0,0.2);
-            transition: right 0.35s var(--transition-slow);
-            z-index: 150000;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            border-left: 1px solid rgba(139,69,19,0.15);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
-        .sidebar-senior.open { right: 0; }
-        .sidebar-overlay-senior {
+
+        #loading-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #FFD700;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* ==============================================
+           BARRA DE ESTADO DE CONEXIÓN
+           ============================================== */
+        #connection-status-bar {
             position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(6px);
-            z-index: 149999;
-            display: none;
-            transition: var(--transition-normal);
-        }
-        .sidebar-overlay-senior.active { display: block; }
-        .sidebar-header-senior {
-            background: linear-gradient(145deg, var(--primary-brown), var(--primary-dark));
-            padding: 45px 25px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1a2634;
+            color: #ffffff;
             text-align: center;
-            color: white;
-            position: relative;
-        }
-        .sidebar-avatar-senior {
-            width: 95px;
-            height: 95px;
-            background: white;
-            border-radius: 50%;
-            margin: 0 auto 18px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 44px;
-            font-weight: bold;
-            color: var(--primary-brown);
-            border: 4px solid var(--gold);
-            box-shadow: var(--shadow-md);
-        }
-        .sidebar-name-senior {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-        .sidebar-email-senior {
-            font-size: 0.75rem;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-        .sidebar-item-senior {
-            padding: 16px 28px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            font-weight: 500;
+            gap: 16px;
             cursor: pointer;
-            transition: var(--transition-fast);
-            border-bottom: 1px solid #f0ebe3;
-            color: #2c241a;
-        }
-        .sidebar-item-senior:hover {
-            background: var(--gray-light);
-            padding-left: 36px;
-            color: var(--primary-brown);
         }
 
-        /* ================= TOP BARS ================= */
-        .topbar-logged {
+        #connection-status-bar.visible {
+            transform: translateY(0) !important;
+        }
+
+        #connection-status-bar.slow-connection {
+            background-color: #ae0404;
+        }
+
+        .wifi-bar {
+            width: 4px;
+            background: #4a90e2;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .bar-1 { height: 12px; }
+        .bar-2 { height: 18px; }
+        .bar-3 { height: 24px; }
+
+        @keyframes loading {
+            0% { width: 0%; opacity: 0.5; }
+            50% { width: 70%; opacity: 1; }
+            100% { width: 100%; opacity: 0.5; }
+        }
+
+        /* ==============================================
+           MENÚ LATERAL
+           ============================================== */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.2);
+            z-index: 1001;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease;
+        }
+
+        .side-menu-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            height: 70px;
-            background: white;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            z-index: 10000;
-            border-bottom: 2px solid rgba(139,69,19,0.1);
-        }
-        .nav-scroll-senior {
-            display: flex;
-            gap: 28px;
-            overflow-x: auto;
-            scrollbar-width: thin;
-            padding-bottom: 5px;
-        }
-        .nav-btn-senior {
-            background: none;
-            border: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            padding: 8px 0;
-            cursor: pointer;
-            color: #3b2a1f;
-            white-space: nowrap;
-            transition: var(--transition-fast);
-            position: relative;
-        }
-        .nav-btn-senior:hover { color: var(--primary-brown);}
-        .nav-btn-senior.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
             width: 100%;
-            height: 3px;
-            background: var(--gold);
-            border-radius: 3px;
-        }
-        .avatar-trigger-senior {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(145deg, var(--primary-brown), var(--primary-light));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            box-shadow: var(--shadow-sm);
-        }
-        .avatar-trigger-senior:hover { transform: scale(1.05); box-shadow: var(--shadow-md);}
-
-        .topbar-public {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 70px;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            border-bottom: 2px solid var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            color: white;
-            z-index: 10000;
-        }
-        .logo-public {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-        .logo-public span { color: var(--gold);}
-
-        /* ================= SCREENS CONTAINER ================= */
-        .screen-container-senior {
-            padding-top: 90px;
-            padding-bottom: 60px;
-            min-height: 100vh;
-        }
-
-        /* ================= CARDS Y COMPONENTES ================= */
-        .card-senior {
-            background: white;
-            border-radius: var(--card-radius);
-            padding: 28px;
-            margin: 18px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition-normal);
-            border: 1px solid rgba(139,69,19,0.08);
-        }
-        .card-senior:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg);}
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            border-left: 5px solid var(--gold);
-            padding-left: 15px;
-        }
-
-        /* ================= FORMULARIOS ÉPICOS ================= */
-        .input-epic {
-            width: 100%;
-            padding: 15px 20px;
-            margin: 12px 0;
-            border: 2px solid #e2d9ce;
-            border-radius: var(--btn-radius);
-            font-size: 1rem;
-            transition: var(--transition-fast);
-            background: white;
-        }
-        .input-epic:focus {
-            border-color: var(--gold);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(255,215,0,0.2);
-        }
-        .btn-epic-primary {
-            background: linear-gradient(145deg, var(--primary-brown), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            border-radius: var(--btn-radius);
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            transition: var(--transition-normal);
-            font-size: 1rem;
-        }
-        .btn-epic-primary:hover { transform: scale(0.98); background: var(--primary-light);}
-        .btn-epic-secondary {
-            background: #f0f2f5;
-            color: #050505;
-            border: 1px solid #e4e6eb;
-            padding: 14px 30px;
-            border-radius: var(--btn-radius);
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: var(--transition-fast);
-        }
-        .btn-epic-secondary:hover { background: #e4e6eb;}
-
-        /* ================= FOOTER ACCORDION ================= */
-        .footer-senior {
-            background: #1e1b16;
-            color: #bbb;
-            padding: 45px 25px 35px;
-            margin-top: 60px;
-        }
-        .accordion-senior {
-            border-bottom: 1px solid #3a2f24;
-            margin-bottom: 5px;
-        }
-        .accordion-header-senior {
-            padding: 18px 0;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            transition: var(--transition-fast);
-        }
-        .accordion-header-senior:hover { color: var(--gold);}
-        .accordion-content-senior {
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
             display: none;
-            padding: 15px 0 25px;
-            line-height: 1.6;
-        }
-        .social-grid {
-            display: flex;
-            gap: 25px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 25px;
-        }
-        .social-grid a {
-            color: var(--gold);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition-fast);
-        }
-        .social-grid a:hover { color: white; transform: translateY(-2px);}
-
-        /* ================= MODAL ================= */
-        .modal-epic {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            z-index: 250000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-epic-content {
-            background: white;
-            border-radius: 48px;
-            max-width: 90%;
-            width: 450px;
-            padding: 35px;
-            text-align: center;
-            box-shadow: var(--shadow-xl);
         }
 
-        /* ================= SKELETON LOADING ================= */
-        .skeleton-epic {
-            background: linear-gradient(90deg, #e2e0db 25%, #f0ece5 50%, #e2e0db 75%);
-            background-size: 200% 100%;
-            animation: skeletonShimmer 1.2s infinite;
-            border-radius: 20px;
-            height: 120px;
-            margin: 15px;
-        }
-        @keyframes skeletonShimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
+        /* ==============================================
+           UTILIDADES
+           ============================================== */
+        .hidden { display: none; }
+        
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 10px; }
 
-        /* ================= ANIMACIONES ADICIONALES ================= */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-        .fade-in-up { animation: fadeInUp 0.4s ease;}
-
-        /* ================= RESPONSIVE ================= */
-        @media (max-width: 768px) {
-            .nav-scroll-senior { gap: 15px; }
-            .sidebar-senior { width: 280px; right: -320px; }
-            .card-senior { margin: 12px; padding: 20px;}
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- PANTALLA DE CARGA -->
 <div id="loading-screen">
-    <div class="loader-epic">
-        <div class="gallo-loader">🐓⚡</div>
-        <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-dark);">LEGADO AVÍCOLA</div>
-        <div class="progress-epic"><div class="progress-epic-fill" id="epicProgressFill"></div></div>
-        <div class="loading-status" id="loadingStatusText">Inicializando núcleo del sistema...</div>
-        <button id="emergencyReloadEpic" style="margin-top: 30px; background: var(--primary-brown); color:white; border:none; padding:10px 32px; border-radius:50px; cursor:pointer; display:none;">⟳ RECARGAR SISTEMA</button>
+    <div style="font-size: 60px; color: white; margin-bottom: 20px;">🐓</div>
+    <div style="font-size: 32px; color: white; font-weight: 800; margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;">
+        <span>L</span><span>E</span><span>G</span><span>A</span><span>D</span><span>O</span>
+        <span>A</span><span>V</span><span>I</span><span>C</span><span>O</span><span>L</span><span>A</span>
     </div>
-</div>
-<div id="app-root"></div>
-<div class="sidebar-overlay-senior" id="sidebarOverlaySenior"></div>
-<div class="sidebar-senior" id="sidebarSenior">
-    <div class="sidebar-header-senior">
-        <div class="sidebar-avatar-senior" id="sidebarAvatarSenior">🐔</div>
-        <div class="sidebar-name-senior" id="sidebarNameSenior">Cargando...</div>
-        <div class="sidebar-email-senior" id="sidebarEmailSenior"></div>
+    <div style="width: 80%; max-width: 300px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
+        <div id="loading-progress-bar" style="width: 0%; height: 100%; background: #FFD700; border-radius: 10px; transition: width 0.3s ease;"></div>
     </div>
-    <div id="sidebarMenuSenior"></div>
+    <div id="loading-subtitle" style="font-size: 16px; color: #FFD700; margin-top: 10px; font-weight: 600; display: none;">Reconectando...</div>
+    <div id="loading-status" style="font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;">Inicializando aplicación</div>
+    <button id="loading-reload-btn" onclick="location.reload()" style="margin-top: 25px; padding: 12px 30px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 500; cursor: pointer; backdrop-filter: blur(4px); display: none;">
+        <span style="display: block; font-weight: 900; font-size: 18px;">⚠️ ACCEDER</span>
+        <span style="display: block; font-weight: 500; font-size: 12px; opacity: 0.8;">RECARGAR PÁGINA</span>
+    </button>
 </div>
-<div class="toast-container-senior" id="toastContainerSenior"></div>
+
+<!-- BARRA DE CONEXIÓN -->
+<div id="connection-status-bar">
+    <div class="wifi-animation" style="display: flex; align-items: center; gap: 4px;">
+        <div class="wifi-bar bar-1"></div>
+        <div class="wifi-bar bar-2"></div>
+        <div class="wifi-bar bar-3"></div>
+        <div style="width: 6px; height: 6px; background: #4a90e2; border-radius: 50%; margin-left: 6px;"></div>
+    </div>
+    <span id="connection-status-message">Verificando conexión...</span>
+</div>
+
+<!-- MENÚ LATERAL -->
+<div class="side-menu" id="side-menu">
+    <div id="side-menu-content"></div>
+</div>
+<div class="side-menu-overlay" id="side-menu-overlay" onclick="toggleSideMenu()"></div>
+
+<!-- CONTENEDOR DE NOTIFICACIONES -->
+<div id="toast-container"></div>
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div id="social-app" style="display: none;"></div>
+
+<!-- OVERLAY PARA INSTALACIÓN PWA -->
+<div id="installOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:transparent; z-index:99998; cursor:pointer;"></div>
+
+<!-- SCRIPTS DE FIREBASE Y GOOGLE -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-    // =================================================================================================
-    // BLOQUE 1: CONFIGURACIONES EXTERNAS COMPLETAS (FIREBASE PRINCIPAL + ADMIN + GOOGLE + REDES)
-    // =================================================================================================
-    window.FIREBASE_CONFIG = {
-        apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
-        authDomain: "galloslivebadge.firebaseapp.com",
-        databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
-        projectId: "galloslivebadge",
-        messagingSenderId: "979482928760",
-        appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
-    };
-    const FIREBASE_ADMIN_CONFIG = {
-        apiKey: "AIzaSyBMON_hBlUJfE-_L6qrt8MEP6JZrculRcs",
-        authDomain: "premiumcotejosgallistico-59e76.firebaseapp.com",
-        databaseURL: "https://premiumcotejosgallistico-59e76-default-rtdb.firebaseio.com",
-        projectId: "premiumcotejosgallistico-59e76",
-        storageBucket: "premiumcotejosgallistico-59e76.firebasestorage.app",
-        messagingSenderId: "785051078042",
-        appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
-    };
-    const GOOGLE_CLIENT_ID = '979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com';
-    const SOCIAL_LINKS_COMPLETE = {
-        whatsapp: "https://wa.me/5219611150394",
-        facebook: "https://facebook.com/legadoavicola",
-        instagram: "https://instagram.com/legadoavicola",
-        tiktok: "https://tiktok.com/@legadoavicola",
-        email: "lg.w@gmail.com",
-        messenger: "https://m.me/luisgerardoescobarescobar"
-    };
+// ==============================================
+// CONFIGURACIÓN DE FIREBASE
+// ==============================================
+window.FIREBASE_CONFIG = {
+    apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+    authDomain: "galloslivebadge.firebaseapp.com",
+    databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+    projectId: "galloslivebadge",
+    messagingSenderId: "979482928760",
+    appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
+};
 
-    // =================================================================================================
-    // BLOQUE 2: STATE MANAGER COMPLETO (TODAS LAS FUNCIONES DEL SISTEMA)
-    // =================================================================================================
-    const AppState = {
-        user: null,
+const FIREBASE_ADMIN_CONFIG = {
+    apiKey: "AIzaSyBMON_hBlUJfE-_L6qrt8MEP6JZrculRcs",
+    authDomain: "premiumcotejosgallistico-59e76.firebaseapp.com",
+    databaseURL: "https://premiumcotejosgallistico-59e76-default-rtdb.firebaseio.com",
+    projectId: "premiumcotejosgallistico-59e76",
+    storageBucket: "premiumcotejosgallistico-59e76.firebasestorage.app",
+    messagingSenderId: "785051078042",
+    appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
+};
+
+// ==============================================
+// GESTOR DE ESTADO (AppState)
+// ==============================================
+const AppState = {
+    _isRendering: false,
+    _isNotifying: false,
+    
+    firebase: {
+        app: null,
+        auth: null,
+        database: null,
+        isEnabled: false,
+        isInitialized: false,
+    },
+    
+    user: {
+        current: null,
         profile: null,
+    },
+    
+    ui: {
         currentScreen: 'public',
-        isLoading: false,
-        listeners: [],
-        firebase: { auth: null, db: null, adminDb: null },
-        cotejoState: null,
-        ui: { isSidebarOpen: false, lastNotification: null },
-
-        setUser(userData, profileData) { this.user = userData; this.profile = profileData; this.notify('user'); },
-        clearUser() { this.user = null; this.profile = null; this.notify('user'); },
-        setScreen(screen) { 
-            if(screen !== 'login') localStorage.setItem('lastScreen', screen); 
-            this.currentScreen = screen; 
-            this.notify('screen'); 
+        pendingScreen: null,
+        isLoading: true,
+        isLoadingScreen: false,
+        loadingScreenName: null,
+        notifications: [],
+        activeTab: 'login',
+        formData: { register: {}, login: {} }
+    },
+    
+    persistentCache: {
+        enabled: true,
+        version: '2.0',
+        
+        set(key, data, uid) {
+            if (!this.enabled) return;
+            const cacheKey = `app_${key}_${uid}`;
+            const cacheData = { version: this.version, timestamp: Date.now(), uid: uid, data: data };
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+            } catch(e) { console.warn('Error guardando cache:', e); }
         },
-        setLoading(loading) { this.isLoading = loading; this.notify('loading'); },
-        setCotejoState(state) { this.cotejoState = state; this.notify('cotejo'); },
-        addNotification(msg, type = 'info', duration = 5000) { this.notify('notification', { msg, type, duration }); },
-        subscribe(callback) { this.listeners.push(callback); },
-        notify(prop, value) { this.listeners.forEach(cb => cb(prop, value)); },
+        
+        get(key, uid, maxAge = 30 * 24 * 60 * 60 * 1000) {
+            if (!this.enabled) return null;
+            const cacheKey = `app_${key}_${uid}`;
+            try {
+                const cached = localStorage.getItem(cacheKey);
+                if (!cached) return null;
+                const cacheData = JSON.parse(cached);
+                if (cacheData.version !== this.version || cacheData.uid !== uid || Date.now() - cacheData.timestamp > maxAge) {
+                    this.remove(key, uid);
+                    return null;
+                }
+                return cacheData.data;
+            } catch(e) { return null; }
+        },
+        
+        remove(key, uid) {
+            localStorage.removeItem(`app_${key}_${uid}`);
+        },
+        
+        clearUserCache(uid) {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('app_') && key.endsWith(uid)) {
+                    localStorage.removeItem(key);
+                }
+            }
+        },
+        
+        setGlobal(key, data) {
+            if (!this.enabled) return;
+            localStorage.setItem(`global_${key}`, JSON.stringify({ version: this.version, timestamp: Date.now(), data: data }));
+        },
+        
+        getGlobal(key, maxAge = 30 * 24 * 60 * 60 * 1000) {
+            if (!this.enabled) return null;
+            try {
+                const cached = localStorage.getItem(`global_${key}`);
+                if (!cached) return null;
+                const cacheData = JSON.parse(cached);
+                if (cacheData.version !== this.version || Date.now() - cacheData.timestamp > maxAge) {
+                    localStorage.removeItem(`global_${key}`);
+                    return null;
+                }
+                return cacheData.data;
+            } catch(e) { return null; }
+        }
+    },
+    
+    rooster: { cotejoState: false, listener: null, tournamentInfo: null, roosters: [] },
+    subscribers: [],
+    
+    setUser(userData, profileData) {
+        if (this.user.current === userData && this.user.profile === profileData) return;
+        this.user.current = userData;
+        this.user.profile = profileData;
+        this.notify('user');
+    },
+    
+    clearUser() {
+        this.user.current = null;
+        this.user.profile = null;
+        if (this.firebase.database && this.rooster.listener) {
+            this.firebase.database.ref('system/cotejo').off('value', this.rooster.listener);
+            this.rooster.listener = null;
+        }
+        this.notify('user');
+    },
+    
+    setScreen(screen) {
+        if (this.ui.currentScreen === screen) return;
+        if (this.ui.currentScreen === 'public' && window.publicKiller) window.publicKiller();
+        if (this.ui.currentScreen === 'ventas' && window.ventasKiller) window.ventasKiller();
+        if (screen && screen !== 'login' && screen !== 'activation_pending') {
+            localStorage.setItem('lastScreen', screen);
+        }
+        this.ui.currentScreen = screen;
+        this.notify('screen');
+    },
+    
+    setLoading(loading) {
+        if (this.ui.isLoading === loading) return;
+        this.ui.isLoading = loading;
+        this.notify('loading');
+    },
+    
+    setCotejoState(state) {
+        if (this.rooster.cotejoState === state) return;
+        this.rooster.cotejoState = state;
+        this.notify('cotejo');
+    },
+    
+    addNotification(message, type = 'info', duration = 5000) {
+        console.log(`🔔 NOTIFICACIÓN [${type}]:`, message);
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-message toast-${type}`;
+        toast.textContent = message;
+        
+        toast.addEventListener('click', function() {
+            if (this.classList.contains('fade-out')) return;
+            this.classList.add('fade-out');
+            setTimeout(() => { if (this.parentNode) this.parentNode.removeChild(this); }, 250);
+        });
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            if (toast.parentNode && !toast.classList.contains('fade-out')) {
+                toast.classList.add('fade-out');
+                setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 250);
+            }
+        }, duration);
+    },
+    
+    subscribe(callback) { this.subscribers.push(callback); },
+    
+    notify(propriedadCambiada) {
+        if (this._isNotifying) return;
+        this._isNotifying = true;
+        try {
+            this.subscribers.forEach(callback => { try { callback(propriedadCambiada); } catch(e) {} });
+        } finally { this._isNotifying = false; }
+    }
+};
 
-        persistentCache: {
-            set(key, data, uid) { 
-                try { localStorage.setItem(key, JSON.stringify({ v: '4.0', ts: Date.now(), uid, data })); } catch(e) {} 
-            },
-            get(key, uid, maxAge = 30 * 24 * 3600 * 1000) {
-                try { 
-                    let raw = localStorage.getItem(key); 
-                    if(!raw) return null; 
-                    let p = JSON.parse(raw); 
-                    if(p.v !== '4.0' || p.uid !== uid || Date.now() - p.ts > maxAge) return null; 
-                    return p.data; 
-                } catch(e) { return null; }
-            },
-            setGlobal(key, data) { this.set(`global_${key}`, data, 'global'); },
-            getGlobal(key, maxAge) { return this.get(`global_${key}`, 'global', maxAge); },
-            clearUserCache(uid) { 
-                Object.keys(localStorage).forEach(k => { 
-                    if(k.includes(uid) || k.startsWith('app_') || k.startsWith('profile_')) localStorage.removeItem(k); 
-                }); 
+// ==============================================
+// FUNCIONES AUXILIARES
+// ==============================================
+function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name[0].toUpperCase();
+}
+
+function formatTime(timestamp) {
+    if (!timestamp) return 'Ahora';
+    const now = new Date(), postDate = new Date(timestamp), diff = now - postDate;
+    const minutes = Math.floor(diff / 60000), hours = Math.floor(diff / 3600000), days = Math.floor(diff / 86400000);
+    if (minutes < 1) return 'Ahora';
+    if (minutes < 60) return `${minutes} min`;
+    if (hours < 24) return `${hours} h`;
+    if (days < 7) return `${days} d`;
+    return postDate.toLocaleDateString();
+}
+
+function sanitizarInput(texto) {
+    if (!texto) return '';
+    if (typeof texto !== 'string') texto = String(texto);
+    
+    const caracteresPeligrosos = {
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+        '`': '&#96;', '$': '&#36;', '\\': '&#92;', '/': '&#47;', '=': '&#61;', '(': '&#40;', ')': '&#41;'
+    };
+    
+    let sanitizado = texto.replace(/[&<>"'`$\\\/=()]/g, char => caracteresPeligrosos[char]);
+    
+    const palabrasClave = ['script', 'javascript', 'onerror', 'onload', 'eval', 'document', 'window', 'location', 'cookie'];
+    palabrasClave.forEach(palabra => {
+        sanitizado = sanitizado.replace(new RegExp(`\\b${palabra}\\b`, 'gi'), `[${palabra.toUpperCase()}_BLOQUEADO]`);
+    });
+    
+    if (sanitizado.length > 10000) sanitizado = sanitizado.substring(0, 10000) + '... [TEXTO TRUNCADO]';
+    return sanitizado;
+}
+
+// ==============================================
+// RECURRENT USER MANAGER
+// ==============================================
+const RecurrentUserManager = {
+    STORAGE_KEY: 'legado_usuario_recurrente',
+    markAsRecurrent() { try { localStorage.setItem(this.STORAGE_KEY, 'true'); } catch(e) {} },
+    isRecurrent() { try { return localStorage.getItem(this.STORAGE_KEY) === 'true'; } catch(e) { return false; } },
+    clear() { try { localStorage.removeItem(this.STORAGE_KEY); } catch(e) {} }
+};
+
+// ==============================================
+// RATE LIMITER
+// ==============================================
+const RateLimiter = {
+    recordAttempt(action) {
+        const key = `rate_${action}`;
+        const now = Date.now();
+        const attempts = JSON.parse(localStorage.getItem(key) || '[]');
+        const recent = attempts.filter(time => now - time < 900000);
+        recent.push(now);
+        localStorage.setItem(key, JSON.stringify(recent));
+        return recent.length;
+    },
+    canAttempt(action, maxAttempts = 5, timeWindow = 900000) {
+        const key = `rate_${action}`;
+        const now = Date.now();
+        const attempts = JSON.parse(localStorage.getItem(key) || '[]');
+        const recent = attempts.filter(time => now - time < timeWindow);
+        localStorage.setItem(key, JSON.stringify(recent));
+        return recent.length < maxAttempts;
+    },
+    getWaitTime(action, maxAttempts = 5) {
+        const key = `rate_${action}`;
+        const now = Date.now();
+        const attempts = JSON.parse(localStorage.getItem(key) || '[]');
+        if (attempts.length < maxAttempts) return 0;
+        const oldest = Math.min(...attempts);
+        const waitTime = 900000 - (now - oldest);
+        return waitTime > 0 ? Math.ceil(waitTime / 1000) : 0;
+    }
+};
+
+// ==============================================
+// FINGERPRINT DE DISPOSITIVO
+// ==============================================
+let cachedFingerprintPromise = null;
+
+function generateHash(str) {
+    if (cachedFingerprintPromise) return cachedFingerprintPromise;
+    
+    if (window.crypto && window.crypto.subtle) {
+        cachedFingerprintPromise = crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+            .then(hash => Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''));
+        return cachedFingerprintPromise;
+    } else {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash = hash & hash;
+        }
+        cachedFingerprintPromise = Promise.resolve(hash.toString(36));
+        return cachedFingerprintPromise;
+    }
+}
+
+window.getDeviceFingerprint = function() {
+    try {
+        let gpuRenderer = 'unknown';
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            }
+        } catch(e) {}
+        
+        const cpuCores = navigator.hardwareConcurrency || 'unknown';
+        const pixelRatio = window.devicePixelRatio || 1;
+        const physicalResolution = `${Math.round(screen.width * pixelRatio)}x${Math.round(screen.height * pixelRatio)}`;
+        
+        const ua = navigator.userAgent;
+        let osFamily = 'unknown';
+        if (ua.includes('Android')) osFamily = 'android';
+        else if (ua.includes('iPhone') || ua.includes('iPad')) osFamily = 'ios';
+        else if (ua.includes('Windows')) osFamily = 'windows';
+        else if (ua.includes('Mac OS')) osFamily = 'macos';
+        else if (ua.includes('Linux')) osFamily = 'linux';
+        
+        let architecture = 'unknown';
+        if (ua.includes('arm64') || ua.includes('aarch64')) architecture = 'arm64';
+        else if (ua.includes('arm')) architecture = 'arm';
+        else if (ua.includes('x86_64') || ua.includes('WOW64')) architecture = 'x64';
+        
+        const components = { gpu: gpuRenderer, cores: cpuCores, resolution: physicalResolution, os: osFamily, arch: architecture };
+        const uniqueString = `${gpuRenderer}|${cpuCores}|${physicalResolution}|${osFamily}|${architecture}`;
+        
+        return generateHash(uniqueString).then(hash => ({ fingerprint: hash, components: components, userAgent: ua }));
+    } catch(error) { return Promise.reject(error); }
+};
+
+// ==============================================
+// VERIFICADOR DE DISPOSITIVOS
+// ==============================================
+async function verificarDispositivo(user) {
+    if (!user) return false;
+    
+    if (!AppState.firebase.database) {
+        try { AppState.firebase.database = firebase.database(); } catch(e) { return false; }
+    }
+    
+    try {
+        const currentDevice = await getDeviceFingerprint();
+        const database = AppState.firebase.database;
+        const userSnapshot = await database.ref('users/' + user.uid).once('value');
+        
+        if (!userSnapshot.exists()) return true;
+        
+        const userProfile = userSnapshot.val();
+        const maxDevices = userProfile.maxDevices || 1;
+        const devicesSnapshot = await database.ref(`dispositivos_autorizados/${user.uid}`).once('value');
+        const authorizedDevices = devicesSnapshot.val() || {};
+        const deviceExists = authorizedDevices[currentDevice.fingerprint];
+        
+        if (deviceExists) {
+            await database.ref(`dispositivos_autorizados/${user.uid}/${currentDevice.fingerprint}/lastLogin`).set(firebase.database.ServerValue.TIMESTAMP);
+            return true;
+        } else {
+            const devicesCount = Object.keys(authorizedDevices).length;
+            if (devicesCount < maxDevices) {
+                await database.ref(`dispositivos_autorizados/${user.uid}/${currentDevice.fingerprint}`).set({
+                    fingerprint: currentDevice.fingerprint,
+                    firstSeen: firebase.database.ServerValue.TIMESTAMP,
+                    lastLogin: firebase.database.ServerValue.TIMESTAMP,
+                    verified: true,
+                    info: currentDevice.components,
+                    userAgent: currentDevice.userAgent
+                });
+                return true;
+            } else {
+                await database.ref(`intentos_bloqueados/${user.uid}`).push({ nombre: user.displayName || 'Usuario sin nombre' });
+                await AppState.firebase.auth.signOut();
+                AppState.addNotification(`🚫 LÍMITE DE DISPOSITIVOS ALCANZADO (${maxDevices}). Contacta al administrador.`, 'error', 8000);
+                return false;
             }
         }
-    };
-    window.AppState = AppState;
+    } catch(error) { return false; }
+}
 
-    // =================================================================================================
-    // BLOQUE 3: FUNCIONES DE SEGURIDAD Y BLOQUEO (COMPLETAS CON TODAS LAS VALIDACIONES)
-    // =================================================================================================
-    function esGooglebot() { 
-        let ua = navigator.userAgent;
-        return /Googlebot|Google-Search|bingbot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp/i.test(ua);
-    }
-    function _0x2e6c() { 
-        let host = window.location.hostname;
-        return host === 'sub-legadoavicola.pages.dev' || host === 'localhost' || host.includes('pages.dev') || host.includes('vercel.app');
-    }
-    function _0x5f3a() { 
-        if(_0x2e6c()) localStorage.setItem('localstore', 'true'); 
-        else localStorage.removeItem('localstore'); 
-    }
-    function _0x1f7a() { 
-        if(localStorage.getItem('localstore') === 'true') return false; 
-        window.location.href = 'https://security-block.com/unauthorized'; 
-        return true; 
-    }
-    function protegerAppState() { 
-        if(AppState.profile) Object.freeze(AppState.profile); 
-        Object.preventExtensions(AppState); 
-        console.log('AppState protegido');
-    }
-    function generateCSRFToken(formName) { 
-        let arr = new Uint8Array(48); 
-        crypto.getRandomValues(arr); 
-        let token = Array.from(arr, b => b.toString(16).padStart(2, '0')).join(''); 
-        sessionStorage.setItem(`csrf_${formName}`, JSON.stringify({ token, exp: Date.now() + 3600000 })); 
-        return token; 
-    }
-    function validarCSRF(formName) { 
-        let stored = sessionStorage.getItem(`csrf_${formName}`); 
-        if(!stored) return false; 
-        let obj = JSON.parse(stored); 
-        let input = document.getElementById(`csrf_${formName}`); 
-        if(!input || input.value !== obj.token || Date.now() > obj.exp) return false; 
-        return true; 
-    }
-    function sanitizarInput(texto) { 
-        if(typeof texto !== 'string') texto = String(texto); 
-        texto = texto.replace(/[&<>'"/$%()*+,:;=@[\]\\`{|}]/g, c => '&#' + c.charCodeAt(0) + ';'); 
-        texto = texto.replace(/script|javascript|onerror|eval|alert|confirm|prompt|expression|url|iframe/gi, ''); 
-        return texto.slice(0, 10000); 
-    }
-    const RateLimiter = {
-        attempts: {},
-        recordAttempt(action) { 
-            if(!this.attempts[action]) this.attempts[action] = []; 
-            this.attempts[action].push(Date.now()); 
-        },
-        canAttempt(action, max = 5, windowMs = 15 * 60 * 1000) { 
-            let now = Date.now(); 
-            let arr = (this.attempts[action] || []).filter(t => now - t < windowMs); 
-            return arr.length < max; 
-        },
-        getWaitTime(action, max = 5) { 
-            let arr = this.attempts[action] || []; 
-            if(arr.length < max) return 0; 
-            return Math.max(0, 15 * 60 * 1000 - (Date.now() - arr[arr.length - max])); 
-        },
-        clearAttempts(action) { delete this.attempts[action]; }
-    };
+// ==============================================
+// FUNCIONES DE PANTALLA DE CARGA
+// ==============================================
+let loadingTimeoutId = null;
 
-    // =================================================================================================
-    // BLOQUE 4: FUNCIONES DE FIREBASE Y BASE DE DATOS (TODAS LAS OPERACIONES)
-    // =================================================================================================
-    async function initializeFirebase() { 
-        if(window.firebaseMainApp) return; 
-        await new Promise(r => setTimeout(r, 150)); 
-        try { 
-            const app = firebase.initializeApp(window.FIREBASE_CONFIG, 'primary'); 
-            window.firebaseMainApp = app; 
-            AppState.firebase.auth = firebase.auth(app); 
-            AppState.firebase.db = firebase.database(app); 
-            setupAuthListener(); 
-            console.log('Firebase Principal Conectado');
-        } catch(e) { console.error('Firebase init error:', e); } 
+function showLoadingScreen(message = 'Cargando...', progress = 0) {
+    const loadingScreen = document.getElementById('loading-screen');
+    const statusEl = document.getElementById('loading-status');
+    const reloadBtn = document.getElementById('loading-reload-btn');
+    const subtitleEl = document.getElementById('loading-subtitle');
+    
+    if (loadingScreen) {
+        loadingScreen.style.display = 'flex';
+        loadingScreen.style.opacity = '1';
     }
-    function getAdminDatabase() { 
-        if(window.__adminDatabaseInstance) return window.__adminDatabaseInstance; 
-        try { 
-            const adminApp = firebase.initializeApp(FIREBASE_ADMIN_CONFIG, 'adminSecondary'); 
-            window.__adminDatabaseInstance = firebase.database(adminApp); 
-            return window.__adminDatabaseInstance; 
-        } catch(e) { return null; } 
-    }
-    async function loadUserProfile(uid) { 
-        if(!AppState.firebase.db) await initializeFirebase(); 
-        let cache = AppState.persistentCache.get(`profile_full_${uid}`, uid, 1800000); 
-        if(cache) { 
-            AppState.profile = cache; 
-            AppState.user = { ...AppState.user, ...cache }; 
-            AppState.notify('user'); 
-        } 
-        let snap = await AppState.firebase.db.ref(`users/${uid}`).once('value'); 
-        let data = snap.val() || {}; 
-        AppState.profile = data; 
-        AppState.user = { uid, ...data }; 
-        AppState.persistentCache.set(`profile_full_${uid}`, data, uid); 
-        AppState.notify('user'); 
-        return data; 
-    }
-    async function cargarDatosGlobales(forceRefresh = false) { 
-        if(window._globalCacheLoaded && !forceRefresh) return window._globalCache; 
-        let adminDb = getAdminDatabase(); 
-        if(!adminDb) return { palenques: [], partidos: [], colores: [] }; 
-        let [palenquesSn, partidosSn, coloresSn] = await Promise.all([
-            adminDb.ref('PALENQUES').once('value'), 
-            adminDb.ref('NOMPARTIDOS').once('value'), 
-            adminDb.ref('COLORGALLOS').once('value')
-        ]); 
-        window._globalCache = { 
-            palenques: palenquesSn.val() || [], 
-            partidos: partidosSn.val() || [], 
-            colores: coloresSn.val() || [] 
-        }; 
-        window._globalCacheLoaded = true; 
-        return window._globalCache; 
-    }
-    async function verificarDispositivo(user) { 
-        if(!user) return false; 
-        let fingerprint = await getDeviceFingerprint(); 
-        let maxDevices = AppState.profile?.maxDevices || 1; 
-        let devicesSnap = await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}`).once('value'); 
-        let devices = devicesSnap.val() || {}; 
-        if(devices[fingerprint]) { 
-            await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}/${fingerprint}/lastLogin`).set(Date.now()); 
-            return true; 
-        } else { 
-            if(Object.keys(devices).length >= maxDevices) { 
-                AppState.addNotification('Límite de dispositivos alcanzado. Contacte soporte.', 'error'); 
-                await AppState.firebase.auth.signOut(); 
-                return false; 
-            } else { 
-                await AppState.firebase.db.ref(`dispositivos_autorizados/${user.uid}/${fingerprint}`).set({ 
-                    fingerprint, 
-                    fechaRegistro: Date.now(), 
-                    userAgent: navigator.userAgent,
-                    lastLogin: Date.now()
-                }); 
-                return true; 
-            } 
-        } 
-    }
-    async function getDeviceFingerprint() { 
-        let canvas = document.createElement('canvas'); 
-        let gl = canvas.getContext('webgl'); 
-        let gpu = gl ? gl.getParameter(gl.RENDERER) : 'unknown'; 
-        let cores = navigator.hardwareConcurrency || 'unknown'; 
-        let resolution = `${screen.width}x${screen.height}x${devicePixelRatio}`; 
-        let os = /Android|iOS|Windows|Mac|Linux/i.test(navigator.userAgent) ? navigator.platform : 'unknown'; 
-        let dataString = gpu + cores + resolution + os + navigator.language + screen.colorDepth; 
-        let hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(dataString)); 
-        return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''); 
-    }
-    function handleFirebaseError(error, action) { 
-        let mensaje = 'Error en la operación'; 
-        if(error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta'; 
-        else if(error.code === 'auth/user-not-found') mensaje = 'No existe cuenta con este correo'; 
-        else if(error.code === 'auth/email-already-in-use') mensaje = 'El email ya está registrado'; 
-        else if(error.code === 'auth/weak-password') mensaje = 'La contraseña es muy débil (mínimo 6 caracteres)'; 
-        else if(error.code === 'auth/too-many-requests') mensaje = 'Demasiados intentos fallidos. Espere unos minutos'; 
-        else if(error.code === 'auth/network-request-failed') mensaje = 'Error de red. Verifica tu conexión'; 
-        else if(error.code === 'auth/invalid-email') mensaje = 'Formato de email inválido'; 
-        AppState.addNotification(mensaje, 'error'); 
-        console.error(`Firebase error on ${action}:`, error); 
-    }
-
-    // =================================================================================================
-    // BLOQUE 5: FUNCIONES DE AUTENTICACIÓN Y USUARIOS (COMPLETAS)
-    // =================================================================================================
-    async function handleLogin() { 
-        if(!validarCSRF('login')) { AppState.addNotification('Error de seguridad CSRF', 'error'); return; }
-        let email = document.getElementById('loginEmailEpic')?.value; 
-        let pass = document.getElementById('loginPassEpic')?.value; 
-        if(!email || !pass) { AppState.addNotification('Complete todos los campos', 'warning'); return; }
-        if(!RateLimiter.canAttempt(`login_${email}`)) { 
-            let wait = Math.ceil(RateLimiter.getWaitTime(`login_${email}`) / 60000);
-            AppState.addNotification(`Demasiados intentos. Espere ${wait} minutos`, 'error'); 
-            return; 
+    
+    const lastScreen = localStorage.getItem('lastScreen');
+    if (subtitleEl) {
+        if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
+            subtitleEl.textContent = `↻ Volviendo a ${lastScreen}...`;
+            subtitleEl.style.display = 'block';
+        } else {
+            subtitleEl.style.display = 'none';
         }
-        RateLimiter.recordAttempt(`login_${email}`);
-        AppState.setLoading(true);
-        try { 
-            await AppState.firebase.auth.signInWithEmailAndPassword(email, pass); 
-            RateLimiter.clearAttempts(`login_${email}`);
-        } catch(e) { handleFirebaseError(e, 'login'); AppState.setLoading(false); } 
     }
-    async function handleCompleteRegister() { 
-        if(!validarCSRF('register')) { AppState.addNotification('Error CSRF', 'error'); return; }
-        let fullname = document.getElementById('regFullnameEpic')?.value;
-        let email = document.getElementById('regEmailEpic')?.value;
-        let pass = document.getElementById('regPassEpic')?.value;
-        let confirm = document.getElementById('regConfirmEpic')?.value;
-        let terms = document.getElementById('termsEpic')?.checked;
-        let phone = document.getElementById('regPhoneEpic')?.value;
+    
+    if (reloadBtn) {
+        reloadBtn.style.display = 'none';
+        if (loadingTimeoutId) clearTimeout(loadingTimeoutId);
         
-        if(!fullname || !email || !pass || !confirm || !terms) { 
-            AppState.addNotification('Complete todos los campos obligatorios y acepte términos', 'warning'); 
-            return; 
+        let timeoutMs = 19500;
+        if (navigator.connection?.effectiveType === '4g') timeoutMs = 14000;
+        else if (navigator.connection?.effectiveType === '3g') timeoutMs = 19000;
+        else if (navigator.connection?.effectiveType === '2g' || navigator.connection?.effectiveType === 'slow-2g') timeoutMs = 28000;
+        
+        loadingTimeoutId = setTimeout(() => {
+            const currentLoadingScreen = document.getElementById('loading-screen');
+            if (currentLoadingScreen && window.getComputedStyle(currentLoadingScreen).display !== 'none') {
+                if (reloadBtn) reloadBtn.style.display = 'block';
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ ERROR AL ACCEDER. Presione el siguiente boton AHORA:';
+                    statusEl.style.color = '#FFD700';
+                }
+            }
+            loadingTimeoutId = null;
+        }, timeoutMs);
+    }
+    
+    updateLoadingProgress(progress, message);
+}
+
+function hideLoadingScreen() {
+    if (loadingTimeoutId) {
+        clearTimeout(loadingTimeoutId);
+        loadingTimeoutId = null;
+    }
+    
+    const reloadBtn = document.getElementById('loading-reload-btn');
+    if (reloadBtn) reloadBtn.style.display = 'none';
+    
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) loadingScreen.style.display = 'none';
+    
+    const socialApp = document.getElementById('social-app');
+    if (socialApp) socialApp.style.display = 'block';
+}
+
+function updateLoadingProgress(percent, message) {
+    const statusEl = document.getElementById('loading-status');
+    const progressBar = document.getElementById('loading-progress-bar');
+    if (statusEl && message) statusEl.textContent = message;
+    if (progressBar) progressBar.style.width = percent + '%';
+}
+
+// ==============================================
+// FUNCIONES DE CONEXIÓN
+// ==============================================
+function getConnectionType() {
+    if ('connection' in navigator) {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (conn) return { effectiveType: conn.effectiveType, downlink: conn.downlink, rtt: conn.rtt, saveData: conn.saveData };
+    }
+    return null;
+}
+
+function isSlowConnection() {
+    const connInfo = getConnectionType();
+    if (!connInfo) return false;
+    return connInfo.effectiveType === '2g' || connInfo.effectiveType === 'slow-2g' || connInfo.downlink < 0.5;
+}
+
+function updateConnectionBar() {
+    const connectionBar = document.getElementById('connection-status-bar');
+    const connectionMessage = document.getElementById('connection-status-message');
+    if (!connectionBar) return;
+    
+    connectionBar.classList.remove('slow-connection', 'connection-restored');
+    
+    if (!navigator.onLine) {
+        connectionBar.classList.add('visible');
+        connectionBar.style.backgroundColor = '#626466';
+        connectionMessage.textContent = '¡Sin acceso a internet! Conectate a una red.... (Los cambios NO se guardarán)';
+    } else if (isSlowConnection()) {
+        connectionBar.classList.add('visible', 'slow-connection');
+        connectionBar.style.backgroundColor = '#ae0404';
+        connectionMessage.textContent = 'Conexión lenta inestable! (Las funciones pueden verse afectadas)';
+    } else if (connectionBar.classList.contains('visible')) {
+        connectionBar.classList.add('connection-restored');
+        connectionBar.style.backgroundColor = '#4CAF50';
+        connectionMessage.textContent = '¡Conexión restablecida! Es seguro usarlo.';
+        setTimeout(() => {
+            connectionBar.classList.remove('visible', 'connection-restored', 'slow-connection');
+            connectionBar.style.transform = 'translateY(100%)';
+        }, 9000);
+        return;
+    }
+}
+
+window.addEventListener('online', updateConnectionBar);
+window.addEventListener('offline', updateConnectionBar);
+if ('connection' in navigator) {
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) conn.addEventListener('change', updateConnectionBar);
+}
+document.addEventListener('DOMContentLoaded', updateConnectionBar);
+window.addEventListener('load', updateConnectionBar);
+
+// ==============================================
+// MUNICIPIOS DE CHIAPAS
+// ==============================================
+const municipiosChiapas = [
+    { id: 1, nombre: "Acacoyagua", prefijo: "919" }, { id: 2, nombre: "Acala", prefijo: "961" },
+    { id: 3, nombre: "Acapetahua", prefijo: "918" }, { id: 4, nombre: "Aldama", prefijo: "919" },
+    { id: 5, nombre: "Altamirano", prefijo: "919" }, { id: 6, nombre: "Amatán", prefijo: "932" },
+    { id: 7, nombre: "Amatenango de la Frontera", prefijo: "963" }, { id: 8, nombre: "Amatenango del Valle", prefijo: "992" },
+    { id: 9, nombre: "Angel Albino Corzo", prefijo: "992" }, { id: 10, nombre: "Arriaga", prefijo: "966" },
+    { id: 11, nombre: "Bejucal de Ocampo", prefijo: "919" }, { id: 12, nombre: "Bella Vista", prefijo: "963" },
+    { id: 13, nombre: "Benemérito de las Américas", prefijo: "934" }, { id: 14, nombre: "Berriozábal", prefijo: "961" },
+    { id: 15, nombre: "Bochil", prefijo: "919" }, { id: 16, nombre: "El Bosque", prefijo: "919" },
+    { id: 17, nombre: "Cacahoatán", prefijo: "962" }, { id: 18, nombre: "Catazajá", prefijo: "916" },
+    { id: 19, nombre: "Cintalapa", prefijo: "968" }, { id: 20, nombre: "Coapilla", prefijo: "919" },
+    { id: 21, nombre: "Comitán de Domínguez", prefijo: "963" }, { id: 22, nombre: "La Concordia", prefijo: "992" },
+    { id: 23, nombre: "Copainalá", prefijo: "968" }, { id: 24, nombre: "Chalchihuitán", prefijo: "919" },
+    { id: 25, nombre: "Chamula", prefijo: "967" }, { id: 26, nombre: "Chanal", prefijo: "963" },
+    { id: 27, nombre: "Chapultenango", prefijo: "932" }, { id: 28, nombre: "Chenalhó", prefijo: "919" },
+    { id: 29, nombre: "Chiapa de Corzo", prefijo: "961" }, { id: 30, nombre: "Chiapilla", prefijo: "961" },
+    { id: 31, nombre: "Chicoasén", prefijo: "961" }, { id: 32, nombre: "Chicomuselo", prefijo: "963" },
+    { id: 33, nombre: "Chilón", prefijo: "919" }, { id: 34, nombre: "Coyutla", prefijo: "932" },
+    { id: 35, nombre: "Dominguez", prefijo: "963" }, { id: 36, nombre: "Escuintla", prefijo: "918" },
+    { id: 37, nombre: "Francisco León", prefijo: "932" }, { id: 38, nombre: "Frontera Comalapa", prefijo: "963" },
+    { id: 39, nombre: "Frontera Hidalgo", prefijo: "962" }, { id: 40, nombre: "La Grandeza", prefijo: "919" },
+    { id: 41, nombre: "Huehuetán", prefijo: "962" }, { id: 42, nombre: "Huixtán", prefijo: "967" },
+    { id: 43, nombre: "Huitiupán", prefijo: "932" }, { id: 44, nombre: "Huixtla", prefijo: "962" },
+    { id: 45, nombre: "La Independencia", prefijo: "963" }, { id: 46, nombre: "Ixhuatán", prefijo: "932" },
+    { id: 47, nombre: "Ixtacomitán", prefijo: "932" }, { id: 48, nombre: "Ixtapa", prefijo: "961" },
+    { id: 49, nombre: "Ixtapangajoya", prefijo: "932" }, { id: 50, nombre: "Jiquipilas", prefijo: "968" },
+    { id: 51, nombre: "Jitotol", prefijo: "919" }, { id: 52, nombre: "Juárez", prefijo: "932" },
+    { id: 53, nombre: "Larráinzar", prefijo: "967" }, { id: 54, nombre: "La Libertad", prefijo: "934" },
+    { id: 55, nombre: "Mapastepec", prefijo: "918" }, { id: 56, nombre: "Las Margaritas", prefijo: "963" },
+    { id: 57, nombre: "Mazapa de Madero", prefijo: "963" }, { id: 58, nombre: "Mazatán", prefijo: "962" },
+    { id: 59, nombre: "Metapa", prefijo: "962" }, { id: 60, nombre: "Mitontic", prefijo: "967" },
+    { id: 61, nombre: "Motozintla", prefijo: "963" }, { id: 62, nombre: "Nicolás Ruíz", prefijo: "961" },
+    { id: 63, nombre: "Ocosingo", prefijo: "919" }, { id: 64, nombre: "Ocotepec", prefijo: "919" },
+    { id: 65, nombre: "Ocozocoautla de Espinosa", prefijo: "968" }, { id: 66, nombre: "Ostuacán", prefijo: "932" },
+    { id: 67, nombre: "Osumacinta", prefijo: "961" }, { id: 68, nombre: "Oxchuc", prefijo: "967" },
+    { id: 69, nombre: "Palenque", prefijo: "916" }, { id: 70, nombre: "Pantelhó", prefijo: "919" },
+    { id: 71, nombre: "Pantepec", prefijo: "932" }, { id: 72, nombre: "Pichucalco", prefijo: "932" },
+    { id: 73, nombre: "Pijijiapan", prefijo: "918" }, { id: 74, nombre: "El Porvenir", prefijo: "963" },
+    { id: 75, nombre: "Pueblo Nuevo Solistahuacán", prefijo: "932" }, { id: 76, nombre: "Rayón", prefijo: "919" },
+    { id: 77, nombre: "Reforma", prefijo: "916" }, { id: 78, nombre: "Las Rosas", prefijo: "992" },
+    { id: 79, nombre: "Sabanilla", prefijo: "919" }, { id: 80, nombre: "Salto de Agua", prefijo: "916" },
+    { id: 81, nombre: "San Andrés Duraznal", prefijo: "919" }, { id: 82, nombre: "San Cristóbal de las Casas", prefijo: "967" },
+    { id: 83, nombre: "San Fernando", prefijo: "961" }, { id: 84, nombre: "San Juan Cancuc", prefijo: "919" },
+    { id: 85, nombre: "San Lucas", prefijo: "992" }, { id: 86, nombre: "Santiago el Pinar", prefijo: "919" },
+    { id: 87, nombre: "Siltepec", prefijo: "963" }, { id: 88, nombre: "Simojovel", prefijo: "932" },
+    { id: 89, nombre: "Sitalá", prefijo: "919" }, { id: 90, nombre: "Socoltenango", prefijo: "992" },
+    { id: 91, nombre: "Solosuchiapa", prefijo: "932" }, { id: 92, nombre: "Soyaló", prefijo: "961" },
+    { id: 93, nombre: "Suchiapa", prefijo: "961" }, { id: 94, nombre: "Suchiate", prefijo: "962" },
+    { id: 95, nombre: "Sunuapa", prefijo: "932" }, { id: 96, nombre: "Tapachula", prefijo: "962" },
+    { id: 97, nombre: "Tapalapa", prefijo: "919" }, { id: 98, nombre: "Tapilula", prefijo: "932" },
+    { id: 99, nombre: "Tecpatán", prefijo: "968" }, { id: 100, nombre: "Tenejapa", prefijo: "967" },
+    { id: 101, nombre: "Teopisca", prefijo: "992" }, { id: 102, nombre: "Tila", prefijo: "919" },
+    { id: 103, nombre: "Tonalá", prefijo: "966" }, { id: 104, nombre: "Totolapa", prefijo: "961" },
+    { id: 105, nombre: "La Trinitaria", prefijo: "963" }, { id: 106, nombre: "Tumbalá", prefijo: "919" },
+    { id: 107, nombre: "Tuxtla Gutiérrez", prefijo: "961" }, { id: 108, nombre: "Tuxtla Chico", prefijo: "962" },
+    { id: 109, nombre: "Tuzantán", prefijo: "962" }, { id: 110, nombre: "Tzimol", prefijo: "963" },
+    { id: 111, nombre: "Unión Juárez", prefijo: "962" }, { id: 112, nombre: "Venustiano Carranza", prefijo: "992" },
+    { id: 113, nombre: "Villa Comaltitlán", prefijo: "918" }, { id: 114, nombre: "Villa Corzo", prefijo: "992" },
+    { id: 115, nombre: "Villaflores", prefijo: "965" }, { id: 116, nombre: "Yajalón", prefijo: "919" },
+    { id: 117, nombre: "Zinacantán", prefijo: "967" }
+];
+
+// ==============================================
+// FUNCIONES DE RENDERIZADO (PANTALLAS COMPLETAS)
+// ==============================================
+
+function renderPublicTopBar() {
+    const currentScreen = AppState.ui.currentScreen;
+    
+    let botonCentral;
+    if (currentScreen === 'public') botonCentral = { texto: 'Ver Subastas', accion: "navigateTo('ventas')" };
+    else if (currentScreen === 'ventas') botonCentral = { texto: 'Ver Torneos', accion: "navigateTo('rooster')" };
+    else if (currentScreen === 'rooster') botonCentral = { texto: 'Ver Publicaciones', accion: "navigateTo('share')" };
+    else if (currentScreen === 'share') botonCentral = { texto: 'Ir a Inicio', accion: "navigateTo('public')" };
+    else botonCentral = { texto: 'Ir a INICIO', accion: "navigateTo('public')" };
+    
+    return `
+        <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
+            <button onclick="handleLoginClick()" style="background: transparent; border: none; color: #FFD700; padding: 6px 4px; border-radius: 40px; font-weight: 700; font-size: 11px; cursor: pointer;">
+                <span style="font-size: 12px;">🔑</span>
+            </button>
+            <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px; flex: 1; justify-content: center;">
+                <button onclick="navigateTo('public')" style="background: ${currentScreen === 'public' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'public' ? '#1a1a2e' : '#FFD700'};">🏠</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'public' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">INICIO</span>
+                </button>
+                <button onclick="navigateTo('ventas')" style="background: ${currentScreen === 'ventas' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'ventas' ? '#1a1a2e' : '#FFD700'};">💰</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'ventas' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">SUBASTAS</span>
+                </button>
+                <button onclick="navigateTo('rooster')" style="background: ${currentScreen === 'rooster' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'rooster' ? '#1a1a2e' : '#FFD700'};">🏆</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'rooster' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">TORNEOS</span>
+                </button>
+                <button onclick="navigateTo('share')" style="background: ${currentScreen === 'share' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'share' ? '#1a1a2e' : '#FFD700'};">🐔</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'share' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">EVENTOS</span>
+                </button>
+            </div>
+        </nav>
+    `;
+}
+
+function renderMobileNavBar() {
+    const currentUser = AppState.user.current;
+    const userProfile = AppState.user.profile;
+    if (!currentUser || !userProfile) return '';
+    
+    const topMenuItems = [];
+    topMenuItems.push({ id: 'public', icon: '🏠', label: 'Inicio' });
+    topMenuItems.push({ id: 'share', icon: '🔗', label: 'Publicaciones' });
+    topMenuItems.push({ id: 'rooster', icon: '🏆', label: 'TORNEOS' });
+    if (userProfile.publicaciones === true) topMenuItems.push({ id: 'publicaciones', icon: '⚔️', label: 'Enfrentamientos' });
+    if (userProfile.pedigri === true) topMenuItems.push({ id: 'pedigri', icon: '🧬', label: 'Pedigrí' });
+    if (userProfile.isJudge === true) topMenuItems.push({ id: 'juez', icon: '⚖️', label: 'Juez' });
+    if (userProfile.ventas === true) topMenuItems.push({ id: 'ventas', icon: '💰', label: 'Subasta' });
+    
+    const photoURL = userProfile.photoURL || currentUser.photoURL || '';
+    const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
+    
+    return `
+        <nav style="position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
+            <div style="display: flex; gap: 2px; align-items: center;">
+                ${topMenuItems.map(item => `
+                    <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? '#8B4513' : '#666'}; font-size: 10px; font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px;">
+                        <span style="font-size: 20px; ${AppState.ui.currentScreen === item.id ? 'background: #8B4513; border-radius: 50%; padding: 7px; margin: -1px;' : ''}">${item.icon}</span>
+                        <span>${item.label}</span>
+                    </button>
+                `).join('')}
+            </div>
+            <button onclick="toggleSideMenu()" style="background: transparent; border: none; cursor: pointer; width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 2px solid #8B4513;">
+                ${photoURL ? `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="width:100%; height:100%; background:#8B4513; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">${initials}</div>`}
+            </button>
+        </nav>
+    `;
+}
+
+function renderLoginForm() {
+    const csrfToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    sessionStorage.setItem('csrf_login', csrfToken);
+    
+    return `
+        <input type="hidden" id="loginCsrfToken" value="${csrfToken}">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <input type="email" id="loginPhone" placeholder="Correo electrónico" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
+            <input type="password" id="loginPassword" placeholder="Contraseña" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
+            <button onclick="handleLogin()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">ACCEDER</button>
+            <div style="text-align:center;"><a href="#" onclick="resetPassword()" style="color:#8B4513; text-decoration:none;">¿Olvidaste tu contraseña?</a></div>
+            <div id="loginError" style="color:#d93025; text-align:center;"></div>
+        </div>
+    `;
+}
+
+function renderRegisterForm() {
+    const savedData = AppState.ui.formData.register || {};
+    
+    return `
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <input type="text" id="registerFullName" placeholder="Nombre completo *" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;" value="${savedData.fullName || ''}">
+            <input type="email" id="registerRealEmail" placeholder="📧 Correo electronico *" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;" value="${savedData.realEmail || ''}">
+            <input type="text" id="registerPartyName" placeholder="Partido (opcional)" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;" value="${savedData.partyName || ''}">
+            <input type="text" id="registerRepresentative" placeholder="Representante/Criadero (opcional)" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;" value="${savedData.representative || ''}">
+            
+            <select id="registerMunicipio" onchange="updatePhonePrefix()" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
+                <option value="">Selecciona tu municipio (Opcional)</option>
+                ${municipiosChiapas.map(m => `<option value="${m.nombre}" data-prefijo="${m.prefijo}">${m.nombre}</option>`).join('')}
+                <option value="otro">Otro (especificar)</option>
+            </select>
+            <div id="customMunicipioContainer" style="display:none;">
+                <input type="text" id="registerCustomMunicipio" placeholder="Escribe tu ubicación" style="width:100%; padding:12px; border:1px solid #dddfe2; border-radius:6px;">
+            </div>
+            
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="registerPhonePrefix" value="+52 961" style="flex:1; max-width:100px; padding:12px; border:1px solid #dddfe2; border-radius:8px; text-align:center;">
+                <input type="tel" id="registerPhone" placeholder="Últimos 7 dígitos" maxlength="7" style="flex:2; padding:12px; border:1px solid #dddfe2; border-radius:8px;">
+            </div>
+            
+            <input type="password" id="registerPassword" placeholder="Contraseña *" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
+            <input type="password" id="registerConfirmPassword" placeholder="Confirmar contraseña *" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
+            
+            <label style="display:flex; align-items:center; gap:12px;">
+                <input type="checkbox" id="registerTerms"> Acepto los términos y condiciones
+            </label>
+            
+            <button onclick="handleCompleteRegister()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">CREAR CUENTA</button>
+            <div id="registerError" style="color:#d93025;"></div>
+            <div id="registerSuccess" style="color:#42b72a;"></div>
+        </div>
+    `;
+}
+
+function renderLoginScreen() {
+    const activeTab = AppState.ui.activeTab || 'login';
+    const isLoginActive = activeTab === 'login';
+    
+    setTimeout(() => {
+        if (AppState.ui.currentScreen === 'login' && !AppState.user.current && isLoginActive && typeof google !== 'undefined') {
+            mostrarModalGoogleInferior();
         }
-        if(pass !== confirm) { AppState.addNotification('Las contraseñas no coinciden', 'error'); return; }
-        if(pass.length < 6) { AppState.addNotification('La contraseña debe tener al menos 6 caracteres', 'error'); return; }
-        if(!email.includes('@') || !email.includes('.')) { AppState.addNotification('Email inválido', 'error'); return; }
+    }, 2000);
+    
+    return `
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifOZH9-0lYvE26eERqh2GlCJ8FluQTtfWIv0511ORLE78-buORw3OT-V5jHrU8yRK-HX_AmMD3FQRF2wiVUVLNKkEhepibWafLLBPvX6YNsTuRL3uJ1OpVD1bcJ9R4FBXfBN9xyYOG3b_v1fMuqZOLkaZrfCJmltGJZsZhKN-5IM7WfstdaM_0ry0nLEY/s320/Gemini_Generated_Image_4l1ocl4l1ocl4l1o.png'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 100%; max-width: 400px; margin: auto;">
+                <div style="text-align:center; background: black; border-radius: 12px; padding: 8px; margin-bottom: 10px;">
+                    <div style="font-size:12px; font-weight:700; color:#D4AF37;">🔗 MENU DE NAVEGACIÓN:</div>
+                    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
+                        <a href="/?section=public" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏠 INICIO</a>
+                        <a href="/?section=rooster" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏆 TORNEOS</a>
+                        <a href="/?section=ventas" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">💰 SUBASTAS</a>
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
+                    <div style="display:flex; gap:8px; margin-bottom:20px;">
+                        <button onclick="showLoginForm()" style="flex:1; padding:12px; background:${isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${isLoginActive ? '700' : '500'}; color:${isLoginActive ? 'white' : '#666'}; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
+                        <button onclick="showRegisterForm()" style="flex:1; padding:12px; background:${!isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${!isLoginActive ? '700' : '500'}; color:${!isLoginActive ? 'white' : '#666'}; cursor:pointer;">📝 Registrar</button>
+                    </div>
+                    <div id="loginForm" class="${isLoginActive ? '' : 'hidden'}">${renderLoginForm()}</div>
+                    <div id="registerForm" class="${!isLoginActive ? '' : 'hidden'}">${renderRegisterForm()}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderPublicScreen() {
+    return `
+        <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
+            <div style="padding-top: 60px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🐓</div>
+                <h1 style="color: #8B4513; margin-bottom: 10px;">LEGADO AVICOLA</h1>
+                <p style="color: #666; margin-bottom: 30px;">La plataforma profesional para torneos gallísticos</p>
+                <button onclick="handleLoginClick()" style="padding: 16px 32px; background: #8B4513; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">INICIAR SESIÓN</button>
+            </div>
+        </div>
+    `;
+}
+
+function renderActivationPendingScreen() {
+    const userProfile = AppState.user.profile;
+    const initials = getInitials(userProfile?.displayName || 'U');
+    
+    return `
+        <div style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="max-width: 500px; width: 100%;">
+                <div style="text-align: center;">
+                    <div style="font-size: 60px; color: white;">⏳</div>
+                    <h1 style="color: white;">Cuenta en revisión</h1>
+                    <p style="color: rgba(255,255,255,0.9);">Tu cuenta está siendo verificada por un administrador</p>
+                </div>
+                <div style="background: white; border-radius: 16px; padding: 24px; margin-top: 20px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f0f8ff; border-radius: 12px;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${initials}</div>
+                        <div><div style="font-size:18px; font-weight:700;">${userProfile?.displayName || 'Usuario'}</div></div>
+                    </div>
+                    <button onclick="checkActivationStatusWithFeedback()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">🔄 INGRESAR AHORA</button>
+                    <button onclick="handleLogout()" style="width:100%; margin-top:12px; padding:14px; background:#f0f2f5; color:#333; border:1px solid #e4e6eb; border-radius:8px; font-weight:700; cursor:pointer;">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Pantallas vacías (pendientes de implementar)
+window.renderPublicacionesScreen = function() { return '<div style="padding-top:80px; text-align:center;">PANTALLA PUBLICACIONES - PRÓXIMAMENTE</div>'; };
+window.renderPedigriScreen = function() { return '<div style="padding-top:80px; text-align:center;">PANTALLA PEDIGRÍ - PRÓXIMAMENTE</div>'; };
+window.renderShareScreen = function() { return '<div style="padding-top:80px; text-align:center;">PANTALLA SHARE - PRÓXIMAMENTE</div>'; };
+window.renderAdminScreen = function() { return '<div style="padding-top:80px; text-align:center;">PANEL ADMIN - PRÓXIMAMENTE</div>'; };
+window.renderVentasScreen = function() { return '<div style="padding-top:80px; text-align:center;">SECCIÓN VENTAS/SUBASTAS - PRÓXIMAMENTE</div>'; };
+window.renderPerfilScreen = function() { return '<div style="padding-top:80px; text-align:center;">MI PERFIL - PRÓXIMAMENTE</div>'; };
+window.renderRoosterScreen = function() { return '<div style="padding-top:80px; text-align:center;">TORNEOS GUARDADOS - PRÓXIMAMENTE</div>'; };
+window.renderJuezScreen = function() { return '<div style="padding-top:80px; text-align:center;">PANEL JUEZ - PRÓXIMAMENTE</div>'; };
+window.renderConfiguracionesScreen = function() { return '<div style="padding-top:80px; text-align:center;">CONFIGURACIONES - PRÓXIMAMENTE</div>'; };
+
+function renderScreenSkeleton(screenName) {
+    return `
+        <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
+            ${renderMobileNavBar()}
+            <div style="max-width: 800px; margin: 0 auto; padding: 10px;">
+                <div style="margin: 10px 0 30px 0; padding: 20px; background: #fff3e0; border-radius: 12px; text-align: center;">
+                    <p style="color: #666;">Esto puede tomar unos segundos...</p>
+                    <div style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden;">
+                        <div style="width: 30%; height: 100%; background: #8B4513; animation: loading 1.5s infinite ease-in-out;"></div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="font-size: 40px; width: 60px; height: 60px; background: #e0e0e0; border-radius: 12px;"></div>
+                    <div style="flex: 1;"><div style="height: 32px; width: 60%; background: #e0e0e0; border-radius: 8px;"></div></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="height: 100px; background: #e0e0e0; border-radius: 12px;"></div>
+                    <div style="height: 100px; background: #e0e0e0; border-radius: 12px;"></div>
+                    <div style="height: 100px; background: #e0e0e0; border-radius: 12px;"></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ==============================================
+// FUNCIONES DE LOGIN Y AUTENTICACIÓN
+// ==============================================
+window.handleLoginClick = function() {
+    if (AppState.firebase.isEnabled && AppState.firebase.auth) {
+        navigateTo('login');
+        return;
+    }
+    AppState.addNotification('Espere por favor. Cargando aplicación...', 'warning');
+    AppState.ui.pendingScreen = 'login';
+    initializeFirebase();
+};
+
+function showLoginForm() {
+    AppState.ui.activeTab = 'login';
+    AppState.setScreen('login');
+    document.getElementById('loginForm')?.classList.remove('hidden');
+    document.getElementById('registerForm')?.classList.add('hidden');
+}
+
+function showRegisterForm() {
+    AppState.ui.activeTab = 'register';
+    AppState.setScreen('register');
+    document.getElementById('loginForm')?.classList.add('hidden');
+    document.getElementById('registerForm')?.classList.remove('hidden');
+}
+
+function updatePhonePrefix() {
+    const select = document.getElementById('registerMunicipio');
+    const prefix = document.getElementById('registerPhonePrefix');
+    const custom = document.getElementById('customMunicipioContainer');
+    if (!select || !prefix) return;
+    const opt = select.options[select.selectedIndex];
+    if (opt.value === 'otro') {
+        if (custom) custom.style.display = 'block';
+        prefix.value = '+52 961';
+    } else {
+        if (custom) custom.style.display = 'none';
+        prefix.value = `+52 ${opt.getAttribute('data-prefijo') || '961'}`;
+    }
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginPhone')?.value.trim();
+    const password = document.getElementById('loginPassword')?.value;
+    const loginBtn = document.querySelector('#loginForm .btn-primary');
+    
+    if (!email || !password) {
+        AppState.addNotification('Completa todos los campos', 'warning');
+        return;
+    }
+    
+    const emailKey = `login_${email}`;
+    if (!RateLimiter.canAttempt(emailKey, 3)) {
+        AppState.addNotification('Demasiados intentos. Espera unos minutos.', 'error');
+        return;
+    }
+    
+    if (!AppState.firebase.isEnabled || !AppState.firebase.auth) {
+        AppState.addNotification('Error: Firebase no inicializado', 'error');
+        return;
+    }
+    
+    showLoadingScreen('Iniciando sesión...', 30);
+    if (loginBtn) loginBtn.disabled = true;
+    
+    try {
+        RateLimiter.recordAttempt(emailKey);
+        await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
+        if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
+        localStorage.removeItem(`rate_${emailKey}`);
+    } catch (error) {
+        hideLoadingScreen();
+        if (error.code === 'auth/invalid-login-credentials') {
+            AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
+        } else {
+            AppState.addNotification('Error al iniciar sesión', 'error');
+        }
+        if (loginBtn) loginBtn.disabled = false;
+    }
+}
+
+async function resetPassword() {
+    if (!AppState.firebase.isEnabled) {
+        AppState.addNotification('Firebase no está inicializado', 'error');
+        return;
+    }
+    const email = document.getElementById('loginPhone')?.value.trim();
+    if (!email) {
+        AppState.addNotification('Ingresa tu correo electrónico', 'error');
+        return;
+    }
+    try {
+        await AppState.firebase.auth.sendPasswordResetEmail(email);
+        AppState.addNotification(`✅ Se envió un enlace de recuperación a: ${email}`, 'success');
+    } catch (error) {
+        AppState.addNotification('Error al enviar correo de recuperación', 'error');
+    }
+}
+
+async function handleCompleteRegister() {
+    const fullName = sanitizarInput(document.getElementById('registerFullName')?.value || '');
+    const realEmail = document.getElementById('registerRealEmail')?.value.trim() || '';
+    const password = document.getElementById('registerPassword')?.value || '';
+    const confirmPassword = document.getElementById('registerConfirmPassword')?.value || '';
+    const termsAccepted = document.getElementById('registerTerms')?.checked || false;
+    
+    if (!fullName || !realEmail || !password || !confirmPassword) {
+        AppState.addNotification('Completa todos los campos obligatorios', 'error');
+        return;
+    }
+    if (password !== confirmPassword) {
+        AppState.addNotification('Las contraseñas no coinciden', 'error');
+        return;
+    }
+    if (password.length < 6) {
+        AppState.addNotification('La contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+    }
+    if (!termsAccepted) {
+        AppState.addNotification('Debes aceptar los términos y condiciones', 'error');
+        return;
+    }
+    
+    if (!AppState.firebase.isEnabled) {
+        AppState.addNotification('Firebase no está inicializado', 'error');
+        return;
+    }
+    
+    showLoadingScreen('Registrando cuenta...', 20);
+    const btn = document.getElementById('registerSubmitBtn');
+    if (btn) btn.disabled = true;
+    
+    try {
+        const userCredential = await AppState.firebase.auth.createUserWithEmailAndPassword(realEmail, password);
+        if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
         
-        AppState.setLoading(true);
-        try { 
-            let cred = await AppState.firebase.auth.createUserWithEmailAndPassword(email, pass); 
-            let uid = cred.user.uid;
-            await cred.user.updateProfile({ displayName: fullname });
-            let defaultPermissions = {
-                displayName: fullname,
-                email: email,
-                phone: phone || '',
+        await userCredential.user.updateProfile({ displayName: fullName });
+        
+        await AppState.firebase.database.ref('users/' + userCredential.user.uid).set({
+            uid: userCredential.user.uid,
+            displayName: fullName,
+            realEmail: realEmail,
+            registeredAt: Date.now(),
+            registeredWith: 'email',
+            maxDevices: 1,
+            activated: false,
+            gallo: false,
+            isJudge: false,
+            publicaciones: false,
+            ventas: false,
+            pedigri: false
+        });
+        
+        await loadUserProfile(userCredential.user.uid);
+        AppState.addNotification('✅ Cuenta creada. Pendiente de activación.', 'success');
+        AppState.setScreen('public');
+        hideLoadingScreen();
+        
+    } catch (error) {
+        hideLoadingScreen();
+        if (error.code === 'auth/email-already-in-use') {
+            AppState.addNotification('Este email ya está registrado', 'error');
+        } else {
+            AppState.addNotification('Error al registrar', 'error');
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+async function loadUserProfile(uid) {
+    if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
+    
+    try {
+        const cachedProfile = AppState.persistentCache.get('profile', uid);
+        if (cachedProfile) {
+            AppState.setUser(AppState.firebase.auth.currentUser, cachedProfile);
+            return true;
+        }
+        
+        const snapshot = await AppState.firebase.database.ref('users/' + uid).once('value');
+        if (snapshot.exists()) {
+            const profile = { id: uid, ...snapshot.val() };
+            if (profile.activated === undefined) profile.activated = false;
+            if (profile.gallo === undefined) profile.gallo = false;
+            if (profile.isJudge === undefined) profile.isJudge = false;
+            if (profile.publicaciones === undefined) profile.publicaciones = false;
+            if (profile.pedigri === undefined) profile.pedigri = false;
+            if (profile.ventas === undefined) profile.ventas = false;
+            
+            AppState.persistentCache.set('profile', profile, uid);
+            AppState.setUser(AppState.firebase.auth.currentUser, profile);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        AppState.addNotification('Error cargando perfil', 'error');
+        return false;
+    }
+}
+
+async function handleLogout() {
+    const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('side-menu-overlay');
+    if (sideMenu) sideMenu.style.right = '-350px';
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    
+    AppState.addNotification('Cerrando sesión...', 'warning');
+    
+    const currentUid = AppState.user.current?.uid;
+    if (currentUid) AppState.persistentCache.clearUserCache(currentUid);
+    RecurrentUserManager.clear();
+    
+    try {
+        if (window.firebase && window.firebase.auth) await window.firebase.auth().signOut();
+    } catch(e) {}
+    
+    AppState.clearUser();
+    localStorage.removeItem('lastScreen');
+    sessionStorage.clear();
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('firebase:') || key.startsWith('app_'))) localStorage.removeItem(key);
+    }
+    
+    window.history.pushState({}, '', '/');
+    setTimeout(() => { if (!AppState.user.current) mostrarModalGoogleInferior(); }, 1000);
+}
+
+// ==============================================
+// NAVEGACIÓN
+// ==============================================
+window.navigateTo = function(section) {
+    const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('side-menu-overlay');
+    if (sideMenu) sideMenu.style.right = '-350px';
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    
+    if (section && section !== 'login' && section !== 'activation_pending') {
+        localStorage.setItem('lastScreen', section);
+    }
+    
+    if (section === 'login' && AppState.user.current) {
+        section = AppState.user.profile?.activated === false ? 'activation_pending' : 'public';
+    }
+    
+    const shareId = new URLSearchParams(window.location.search).get('share');
+    if (section === 'share' && shareId) {
+        window.history.pushState({}, '', `/?share=${shareId}`);
+    } else {
+        window.history.pushState({}, '', `/?section=${section}`);
+    }
+    
+    if (!AppState.user.current && section !== 'public' && section !== 'login' && section !== 'share' && section !== 'ventas' && section !== 'rooster') {
+        AppState.ui.pendingScreen = section;
+        if (!AppState.firebase.isEnabled) initializeFirebase();
+        section = 'login';
+    }
+    
+    if (section === 'login' && !AppState.firebase.isEnabled) {
+        AppState.ui.pendingScreen = 'login';
+        initializeFirebase();
+        return;
+    }
+    
+    AppState.setScreen(section);
+};
+
+// ==============================================
+// FUNCIONES DE ADMIN
+// ==============================================
+window.toggleUserActivation = async function(uid, activate) {
+    const currentUser = AppState.user.current;
+    if (!currentUser || !AppState.user.profile?.gallo) {
+        AppState.addNotification('No tienes permisos', 'error');
+        return;
+    }
+    if (uid === currentUser.uid && activate === false) {
+        AppState.addNotification('No puedes desactivar tu propia cuenta', 'error');
+        return;
+    }
+    try {
+        await AppState.firebase.database.ref(`users/${uid}/activated`).set(activate);
+        AppState.addNotification(`Usuario ${activate ? 'activado' : 'desactivado'} correctamente`, 'success');
+        if (AppState.ui.currentScreen === 'admin') renderApp();
+    } catch (error) {
+        AppState.addNotification('Error al cambiar estado', 'error');
+    }
+};
+
+// ==============================================
+// FUNCIONES DEL MODAL GOOGLE
+// ==============================================
+window.modalGoogleActivo = false;
+
+async function handleGoogleCredentialResponse(response) {
+    showLoadingScreen('Autenticando...', 50);
+    
+    try {
+        if (!AppState.firebase.isEnabled) {
+            const firebaseApp = firebase.initializeApp(window.FIREBASE_CONFIG);
+            AppState.firebase.app = firebaseApp;
+            AppState.firebase.auth = firebase.auth();
+            AppState.firebase.isEnabled = true;
+        }
+        
+        const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+        const result = await AppState.firebase.auth.signInWithCredential(credential);
+        
+        if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
+        
+        const snapshot = await AppState.firebase.database.ref('users/' + result.user.uid).once('value');
+        
+        if (!snapshot.exists()) {
+            const newUserProfile = {
+                uid: result.user.uid,
+                displayName: result.user.displayName || 'Usuario Google',
+                realEmail: result.user.email || '',
+                photoURL: result.user.photoURL || '',
+                registeredAt: Date.now(),
+                registeredWith: 'google',
+                maxDevices: 1,
                 activated: false,
                 gallo: false,
                 isJudge: false,
                 publicaciones: false,
                 ventas: false,
-                pedigri: false,
-                maxDevices: 1,
-                registeredAt: Date.now(),
-                registeredWith: 'email'
+                pedigri: false
             };
-            await AppState.firebase.db.ref(`users/${uid}`).set(defaultPermissions);
-            AppState.addNotification('Registro exitoso. Espera activación del administrador.', 'success');
-            navigateTo('public');
-        } catch(e) { handleFirebaseError(e, 'register'); } 
-        finally { AppState.setLoading(false); }
-    }
-    async function handleLogout() { 
-        closeSidebar(); 
-        AppState.persistentCache.clearUserCache(AppState.user?.uid); 
-        sessionStorage.clear(); 
-        localStorage.removeItem('legado_usuario_recurrente');
-        if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect();
-        if(AppState.firebase.auth) await AppState.firebase.auth.signOut(); 
-        AppState.clearUser(); 
-        navigateTo('public'); 
-        renderApp(); 
-    }
-    async function resetPassword() { 
-        let email = prompt('Ingrese su correo electrónico para restablecer la contraseña:');
-        if(email && email.includes('@')) { 
-            try { 
-                await AppState.firebase.auth.sendPasswordResetEmail(email); 
-                AppState.addNotification('Revisa tu bandeja de entrada', 'success'); 
-            } catch(e) { handleFirebaseError(e, 'reset'); } 
-        } else if(email) { AppState.addNotification('Email inválido', 'error'); }
-    }
-    function checkActivationStatus() { 
-        if(AppState.profile?.activated === true) { 
-            AppState.addNotification('Tu cuenta ya está activada', 'success'); 
-            navigateTo('public'); 
-        } else { 
-            showActivationModal(); 
-        } 
-    }
-    function showActivationModal() { 
-        let confirmModal = confirm('Tu cuenta no está activada. ¿Deseas contactar al administrador por WhatsApp?');
-        if(confirmModal) window.open(SOCIAL_LINKS_COMPLETE.whatsapp, '_blank');
-    }
-
-    // =================================================================================================
-    // BLOQUE 6: FUNCIONES DE UI Y RENDERIZADO (TODAS LAS PANTALLAS COMPLETAS Y EXTENSAS)
-    // =================================================================================================
-    function renderPublicacionesScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">📢 PUBLICACIONES DE LA COMUNIDAD</div>
-                <p>Sistema de muro social, noticias y eventos gallísticos en tiempo real.</p>
-                <div class="skeleton-epic"></div>
-                <div class="skeleton-epic"></div>
-                <button class="btn-epic-primary" id="demoNewPostBtn" style="margin-top:20px;">+ CREAR NUEVA PUBLICACIÓN</button>
-            </div>
-        </div>`;
-    }
-    function renderPedigriScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">🧬 PEDIGRÍ GENÉTICO AVANZADO</div>
-                <p>Registro genealógico de sus ejemplares de élite. Árboles de hasta 5 generaciones.</p>
-                <div style="background:#f3ede3; border-radius:28px; padding:30px; text-align:center; margin:20px 0;">
-                    <div style="font-size:3rem;">🐓</div>
-                    <div>Árbol genealógico interactivo (desarrollo en curso)</div>
-                </div>
-                <button class="btn-epic-secondary">REGISTRAR NUEVO EJEMPLAR</button>
-            </div>
-        </div>`;
-    }
-    function renderShareScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">🔗 COMPARTIR LEGADO AVÍCOLA</div>
-                <p>Invita a más criadores a unirse a la plataforma líder del sector.</p>
-                <button class="btn-epic-primary" id="copyShareLinkBtn">📋 COPIAR ENLACE DE INVITACIÓN</button>
-                <button class="btn-epic-secondary" id="nativeShareBtn" style="margin-top:15px;">📱 COMPARTIR NATIVO</button>
-                <div style="margin-top:25px; background:#f0ebe3; border-radius:20px; padding:15px;">
-                    <strong>Enlace único:</strong><br>
-                    <code style="word-break:break-all;">${window.location.href}</code>
-                </div>
-            </div>
-        </div>`;
-    }
-    function renderAdminScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">👑 PANEL DE ADMINISTRACIÓN</div>
-                <p>Gestión de usuarios, permisos y configuración global del sistema.</p>
-                <div id="adminUsersListContainer"><div class="skeleton-epic"></div><div class="skeleton-epic"></div></div>
-                <button class="btn-epic-primary" id="refreshAdminListBtn">REFRESCAR USUARIOS</button>
-                <button class="btn-epic-secondary" id="loadGlobalConfigBtn" style="margin-top:15px;">CARGAR CONFIGURACIÓN GLOBAL</button>
-            </div>
-        </div>`;
-    }
-    function renderVentasScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">💰 SUBASTAS Y MERCADO</div>
-                <p>Plataforma de subastas de gallos de alta genética. Ofertas en tiempo real.</p>
-                <div class="skeleton-epic"></div>
-                <div class="skeleton-epic"></div>
-                <button class="btn-epic-primary">PUBLICAR SUBASTA</button>
-            </div>
-        </div>`;
-    }
-    function renderPerfilScreen() { 
-        let p = AppState.profile || {};
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">👤 MI PERFIL PERSONAL</div>
-                <div style="text-align:center; margin-bottom:20px;">
-                    <div style="width:80px; height:80px; background:var(--primary-brown); border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:2rem; color:white;">${(p.displayName || 'U').charAt(0)}</div>
-                </div>
-                <p><strong>Nombre completo:</strong> ${p.displayName || 'No registrado'}</p>
-                <p><strong>Correo electrónico:</strong> ${p.email || ''}</p>
-                <p><strong>Teléfono:</strong> ${p.phone || 'No especificado'}</p>
-                <p><strong>Municipio:</strong> ${p.municipio || 'No especificado'}</p>
-                <p><strong>Estado de cuenta:</strong> ${p.activated ? '✅ ACTIVADA' : '⏳ PENDIENTE DE ACTIVACIÓN'}</p>
-                <p><strong>Permisos especiales:</strong> Admin: ${p.gallo ? 'Sí' : 'No'} | Juez: ${p.isJudge ? 'Sí' : 'No'}</p>
-                <button class="btn-epic-secondary" id="editProfileActionBtn">EDITAR PERFIL</button>
-            </div>
-        </div>`;
-    }
-    function renderRoosterScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">🏆 TORNEOS Y ENFRENTAMIENTOS</div>
-                <p>Calendario oficial de torneos, resultados y estadísticas.</p>
-                <div class="skeleton-epic"></div>
-                <div class="skeleton-epic"></div>
-                <button class="btn-epic-primary">CREAR NUEVO TORNEO</button>
-                <button class="btn-epic-secondary" style="margin-top:12px;">VER RESULTADOS</button>
-            </div>
-        </div>`;
-    }
-    function renderJuezScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">⚖️ PANEL DEL JUEZ OFICIAL</div>
-                <p>Puntuación de combates, registro de incidencias y veredictos.</p>
-                <div style="background:#f3ede3; border-radius:24px; padding:20px; margin:15px 0;">
-                    <select id="combateSelect" class="input-epic"><option>Enfrentamiento activo #001</option><option>Enfrentamiento activo #002</option></select>
-                    <button class="btn-epic-primary" id="registrarPuntuacionBtn">REGISTRAR PUNTUACIÓN</button>
-                </div>
-            </div>
-        </div>`;
-    }
-    function renderConfiguracionesScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">⚙️ CONFIGURACIÓN AVANZADA</div>
-                <label style="display:flex; justify-content:space-between; margin:15px 0;"><span>🔔 Notificaciones push</span><input type="checkbox" id="pushNotifyToggle"></label>
-                <label style="display:flex; justify-content:space-between; margin:15px 0;"><span>🌙 Modo oscuro</span><input type="checkbox" id="darkModeToggleGlobal"></label>
-                <label style="display:flex; justify-content:space-between; margin:15px 0;"><span>📱 Sincronización automática</span><input type="checkbox" id="autoSyncToggle" checked></label>
-                <button class="btn-epic-secondary" id="logoutConfigBtn">CERRAR SESIÓN</button>
-                <button class="btn-epic-primary" id="deleteAccountConfigBtn" style="background:var(--error); margin-top:12px;">ELIMINAR MI CUENTA</button>
-            </div>
-        </div>`;
-    }
-    function renderActivationPendingScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up" style="text-align:center;">
-                <div style="font-size:4rem;">⏳</div>
-                <div class="card-title">CUENTA EN REVISIÓN</div>
-                <p>Tu cuenta está pendiente de activación por parte de un administrador del sistema.</p>
-                <div style="background:#fff3cd; padding:18px; border-radius:24px; margin:20px 0;">
-                    <strong>📌 Importante:</strong> Una vez activada podrás acceder a todas las funciones: torneos, subastas, pedigrí y más.
-                </div>
-                <button class="btn-epic-primary" id="checkActivationStatusBtn">VERIFICAR AHORA</button>
-                <button class="btn-epic-secondary" id="logoutPendingBtn" style="margin-top:12px;">CERRAR SESIÓN</button>
-            </div>
-        </div>`;
-    }
-    function renderPublicScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div style="text-align:center;">
-                    <div style="font-size:5rem;">🐔⚡</div>
-                    <div class="card-title">LEGADO AVÍCOLA</div>
-                    <p style="font-size:1.1rem;">La plataforma profesional para la élite gallística. Torneos, pedigrí, subastas y comunidad.</p>
-                </div>
-                <div style="display:flex; gap:15px; margin:30px 0;">
-                    <button class="btn-epic-primary" id="publicLoginMainBtn">INICIAR SESIÓN</button>
-                    <button class="btn-epic-secondary" id="publicRegisterMainBtn">CREAR CUENTA</button>
-                </div>
-                <div class="social-grid" style="margin-top:25px;">
-                    <a href="${SOCIAL_LINKS_COMPLETE.whatsapp}" target="_blank">WhatsApp</a>
-                    <a href="${SOCIAL_LINKS_COMPLETE.facebook}" target="_blank">Facebook</a>
-                    <a href="${SOCIAL_LINKS_COMPLETE.instagram}" target="_blank">Instagram</a>
-                    <a href="${SOCIAL_LINKS_COMPLETE.tiktok}" target="_blank">TikTok</a>
-                </div>
-            </div>
-            <div class="card-senior">
-                <h3>✨ Características del sistema</h3>
-                <ul style="margin-top:15px; list-style:none;">
-                    <li>✅ Torneos en vivo con puntuación oficial</li>
-                    <li>✅ Registro genealógico de 5 generaciones</li>
-                    <li>✅ Subastas exclusivas para miembros</li>
-                    <li>✅ Comunidad de criadores profesionales</li>
-                    <li>✅ Sistema de juez certificado</li>
-                </ul>
-            </div>
-        </div>`;
-    }
-    function renderLoginScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">🔐 ACCESO AL SISTEMA</div>
-                <input type="email" id="loginEmailEpic" class="input-epic" placeholder="Correo electrónico registrado">
-                <input type="password" id="loginPassEpic" class="input-epic" placeholder="Contraseña">
-                <button class="btn-epic-primary" id="doLoginEpicBtn">ACCEDER</button>
-                <button id="forgotPasswordEpicBtn" style="background:none; border:none; margin-top:15px; color:var(--primary-brown); cursor:pointer;">¿Olvidaste tu contraseña?</button>
-                <hr style="margin:20px 0;">
-                <button id="googleLoginEpicBtn" class="btn-epic-secondary" style="background:white; border:1px solid #dadce0;">🔐 Continuar con Google</button>
-                <button id="switchToRegisterEpicBtn" style="background:none; border:none; margin-top:15px; color:var(--primary-light); cursor:pointer;">¿No tienes cuenta? Regístrate aquí</button>
-                <input type="hidden" id="csrf_login">
-            </div>
-        </div>`;
-    }
-    function renderRegisterScreen() { 
-        return `<div class="screen-container-senior">
-            <div class="card-senior fade-in-up">
-                <div class="card-title">📝 REGISTRO DE USUARIO</div>
-                <input id="regFullnameEpic" class="input-epic" placeholder="Nombre completo *">
-                <input id="regEmailEpic" class="input-epic" type="email" placeholder="Correo electrónico *">
-                <select id="regMunicipioEpic" class="input-epic">
-                    <option>Selecciona municipio</option>
-                    <option>Tuxtla Gutiérrez</option><option>San Cristóbal de Las Casas</option>
-                    <option>Comitán</option><option>Tapachula</option><option>Arriaga</option>
-                    <option>Pichucalco</option><option>Ocosingo</option><option>Palenque</option>
-                    <option>Otro</option>
-                </select>
-                <input id="regPhoneEpic" class="input-epic" placeholder="Teléfono (7 dígitos) - opcional">
-                <input id="regPassEpic" class="input-epic" type="password" placeholder="Contraseña (mínimo 6 caracteres) *">
-                <input id="regConfirmEpic" class="input-epic" type="password" placeholder="Confirmar contraseña *">
-                <label style="display:flex; align-items:center; gap:10px; margin:15px 0;">
-                    <input type="checkbox" id="termsEpic"> Acepto los <a href="#" id="termsLinkEpic">Términos y Condiciones</a>
-                </label>
-                <button class="btn-epic-primary" id="doRegisterEpicBtn">CREAR CUENTA</button>
-                <button class="btn-epic-secondary" id="backToLoginEpicBtn" style="margin-top:12px;">VOLVER AL LOGIN</button>
-                <input type="hidden" id="csrf_register">
-            </div>
-        </div>`;
-    }
-
-    function renderTopBarComplete() { 
-        if(AppState.user && AppState.profile) {
-            return `<div class="topbar-logged">
-                <div class="nav-scroll-senior">
-                    <button class="nav-btn-senior" data-nav="public">🏠 INICIO</button>
-                    ${AppState.profile.publicaciones ? '<button class="nav-btn-senior" data-nav="publicaciones">📢 PUBLICACIONES</button>' : ''}
-                    <button class="nav-btn-senior" data-nav="rooster">🏆 TORNEOS</button>
-                    ${AppState.profile.ventas ? '<button class="nav-btn-senior" data-nav="ventas">💰 SUBASTAS</button>' : ''}
-                    ${AppState.profile.isJudge ? '<button class="nav-btn-senior" data-nav="juez">⚖️ JUEZ</button>' : ''}
-                    ${AppState.profile.pedigri ? '<button class="nav-btn-senior" data-nav="pedigri">🧬 PEDIGRÍ</button>' : ''}
-                    ${AppState.profile.gallo ? '<button class="nav-btn-senior" data-nav="admin">👑 ADMIN</button>' : ''}
-                </div>
-                <div class="avatar-trigger-senior" id="openSidebarSeniorBtn">${(AppState.profile.displayName || 'U').charAt(0)}</div>
-            </div>`;
+            await AppState.firebase.database.ref('users/' + result.user.uid).set(newUserProfile);
+            AppState.setUser(result.user, newUserProfile);
+            AppState.addNotification('✅ Registro exitoso. Pendiente de activación.', 'success');
         } else {
-            return `<div class="topbar-public">
-                <div class="logo-public">LEGADO <span>AVÍCOLA</span></div>
-                <button id="publicTopLoginBtn" style="background:var(--gold); color:#1e1b16; border:none; padding:8px 24px; border-radius:40px; font-weight:bold;">ACCEDER</button>
-            </div>`;
-        }
-    }
-    function footerComplete() { 
-        return `<div class="footer-senior">
-            <div class="accordion-senior">
-                <div class="accordion-header-senior" data-accordion="legal">📜 Información Legal <span>▼</span></div>
-                <div id="accordion-legal" class="accordion-content-senior">Legado Avícola © 2025 - Todos los derechos reservados. Plataforma certificada para criadores profesionales.</div>
-            </div>
-            <div class="accordion-senior">
-                <div class="accordion-header-senior" data-accordion="contact">📞 Contacto y Soporte <span>▼</span></div>
-                <div id="accordion-contact" class="accordion-content-senior"><div class="social-grid">${Object.entries(SOCIAL_LINKS_COMPLETE).map(([k,v]) => `<a href="${v}" target="_blank">${k.toUpperCase()}</a>`).join('')}</div></div>
-            </div>
-            <div style="text-align:center; margin-top:30px; font-size:0.8rem;">Versión 3.0 - Sistema completo de gestión gallística</div>
-        </div>`;
-    }
-
-    async function renderApp() { 
-        if(window._isRenderingNow) return; 
-        window._isRenderingNow = true;
-        try { 
-            _0x5f3a(); 
-            if(_0x1f7a()) { 
-                document.getElementById('app-root').innerHTML = '<div style="padding:100px;text-align:center;color:red;">ACCESO RESTRINGIDO - DOMINIO NO AUTORIZADO</div>'; 
-                return; 
+            const profile = snapshot.val();
+            const deviceInfo = await getDeviceFingerprint();
+            const devicesSnapshot = await AppState.firebase.database.ref(`dispositivos_autorizados/${result.user.uid}`).once('value');
+            const authorizedDevices = devicesSnapshot.val() || {};
+            
+            if (!authorizedDevices[deviceInfo.fingerprint]) {
+                const maxDevices = profile.maxDevices || 1;
+                if (Object.keys(authorizedDevices).length >= maxDevices) {
+                    AppState.addNotification('LÍMITE DE DISPOSITIVOS ALCANZADO', 'error');
+                    await AppState.firebase.auth.signOut();
+                    hideLoadingScreen();
+                    return;
+                }
+                await AppState.firebase.database.ref(`dispositivos_autorizados/${result.user.uid}/${deviceInfo.fingerprint}`).set({
+                    fingerprint: deviceInfo.fingerprint,
+                    firstSeen: firebase.database.ServerValue.TIMESTAMP,
+                    lastLogin: firebase.database.ServerValue.TIMESTAMP,
+                    verified: true
+                });
             }
-            let screen = AppState.currentScreen;
-            let content = '';
-            if(screen === 'public') content = renderPublicScreen();
-            else if(screen === 'login') content = renderLoginScreen();
-            else if(screen === 'register') content = renderRegisterScreen();
-            else if(screen === 'activation_pending') content = renderActivationPendingScreen();
-            else if(screen === 'publicaciones') content = renderPublicacionesScreen();
-            else if(screen === 'pedigri') content = renderPedigriScreen();
-            else if(screen === 'share') content = renderShareScreen();
-            else if(screen === 'admin') content = renderAdminScreen();
-            else if(screen === 'ventas') content = renderVentasScreen();
-            else if(screen === 'perfil') content = renderPerfilScreen();
-            else if(screen === 'rooster') content = renderRoosterScreen();
-            else if(screen === 'juez') content = renderJuezScreen();
-            else if(screen === 'configuraciones') content = renderConfiguracionesScreen();
-            else content = renderPublicScreen();
-            let finalHtml = renderTopBarComplete() + content + footerComplete();
-            document.getElementById('app-root').innerHTML = finalHtml;
-            attachGlobalEventsEpic();
-            updateSidebarContentComplete();
-        } catch(e) { console.error(e); } 
-        finally { window._isRenderingNow = false; }
+            
+            if (profile.activated === true) RecurrentUserManager.markAsRecurrent();
+            AppState.setUser(result.user, { id: result.user.uid, ...profile });
+        }
+        
+        AppState.setScreen('public');
+        hideLoadingScreen();
+        
+    } catch (error) {
+        console.error('Error en Google login:', error);
+        hideLoadingScreen();
+        AppState.addNotification('Error al iniciar sesión con Google', 'error');
     }
+}
 
-    function updateSidebarContentComplete() { 
-        let perms = AppState.profile || {};
-        let items = `
-            <div class="sidebar-item-senior" data-nav="perfil">👤 MI PERFIL</div>
-            <div class="sidebar-item-senior" data-nav="share">🔗 COMPARTIR</div>
-            ${perms.ventas ? '<div class="sidebar-item-senior" data-nav="ventas">💰 SUBASTAS</div>' : ''}
-            ${perms.isJudge ? '<div class="sidebar-item-senior" data-nav="juez">⚖️ PANEL JUEZ</div>' : ''}
-            <div class="sidebar-item-senior" data-nav="configuraciones">⚙️ CONFIGURACIÓN</div>
-            ${perms.gallo ? '<div class="sidebar-item-senior" data-nav="admin">🔧 ADMINISTRACIÓN</div>' : ''}
-            <div class="sidebar-item-senior" id="logoutSidebarFinalBtn">🚪 CERRAR SESIÓN</div>
-        `;
-        document.getElementById('sidebarMenuSenior').innerHTML = items;
-        document.querySelectorAll('.sidebar-item-senior[data-nav]').forEach(el => {
-            el.addEventListener('click', () => { navigateTo(el.getAttribute('data-nav')); closeSidebar(); });
-        });
-        document.getElementById('logoutSidebarFinalBtn')?.addEventListener('click', () => { handleLogout(); closeSidebar(); });
-        if(AppState.profile) {
-            document.getElementById('sidebarNameSenior').innerText = AppState.profile.displayName || 'Usuario Legado';
-            document.getElementById('sidebarEmailSenior').innerText = AppState.profile.email || '';
-            document.getElementById('sidebarAvatarSenior').innerText = (AppState.profile.displayName || 'U').charAt(0);
+window.mostrarModalGoogleInferior = function() {
+    if (window.modalGoogleActivo) return;
+    if (AppState.user.current) return;
+    
+    const container = document.getElementById('google-one-tap-container');
+    if (!container) {
+        const newContainer = document.createElement('div');
+        newContainer.id = 'google-one-tap-container';
+        newContainer.style.cssText = 'position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 10001; pointer-events: auto;';
+        document.body.prepend(newContainer);
+    }
+    
+    google.accounts.id.initialize({
+        client_id: '979482928760-fdj8iukfct9gp95sh4n3p3ec0mr72b4g.apps.googleusercontent.com',
+        callback: handleGoogleCredentialResponse,
+        itp_support: true,
+    });
+    
+    window.modalGoogleActivo = true;
+    google.accounts.id.prompt();
+    setTimeout(() => { window.modalGoogleActivo = false; }, 3000);
+};
+
+// ==============================================
+// VERIFICACIÓN DE ACTIVACIÓN
+// ==============================================
+async function checkActivationStatusWithFeedback() {
+    const currentUser = AppState.user.current;
+    if (!currentUser || !AppState.firebase.database) return;
+    
+    try {
+        const snapshot = await AppState.firebase.database.ref('users/' + currentUser.uid + '/activated').once('value');
+        if (snapshot.val() === true) {
+            AppState.addNotification('✅ ¡Cuenta activada!', 'success');
+            await loadUserProfile(currentUser.uid);
+            AppState.setScreen('public');
+        } else {
+            AppState.addNotification('⏳ Tu cuenta aún no ha sido activada', 'warning');
+        }
+    } catch (error) {
+        AppState.addNotification('Error al verificar estado de activación', 'error');
+    }
+}
+
+function toggleSideMenu() {
+    const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('side-menu-overlay');
+    if (!sideMenu || !overlay) return;
+    
+    const isOpen = window.getComputedStyle(sideMenu).right === '0px';
+    if (isOpen) {
+        sideMenu.style.right = '-350px';
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+    } else {
+        sideMenu.style.right = '0px';
+        overlay.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function updateSideMenuContent() {
+    const menuContent = document.getElementById('side-menu-content');
+    const userProfile = AppState.user.profile;
+    const currentUser = AppState.user.current;
+    if (!menuContent || !userProfile || !currentUser) return;
+    
+    const isAdmin = userProfile.gallo === true;
+    const currentScreen = AppState.ui.currentScreen;
+    const photoURL = userProfile.photoURL || currentUser.photoURL || '';
+    const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
+    
+    menuContent.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                ${photoURL ? `<img src="${photoURL}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div style="width:50px; height:50px; border-radius:50%; background: linear-gradient(135deg, #8B4513, #D2691E); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px;">${initials}</div>`}
+                <div><div style="font-weight: 700;">${userProfile.displayName}</div><div style="font-size: 12px; color: #666;">${isAdmin ? '👑 Administrador' : '👤 Miembro'}</div></div>
+            </div>
+            <button onclick="toggleSideMenu()" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+            <button onclick="navigateTo('perfil')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>👤</span><span>Mi Perfil</span></button>
+            <button onclick="navigateTo('share')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔗</span><span>Compartir</span></button>
+            ${userProfile.ventas === true ? `<button onclick="navigateTo('ventas')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>💰</span><span>Subastas</span></button>` : ''}
+            ${userProfile.isJudge === true ? `<button onclick="navigateTo('juez')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚖️</span><span>Panel Juez</span></button>` : ''}
+            <button onclick="navigateTo('configuraciones')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚙️</span><span>Configuraciones</span></button>
+            ${isAdmin ? `<button onclick="navigateTo('admin')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔧</span><span>CREAR COTEJO</span></button>` : ''}
+            <div style="height:1px; background:#eee; margin:16px 0;"></div>
+            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>🚪</span><span>Cerrar Sesión</span></button>
+        </div>
+    `;
+}
+
+// ==============================================
+// INICIALIZACIÓN DE FIREBASE Y RENDERIZADO
+// ==============================================
+function initializeFirebase() {
+    if (AppState.firebase.isEnabled && AppState.firebase.app) return true;
+    if (loadingTimeoutId) clearTimeout(loadingTimeoutId);
+    
+    updateLoadingProgress(25, 'Conectando con servidores...');
+    
+    try {
+        const firebaseApp = firebase.initializeApp(window.FIREBASE_CONFIG);
+        AppState.firebase.app = firebaseApp;
+        AppState.firebase.auth = firebase.auth();
+        AppState.firebase.isEnabled = true;
+        updateLoadingProgress(60, 'Verificando autenticación...');
+        setupAuthListener();
+        return true;
+    } catch (e) {
+        console.error('Error al iniciar Firebase:', e);
+        hideLoadingScreen();
+        return false;
+    }
+}
+
+function setupAuthListener() {
+    if (!AppState.firebase.auth) return;
+    
+    AppState.firebase.auth.onAuthStateChanged(async (user) => {
+        const pantallaPendiente = AppState.ui.pendingScreen;
+        AppState.ui.pendingScreen = null;
+        
+        if (user) {
+            const accesoPermitido = await verificarDispositivo(user);
+            if (!accesoPermitido) {
+                AppState.clearUser();
+                AppState.setScreen('public');
+                return;
+            }
+            
+            if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
+            updateLoadingProgress(80, 'Cargando perfil...');
+            const perfilExiste = await loadUserProfile(user.uid);
+            const profile = AppState.user.profile;
+            
+            if (!perfilExiste) return;
+            
+            let pantallaADestino = 'public';
+            const shareIdActual = new URLSearchParams(window.location.search).get('share');
+            
+            if (shareIdActual) {
+                pantallaADestino = 'share';
+                sessionStorage.setItem('currentShareId', shareIdActual);
+            } else if (!profile?.activated) {
+                pantallaADestino = 'public';
+            } else if (pantallaPendiente) {
+                pantallaADestino = pantallaPendiente;
+            }
+            
+            AppState.setScreen(pantallaADestino);
+            hideLoadingScreen();
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareId = urlParams.get('share');
+            const ventasId = urlParams.get('v');
+            
+            if (shareId !== null) {
+                AppState.setScreen('share');
+                window.history.pushState({}, '', `/?share=${shareId}`);
+            } else if (ventasId !== null || pantallaPendiente === 'ventas') {
+                AppState.setScreen('ventas');
+            } else {
+                AppState.setScreen('public');
+            }
+            AppState.clearUser();
+            hideLoadingScreen();
+        }
+        AppState.setLoading(false);
+    });
+}
+
+let loadingInterval = null;
+
+function checkIfEverythingLoaded() {
+    if (loadingInterval) clearInterval(loadingInterval);
+    
+    let progress = 10;
+    let intentos = 0;
+    let timeoutMs = 20500;
+    if (navigator.connection?.effectiveType === '4g') timeoutMs = 10000;
+    else if (navigator.connection?.effectiveType === '3g') timeoutMs = 15000;
+    else if (navigator.connection?.effectiveType === '2g' || navigator.connection?.effectiveType === 'slow-2g') timeoutMs = 25000;
+    
+    const MAX_INTENTOS = Math.ceil(timeoutMs / 200);
+    
+    loadingInterval = setInterval(() => {
+        intentos++;
+        if (progress < 90 && AppState.ui.isLoading) {
+            progress += 5;
+            updateLoadingProgress(progress, 'Cargando componentes...');
+        }
+        
+        if (!AppState.ui.isLoading) {
+            clearInterval(loadingInterval);
+            updateLoadingProgress(100, '¡Listo!');
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                const socialApp = document.getElementById('social-app');
+                if (loadingScreen) loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    if (loadingScreen) loadingScreen.style.display = 'none';
+                    if (socialApp) socialApp.style.display = 'block';
+                }, 500);
+            }, 300);
+        }
+        
+        if (intentos >= MAX_INTENTOS && AppState.ui.isLoading) {
+            clearInterval(loadingInterval);
+            AppState.setLoading(false);
+            const loadingScreen = document.getElementById('loading-screen');
+            const socialApp = document.getElementById('social-app');
+            if (loadingScreen) loadingScreen.style.display = 'none';
+            if (socialApp) socialApp.style.display = 'block';
+        }
+    }, 200);
+}
+
+async function renderApp() {
+    if (AppState._isRendering) return;
+    AppState._isRendering = true;
+    
+    try {
+        const app = document.getElementById('social-app');
+        if (!app) return;
+        
+        if (AppState.ui.isLoadingScreen && AppState.ui.loadingScreenName) {
+            app.innerHTML = renderScreenSkeleton(AppState.ui.loadingScreenName);
+            return;
+        }
+        
+        const isOffline = !navigator.onLine;
+        const currentScreen = AppState.ui.currentScreen;
+        const currentUser = AppState.user.current;
+        
+        if (isOffline && currentScreen !== 'public' && currentScreen !== 'login' && currentScreen !== 'activation_pending') {
+            app.innerHTML = `
+                <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; background:#f8f9fa;">
+                    <div><div style="font-size:60px;">📴</div><h2>Sin Conexión</h2><p>Activa tus datos móviles o conéctate a WiFi.</p><button onclick="location.reload()">Reintentar</button></div>
+                </div>
+            `;
+            return;
+        }
+        
+        const coreScreens = {
+            'login': renderLoginScreen,
+            'activation_pending': renderActivationPendingScreen,
+            'public': renderPublicScreen
+        };
+        
+        if (coreScreens[currentScreen]) {
+            let topBarHtml = '';
+            if (currentUser) topBarHtml = renderMobileNavBar();
+            else if (currentScreen === 'public') topBarHtml = renderPublicTopBar();
+            
+            app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${coreScreens[currentScreen]()}</div>`;
+            AppState.setLoading(false);
+            return;
+        }
+        
+        const screenFunctions = {
+            'rooster': window.renderRoosterScreen,
+            'publicaciones': window.renderPublicacionesScreen,
+            'pedigri': window.renderPedigriScreen,
+            'juez': window.renderJuezScreen,
+            'share': window.renderShareScreen,
+            'ventas': window.renderVentasScreen,
+            'perfil': window.renderPerfilScreen,
+            'configuraciones': window.renderConfiguracionesScreen,
+            'admin': window.renderAdminScreen
+        };
+        
+        if (screenFunctions[currentScreen]) {
+            let topBarHtml = '';
+            if (currentUser) topBarHtml = renderMobileNavBar();
+            else topBarHtml = renderPublicTopBar();
+            
+            app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${screenFunctions[currentScreen]()}</div>`;
+        } else {
+            app.innerHTML = !currentUser ? renderPublicScreen() : (window.renderRoosterScreen || (() => '<div>Página en construcción</div>'))();
+        }
+        
+    } catch (error) {
+        console.error('Error en renderApp:', error);
+        document.getElementById('social-app').innerHTML = `<div style="padding:20px; text-align:center;"><h2>Error</h2><p>${error.message}</p><button onclick="location.reload()">Recargar</button></div>`;
+    } finally {
+        AppState._isRendering = false;
+        updateSideMenuContent();
+    }
+}
+
+AppState.subscribe((propriedadCambiada) => {
+    if (propriedadCambiada === 'screen' || propriedadCambiada === 'user') {
+        renderApp();
+    }
+});
+
+// ==============================================
+// PWA INSTALLATION
+// ==============================================
+let deferredPrompt;
+let userCanceled = false;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    if (!userCanceled) deferredPrompt = e;
+    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
+        document.getElementById('installOverlay').style.display = 'block';
+    }
+});
+
+document.getElementById('installOverlay').addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') userCanceled = false;
+        else userCanceled = true;
+        deferredPrompt = null;
+        document.getElementById('installOverlay').style.display = 'none';
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installOverlay').style.display = 'none';
+    userCanceled = false;
+    AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
+});
+
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    document.getElementById('installOverlay').style.display = 'none';
+}
+
+// ==============================================
+// INICIO DE LA APLICACIÓN
+// ==============================================
+window.addEventListener('load', () => {
+    console.log('🚀 Aplicación iniciando');
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    
+    if (shareId !== null) {
+        sessionStorage.setItem('currentShareId', shareId);
+        AppState.ui.pendingScreen = 'share';
+        showLoadingScreen('Cargando contenido compartido...', 0);
+        AppState.setLoading(true);
+        initializeFirebase();
+        checkIfEverythingLoaded();
+        return;
+    }
+    
+    const sectionParam = urlParams.get('section');
+    const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
+    let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
+    
+    if (!pantallaInicial) {
+        const lastScreen = localStorage.getItem('lastScreen');
+        if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
+            pantallaInicial = lastScreen;
         }
     }
-    function attachGlobalEventsEpic() { 
-        document.getElementById('doLoginEpicBtn')?.addEventListener('click', handleLogin);
-        document.getElementById('doRegisterEpicBtn')?.addEventListener('click', handleCompleteRegister);
-        document.getElementById('switchToRegisterEpicBtn')?.addEventListener('click', () => navigateTo('register'));
-        document.getElementById('backToLoginEpicBtn')?.addEventListener('click', () => navigateTo('login'));
-        document.getElementById('publicTopLoginBtn')?.addEventListener('click', () => navigateTo('login'));
-        document.getElementById('publicLoginMainBtn')?.addEventListener('click', () => navigateTo('login'));
-        document.getElementById('publicRegisterMainBtn')?.addEventListener('click', () => navigateTo('register'));
-        document.getElementById('openSidebarSeniorBtn')?.addEventListener('click', openSidebar);
-        document.getElementById('sidebarOverlaySenior')?.addEventListener('click', closeSidebar);
-        document.getElementById('forgotPasswordEpicBtn')?.addEventListener('click', resetPassword);
-        document.getElementById('logoutPendingBtn')?.addEventListener('click', handleLogout);
-        document.getElementById('logoutConfigBtn')?.addEventListener('click', handleLogout);
-        document.getElementById('checkActivationStatusBtn')?.addEventListener('click', checkActivationStatus);
-        document.querySelectorAll('.accordion-header-senior').forEach(header => {
-            header.addEventListener('click', () => { let id = header.getAttribute('data-accordion'); let content = document.getElementById(`accordion-${id}`); if(content) content.style.display = content.style.display === 'block' ? 'none' : 'block'; });
-        });
-        document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', (e) => navigateTo(el.getAttribute('data-nav'))));
-        document.getElementById('copyShareLinkBtn')?.addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); AppState.addNotification('Enlace copiado!', 'success'); });
-        document.getElementById('nativeShareBtn')?.addEventListener('click', () => { if(navigator.share) navigator.share({title:'Legado Avícola', url:window.location.href}); else AppState.addNotification('Usa copiar enlace','info'); });
-        document.getElementById('googleLoginEpicBtn')?.addEventListener('click', () => { AppState.addNotification('Google OAuth listo para integrar', 'info'); });
+    
+    if (pantallaInicial && pantallaInicial !== 'public') {
+        AppState.ui.pendingScreen = pantallaInicial;
     }
-    function openSidebar() { document.getElementById('sidebarSenior').classList.add('open'); document.getElementById('sidebarOverlaySenior').classList.add('active'); }
-    function closeSidebar() { document.getElementById('sidebarSenior').classList.remove('open'); document.getElementById('sidebarOverlaySenior').classList.remove('active'); }
-    async function navigateTo(section) { 
-        if(esGooglebot()) return; 
-        closeSidebar(); 
-        let profile = AppState.profile || {};
-        if(section === 'admin' && !profile.gallo) { AppState.addNotification('Sin permisos de administrador', 'error'); return; }
-        if((section === 'juez' && !profile.isJudge) || (section === 'publicaciones' && !profile.publicaciones) || (section === 'ventas' && !profile.ventas) || (section === 'pedigri' && !profile.pedigri)) { AppState.addNotification('Permiso denegado para esta sección', 'warning'); return; }
-        if(!AppState.user && !['public', 'login', 'register'].includes(section)) { sessionStorage.setItem('postLoginRedirect', section); navigateTo('login'); return; }
-        AppState.setScreen(section); 
-        renderApp(); 
+    
+    showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
+    AppState.setLoading(true);
+    
+    if (!AppState.firebase.isEnabled) {
+        initializeFirebase();
+    } else {
+        setupAuthListener();
     }
-    function setupAuthListener() { 
-        if(!AppState.firebase.auth) return; 
-        AppState.firebase.auth.onAuthStateChanged(async (user) => { 
-            if(user) { 
-                let profile = await loadUserProfile(user.uid); 
-                let deviceOk = await verificarDispositivo(user); 
-                if(!deviceOk) { await AppState.firebase.auth.signOut(); return; } 
-                if(profile.activated === true) AppState.setScreen(localStorage.getItem('lastScreen') || 'public'); 
-                else AppState.setScreen('activation_pending'); 
-                renderApp(); 
-            } else { 
-                AppState.clearUser(); 
-                if(!['public', 'login', 'register'].includes(AppState.currentScreen)) AppState.setScreen('public'); 
-                renderApp(); 
-            } 
-        }); 
-    }
+    
+    checkIfEverythingLoaded();
+    
+    AppState.setScreen(pantallaInicial || 'public');
+});
 
-    // LOADING SECUENCE
-    let loadPercent = 0;
-    function startEpicLoading() { 
-        let interval = setInterval(() => { 
-            if(loadPercent < 92) { 
-                loadPercent += Math.random() * 7; 
-                document.getElementById('epicProgressFill') && (document.getElementById('epicProgressFill').style.width = Math.min(loadPercent, 92) + '%'); 
-                let steps = ['Conectando Firebase...', 'Cargando perfiles...', 'Sincronizando datos...', 'Verificando seguridad...', 'Iniciando interfaz...'];
-                document.getElementById('loadingStatusText') && (document.getElementById('loadingStatusText').innerText = steps[Math.floor(Math.random() * steps.length)] + ' ' + Math.floor(loadPercent) + '%');
-            } 
-        }, 180); 
-        setTimeout(() => { 
-            clearInterval(interval); 
-            document.getElementById('loading-screen').style.opacity = '0'; 
-            setTimeout(() => { 
-                document.getElementById('loading-screen').style.display = 'none'; 
-                document.getElementById('app-root').style.display = 'block'; 
-                renderApp(); 
-            }, 400); 
-        }, 2800); 
-    }
-    window.onload = async () => { 
-        if(esGooglebot()) { 
-            document.getElementById('loading-screen').style.display = 'none'; 
-            document.getElementById('app-root').style.display = 'block'; 
-            document.getElementById('app-root').innerHTML = '<div>Contenido público indexado para buscadores</div>'; 
-            return; 
-        } 
-        await initializeFirebase(); 
-        startEpicLoading(); 
-        setInterval(() => { 
-            let csrf = document.getElementById('csrf_login'); 
-            if(csrf) csrf.value = generateCSRFToken('login'); 
-            let csrfReg = document.getElementById('csrf_register'); 
-            if(csrfReg) csrfReg.value = generateCSRFToken('register'); 
-        }, 800); 
-    };
-    window.navigateTo = navigateTo;
-    window.AppState = AppState;
+// Exponer funciones globales necesarias
+window.AppState = AppState;
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.handleCompleteRegister = handleCompleteRegister;
+window.showLoginForm = showLoginForm;
+window.showRegisterForm = showRegisterForm;
+window.resetPassword = resetPassword;
+window.updatePhonePrefix = updatePhonePrefix;
+window.toggleSideMenu = toggleSideMenu;
+window.navigateTo = window.navigateTo;
+window.handleLoginClick = window.handleLoginClick;
+window.checkActivationStatusWithFeedback = checkActivationStatusWithFeedback;
+window.mostrarModalGoogleInferior = mostrarModalGoogleInferior;
+window.getInitials = getInitials;
+window.formatTime = formatTime;
 </script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- FOOTER -->
+<footer style="background:#0a0a0a; color:#fff; padding:30px 15px 25px; margin-top:40px; border-top:2px solid #D4AF37;">
+    <div style="max-width:100%; margin:0 auto; text-align:center;">
+        <div style="margin-bottom:25px;">
+            <div style="font-size:50px;">🐓</div>
+            <div style="font-size:22px; font-weight:900; color:#D4AF37;">LEGADO AVICOLA</div>
+            <div style="font-size:9px; color:rgba(255,255,255,0.5);">TECNOLOGÍA PARA LOS MEJORES PALENQUES</div>
+        </div>
+        
+        <div style="background:rgba(212,175,55,0.08); border-radius:16px; padding:18px; margin-bottom:25px;">
+            <p><strong style="color:#D4AF37;">⚡ EL SOFTWARE PARA EVENTOS GALLÍSTICOS MÁS COMPLETO Y AVANZADO DE MÉXICO</strong></p>
+            <p style="font-size:13px;">Registro de gallos, emparejamiento automático, tabla de posiciones, subastas, calcutas y más.</p>
+        </div>
+        
+        <div style="margin-bottom:20px;">
+            <div style="font-size:12px; font-weight:700; color:#D4AF37;">📱 ¿DÓNDE FUNCIONA?</div>
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:10px;">
+                <span>📺 TV</span><span>💻 PC</span><span>📱 iPhone/Android</span><span>📲 App Instalable</span><span>📴 Sin Internet</span>
+            </div>
+        </div>
+        
+        <div style="margin-bottom:20px;">
+            <div style="font-size:12px; font-weight:700; color:#D4AF37;">📞 CONTACTO DIRECTO</div>
+            <a href="https://wa.me/529611150394" style="display:inline-block; background:#25D366; padding:10px 20px; border-radius:50px; color:white; text-decoration:none; margin:10px;">📱 WHATSAPP: +52 961 115 03 94</a>
+            <a href="mailto:lg.w@gmail.com" style="display:inline-block; padding:10px 20px; background:rgba(255,255,255,0.1); border-radius:50px; color:white; text-decoration:none;">📧 lg.w@gmail.com</a>
+        </div>
+        
+        <div style="border-top:1px solid rgba(212,175,55,0.2); padding-top:20px;">
+            <div style="font-size:10px; color:rgba(255,255,255,0.4);">🐓⚡ "DONDE USTED VAYA, SU TORNEO VA CON USTED"</div>
+            <div style="font-size:9px; margin-top:10px;">© 2026 LEGADO AVICOLA | Versión 2.0</div>
+        </div>
+    </div>
+</footer>
+
 </body>
 </html>
