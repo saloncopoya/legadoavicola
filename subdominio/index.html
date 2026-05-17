@@ -1337,14 +1337,14 @@ function renderPublicTopBar() {
                     <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : '#FFD700'};">💰</span>
                     <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">SUBASTAS</span>
                 </button>
-                <button onclick="navigateTo('${SCREENS.ROOSTER}')" style="background: ${currentScreen === n onclick="navigateTo('${SCREENS.ROOSTER}')" style="background: ${currentScreen === SCREENS.ROOSTER ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === n onclick="navigateTo('${SCREENS.ROOSTER}')" style="background: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : '#FFD700'};">🏆</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">TORNEOS</span>
-                </button>
-                <button onclick="navigateTo('${SCREENS.SHARE}')" style="background: ${currentScreen === 'share' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'share' ? '#1a1a2e' : '#FFD700'};">🐔</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'share' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">EVENTOS</span>
-                </button>
+                <button onclick="navigateTo('${SCREENS.ROOSTER}')" style="background: ${currentScreen === SCREENS.ROOSTER ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : '#FFD700'};">🏆</span>
+    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">TORNEOS</span>
+</button>
+                <button onclick="navigateTo('${SCREENS.SHARE}')" style="background: ${currentScreen === SCREENS.SHARE ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : '#FFD700'};">🐔</span>
+    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">EVENTOS</span>
+</button>
             </div>
         </nav>
     `;
@@ -1561,14 +1561,14 @@ AppState.ui.pendingScreen = SCREENS.LOGIN;
 
 function showLoginForm() {
     AppState.ui.activeTab = 'login';
-    AppState.setScreen('login');
+    AppState.setScreen(SCREENS.LOGIN);
     document.getElementById('loginForm')?.classList.remove('hidden');
     document.getElementById('registerForm')?.classList.add('hidden');
 }
 
 function showRegisterForm() {
-    AppState.setScreen(SCREENS.LOGIN);
-AppState.setScreen(SCREENS.REGISTER);
+    AppState.ui.activeTab = 'register';
+    AppState.setScreen(SCREENS.REGISTER);
     document.getElementById('loginForm')?.classList.add('hidden');
     document.getElementById('registerForm')?.classList.remove('hidden');
 }
@@ -2107,7 +2107,7 @@ const pantallasPublicas = PUBLIC_SCREENS;
             const shareIdActual = new URLSearchParams(window.location.search).get('share');
             
             if (shareIdActual) {
-                pantallaADestino = 'share';
+    pantallaADestino = SCREENS.SHARE;
                 sessionStorage.setItem('currentShareId', shareIdActual);
             } else if (!profile?.activated) {
                 pantallaADestino = 'public';
@@ -2127,7 +2127,7 @@ const pantallasPublicas = PUBLIC_SCREENS;
 const pantallasPublicas = PUBLIC_SCREENS;
     
     if (shareId !== null) {
-        AppState.setScreen('share');
+    AppState.setScreen(SCREENS.SHARE);
         window.history.pushState({}, '', `/?share=${shareId}`);
     } 
     // ✅ Verificar si el parámetro section está en la lista de públicas
@@ -2140,7 +2140,7 @@ const pantallasPublicas = PUBLIC_SCREENS;
         AppState.setScreen(pantallaPendiente);
     }
     else {
-        AppState.setScreen('public');
+    AppState.setScreen(SCREENS.PUBLIC);
     }
     
     AppState.clearUser();
@@ -2231,8 +2231,7 @@ if (isOffline && currentScreen !== 'login' && currentScreen !== 'activation_pend
         if (coreScreens[currentScreen]) {
             let topBarHtml = '';
             if (currentUser) topBarHtml = renderMobileNavBar();
-            else if (currentScreen === 'public') topBarHtml = renderPublicTopBar();
-            
+else if (currentScreen === SCREENS.PUBLIC) topBarHtml = renderPublicTopBar();            
             app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${coreScreens[currentScreen]()}</div>`;
             AppState.setLoading(false);
             return;
@@ -2305,13 +2304,13 @@ window.addEventListener('load', () => {
     
  
     const sectionParam = urlParams.get('section');
-const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
-let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
+const allowedSections = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PENDING, SCREENS.ROOSTER, SCREENS.PUBLICACIONES, SCREENS.PEDIGRI, SCREENS.JUEZ, SCREENS.VENTAS, SCREENS.PERFIL, SCREENS.CONFIGURACIONES, SCREENS.ADMIN, SCREENS.SHARE];
+    let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
 
 if (!pantallaInicial) {
     const lastScreen = localStorage.getItem('lastScreen');
-    if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
-        pantallaInicial = lastScreen;
+if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN) {
+    pantallaInicial = lastScreen;
     }
 }
 
