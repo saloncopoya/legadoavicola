@@ -2077,14 +2077,14 @@ async function renderApp() {
         const currentScreen = AppState.ui.currentScreen;
         const currentUser = AppState.user.current;
         
-        if (isOffline && currentScreen !== 'public' && currentScreen !== 'login' && currentScreen !== 'activation_pending') {
-            app.innerHTML = `
-                <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; background:#f8f9fa;">
-                    <div><div style="font-size:60px;">📴</div><h2>Sin Conexión</h2><p>Activa tus datos móviles o conéctate a WiFi.</p><button onclick="location.reload()">Reintentar</button></div>
-                </div>
-            `;
-            return;
-        }
+        
+        // Mostrar indicador de modo offline sin bloquear
+if (isOffline && currentScreen !== 'login' && currentScreen !== 'activation_pending') {
+    // Solo mostrar un aviso sutil, no bloquear la pantalla
+    setTimeout(() => {
+        AppState.addNotification('📴 Modo offline - Los datos pueden estar desactualizados', 'warning', 3000);
+    }, 500);
+}
         
         const coreScreens = {
             'login': renderLoginScreen,
