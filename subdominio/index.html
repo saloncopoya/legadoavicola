@@ -1994,22 +1994,35 @@ function setupAuthListener() {
             
             AppState.setScreen(pantallaADestino);
             hideLoadingScreen();
-        } else {
-            const urlParams = new URLSearchParams(window.location.search);
-            const shareId = urlParams.get('share');
-            const ventasId = urlParams.get('v');
-            
-            if (shareId !== null) {
-                AppState.setScreen('share');
-                window.history.pushState({}, '', `/?share=${shareId}`);
-            } else if (ventasId !== null || pantallaPendiente === 'ventas') {
-                AppState.setScreen('ventas');
-            } else {
-                AppState.setScreen('public');
-            }
-            AppState.clearUser();
-            hideLoadingScreen();
-        }
+       } else {
+    // Usuario NO autenticado
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    const sectionParam = urlParams.get('section');
+    
+    // Lista de pantallas públicas que se pueden ver SIN login
+    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
+    
+    if (shareId !== null) {
+        AppState.setScreen('share');
+        window.history.pushState({}, '', `/?share=${shareId}`);
+    } 
+    // ✅ Verificar si el parámetro section está en la lista de públicas
+    else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
+        AppState.setScreen(sectionParam);
+        window.history.pushState({}, '', `/?section=${sectionParam}`);
+    }
+    // ✅ Verificar si hay una pantalla pendiente que sea pública
+    else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
+        AppState.setScreen(pantallaPendiente);
+    }
+    else {
+        AppState.setScreen('public');
+    }
+    
+    AppState.clearUser();
+    hideLoadingScreen();
+}
         AppState.setLoading(false);
     });
 }
