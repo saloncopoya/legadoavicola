@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.15';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.15';
+const CACHE_NAME = 'legado-offline-v2.0.16';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.16';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -56,17 +56,18 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-  // 🔥 SOLO cuando estamos OFFLINE, forzar index.html para rutas con ?section=
-if (!navigator.onLine && url.pathname === '/' && url.searchParams.has('section')) {
-    event.respondWith(
-        caches.match('/index.html').then(response => {
-            if (response) return response;
-            // Si no hay caché, mostrar offline.html
-            return caches.match('/offline.html');
-        })
-    );
-    return;
-}
+  if (!navigator.onLine && event.request.mode === 'navigate') {
+        event.respondWith(
+            caches.match('/index.html').then(response => {
+                if (response) {
+                    console.log('✅ Sirviendo index.html offline para:', url.pathname);
+                    return response;
+                }
+                return caches.match('/offline.html');
+            })
+        );
+        return;
+    }
     
     // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
     if (event.request.method !== 'GET') {
