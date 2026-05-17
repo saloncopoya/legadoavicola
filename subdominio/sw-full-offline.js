@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.17';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.17';
+const CACHE_NAME = 'legado-offline-v2.0.18';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.18';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -56,18 +56,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-  if (!navigator.onLine && event.request.mode === 'navigate') {
-        event.respondWith(
-            caches.match('/index.html').then(response => {
-                if (response) {
-                    console.log('✅ Sirviendo index.html offline para:', url.pathname);
-                    return response;
-                }
-                return caches.match('/offline.html');
-            })
-        );
-        return;
-    }
+ 
     
     // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
     if (event.request.method !== 'GET') {
