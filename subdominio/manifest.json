@@ -1,7 +1,7 @@
 {
     "name": "subLegado Avícola",
     "short_name": "subLegadoAV",
-    "description": "Cotejo Computarizado - Tabla de Posiciones en Vivo",
+    "description": "Cotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en Vivo",
     "start_url": "/",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
