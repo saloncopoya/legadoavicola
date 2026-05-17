@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.9';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.9';
+const CACHE_NAME = 'legado-offline-v2.0.10';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.10';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -57,6 +57,24 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     
+    // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
+    if (event.request.method !== 'GET') {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+    
+    // 🔥 CAMBIO 2: IGNORAR peticiones a Firebase/Google cuando offline
+    if (url.hostname.includes('googleapis.com') || 
+        url.hostname.includes('identitytoolkit') ||
+        url.hostname.includes('accounts.google.com')) {
+        if (!navigator.onLine) {
+            event.respondWith(new Response('Offline', { status: 503 }));
+            return;
+        }
+        event.respondWith(fetch(event.request));
+        return;
+    }
+    
     // Estrategia: Cache First, luego Network
     event.respondWith(
         caches.match(event.request)
@@ -81,21 +99,18 @@ self.addEventListener('fetch', event => {
                         return response;
                     })
                    .catch(() => {
-    // Si es navegación, mostrar index.html SIEMPRE (logueado o no)
-    if (event.request.mode === 'navigate') {
-        // Intentar primero con el index.html cacheado
-        return caches.match('/index.html').then(response => {
-            if (response) return response;
-            // Si no está en caché, devolver offline.html
-            return caches.match('/offline.html');
-        });
-    }
-    
-    return new Response('Offline', {
-        status: 503,
-        statusText: 'Service Unavailable'
-    });
-})
+                        if (event.request.mode === 'navigate') {
+                            return caches.match('/index.html').then(response => {
+                                if (response) return response;
+                                return caches.match('/offline.html');
+                            });
+                        }
+                        
+                        return new Response('Offline', {
+                            status: 503,
+                            statusText: 'Service Unavailable'
+                        });
+                    })
             })
     );
 });
