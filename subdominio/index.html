@@ -853,6 +853,53 @@ const AppState = {
     }
 };
 
+
+
+    
+// ==============================================
+// PWA INSTALLATION
+// ==============================================
+let deferredPrompt;
+let userCanceled = false;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    if (!userCanceled) deferredPrompt = e;
+    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
+        document.getElementById('installOverlay').style.display = 'block';
+    }
+});
+
+// ✅ ESTO es lo que CAMBIA (se envuelve en DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('installOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') userCanceled = false;
+                else userCanceled = true;
+                deferredPrompt = null;
+                overlay.style.display = 'none';
+            }
+        });
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installOverlay').style.display = 'none';
+    userCanceled = false;
+    if (typeof AppState !== 'undefined') {
+        AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
+    }
+});
+
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    document.getElementById('installOverlay').style.display = 'none';
+}
+
+    
 // ==============================================
 // FUNCIONES AUXILIARES
 // ==============================================
@@ -2155,40 +2202,6 @@ AppState.subscribe((propriedadCambiada) => {
     }
 });
 
-// ==============================================
-// PWA INSTALLATION
-// ==============================================
-let deferredPrompt;
-let userCanceled = false;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    if (!userCanceled) deferredPrompt = e;
-    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
-        document.getElementById('installOverlay').style.display = 'block';
-    }
-});
-
-document.getElementById('installOverlay').addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') userCanceled = false;
-        else userCanceled = true;
-        deferredPrompt = null;
-        document.getElementById('installOverlay').style.display = 'none';
-    }
-});
-
-window.addEventListener('appinstalled', () => {
-    document.getElementById('installOverlay').style.display = 'none';
-    userCanceled = false;
-    AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
-});
-
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-    document.getElementById('installOverlay').style.display = 'none';
-}
 
 // ==============================================
 // INICIO DE LA APLICACIÓN
