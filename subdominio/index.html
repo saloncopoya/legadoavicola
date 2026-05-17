@@ -1772,11 +1772,14 @@ window.navigateTo = function(section) {
         section = AppState.user.profile?.activated === false ? 'activation_pending' : 'public';
     }
     
-    const shareId = new URLSearchParams(window.location.search).get('share');
-    if (section === 'share' && shareId) {
-        window.history.pushState({}, '', `/?share=${shareId}`);
-    } else {
-        window.history.pushState({}, '', `/?section=${section}`);
+    // ✅ SOLO CAMBIAR LA URL SI HAY INTERNET
+    if (navigator.onLine) {
+        const shareId = new URLSearchParams(window.location.search).get('share');
+        if (section === 'share' && shareId) {
+            window.history.pushState({}, '', `/?share=${shareId}`);
+        } else {
+            window.history.pushState({}, '', `/?section=${section}`);
+        }
     }
     
     if (!AppState.user.current && section !== 'public' && section !== 'login' && section !== 'share' && section !== 'ventas' && section !== 'rooster') {
@@ -2025,45 +2028,39 @@ function setupAuthListener() {
         // ==============================================
         // CASO 1: ESTAMOS OFFLINE (NO hay internet)
         // ==============================================
-        if (isOffline) {
-            console.log('📴 Modo offline - Usando datos guardados');
-            
-            // Intentar recuperar usuario guardado de localStorage
-            const cachedUser = localStorage.getItem('offline_user');
-            const cachedProfile = localStorage.getItem('offline_profile');
-            
-            if (cachedUser && cachedProfile) {
-                try {
-                    const userData = JSON.parse(cachedUser);
-                    const profileData = JSON.parse(cachedProfile);
-                    AppState.setUser(userData, profileData);
-                } catch(e) {}
-            }
-            
-            // Determinar qué pantalla mostrar OFFLINE
-            const urlParams = new URLSearchParams(window.location.search);
-            const sectionParam = urlParams.get('section');
-            const shareId = urlParams.get('share');
-            const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
-            
-            if (shareId !== null) {
-                AppState.setScreen('share');
-                window.history.pushState({}, '', `/?share=${shareId}`);
-            } else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
-                AppState.setScreen(sectionParam);
-                window.history.pushState({}, '', `/?section=${sectionParam}`);
-            } else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
-                AppState.setScreen(pantallaPendiente);
-            } else {
-                AppState.setScreen('public');
-            }
-            
-            hideLoadingScreen();
-            AppState.setLoading(false);
-                renderApp();
-
-            return; // ✅ SALIR (no intentar conectar a Firebase)
-        }
+      if (isOffline) {
+    console.log('📴 Modo offline - Usando datos guardados');
+    
+    // Intentar recuperar usuario guardado de localStorage
+    const cachedUser = localStorage.getItem('offline_user');
+    const cachedProfile = localStorage.getItem('offline_profile');
+    
+    if (cachedUser && cachedProfile) {
+        try {
+            const userData = JSON.parse(cachedUser);
+            const profileData = JSON.parse(cachedProfile);
+            AppState.setUser(userData, profileData);
+        } catch(e) {}
+    }
+    
+    // ✅ OFFLINE: NO cambiar la URL, usar solo localStorage
+    const lastScreen = localStorage.getItem('lastScreen');
+    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
+    
+    let pantallaFinal = 'public';
+    
+    if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
+        pantallaFinal = pantallaPendiente;
+    } else if (lastScreen && pantallasPublicas.includes(lastScreen)) {
+        pantallaFinal = lastScreen;
+    }
+    
+    AppState.setScreen(pantallaFinal);
+    hideLoadingScreen();
+    AppState.setLoading(false);
+    renderApp();
+    return;
+}
         
         // ==============================================
         // CASO 2: HAY INTERNET (código original)
