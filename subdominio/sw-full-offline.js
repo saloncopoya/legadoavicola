@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.3';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.3';
+const CACHE_NAME = 'legado-offline-v2.0.5';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.5';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -12,7 +12,7 @@ const urlsToCache = [
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js',
     'https://accounts.google.com/gsi/client',
     'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
-    'https://cdn.jsdelivr.net/npm/idb@7.1.1/build/index.global.min.js',
+   'https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js',
     'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js'
 ];
 
