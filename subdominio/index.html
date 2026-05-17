@@ -2060,6 +2060,8 @@ function setupAuthListener() {
             
             hideLoadingScreen();
             AppState.setLoading(false);
+                renderApp();
+
             return; // ✅ SALIR (no intentar conectar a Firebase)
         }
         
