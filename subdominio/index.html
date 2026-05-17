@@ -876,6 +876,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (overlay) {
         overlay.addEventListener('click', async () => {
             if (deferredPrompt) {
+
+      AppState.addNotification('📱 Instala la aplicación para continuar', 'info', 14000);
+                
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') userCanceled = false;
