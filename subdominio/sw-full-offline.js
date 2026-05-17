@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.10';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.10';
+const CACHE_NAME = 'legado-offline-v2.0.11';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.11';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -56,6 +56,17 @@ self.addEventListener('activate', event => {
 // Interceptar peticiones - Cache FIRST para TODO
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
+
+      // 🔥 NUEVO: Para TODAS las rutas con ?section=, forzar respuesta con index.html
+    if (url.pathname === '/' && url.searchParams.has('section')) {
+        event.respondWith(
+            caches.match('/index.html').then(response => {
+                if (response) return response;
+                return fetch(event.request);
+            })
+        );
+        return;
+    }
     
     // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
     if (event.request.method !== 'GET') {
