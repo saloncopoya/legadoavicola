@@ -2282,9 +2282,15 @@ window.addEventListener('load', () => {
         return;
     }
     
+ // 🔥 OFFLINE: Ignorar sectionParam y forzar pantalla 'public'
+const isOffline = !navigator.onLine;
+let pantallaInicial = 'public';  // Por defecto, siempre public
+
+// Solo si hay internet, procesar sectionParam normalmente
+if (!isOffline) {
     const sectionParam = urlParams.get('section');
     const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
-    let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
+    pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
     
     if (!pantallaInicial) {
         const lastScreen = localStorage.getItem('lastScreen');
@@ -2296,6 +2302,12 @@ window.addEventListener('load', () => {
     if (pantallaInicial && pantallaInicial !== 'public') {
         AppState.ui.pendingScreen = pantallaInicial;
     }
+} else {
+    // OFFLINE: Limpiar cualquier pantalla pendiente
+    AppState.ui.pendingScreen = null;
+    console.log('📴 Modo offline - Ignorando section=, mostrando pantalla principal');
+}
+    
     
     // 🔥 CAMBIO 2
     if (!isOffline) {
