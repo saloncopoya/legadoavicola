@@ -1,98 +1,125 @@
-// sw-full-offline.js
-const CACHE_NAME = 'legado-offline-v2.0.21';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.21';
+const CACHE_NAME = 'legado-offline-v2.0.18';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.18';
 
-// TODAS las URLs que quieres que funcionen OFFLINE
+// TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
     '/',
     '/index.html',
-    '/manifest.json',
+        '/manifest.json',
     '/offline.html',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js',
     'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
-    'https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js',
+   'https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js',
     'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js'
 ];
 
-// INSTALAR - Cachear todo inmediatamente
+// Instalar Service Worker
 self.addEventListener('install', event => {
-    console.log('⚡ SW: Instalando...');
+    console.log('⚡ Service Worker FULL OFFLINE instalando...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then(async cache => {
-            for (const url of urlsToCache) {
-                try {
-                    await cache.add(url);
-                    console.log('✅ Cacheado:', url);
-                } catch (err) {
-                    console.warn('⚠️ Falló:', url);
+        caches.open(CACHE_NAME)
+            .then(async cache => {
+                for (const url of urlsToCache) {
+                    try {
+                        await cache.add(url);
+                        console.log('✅ Cacheado:', url);
+                    } catch (err) {
+                        console.warn('⚠️ Falló:', url, err);
+                    }
                 }
-            }
-        })
+            })
     );
     self.skipWaiting();
 });
 
-// ACTIVAR - Limpiar caches viejos
+// Activar Service Worker
 self.addEventListener('activate', event => {
-    console.log('✅ SW: Activado');
+    console.log('✅ Service Worker FULL OFFLINE activado');
     event.waitUntil(
-        caches.keys().then(keys => Promise.all(
-            keys.map(key => {
-                // ✅ Solo eliminar si NO es la versión actual
-                if (key !== CACHE_NAME && key !== DYNAMIC_CACHE) {
-                    console.log('🗑️ Eliminando:', key);
-                    return caches.delete(key);
-                }
-            })
-        ))
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cache => {
+                    if (cache !== CACHE_NAME && cache !== DYNAMIC_CACHE) {
+                        console.log('🧹 Eliminando cache antiguo:', cache);
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
     );
     self.clients.claim();
 });
 
-// FETCH - ESTRATEGIA: CACHE FIRST (OFFLINE FIRST)
+// Interceptar peticiones - Cache FIRST para TODO
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
+
+ 
     
-    // Ignorar métodos no-GET
+    // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
     if (event.request.method !== 'GET') {
         event.respondWith(fetch(event.request));
         return;
     }
     
-   // Ignorar Firebase/Google cuando offline
-if (url.hostname.includes('googleapis.com') || 
-    url.hostname.includes('gstatic.com') ||
-    url.hostname.includes('accounts.google.com')) {  // ← AGREGA ESTA LÍNEA
-    event.respondWith(fetch(event.request));
-    return;
-}
+    // 🔥 CAMBIO 2: IGNORAR peticiones a Firebase/Google cuando offline
+    if (url.hostname.includes('googleapis.com') || 
+        url.hostname.includes('identitytoolkit') ||
+        url.hostname.includes('accounts.google.com')) {
+        if (!navigator.onLine) {
+            event.respondWith(new Response('Offline', { status: 503 }));
+            return;
+        }
+        event.respondWith(fetch(event.request));
+        return;
+    }
     
-    // ⭐ ESTRATEGIA PRINCIPAL: Cache First, luego Network
+    // Estrategia: Cache First, luego Network
     event.respondWith(
-        caches.match(event.request).then(cachedResponse => {
-            if (cachedResponse) {
-                console.log('📀 [OFFLINE]', url.pathname);
-                return cachedResponse;
-            }
-            
-            console.log('🌐 [NETWORK]', url.pathname);
-            return fetch(event.request.clone()).then(response => {
-                if (!response || response.status !== 200) return response;
-                
-                const responseToCache = response.clone();
-                caches.open(DYNAMIC_CACHE).then(cache => {
-                    cache.put(event.request, responseToCache);
-                });
-                return response;
-            }).catch(() => {
-                // Si es navegación y falla, mostrar index.html
-                if (event.request.mode === 'navigate') {
-                    return caches.match('/index.html');
+        caches.match(event.request)
+            .then(response => {
+                if (response) {
+                    console.log('✅ [CACHE]', url.pathname);
+                    return response;
                 }
-                return new Response('Offline', { status: 503 });
-            });
-        })
+                
+                console.log('🌐 [NETWORK]', url.pathname);
+                return fetch(event.request.clone())
+                    .then(response => {
+                        if (!response || response.status !== 200) {
+                            return response;
+                        }
+                        
+                        const responseToCache = response.clone();
+                        caches.open(DYNAMIC_CACHE).then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+                        
+                        return response;
+                    })
+                   .catch(() => {
+                        if (event.request.mode === 'navigate') {
+                            return caches.match('/index.html').then(response => {
+                                if (response) return response;
+                                return caches.match('/offline.html');
+                            });
+                        }
+                        
+                        return new Response('Offline', {
+                            status: 503,
+                            statusText: 'Service Unavailable'
+                        });
+                    })
+            })
     );
+});
+
+// Escuchar mensajes desde la app para sincronizar datos
+self.addEventListener('message', event => {
+    if (event.data.type === 'SYNC_DATA') {
+        console.log('🔄 Recibido mensaje de sincronización:', event.data);
+        // Aquí puedes manejar sincronización de datos pendientes
+    }
 });
