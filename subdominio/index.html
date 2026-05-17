@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#8B4513">
+    <meta name="theme-color" content="#0B1121">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <meta name="description" content="LEGADO AVICOLA - La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
     <meta name="keywords" content="gallos, pelea, torneo, cotejo, subasta, palenque, avícola">
     <meta name="author" content="Legado Avícola">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://legadoavicola.com/">
     <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%238B4513'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white'%3E🐓%3C/text%3E%3C/svg%3E">
     <title>LEGADO AVICOLA - Torneos Gallísticos Profesionales</title>
     
@@ -277,6 +280,43 @@
 <script src="https://accounts.google.com/gsi/client"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+    <!-- REGISTRO DE SERVICE WORKER PARA MODO OFFLINE -->
+<script>
+    // Registrar Service Worker SOLO si el navegador lo soporta
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                
+                // Verificar si hay actualizaciones
+                registration.addEventListener('updatefound', function() {
+                    const newWorker = registration.installing;
+                    console.log('🔄 Nueva versión del Service Worker encontrada');
+                    
+                    newWorker.addEventListener('statechange', function() {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('✅ Nueva versión disponible - Recarga para actualizar');
+                        }
+                    });
+                });
+            }).catch(function(error) {
+                console.log('❌ Error al registrar Service Worker:', error);
+            });
+            
+            // Verificar estado de conexión para mostrar mensaje offline
+            window.addEventListener('online', function() {
+                AppState.addNotification('✅ Conexión restablecida', 'success', 3000);
+            });
+            
+            window.addEventListener('offline', function() {
+                AppState.addNotification('📴 Modo offline activado - Solo contenido público disponible', 'warning', 5000);
+            });
+        });
+    } else {
+        console.log('⚠️ Service Worker no soportado en este navegador');
+    }
+</script>
+    
 <script>
 // ==============================================
 // CONFIGURACIÓN DE FIREBASE
