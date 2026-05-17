@@ -1,6 +1,6 @@
 // sw-full-offline.js
-const CACHE_NAME = 'legado-offline-v2.0.20';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.20';
+const CACHE_NAME = 'legado-offline-v2.0.21';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.21';
 
 // TODAS las URLs que quieres que funcionen OFFLINE
 const urlsToCache = [
@@ -13,8 +13,7 @@ const urlsToCache = [
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js',
     'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
     'https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js',
-    'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js',
-    'https://accounts.google.com/gsi/client'
+    'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js'
 ];
 
 // INSTALAR - Cachear todo inmediatamente
@@ -41,6 +40,7 @@ self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys => Promise.all(
             keys.map(key => {
+                // ✅ Solo eliminar si NO es la versión actual
                 if (key !== CACHE_NAME && key !== DYNAMIC_CACHE) {
                     console.log('🗑️ Eliminando:', key);
                     return caches.delete(key);
@@ -61,12 +61,13 @@ self.addEventListener('fetch', event => {
         return;
     }
     
-    // Ignorar Firebase/Google cuando offline
-    if (url.hostname.includes('googleapis.com') || 
-        url.hostname.includes('gstatic.com')) {
-        event.respondWith(fetch(event.request));
-        return;
-    }
+   // Ignorar Firebase/Google cuando offline
+if (url.hostname.includes('googleapis.com') || 
+    url.hostname.includes('gstatic.com') ||
+    url.hostname.includes('accounts.google.com')) {  // ← AGREGA ESTA LÍNEA
+    event.respondWith(fetch(event.request));
+    return;
+}
     
     // ⭐ ESTRATEGIA PRINCIPAL: Cache First, luego Network
     event.respondWith(
