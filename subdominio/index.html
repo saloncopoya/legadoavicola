@@ -281,32 +281,14 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <!-- LIBRERÍAS PARA OFFLINE TOTAL -->
-<!-- CORREGIDO: URL correcta para idb versión 8.0.0 (la más reciente y estable) -->
-<script src="https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js"></script>
-
-<!-- CORRECTO: localforage, esta URL sí es válida, la dejamos igual -->
+<script src="https://cdn.jsdelivr.net/npm/idb@7.1.1/build/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
     
-   <script>
+    <!-- REGISTRO DE SERVICE WORKER PARA MODO OFFLINE -->
+<script>
+    // ==============================================
+// SISTEMA OFFLINE TOTAL - SINCRONIZACIÓN CON FIREBASE
 // ==============================================
-// SISTEMA OFFLINE TOTAL - CON DESCARGA AUTOMÁTICA
-// ==============================================
-
-// 🔥 LÍNEA 1: Variable para saber si estamos offline
-let isPageCached = false;
-
-// 🔥 LÍNEA 2: Función para forzar cache al cargar
-async function forceCacheOffline() {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        try {
-            const cache = await caches.open('legado-offline-v2.0.19');
-            await cache.add('/index.html');
-            await cache.add('/');
-            console.log('✅ Página guardada para offline');
-            isPageCached = true;
-        } catch(e) { console.log('Cache error:', e); }
-    }
-}
 
 // Configurar IndexedDB para almacenar datos offline
 const OfflineDB = {
@@ -327,6 +309,7 @@ const OfflineDB = {
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
                 
+                // Crear almacenes para cada tipo de dato
                 if (!db.objectStoreNames.contains('users')) {
                     db.createObjectStore('users', { keyPath: 'uid' });
                 }
@@ -404,6 +387,7 @@ const OfflineDB = {
         });
     },
     
+    // Guardar operación pendiente para sincronizar después
     async addPendingSync(operation, data) {
         const pending = {
             operation: operation,
@@ -414,10 +398,12 @@ const OfflineDB = {
         return await this.set('pendingSync', Date.now().toString(), pending);
     },
     
+    // Obtener todas las operaciones pendientes
     async getPendingSync() {
         return await this.getAll('pendingSync');
     },
     
+    // Eliminar operación sincronizada
     async removePendingSync(id) {
         return await this.delete('pendingSync', id);
     }
@@ -472,6 +458,7 @@ async function syncOfflineData() {
                     case 'CREATE_PUBLICACION':
                         await AppState.firebase.database.ref('publicaciones/' + data.id).set(data);
                         break;
+                    // Agrega más casos según necesites
                 }
                 
                 await OfflineDB.removePendingSync(op.id);
@@ -479,6 +466,7 @@ async function syncOfflineData() {
                 
             } catch (err) {
                 console.error(`❌ Error sincronizando ${op.operation}:`, err);
+                // Incrementar reintentos
                 op.retries++;
                 if (op.retries < 5) {
                     await OfflineDB.set('pendingSync', op.id, op);
@@ -489,9 +477,7 @@ async function syncOfflineData() {
             }
         }
         
-        if (typeof AppState !== 'undefined') {
-            AppState.addNotification(`✅ Sincronizados ${pendingOps.length} datos offline`, 'success');
-        }
+        AppState.addNotification(`✅ Sincronizados ${pendingOps.length} datos offline`, 'success');
         
     } catch (error) {
         console.error('❌ Error en sincronización:', error);
@@ -500,22 +486,13 @@ async function syncOfflineData() {
     }
 }
 
-// 🔥 LÍNEA 3: Guardar usuario en localStorage para modo offline
-function saveUserForOffline(user, profile) {
-    if (user && profile) {
-        localStorage.setItem('offline_user', JSON.stringify(user));
-        localStorage.setItem('offline_profile', JSON.stringify(profile));
-    }
-}
-
 // Escuchar cambios de conexión
 window.addEventListener('online', async () => {
     console.log('🌐 Conexión restablecida - Sincronizando datos...');
-    if (typeof AppState !== 'undefined') {
-        AppState.addNotification('✅ Conexión restablecida - Sincronizando datos offline', 'success');
-    }
+    AppState.addNotification('✅ Conexión restablecida - Sincronizando datos offline', 'success');
     await syncOfflineData();
     
+    // Recargar datos desde Firebase
     if (AppState.user.current && AppState.firebase.database) {
         await loadAllFirebaseDataOffline();
     }
@@ -523,12 +500,10 @@ window.addEventListener('online', async () => {
 
 window.addEventListener('offline', () => {
     console.log('📴 Sin conexión - Modo offline activado');
-    if (typeof AppState !== 'undefined') {
-        AppState.addNotification('📴 Modo offline - Los datos se mostrarán desde caché', 'warning', 4000);
-    }
+    AppState.addNotification('📴 Modo offline - Los datos se guardarán localmente', 'warning', 4000);
 });
 
-// Cargar TODOS los datos de Firebase al iniciar
+// Cargar TODOS los datos de Firebase al iniciar (para tenerlos offline)
 async function loadAllFirebaseDataOffline() {
     if (!AppState.firebase.database) return;
     if (!navigator.onLine) return;
@@ -536,6 +511,7 @@ async function loadAllFirebaseDataOffline() {
     console.log('📥 Cargando datos de Firebase para modo offline...');
     
     try {
+        // Cargar subastas
         const subastasSnapshot = await AppState.firebase.database.ref('subastas').once('value');
         if (subastasSnapshot.exists()) {
             const subastas = subastasSnapshot.val();
@@ -545,6 +521,7 @@ async function loadAllFirebaseDataOffline() {
             console.log(`✅ Cargadas ${Object.keys(subastas).length} subastas`);
         }
         
+        // Cargar torneos
         const torneosSnapshot = await AppState.firebase.database.ref('torneos').once('value');
         if (torneosSnapshot.exists()) {
             const torneos = torneosSnapshot.val();
@@ -554,6 +531,7 @@ async function loadAllFirebaseDataOffline() {
             console.log(`✅ Cargados ${Object.keys(torneos).length} torneos`);
         }
         
+        // Cargar publicaciones
         const publicacionesSnapshot = await AppState.firebase.database.ref('publicaciones').once('value');
         if (publicacionesSnapshot.exists()) {
             const publicaciones = publicacionesSnapshot.val();
@@ -563,16 +541,17 @@ async function loadAllFirebaseDataOffline() {
             console.log(`✅ Cargadas ${Object.keys(publicaciones).length} publicaciones`);
         }
         
-        if (typeof AppState !== 'undefined') {
-            AppState.addNotification('✅ Datos sincronizados para modo offline', 'success');
-        }
+        AppState.addNotification('✅ Datos sincronizados para modo offline', 'success');
         
     } catch (error) {
         console.error('❌ Error cargando datos offline:', error);
     }
 }
 
+// Modificar las funciones de renderizado para usar OFFLINE FIRST
+// Función para obtener datos (primero offline, luego online)
 async function getDataOfflineFirst(store, id = null) {
+    // 1. Intentar obtener de IndexedDB
     let offlineData;
     if (id) {
         offlineData = await OfflineDB.get(store, id);
@@ -580,17 +559,20 @@ async function getDataOfflineFirst(store, id = null) {
         offlineData = await OfflineDB.getAll(store);
     }
     
+    // 2. Si hay datos offline, mostrarlos inmediatamente
     if (offlineData && (Array.isArray(offlineData) ? offlineData.length > 0 : offlineData)) {
-        console.log(`📀 Datos desde OFFLINE (${store})`);
+        console.log(`📀 Datos desde OFFLINE (${store}):`, offlineData);
         return offlineData;
     }
     
+    // 3. Si no hay datos offline y estamos online, traer de Firebase
     if (navigator.onLine && AppState.firebase.database) {
         console.log(`🌐 Datos desde ONLINE (${store})`);
         try {
             const snapshot = await AppState.firebase.database.ref(store).once('value');
             if (snapshot.exists()) {
                 const data = snapshot.val();
+                // Guardar en offline para próxima vez
                 for (const [key, value] of Object.entries(data)) {
                     await OfflineDB.set(store, key, { id: key, ...value });
                 }
@@ -604,90 +586,71 @@ async function getDataOfflineFirst(store, id = null) {
     return id ? null : [];
 }
 
-// Sobrescribir funciones de renderizado
-if (typeof window !== 'undefined') {
-    window.renderVentasScreen = async function() {
-        const subastas = await getDataOfflineFirst('subastas');
-        const subastasArray = subastas ? Object.values(subastas) : [];
-        
-        return `
-            <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
-                ${typeof renderMobileNavBar !== 'undefined' ? renderMobileNavBar() : ''}
-                <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-                    <h2 style="color: #8B4513;">💰 Subastas Disponibles</h2>
-                    ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
-                    <div id="subastas-list">
-                        ${subastasArray.length === 0 ? '<p>No hay subastas disponibles</p>' : 
-                            subastasArray.map(subasta => `
-                                <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                    <h3>${subasta.titulo || 'Subasta'}</h3>
-                                    <p>${subasta.descripcion || ''}</p>
-                                </div>
-                            `).join('')
-                        }
-                    </div>
+// Sobrescribir funciones de renderizado para usar datos offline
+window.renderVentasScreen = async function() {
+    const subastas = await getDataOfflineFirst('subastas');
+    const subastasArray = subastas ? Object.values(subastas) : [];
+    
+    return `
+        <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
+            ${renderMobileNavBar()}
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #8B4513;">💰 Subastas Disponibles</h2>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <div id="subastas-list">
+                    ${subastasArray.length === 0 ? '<p>No hay subastas disponibles</p>' : 
+                        subastasArray.map(subasta => `
+                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3>${subasta.titulo || 'Subasta'}</h3>
+                                <p>${subasta.descripcion || ''}</p>
+                            </div>
+                        `).join('')
+                    }
                 </div>
             </div>
-        `;
-    };
+        </div>
+    `;
+};
 
-    window.renderRoosterScreen = async function() {
-        const torneos = await getDataOfflineFirst('torneos');
-        const torneosArray = torneos ? Object.values(torneos) : [];
-        
-        return `
-            <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
-                ${typeof renderMobileNavBar !== 'undefined' ? renderMobileNavBar() : ''}
-                <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-                    <h2 style="color: #8B4513;">🏆 Torneos Activos</h2>
-                    ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
-                    <div id="torneos-list">
-                        ${torneosArray.length === 0 ? '<p>No hay torneos disponibles</p>' : 
-                            torneosArray.map(torneo => `
-                                <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                    <h3>${torneo.nombre || 'Torneo'}</h3>
-                                    <p>${torneo.fecha || ''}</p>
-                                </div>
-                            `).join('')
-                        }
-                    </div>
+window.renderRoosterScreen = async function() {
+    const torneos = await getDataOfflineFirst('torneos');
+    const torneosArray = torneos ? Object.values(torneos) : [];
+    
+    return `
+        <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
+            ${renderMobileNavBar()}
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #8B4513;">🏆 Torneos Activos</h2>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <div id="torneos-list">
+                    ${torneosArray.length === 0 ? '<p>No hay torneos disponibles</p>' : 
+                        torneosArray.map(torneo => `
+                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3>${torneo.nombre || 'Torneo'}</h3>
+                                <p>${torneo.fecha || ''}</p>
+                            </div>
+                        `).join('')
+                    }
                 </div>
             </div>
-        `;
-    };
-}
+        </div>
+    `;
+};
 
-// Registrar Service Worker con force refresh
+// Registrar Service Worker con el nuevo sistema
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        // Eliminar SW viejo si existe
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister();
-                console.log('SW antiguo desregistrado');
-            }
-        });
-        
-        // Registrar el nuevo
-        navigator.serviceWorker.register('/sw-full-offline.js', { scope: '/' }).then(function(registration) {
-            console.log('✅ Service Worker FULL OFFLINE registrado');
-            
-            // Forzar activación inmediata
-            if (registration.waiting) {
-                registration.waiting.postMessage({type: 'SKIP_WAITING'});
-            }
-            
-            // Guardar la página en caché después de registrar
-            setTimeout(forceCacheOffline, 1000);
+        navigator.serviceWorker.register('/sw-full-offline.js').then(function(registration) {
+            console.log('✅ Service Worker FULL OFFLINE registrado:', registration.scope);
         }).catch(function(error) {
             console.log('❌ Error al registrar Service Worker:', error);
         });
     });
 }
 
-// Cargar datos offline al iniciar
+// Cargar datos offline al iniciar la app
 setTimeout(async () => {
-    if (navigator.onLine && typeof AppState !== 'undefined' && AppState.firebase && AppState.firebase.database) {
+    if (navigator.onLine && AppState.firebase.database) {
         await loadAllFirebaseDataOffline();
     }
 }, 3000);
@@ -887,56 +850,6 @@ const AppState = {
     }
 };
 
-
-
-    
-// ==============================================
-// PWA INSTALLATION
-// ==============================================
-let deferredPrompt;
-let userCanceled = false;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    if (!userCanceled) deferredPrompt = e;
-    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
-        document.getElementById('installOverlay').style.display = 'block';
-    }
-});
-
-// ✅ ESTO es lo que CAMBIA (se envuelve en DOMContentLoaded)
-document.addEventListener('DOMContentLoaded', () => {
-    const overlay = document.getElementById('installOverlay');
-    if (overlay) {
-        overlay.addEventListener('click', async () => {
-            if (deferredPrompt) {
-
-      AppState.addNotification('📱 Instala la aplicación para continuar', 'info', 14000);
-                
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') userCanceled = false;
-                else userCanceled = true;
-                deferredPrompt = null;
-                overlay.style.display = 'none';
-            }
-        });
-    }
-});
-
-window.addEventListener('appinstalled', () => {
-    document.getElementById('installOverlay').style.display = 'none';
-    userCanceled = false;
-    if (typeof AppState !== 'undefined') {
-        AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
-    }
-});
-
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-    document.getElementById('installOverlay').style.display = 'none';
-}
-
-    
 // ==============================================
 // FUNCIONES AUXILIARES
 // ==============================================
@@ -2051,56 +1964,7 @@ function setupAuthListener() {
     AppState.firebase.auth.onAuthStateChanged(async (user) => {
         const pantallaPendiente = AppState.ui.pendingScreen;
         AppState.ui.pendingScreen = null;
-
-
-         // 🔥 DETECTAR SI ESTAMOS OFFLINE
-        const isOffline = !navigator.onLine;
         
-        // ==============================================
-        // CASO 1: ESTAMOS OFFLINE (NO hay internet)
-        // ==============================================
-        if (isOffline) {
-            console.log('📴 Modo offline - Usando datos guardados');
-            
-            // Intentar recuperar usuario guardado de localStorage
-            const cachedUser = localStorage.getItem('offline_user');
-            const cachedProfile = localStorage.getItem('offline_profile');
-            
-            if (cachedUser && cachedProfile) {
-                try {
-                    const userData = JSON.parse(cachedUser);
-                    const profileData = JSON.parse(cachedProfile);
-                    AppState.setUser(userData, profileData);
-                } catch(e) {}
-            }
-            
-            // Determinar qué pantalla mostrar OFFLINE
-            const urlParams = new URLSearchParams(window.location.search);
-            const sectionParam = urlParams.get('section');
-            const shareId = urlParams.get('share');
-            const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
-            
-            if (shareId !== null) {
-                AppState.setScreen('share');
-                window.history.pushState({}, '', `/?share=${shareId}`);
-            } else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
-                AppState.setScreen(sectionParam);
-                window.history.pushState({}, '', `/?section=${sectionParam}`);
-            } else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
-                AppState.setScreen(pantallaPendiente);
-            } else {
-                AppState.setScreen('public');
-            }
-            
-            hideLoadingScreen();
-            AppState.setLoading(false);
-            return; // ✅ SALIR (no intentar conectar a Firebase)
-        }
-        
-        // ==============================================
-        // CASO 2: HAY INTERNET (código original)
-        // ==============================================
-
         if (user) {
             const accesoPermitido = await verificarDispositivo(user);
             if (!accesoPermitido) {
@@ -2130,35 +1994,22 @@ function setupAuthListener() {
             
             AppState.setScreen(pantallaADestino);
             hideLoadingScreen();
-       } else {
-    // Usuario NO autenticado
-    const urlParams = new URLSearchParams(window.location.search);
-    const shareId = urlParams.get('share');
-    const sectionParam = urlParams.get('section');
-    
-    // Lista de pantallas públicas que se pueden ver SIN login
-    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
-    
-    if (shareId !== null) {
-        AppState.setScreen('share');
-        window.history.pushState({}, '', `/?share=${shareId}`);
-    } 
-    // ✅ Verificar si el parámetro section está en la lista de públicas
-    else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
-        AppState.setScreen(sectionParam);
-        window.history.pushState({}, '', `/?section=${sectionParam}`);
-    }
-    // ✅ Verificar si hay una pantalla pendiente que sea pública
-    else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
-        AppState.setScreen(pantallaPendiente);
-    }
-    else {
-        AppState.setScreen('public');
-    }
-    
-    AppState.clearUser();
-    hideLoadingScreen();
-}
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareId = urlParams.get('share');
+            const ventasId = urlParams.get('v');
+            
+            if (shareId !== null) {
+                AppState.setScreen('share');
+                window.history.pushState({}, '', `/?share=${shareId}`);
+            } else if (ventasId !== null || pantallaPendiente === 'ventas') {
+                AppState.setScreen('ventas');
+            } else {
+                AppState.setScreen('public');
+            }
+            AppState.clearUser();
+            hideLoadingScreen();
+        }
         AppState.setLoading(false);
     });
 }
@@ -2288,6 +2139,40 @@ AppState.subscribe((propriedadCambiada) => {
     }
 });
 
+// ==============================================
+// PWA INSTALLATION
+// ==============================================
+let deferredPrompt;
+let userCanceled = false;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    if (!userCanceled) deferredPrompt = e;
+    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
+        document.getElementById('installOverlay').style.display = 'block';
+    }
+});
+
+document.getElementById('installOverlay').addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') userCanceled = false;
+        else userCanceled = true;
+        deferredPrompt = null;
+        document.getElementById('installOverlay').style.display = 'none';
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installOverlay').style.display = 'none';
+    userCanceled = false;
+    AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
+});
+
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    document.getElementById('installOverlay').style.display = 'none';
+}
 
 // ==============================================
 // INICIO DE LA APLICACIÓN
@@ -2298,45 +2183,32 @@ window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const shareId = urlParams.get('share');
     
-    // 🔥 NUEVA LÍNEA 1
-    const isOffline = !navigator.onLine;
-    
     if (shareId !== null) {
         sessionStorage.setItem('currentShareId', shareId);
         AppState.ui.pendingScreen = 'share';
-        
-        // 🔥 CAMBIO 1
-        if (!isOffline) {
-            showLoadingScreen('Cargando contenido compartido...', 0);
-        }
-        
+        showLoadingScreen('Cargando contenido compartido...', 0);
         AppState.setLoading(true);
         initializeFirebase();
         checkIfEverythingLoaded();
         return;
     }
     
- 
     const sectionParam = urlParams.get('section');
-const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
-let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
-
-if (!pantallaInicial) {
-    const lastScreen = localStorage.getItem('lastScreen');
-    if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
-        pantallaInicial = lastScreen;
-    }
-}
-
-if (pantallaInicial && pantallaInicial !== 'public') {
-    AppState.ui.pendingScreen = pantallaInicial;
-}
+    const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
+    let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
     
-    // 🔥 CAMBIO 2
-    if (!isOffline) {
-        showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
+    if (!pantallaInicial) {
+        const lastScreen = localStorage.getItem('lastScreen');
+        if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
+            pantallaInicial = lastScreen;
+        }
     }
     
+    if (pantallaInicial && pantallaInicial !== 'public') {
+        AppState.ui.pendingScreen = pantallaInicial;
+    }
+    
+    showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
     AppState.setLoading(true);
     
     if (!AppState.firebase.isEnabled) {
