@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.7';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.7';
+const CACHE_NAME = 'legado-offline-v2.0.8';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.8';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -80,17 +80,22 @@ self.addEventListener('fetch', event => {
                         
                         return response;
                     })
-                    .catch(() => {
-                        // Si es navegación, mostrar index.html
-                        if (event.request.mode === 'navigate') {
-                            return caches.match('/index.html');
-                        }
-                        
-                        return new Response('Offline', {
-                            status: 503,
-                            statusText: 'Service Unavailable'
-                        });
-                    });
+                   .catch(() => {
+    // Si es navegación, mostrar index.html SIEMPRE (logueado o no)
+    if (event.request.mode === 'navigate') {
+        // Intentar primero con el index.html cacheado
+        return caches.match('/index.html').then(response => {
+            if (response) return response;
+            // Si no está en caché, devolver offline.html
+            return caches.match('/offline.html');
+        });
+    }
+    
+    return new Response('Offline', {
+        status: 503,
+        statusText: 'Service Unavailable'
+    });
+})
             })
     );
 });
