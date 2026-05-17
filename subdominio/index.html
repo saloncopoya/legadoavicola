@@ -280,41 +280,380 @@
 <script src="https://accounts.google.com/gsi/client"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+    <!-- LIBRERÍAS PARA OFFLINE TOTAL -->
+<script src="https://cdn.jsdelivr.net/npm/idb@7.1.1/build/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    
     <!-- REGISTRO DE SERVICE WORKER PARA MODO OFFLINE -->
 <script>
-    // Registrar Service Worker SOLO si el navegador lo soporta
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+    // ==============================================
+// SISTEMA OFFLINE TOTAL - SINCRONIZACIÓN CON FIREBASE
+// ==============================================
+
+// Configurar IndexedDB para almacenar datos offline
+const OfflineDB = {
+    dbName: 'LegadoAvicolaDB',
+    dbVersion: 1,
+    db: null,
+    
+    async init() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, this.dbVersion);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                this.db = request.result;
+                resolve(this.db);
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
                 
-                // Verificar si hay actualizaciones
-                registration.addEventListener('updatefound', function() {
-                    const newWorker = registration.installing;
-                    console.log('🔄 Nueva versión del Service Worker encontrada');
-                    
-                    newWorker.addEventListener('statechange', function() {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('✅ Nueva versión disponible - Recarga para actualizar');
-                        }
-                    });
-                });
-            }).catch(function(error) {
-                console.log('❌ Error al registrar Service Worker:', error);
-            });
-            
-            // Verificar estado de conexión para mostrar mensaje offline
-            window.addEventListener('online', function() {
-                AppState.addNotification('✅ Conexión restablecida', 'success', 3000);
-            });
-            
-            window.addEventListener('offline', function() {
-                AppState.addNotification('📴 Modo offline activado - Solo contenido público disponible', 'warning', 5000);
-            });
+                // Crear almacenes para cada tipo de dato
+                if (!db.objectStoreNames.contains('users')) {
+                    db.createObjectStore('users', { keyPath: 'uid' });
+                }
+                if (!db.objectStoreNames.contains('subastas')) {
+                    db.createObjectStore('subastas', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('torneos')) {
+                    db.createObjectStore('torneos', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('publicaciones')) {
+                    db.createObjectStore('publicaciones', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('pendingSync')) {
+                    db.createObjectStore('pendingSync', { keyPath: 'id', autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains('appState')) {
+                    db.createObjectStore('appState', { keyPath: 'key' });
+                }
+            };
         });
-    } else {
-        console.log('⚠️ Service Worker no soportado en este navegador');
+    },
+    
+    async set(store, key, data) {
+        if (!this.db) await this.init();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([store], 'readwrite');
+            const objectStore = transaction.objectStore(store);
+            const request = objectStore.put({ ...data, [key]: data[key] || key });
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    async get(store, key) {
+        if (!this.db) await this.init();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([store], 'readonly');
+            const objectStore = transaction.objectStore(store);
+            const request = objectStore.get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    async getAll(store) {
+        if (!this.db) await this.init();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([store], 'readonly');
+            const objectStore = transaction.objectStore(store);
+            const request = objectStore.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    async delete(store, key) {
+        if (!this.db) await this.init();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([store], 'readwrite');
+            const objectStore = transaction.objectStore(store);
+            const request = objectStore.delete(key);
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    async clear(store) {
+        if (!this.db) await this.init();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([store], 'readwrite');
+            const objectStore = transaction.objectStore(store);
+            const request = objectStore.clear();
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(request.error);
+        });
+    },
+    
+    // Guardar operación pendiente para sincronizar después
+    async addPendingSync(operation, data) {
+        const pending = {
+            operation: operation,
+            data: data,
+            timestamp: Date.now(),
+            retries: 0
+        };
+        return await this.set('pendingSync', Date.now().toString(), pending);
+    },
+    
+    // Obtener todas las operaciones pendientes
+    async getPendingSync() {
+        return await this.getAll('pendingSync');
+    },
+    
+    // Eliminar operación sincronizada
+    async removePendingSync(id) {
+        return await this.delete('pendingSync', id);
     }
+};
+
+// Inicializar OfflineDB al cargar
+OfflineDB.init().then(() => {
+    console.log('✅ IndexedDB inicializado para offline total');
+}).catch(err => {
+    console.error('❌ Error inicializando IndexedDB:', err);
+});
+
+// Sincronizador de datos cuando hay conexión
+let syncInProgress = false;
+
+async function syncOfflineData() {
+    if (syncInProgress) return;
+    if (!navigator.onLine) return;
+    if (!AppState.firebase.database) return;
+    
+    syncInProgress = true;
+    console.log('🔄 Iniciando sincronización de datos offline...');
+    
+    try {
+        const pendingOps = await OfflineDB.getPendingSync();
+        
+        if (pendingOps.length === 0) {
+            console.log('✅ No hay datos pendientes de sincronizar');
+            syncInProgress = false;
+            return;
+        }
+        
+        console.log(`📦 Sincronizando ${pendingOps.length} operaciones pendientes...`);
+        
+        for (const op of pendingOps) {
+            try {
+                const { operation, data } = op;
+                
+                switch(operation) {
+                    case 'CREATE_SUBASTA':
+                        await AppState.firebase.database.ref('subastas/' + data.id).set(data);
+                        break;
+                    case 'UPDATE_SUBASTA':
+                        await AppState.firebase.database.ref('subastas/' + data.id).update(data);
+                        break;
+                    case 'DELETE_SUBASTA':
+                        await AppState.firebase.database.ref('subastas/' + data.id).remove();
+                        break;
+                    case 'CREATE_TORNEO':
+                        await AppState.firebase.database.ref('torneos/' + data.id).set(data);
+                        break;
+                    case 'CREATE_PUBLICACION':
+                        await AppState.firebase.database.ref('publicaciones/' + data.id).set(data);
+                        break;
+                    // Agrega más casos según necesites
+                }
+                
+                await OfflineDB.removePendingSync(op.id);
+                console.log(`✅ Sincronizado: ${operation}`);
+                
+            } catch (err) {
+                console.error(`❌ Error sincronizando ${op.operation}:`, err);
+                // Incrementar reintentos
+                op.retries++;
+                if (op.retries < 5) {
+                    await OfflineDB.set('pendingSync', op.id, op);
+                } else {
+                    await OfflineDB.removePendingSync(op.id);
+                    console.warn(`⚠️ Operación ${op.operation} descartada después de 5 reintentos`);
+                }
+            }
+        }
+        
+        AppState.addNotification(`✅ Sincronizados ${pendingOps.length} datos offline`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Error en sincronización:', error);
+    } finally {
+        syncInProgress = false;
+    }
+}
+
+// Escuchar cambios de conexión
+window.addEventListener('online', async () => {
+    console.log('🌐 Conexión restablecida - Sincronizando datos...');
+    AppState.addNotification('✅ Conexión restablecida - Sincronizando datos offline', 'success');
+    await syncOfflineData();
+    
+    // Recargar datos desde Firebase
+    if (AppState.user.current && AppState.firebase.database) {
+        await loadAllFirebaseDataOffline();
+    }
+});
+
+window.addEventListener('offline', () => {
+    console.log('📴 Sin conexión - Modo offline activado');
+    AppState.addNotification('📴 Modo offline - Los datos se guardarán localmente', 'warning', 4000);
+});
+
+// Cargar TODOS los datos de Firebase al iniciar (para tenerlos offline)
+async function loadAllFirebaseDataOffline() {
+    if (!AppState.firebase.database) return;
+    if (!navigator.onLine) return;
+    
+    console.log('📥 Cargando datos de Firebase para modo offline...');
+    
+    try {
+        // Cargar subastas
+        const subastasSnapshot = await AppState.firebase.database.ref('subastas').once('value');
+        if (subastasSnapshot.exists()) {
+            const subastas = subastasSnapshot.val();
+            for (const [id, data] of Object.entries(subastas)) {
+                await OfflineDB.set('subastas', id, { id, ...data });
+            }
+            console.log(`✅ Cargadas ${Object.keys(subastas).length} subastas`);
+        }
+        
+        // Cargar torneos
+        const torneosSnapshot = await AppState.firebase.database.ref('torneos').once('value');
+        if (torneosSnapshot.exists()) {
+            const torneos = torneosSnapshot.val();
+            for (const [id, data] of Object.entries(torneos)) {
+                await OfflineDB.set('torneos', id, { id, ...data });
+            }
+            console.log(`✅ Cargados ${Object.keys(torneos).length} torneos`);
+        }
+        
+        // Cargar publicaciones
+        const publicacionesSnapshot = await AppState.firebase.database.ref('publicaciones').once('value');
+        if (publicacionesSnapshot.exists()) {
+            const publicaciones = publicacionesSnapshot.val();
+            for (const [id, data] of Object.entries(publicaciones)) {
+                await OfflineDB.set('publicaciones', id, { id, ...data });
+            }
+            console.log(`✅ Cargadas ${Object.keys(publicaciones).length} publicaciones`);
+        }
+        
+        AppState.addNotification('✅ Datos sincronizados para modo offline', 'success');
+        
+    } catch (error) {
+        console.error('❌ Error cargando datos offline:', error);
+    }
+}
+
+// Modificar las funciones de renderizado para usar OFFLINE FIRST
+// Función para obtener datos (primero offline, luego online)
+async function getDataOfflineFirst(store, id = null) {
+    // 1. Intentar obtener de IndexedDB
+    let offlineData;
+    if (id) {
+        offlineData = await OfflineDB.get(store, id);
+    } else {
+        offlineData = await OfflineDB.getAll(store);
+    }
+    
+    // 2. Si hay datos offline, mostrarlos inmediatamente
+    if (offlineData && (Array.isArray(offlineData) ? offlineData.length > 0 : offlineData)) {
+        console.log(`📀 Datos desde OFFLINE (${store}):`, offlineData);
+        return offlineData;
+    }
+    
+    // 3. Si no hay datos offline y estamos online, traer de Firebase
+    if (navigator.onLine && AppState.firebase.database) {
+        console.log(`🌐 Datos desde ONLINE (${store})`);
+        try {
+            const snapshot = await AppState.firebase.database.ref(store).once('value');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                // Guardar en offline para próxima vez
+                for (const [key, value] of Object.entries(data)) {
+                    await OfflineDB.set(store, key, { id: key, ...value });
+                }
+                return data;
+            }
+        } catch (error) {
+            console.error('Error fetching from Firebase:', error);
+        }
+    }
+    
+    return id ? null : [];
+}
+
+// Sobrescribir funciones de renderizado para usar datos offline
+window.renderVentasScreen = async function() {
+    const subastas = await getDataOfflineFirst('subastas');
+    const subastasArray = subastas ? Object.values(subastas) : [];
+    
+    return `
+        <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
+            ${renderMobileNavBar()}
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #8B4513;">💰 Subastas Disponibles</h2>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <div id="subastas-list">
+                    ${subastasArray.length === 0 ? '<p>No hay subastas disponibles</p>' : 
+                        subastasArray.map(subasta => `
+                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3>${subasta.titulo || 'Subasta'}</h3>
+                                <p>${subasta.descripcion || ''}</p>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+window.renderRoosterScreen = async function() {
+    const torneos = await getDataOfflineFirst('torneos');
+    const torneosArray = torneos ? Object.values(torneos) : [];
+    
+    return `
+        <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
+            ${renderMobileNavBar()}
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #8B4513;">🏆 Torneos Activos</h2>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <div id="torneos-list">
+                    ${torneosArray.length === 0 ? '<p>No hay torneos disponibles</p>' : 
+                        torneosArray.map(torneo => `
+                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3>${torneo.nombre || 'Torneo'}</h3>
+                                <p>${torneo.fecha || ''}</p>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+// Registrar Service Worker con el nuevo sistema
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw-full-offline.js').then(function(registration) {
+            console.log('✅ Service Worker FULL OFFLINE registrado:', registration.scope);
+        }).catch(function(error) {
+            console.log('❌ Error al registrar Service Worker:', error);
+        });
+    });
+}
+
+// Cargar datos offline al iniciar la app
+setTimeout(async () => {
+    if (navigator.onLine && AppState.firebase.database) {
+        await loadAllFirebaseDataOffline();
+    }
+}, 3000);
 </script>
     
 <script>
