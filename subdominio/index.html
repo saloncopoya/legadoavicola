@@ -2264,10 +2264,18 @@ window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const shareId = urlParams.get('share');
     
+    // 🔥 NUEVA LÍNEA 1
+    const isOffline = !navigator.onLine;
+    
     if (shareId !== null) {
         sessionStorage.setItem('currentShareId', shareId);
         AppState.ui.pendingScreen = 'share';
-        showLoadingScreen('Cargando contenido compartido...', 0);
+        
+        // 🔥 CAMBIO 1
+        if (!isOffline) {
+            showLoadingScreen('Cargando contenido compartido...', 0);
+        }
+        
         AppState.setLoading(true);
         initializeFirebase();
         checkIfEverythingLoaded();
@@ -2289,7 +2297,11 @@ window.addEventListener('load', () => {
         AppState.ui.pendingScreen = pantallaInicial;
     }
     
-    showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
+    // 🔥 CAMBIO 2
+    if (!isOffline) {
+        showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
+    }
+    
     AppState.setLoading(true);
     
     if (!AppState.firebase.isEnabled) {
