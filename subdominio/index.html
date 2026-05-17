@@ -281,7 +281,10 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <!-- LIBRERÍAS PARA OFFLINE TOTAL -->
-<script src="https://cdn.jsdelivr.net/npm/idb@7.1.1/build/index.global.min.js"></script>
+<!-- CORREGIDO: URL correcta para idb versión 8.0.0 (la más reciente y estable) -->
+<script src="https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js"></script>
+
+<!-- CORRECTO: localforage, esta URL sí es válida, la dejamos igual -->
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
     
     <!-- REGISTRO DE SERVICE WORKER PARA MODO OFFLINE -->
@@ -850,6 +853,56 @@ const AppState = {
     }
 };
 
+
+
+    
+// ==============================================
+// PWA INSTALLATION
+// ==============================================
+let deferredPrompt;
+let userCanceled = false;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    if (!userCanceled) deferredPrompt = e;
+    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
+        document.getElementById('installOverlay').style.display = 'block';
+    }
+});
+
+// ✅ ESTO es lo que CAMBIA (se envuelve en DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('installOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', async () => {
+            if (deferredPrompt) {
+
+      AppState.addNotification('📱 Instala la aplicación para continuar', 'info', 14000);
+                
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') userCanceled = false;
+                else userCanceled = true;
+                deferredPrompt = null;
+                overlay.style.display = 'none';
+            }
+        });
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installOverlay').style.display = 'none';
+    userCanceled = false;
+    if (typeof AppState !== 'undefined') {
+        AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
+    }
+});
+
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    document.getElementById('installOverlay').style.display = 'none';
+}
+
+    
 // ==============================================
 // FUNCIONES AUXILIARES
 // ==============================================
@@ -1964,7 +2017,56 @@ function setupAuthListener() {
     AppState.firebase.auth.onAuthStateChanged(async (user) => {
         const pantallaPendiente = AppState.ui.pendingScreen;
         AppState.ui.pendingScreen = null;
+
+
+         // 🔥 DETECTAR SI ESTAMOS OFFLINE
+        const isOffline = !navigator.onLine;
         
+        // ==============================================
+        // CASO 1: ESTAMOS OFFLINE (NO hay internet)
+        // ==============================================
+        if (isOffline) {
+            console.log('📴 Modo offline - Usando datos guardados');
+            
+            // Intentar recuperar usuario guardado de localStorage
+            const cachedUser = localStorage.getItem('offline_user');
+            const cachedProfile = localStorage.getItem('offline_profile');
+            
+            if (cachedUser && cachedProfile) {
+                try {
+                    const userData = JSON.parse(cachedUser);
+                    const profileData = JSON.parse(cachedProfile);
+                    AppState.setUser(userData, profileData);
+                } catch(e) {}
+            }
+            
+            // Determinar qué pantalla mostrar OFFLINE
+            const urlParams = new URLSearchParams(window.location.search);
+            const sectionParam = urlParams.get('section');
+            const shareId = urlParams.get('share');
+            const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
+            
+            if (shareId !== null) {
+                AppState.setScreen('share');
+                window.history.pushState({}, '', `/?share=${shareId}`);
+            } else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
+                AppState.setScreen(sectionParam);
+                window.history.pushState({}, '', `/?section=${sectionParam}`);
+            } else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
+                AppState.setScreen(pantallaPendiente);
+            } else {
+                AppState.setScreen('public');
+            }
+            
+            hideLoadingScreen();
+            AppState.setLoading(false);
+            return; // ✅ SALIR (no intentar conectar a Firebase)
+        }
+        
+        // ==============================================
+        // CASO 2: HAY INTERNET (código original)
+        // ==============================================
+
         if (user) {
             const accesoPermitido = await verificarDispositivo(user);
             if (!accesoPermitido) {
@@ -1994,22 +2096,35 @@ function setupAuthListener() {
             
             AppState.setScreen(pantallaADestino);
             hideLoadingScreen();
-        } else {
-            const urlParams = new URLSearchParams(window.location.search);
-            const shareId = urlParams.get('share');
-            const ventasId = urlParams.get('v');
-            
-            if (shareId !== null) {
-                AppState.setScreen('share');
-                window.history.pushState({}, '', `/?share=${shareId}`);
-            } else if (ventasId !== null || pantallaPendiente === 'ventas') {
-                AppState.setScreen('ventas');
-            } else {
-                AppState.setScreen('public');
-            }
-            AppState.clearUser();
-            hideLoadingScreen();
-        }
+       } else {
+    // Usuario NO autenticado
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    const sectionParam = urlParams.get('section');
+    
+    // Lista de pantallas públicas que se pueden ver SIN login
+    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
+    
+    if (shareId !== null) {
+        AppState.setScreen('share');
+        window.history.pushState({}, '', `/?share=${shareId}`);
+    } 
+    // ✅ Verificar si el parámetro section está en la lista de públicas
+    else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
+        AppState.setScreen(sectionParam);
+        window.history.pushState({}, '', `/?section=${sectionParam}`);
+    }
+    // ✅ Verificar si hay una pantalla pendiente que sea pública
+    else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
+        AppState.setScreen(pantallaPendiente);
+    }
+    else {
+        AppState.setScreen('public');
+    }
+    
+    AppState.clearUser();
+    hideLoadingScreen();
+}
         AppState.setLoading(false);
     });
 }
@@ -2139,40 +2254,6 @@ AppState.subscribe((propriedadCambiada) => {
     }
 });
 
-// ==============================================
-// PWA INSTALLATION
-// ==============================================
-let deferredPrompt;
-let userCanceled = false;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    if (!userCanceled) deferredPrompt = e;
-    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
-        document.getElementById('installOverlay').style.display = 'block';
-    }
-});
-
-document.getElementById('installOverlay').addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') userCanceled = false;
-        else userCanceled = true;
-        deferredPrompt = null;
-        document.getElementById('installOverlay').style.display = 'none';
-    }
-});
-
-window.addEventListener('appinstalled', () => {
-    document.getElementById('installOverlay').style.display = 'none';
-    userCanceled = false;
-    AppState.addNotification('✅ ¡INSTALACIÓN EXITOSA!', 'success');
-});
-
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-    document.getElementById('installOverlay').style.display = 'none';
-}
 
 // ==============================================
 // INICIO DE LA APLICACIÓN
@@ -2183,10 +2264,18 @@ window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const shareId = urlParams.get('share');
     
+    // 🔥 NUEVA LÍNEA 1
+    const isOffline = !navigator.onLine;
+    
     if (shareId !== null) {
         sessionStorage.setItem('currentShareId', shareId);
         AppState.ui.pendingScreen = 'share';
-        showLoadingScreen('Cargando contenido compartido...', 0);
+        
+        // 🔥 CAMBIO 1
+        if (!isOffline) {
+            showLoadingScreen('Cargando contenido compartido...', 0);
+        }
+        
         AppState.setLoading(true);
         initializeFirebase();
         checkIfEverythingLoaded();
@@ -2208,7 +2297,11 @@ window.addEventListener('load', () => {
         AppState.ui.pendingScreen = pantallaInicial;
     }
     
-    showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
+    // 🔥 CAMBIO 2
+    if (!isOffline) {
+        showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
+    }
+    
     AppState.setLoading(true);
     
     if (!AppState.firebase.isEnabled) {
