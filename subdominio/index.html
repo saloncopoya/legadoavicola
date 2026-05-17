@@ -2017,7 +2017,56 @@ function setupAuthListener() {
     AppState.firebase.auth.onAuthStateChanged(async (user) => {
         const pantallaPendiente = AppState.ui.pendingScreen;
         AppState.ui.pendingScreen = null;
+
+
+         // 🔥 DETECTAR SI ESTAMOS OFFLINE
+        const isOffline = !navigator.onLine;
         
+        // ==============================================
+        // CASO 1: ESTAMOS OFFLINE (NO hay internet)
+        // ==============================================
+        if (isOffline) {
+            console.log('📴 Modo offline - Usando datos guardados');
+            
+            // Intentar recuperar usuario guardado de localStorage
+            const cachedUser = localStorage.getItem('offline_user');
+            const cachedProfile = localStorage.getItem('offline_profile');
+            
+            if (cachedUser && cachedProfile) {
+                try {
+                    const userData = JSON.parse(cachedUser);
+                    const profileData = JSON.parse(cachedProfile);
+                    AppState.setUser(userData, profileData);
+                } catch(e) {}
+            }
+            
+            // Determinar qué pantalla mostrar OFFLINE
+            const urlParams = new URLSearchParams(window.location.search);
+            const sectionParam = urlParams.get('section');
+            const shareId = urlParams.get('share');
+            const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
+            
+            if (shareId !== null) {
+                AppState.setScreen('share');
+                window.history.pushState({}, '', `/?share=${shareId}`);
+            } else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
+                AppState.setScreen(sectionParam);
+                window.history.pushState({}, '', `/?section=${sectionParam}`);
+            } else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
+                AppState.setScreen(pantallaPendiente);
+            } else {
+                AppState.setScreen('public');
+            }
+            
+            hideLoadingScreen();
+            AppState.setLoading(false);
+            return; // ✅ SALIR (no intentar conectar a Firebase)
+        }
+        
+        // ==============================================
+        // CASO 2: HAY INTERNET (código original)
+        // ==============================================
+
         if (user) {
             const accesoPermitido = await verificarDispositivo(user);
             if (!accesoPermitido) {
