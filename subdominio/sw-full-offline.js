@@ -9,6 +9,12 @@ console.log('[SW] Dynamic cache:', DYNAMIC_CACHE);
 const urlsToCache = [
     '/',
     '/index.html',
+    '/?section=public',
+        '/?section=ventas',
+        '/?section=rooster',
+            '/?section=share',
+
+
     '/manifest.json',
     '/offline.html',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
