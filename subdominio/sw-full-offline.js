@@ -10,7 +10,6 @@ const urlsToCache = [
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js',
-    'https://accounts.google.com/gsi/client',
     'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
    'https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js',
     'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js'
