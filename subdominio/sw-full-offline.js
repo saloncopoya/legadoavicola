@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.38';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.38';
+const CACHE_NAME = 'legado-offline-v2.0.39';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.39';
 
 console.log('[SW] Archivo cargado correctamente');
 console.log('[SW] Cache name:', CACHE_NAME);
@@ -95,8 +95,8 @@ self.addEventListener('fetch', event => {
     // Estrategia: Cache First, luego Network
     console.log('[SW] Buscando en cache:', url.pathname);
     event.respondWith(
-        caches.match(event.request)
-            .then(response => {
+caches.match(url.pathname)
+        .then(response => {
                 if (response) {
                     console.log('[SW] CACHE HIT:', url.pathname);
                     return response;
@@ -113,7 +113,7 @@ self.addEventListener('fetch', event => {
                         console.log('[SW] Cacheando respuesta:', url.pathname);
                         const responseToCache = response.clone();
                         caches.open(DYNAMIC_CACHE).then(cache => {
-                            cache.put(event.request, responseToCache);
+cache.put(url.pathname, responseToCache);
                             console.log('[SW] Respuesta cacheada en:', DYNAMIC_CACHE);
                         });
                         
@@ -121,13 +121,16 @@ self.addEventListener('fetch', event => {
                     })
                    .catch(error => {
                         console.log('[SW] Error de red:', error.message);
-                        if (event.request.mode === 'navigate') {
-                            console.log('[SW] Fallback a index.html');
-                            return caches.match('/index.html').then(response => {
-                                if (response) return response;
-                                return caches.match('/offline.html');
-                            });
-                        }
+                      if (event.request.mode === 'navigate') {
+    console.log('[SW] Fallback a offline.html');
+    // PRIMERO buscar offline.html
+    return caches.match('/offline.html').then(response => {
+        if (response) return response;
+        // Si no hay offline.html, buscar index.html
+        console.log('[SW] offline.html no encontrado, buscando index.html');
+        return caches.match('/index.html');
+    });
+}
                         
                         console.log('[SW] Fallback offline genérico');
                         return new Response('Offline', {
