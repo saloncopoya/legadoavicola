@@ -2524,68 +2524,31 @@ try {
     },
     
     // Guardar token en Firebase Database
-    async saveTokenToDatabase() {
-    if (!this.fcmToken) return;
+   async saveTokenToDatabase() {
+    const currentUser = AppState.user.current;
+    if (!currentUser || !this.fcmToken) return;  // ← Aquí está el problema
     
     if (!AppState.firebase.database) {
         AppState.firebase.database = firebase.database();
     }
     
     try {
-        let tokenData;
+        const tokenData = {
+            token: this.fcmToken,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            userName: AppState.user.profile?.displayName || currentUser.displayName,
+            userAgent: navigator.userAgent,
+            platform: this.getPlatform(),
+            registeredAt: firebase.database.ServerValue.TIMESTAMP,
+            lastActive: firebase.database.ServerValue.TIMESTAMP,
+            active: true
+        };
         
-        if (AppState.user.current) {
-            // ==============================================
-            // CASO 1: Usuario LOGUEADO (tu código original)
-            // ==============================================
-            tokenData = {
-                token: this.fcmToken,
-                userId: AppState.user.current.uid,
-                userEmail: AppState.user.current.email,
-                userName: AppState.user.profile?.displayName || AppState.user.current.displayName,
-                userAgent: navigator.userAgent,
-                platform: this.getPlatform(),
-                registeredAt: firebase.database.ServerValue.TIMESTAMP,
-                lastActive: firebase.database.ServerValue.TIMESTAMP,
-                active: true,
-                isAnonymous: false
-            };
-            
-            // Guardar en colección del usuario
-            await AppState.firebase.database.ref(`fcm_tokens/${AppState.user.current.uid}/${this.fcmToken}`).set(tokenData);
-            
-        } else {
-            // ==============================================
-            // CASO 2: Usuario NO LOGUEADO (ANÓNIMO) - NUEVO
-            // ==============================================
-            // Generar ID anónimo único basado en el token
-            const anonymousId = 'anon_' + this.fcmToken.substring(0, 16);
-            
-            tokenData = {
-                token: this.fcmToken,
-                userId: anonymousId,
-                userEmail: null,
-                userName: 'Usuario Anónimo',
-                userAgent: navigator.userAgent,
-                platform: this.getPlatform(),
-                registeredAt: firebase.database.ServerValue.TIMESTAMP,
-                lastActive: firebase.database.ServerValue.TIMESTAMP,
-                active: true,
-                isAnonymous: true
-            };
-            
-            // Guardar en colección de anónimos
-            await AppState.firebase.database.ref(`fcm_tokens_anonymous/${anonymousId}/${this.fcmToken}`).set(tokenData);
-            
-            console.log('✅ Token FCM guardado como ANÓNIMO');
-        }
-        
-        // ==============================================
-        // SIEMPRE guardar en colección GLOBAL (para enviar a todos)
-        // ==============================================
+        await AppState.firebase.database.ref(`fcm_tokens/${currentUser.uid}/${this.fcmToken}`).set(tokenData);
         await AppState.firebase.database.ref(`all_fcm_tokens/${this.fcmToken}`).set(tokenData);
         
-        console.log('✅ Token FCM guardado en base de datos global');
+        console.log('✅ Token FCM guardado en base de datos');
         
     } catch (error) {
         console.error('❌ Error guardando token:', error);
