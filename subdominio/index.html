@@ -699,6 +699,40 @@ const SCREENS = {
     PUBLICACIONES: 'menu8',
     PEDIGRI: 'menu9'
 };
+
+
+    // ==============================================
+// CONSTANTES DE TEXTOS PARA NAVEGACIÓN (FÁCIL DE EDITAR)
+// ==============================================
+const TEXTS = {
+    // Textos para usuarios NO logueados (barra superior)
+    PUBLIC_BTN_PUBLIC: 'INICIO',
+    PUBLIC_BTN_VENTAS: 'SUBASTAS',
+    PUBLIC_BTN_ROOSTER: 'TORNEOS',
+    PUBLIC_BTN_SHARE: 'EVENTOS',
+    
+    // Textos para usuarios logueados (menú móvil inferior)
+    MENU_BTN_PUBLIC: 'Inicio',
+    MENU_BTN_SHARE: 'Publicaciones',
+    MENU_BTN_ROOSTER: 'TORNEOS',
+    MENU_BTN_PUBLICACIONES: 'Enfrentamientos',
+    MENU_BTN_PEDIGRI: 'Pedigrí',
+    MENU_BTN_JUEZ: 'Juez',
+    MENU_BTN_VENTAS: 'Subasta',
+    
+    // Textos del menú lateral
+    SIDE_BTN_PERFIL: 'Mi Perfil',
+    SIDE_BTN_SHARE: 'Compartir',
+    SIDE_BTN_VENTAS: 'Subastas',
+    SIDE_BTN_JUEZ: 'Panel Juez',
+    SIDE_BTN_CONFIGURACIONES: 'Configuraciones',
+    SIDE_BTN_ADMIN: 'CREAR COTEJO',
+    SIDE_BTN_LOGOUT: 'Cerrar Sesión',
+    
+    // Badges
+    BADGE_ADMIN: '👑 Administrador',
+    BADGE_MEMBER: '👤 Miembro'
+};
     
 // ==============================================
 // GESTOR DE ESTADO (AppState)
@@ -1312,11 +1346,12 @@ function renderPublicTopBar() {
     const currentScreen = AppState.ui.currentScreen;
     
     let botonCentral;
-   if (currentScreen === SCREENS.PUBLIC) botonCentral = { texto: 'Ver Subastas', accion: `navigateTo('${SCREENS.VENTAS}')` };
-else if (currentScreen === SCREENS.VENTAS) botonCentral = { texto: 'Ver Torneos', accion: `navigateTo('${SCREENS.ROOSTER}')` };
-else if (currentScreen === SCREENS.ROOSTER) botonCentral = { texto: 'Ver Publicaciones', accion: `navigateTo('${SCREENS.SHARE}')` };
-else if (currentScreen === SCREENS.SHARE) botonCentral = { texto: 'Ir a Inicio', accion: `navigateTo('${SCREENS.PUBLIC}')` };
-else botonCentral = { texto: 'Ir a INICIO', accion: `navigateTo('${SCREENS.PUBLIC}')` };
+    if (currentScreen === SCREENS.PUBLIC) botonCentral = { texto: `Ver ${TEXTS.PUBLIC_BTN_VENTAS}`, accion: `navigateTo('${SCREENS.VENTAS}')` };
+    else if (currentScreen === SCREENS.VENTAS) botonCentral = { texto: `Ver ${TEXTS.PUBLIC_BTN_ROOSTER}`, accion: `navigateTo('${SCREENS.ROOSTER}')` };
+    else if (currentScreen === SCREENS.ROOSTER) botonCentral = { texto: `Ver ${TEXTS.PUBLIC_BTN_SHARE}`, accion: `navigateTo('${SCREENS.SHARE}')` };
+    else if (currentScreen === SCREENS.SHARE) botonCentral = { texto: `Ir a ${TEXTS.PUBLIC_BTN_PUBLIC}`, accion: `navigateTo('${SCREENS.PUBLIC}')` };
+    else botonCentral = { texto: `Ir a ${TEXTS.PUBLIC_BTN_PUBLIC}`, accion: `navigateTo('${SCREENS.PUBLIC}')` };
+    
     
     return `
         <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
@@ -1326,19 +1361,19 @@ else botonCentral = { texto: 'Ir a INICIO', accion: `navigateTo('${SCREENS.PUBLI
             <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px; flex: 1; justify-content: center;">
                 <button onclick="navigateTo(SCREENS.PUBLIC)" style="background: ${currentScreen === SCREENS.PUBLIC ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
                     <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : '#FFD700'};">🏠</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">INICIO</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_PUBLIC}</span>
                 </button>
                 <button onclick="navigateTo(SCREENS.VENTAS)" style="background: ${currentScreen === SCREENS.VENTAS ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
                     <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : '#FFD700'};">💰</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">SUBASTAS</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_VENTAS}</span>
                 </button>
                 <button onclick="navigateTo(SCREENS.ROOSTER)" style="background: ${currentScreen === SCREENS.ROOSTER ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
                     <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : '#FFD700'};">🏆</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">TORNEOS</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_ROOSTER}</span>
                 </button>
                 <button onclick="navigateTo(SCREENS.SHARE)" style="background: ${currentScreen === SCREENS.SHARE ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
                     <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : '#FFD700'};">🐔</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">EVENTOS</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_SHARE}</span>
                 </button>
             </div>
         </nav>
@@ -1350,14 +1385,14 @@ function renderMobileNavBar() {
     const userProfile = AppState.user.profile;
     if (!currentUser || !userProfile) return '';
     
-    const topMenuItems = [];
-  topMenuItems.push({ id: SCREENS.PUBLIC, icon: '🏠', label: 'Inicio' });
-topMenuItems.push({ id: SCREENS.SHARE, icon: '🔗', label: 'Publicaciones' });
-topMenuItems.push({ id: SCREENS.ROOSTER, icon: '🏆', label: 'TORNEOS' });
-   if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: '⚔️', label: 'Enfrentamientos' });
-if (userProfile.pedigri === true) topMenuItems.push({ id: SCREENS.PEDIGRI, icon: '🧬', label: 'Pedigrí' });
-if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: '⚖️', label: 'Juez' });
-if (userProfile.ventas === true) topMenuItems.push({ id: SCREENS.VENTAS, icon: '💰', label: 'Subasta' });
+ const topMenuItems = [];
+    topMenuItems.push({ id: SCREENS.PUBLIC, icon: '🏠', label: TEXTS.MENU_BTN_PUBLIC });
+    topMenuItems.push({ id: SCREENS.SHARE, icon: '🔗', label: TEXTS.MENU_BTN_SHARE });
+    topMenuItems.push({ id: SCREENS.ROOSTER, icon: '🏆', label: TEXTS.MENU_BTN_ROOSTER });
+    if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: '⚔️', label: TEXTS.MENU_BTN_PUBLICACIONES });
+    if (userProfile.pedigri === true) topMenuItems.push({ id: SCREENS.PEDIGRI, icon: '🧬', label: TEXTS.MENU_BTN_PEDIGRI });
+    if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: '⚖️', label: TEXTS.MENU_BTN_JUEZ });
+    if (userProfile.ventas === true) topMenuItems.push({ id: SCREENS.VENTAS, icon: '💰', label: TEXTS.MENU_BTN_VENTAS });
     
     const photoURL = userProfile.photoURL || currentUser.photoURL || '';
     const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
@@ -1449,9 +1484,9 @@ function renderLoginScreen() {
                 <div style="text-align:center; background: black; border-radius: 12px; padding: 8px; margin-bottom: 10px;">
                     <div style="font-size:12px; font-weight:700; color:#D4AF37;">🔗 MENU DE NAVEGACIÓN:</div>
                     <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
-                        <a href="/?section=${SCREENS.PUBLIC}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏠 INICIO</a>
-                        <a href="/?section=${SCREENS.ROOSTER}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏆 TORNEOS</a>
-                        <a href="/?section=${SCREENS.VENTAS}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">💰 SUBASTAS</a>
+                        <a href="/?section=${SCREENS.PUBLIC}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏠  ${TEXTS.PUBLIC_BTN_PUBLIC}</a>
+                        <a href="/?section=${SCREENS.ROOSTER}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏆 ${TEXTS.PUBLIC_BTN_ROOSTER}</a>
+                        <a href="/?section=${SCREENS.VENTAS}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">💰 ${TEXTS.PUBLIC_BTN_VENTAS}</a>
                     </div>
                 </div>
                 <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
@@ -2003,19 +2038,20 @@ function updateSideMenuContent() {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 ${photoURL ? `<img src="${photoURL}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div style="width:50px; height:50px; border-radius:50%; background: linear-gradient(135deg, #8B4513, #D2691E); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px;">${initials}</div>`}
-                <div><div style="font-weight: 700;">${userProfile.displayName}</div><div style="font-size: 12px; color: #666;">${isAdmin ? '👑 Administrador' : '👤 Miembro'}</div></div>
+                <div><div style="font-weight: 700;">${userProfile.displayName}</div>
+                  <div style="font-size: 12px; color: #666;">${isAdmin ? TEXTS.BADGE_ADMIN : TEXTS.BADGE_MEMBER}</div></div>
             </div>
             <button onclick="toggleSideMenu()" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
         </div>
         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
-            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>👤</span><span>Mi Perfil</span></button>
-            <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔗</span><span>Compartir</span></button>
-            ${userProfile.ventas === true ? `<button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>💰</span><span>Subastas</span></button>` : ''}
-            ${userProfile.isJudge === true ? `<button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚖️</span><span>Panel Juez</span></button>` : ''}
-            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚙️</span><span>Configuraciones</span></button>
-            ${isAdmin ? `<button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔧</span><span>CREAR COTEJO</span></button>` : ''}
+            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>👤</span><span>${TEXTS.SIDE_BTN_PERFIL}</span></button>
+            <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔗</span><span>${TEXTS.SIDE_BTN_SHARE}</span></button>
+            ${userProfile.ventas === true ? `<button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>💰</span><span>${TEXTS.SIDE_BTN_VENTAS}</span></button>` : ''}
+            ${userProfile.isJudge === true ? `<button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚖️</span><span>${TEXTS.SIDE_BTN_JUEZ}</span></button>` : ''}
+            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚙️</span><span>${TEXTS.SIDE_BTN_CONFIGURACIONES}</span></button>
+            ${isAdmin ? `<button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔧</span><span>${TEXTS.SIDE_BTN_ADMIN}</span></button>` : ''}
             <div style="height:1px; background:#eee; margin:16px 0;"></div>
-            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>🚪</span><span>Cerrar Sesión</span></button>
+            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>🚪</span><span>${TEXTS.SIDE_BTN_LOGOUT}</span></button>
         </div>
     `;
 }
