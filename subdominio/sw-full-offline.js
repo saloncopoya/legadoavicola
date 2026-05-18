@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.51';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.51';
+const CACHE_NAME = 'legado-offline-v2.0.52';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.52';
 
 console.log('[SW] Archivo cargado correctamente');
 console.log('[SW] Cache name:', CACHE_NAME);
