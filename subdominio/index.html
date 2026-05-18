@@ -1546,7 +1546,7 @@ function renderScreenSkeleton(screenName) {
 // ==============================================
 window.handleLoginClick = function() {
     if (AppState.firebase.isEnabled && AppState.firebase.auth) {
-        navigateTo('login');
+        navigateTo(SCREENS.LOGIN);
         return;
     }
     AppState.addNotification('Espere por favor. Cargando aplicación...', 'warning');
@@ -1707,7 +1707,7 @@ async function handleCompleteRegister() {
         
         await loadUserProfile(userCredential.user.uid);
         AppState.addNotification('✅ Cuenta creada. Pendiente de activación.', 'success');
-        AppState.setScreen('public');
+AppState.setScreen(SCREENS.PUBLIC);
         hideLoadingScreen();
         
     } catch (error) {
@@ -1815,7 +1815,7 @@ const pantallasPublicasNavigate = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.SHARE,
 if (!AppState.user.current && !pantallasPublicasNavigate.includes(section)) {
     AppState.ui.pendingScreen = section;
         if (!AppState.firebase.isEnabled) initializeFirebase();
-        section = 'login';
+        section = SCREENS.LOGIN;
     }
     
 if (section === SCREENS.LOGIN && !AppState.firebase.isEnabled) {
@@ -1917,7 +1917,7 @@ async function handleGoogleCredentialResponse(response) {
             AppState.setUser(result.user, { id: result.user.uid, ...profile });
         }
         
-        AppState.setScreen('public');
+AppState.setScreen(SCREENS.PUBLIC);
         hideLoadingScreen();
         
     } catch (error) {
@@ -1962,7 +1962,7 @@ async function checkActivationStatusWithFeedback() {
         if (snapshot.val() === true) {
             AppState.addNotification('✅ ¡Cuenta activada!', 'success');
             await loadUserProfile(currentUser.uid);
-            AppState.setScreen('public');
+AppState.setScreen(SCREENS.PUBLIC);
         } else {
             AppState.addNotification('⏳ Tu cuenta aún no ha sido activada', 'warning');
         }
@@ -2077,8 +2077,7 @@ function setupAuthListener() {
     const lastScreen = localStorage.getItem('lastScreen');
 const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
     
-    let pantallaFinal = 'public';
-    
+let pantallaFinal = SCREENS.PUBLIC;    
     if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
         pantallaFinal = pantallaPendiente;
     } else if (lastScreen && pantallasPublicas.includes(lastScreen)) {
@@ -2100,7 +2099,7 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCRE
             const accesoPermitido = await verificarDispositivo(user);
             if (!accesoPermitido) {
                 AppState.clearUser();
-                AppState.setScreen('public');
+AppState.setScreen(SCREENS.PUBLIC);
                 return;
             }
             
@@ -2111,14 +2110,14 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCRE
             
             if (!perfilExiste) return;
             
-            let pantallaADestino = 'public';
+            let pantallaADestino = SCREENS.PUBLIC;
             const shareIdActual = new URLSearchParams(window.location.search).get('share');
             
             if (shareIdActual) {
-                pantallaADestino = 'share';
+                pantallaADestino = SCREENS.SHARE;
                 sessionStorage.setItem('currentShareId', shareIdActual);
             } else if (!profile?.activated) {
-                pantallaADestino = 'public';
+                pantallaADestino = SCREENS.PUBLIC;
             } else if (pantallaPendiente) {
                 pantallaADestino = pantallaPendiente;
             }
@@ -2148,7 +2147,7 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
         AppState.setScreen(pantallaPendiente);
     }
     else {
-        AppState.setScreen('public');
+AppState.setScreen(SCREENS.PUBLIC);
     }
     
     AppState.clearUser();
@@ -2298,7 +2297,7 @@ window.addEventListener('load', () => {
     
     if (shareId !== null) {
         sessionStorage.setItem('currentShareId', shareId);
-        AppState.ui.pendingScreen = 'share';
+        AppState.ui.pendingScreen = SCREENS.SHARE;
         
         // 🔥 CAMBIO 1
         if (!isOffline) {
@@ -2342,7 +2341,7 @@ if (pantallaInicial && pantallaInicial !== SCREENS.PUBLIC) {
     
     checkIfEverythingLoaded();
     
-    AppState.setScreen(pantallaInicial || 'public');
+    AppState.setScreen(pantallaInicial || SCREENS.PUBLIC);
 });
 
 // Exponer funciones globales necesarias
