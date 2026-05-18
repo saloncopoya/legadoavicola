@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.41';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.41';
+const CACHE_NAME = 'legado-offline-v2.0.42';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.42';
 
 console.log('[SW] Archivo cargado correctamente');
 console.log('[SW] Cache name:', CACHE_NAME);
@@ -11,6 +11,7 @@ const urlsToCache = [
     '/index.html',
     '/manifest.json',
     '/offline.html',
+   '/firebase-messaging-sw.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js',
