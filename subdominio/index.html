@@ -1661,11 +1661,10 @@ function updatePhonePrefix() {
         prefix.value = `+52 ${opt.getAttribute('data-prefijo') || '961'}`;
     }
 }
-
 async function handleLogin() {
     const email = document.getElementById('loginPhone')?.value.trim();
     const password = document.getElementById('loginPassword')?.value;
-    const loginBtn = document.querySelector('#loginForm .btn-primary');
+    const loginBtn = document.querySelector('#loginForm button'); // ✅ CAMBIA ESTO
     
     if (!email || !password) {
         AppState.addNotification('Completa todos los campos', 'warning');
@@ -1691,8 +1690,12 @@ async function handleLogin() {
         await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
         localStorage.removeItem(`rate_${emailKey}`);
-    } catch (error) {
+        // ✅ IMPORTANTE: Cerrar loading cuando el login es exitoso
         hideLoadingScreen();
+    } catch (error) {
+        // ✅ Cerrar loading inmediatamente en caso de error
+        hideLoadingScreen();
+        
         if (error.code === 'auth/invalid-login-credentials') {
             AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
         } else {
