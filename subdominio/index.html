@@ -1473,14 +1473,7 @@ function renderLoginScreen() {
     
     return `
 <div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 20px;">            <div style="width: 100%; max-width: 400px; margin: auto;">
-                <div style="text-align:center; background: black; border-radius: 12px; padding: 8px; margin-bottom: 10px;">
-                    <div style="font-size:12px; font-weight:700; color:#D4AF37;">🔗 MENU DE NAVEGACIÓN:</div>
-                    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
-                        <a href="/?section=${SCREENS.PUBLIC}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏠  ${TEXTS.PUBLIC_BTN_PUBLIC}</a>
-                        <a href="/?section=${SCREENS.ROOSTER}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏆 ${TEXTS.PUBLIC_BTN_ROOSTER}</a>
-                        <a href="/?section=${SCREENS.VENTAS}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">💰 ${TEXTS.PUBLIC_BTN_VENTAS}</a>
-                    </div>
-                </div>
+              
                 <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
                     <div style="display:flex; gap:8px; margin-bottom:20px;">
                         <button onclick="showLoginForm()" style="flex:1; padding:12px; background:${isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${isLoginActive ? '700' : '500'}; color:${isLoginActive ? 'white' : '#666'}; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
