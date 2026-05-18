@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.39';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.39';
+const CACHE_NAME = 'legado-offline-v2.0.40';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.40';
 
 console.log('[SW] Archivo cargado correctamente');
 console.log('[SW] Cache name:', CACHE_NAME);
@@ -70,6 +70,14 @@ self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     console.log('[SW] Fetch interceptado:', event.request.method, url.pathname);
 
+        // 🔥 IGNORAR peticiones molestas (remove.video, etc)
+    if (url.hostname.includes('remove.video') || 
+        url.hostname.includes('cloudflare.com') ||
+        url.hostname.includes('rum')) {
+        console.log('[SW] Ignorando petición molesta:', url.hostname);
+        return; // No hacer nada, dejar que el navegador la maneje
+    }
+    
     // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
     if (event.request.method !== 'GET') {
         console.log('[SW] Método no-GET ignorado:', event.request.method);
