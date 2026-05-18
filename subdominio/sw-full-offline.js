@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.57';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.57';
+const CACHE_NAME = 'legado-offline-v2.0.58';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.58';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -60,19 +60,16 @@ self.addEventListener('activate', event => {
         })
     );
     self.clients.claim();
-    console.log('[SW] clients.claim ejecutado');
 });
 
 // Interceptar peticiones - Cache FIRST para TODO
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
-    console.log('[SW] Fetch interceptado:', event.request.method, url.pathname);
 
         // 🔥 IGNORAR peticiones molestas (remove.video, etc)
     if (url.hostname.includes('remove.video') || 
         url.hostname.includes('cloudflare.com') ||
         url.hostname.includes('rum')) {
-        console.log('[SW] Ignorando petición molesta:', url.hostname);
         return; // No hacer nada, dejar que el navegador la maneje
     }
     
@@ -87,13 +84,10 @@ self.addEventListener('fetch', event => {
     if (url.hostname.includes('googleapis.com') || 
         url.hostname.includes('identitytoolkit') ||
         url.hostname.includes('accounts.google.com')) {
-        console.log('[SW] Petición a Google API:', url.hostname);
         if (!navigator.onLine) {
-            console.log('[SW] Offline - Google API bloqueada');
             event.respondWith(new Response('Offline', { status: 503 }));
             return;
         }
-        console.log('[SW] Online - Pasando a red');
         event.respondWith(fetch(event.request));
         return;
     }
@@ -104,29 +98,23 @@ self.addEventListener('fetch', event => {
 caches.match(url.pathname)
         .then(response => {
                 if (response) {
-                    console.log('[SW] CACHE HIT:', url.pathname);
                     return response;
                 }
                 
-                console.log('[SW] CACHE MISS - Yendo a red:', url.pathname);
                 return fetch(event.request.clone())
                     .then(response => {
                         if (!response || response.status !== 200) {
-                            console.log('[SW] Respuesta no cacheable:', response?.status);
                             return response;
                         }
                         
-                        console.log('[SW] Cacheando respuesta:', url.pathname);
                         const responseToCache = response.clone();
                         caches.open(DYNAMIC_CACHE).then(cache => {
 cache.put(url.pathname, responseToCache);
-                            console.log('[SW] Respuesta cacheada en:', DYNAMIC_CACHE);
                         });
                         
                         return response;
                     })
                    .catch(error => {
-                        console.log('[SW] Error de red:', error.message);
                       if (event.request.mode === 'navigate') {
     console.log('[SW] Fallback a offline.html');
     // PRIMERO buscar offline.html
@@ -138,7 +126,6 @@ cache.put(url.pathname, responseToCache);
     });
 }
                         
-                        console.log('[SW] Fallback offline genérico');
                         return new Response('Offline', {
                             status: 503,
                             statusText: 'Service Unavailable'
@@ -150,9 +137,7 @@ cache.put(url.pathname, responseToCache);
 
 // Escuchar mensajes desde la app para sincronizar datos
 self.addEventListener('message', event => {
-    console.log('[SW] Mensaje recibido:', event.data);
     if (event.data.type === 'SYNC_DATA') {
-        console.log('[SW] Tipo SYNC_DATA:', event.data);
         // Aquí puedes manejar sincronización de datos pendientes
     }
 });
