@@ -1692,15 +1692,24 @@ async function handleLogin() {
         localStorage.removeItem(`rate_${emailKey}`);
         hideLoadingScreen();
         
-    } catch (error) {
-        hideLoadingScreen();
-        
-        if (error.code === 'auth/invalid-login-credentials') {
-            AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
-        } else {
-            AppState.addNotification('Error al iniciar sesión: ' + error.message, 'error');
-        }
+    catch (error) {
+    console.log("🔴 CÓDIGO DE ERROR:", error.code);
+    console.log("🔴 MENSAJE:", error.message);
+    
+    hideLoadingScreen();
+    
+    if (error.code === 'auth/invalid-login-credentials') {
+        AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
+    } else if (error.code === 'auth/user-not-found') {
+        AppState.addNotification('❌ No existe una cuenta con este email', 'error');
+    } else if (error.code === 'auth/wrong-password') {
+        AppState.addNotification('❌ Contraseña incorrecta', 'error');
+    } else if (error.code === 'auth/too-many-requests') {
+        AppState.addNotification('⚠️ Demasiados intentos. Espera unos minutos', 'error');
+    } else {
+        AppState.addNotification('❌ Error: ' + error.message, 'error');
     }
+}
 }
 
 async function resetPassword() {
