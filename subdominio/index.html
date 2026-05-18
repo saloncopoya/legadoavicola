@@ -682,30 +682,6 @@ const FIREBASE_ADMIN_CONFIG = {
     appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
 };
 
-
-    // ==============================================
-// CONSTANTES DE PANTALLAS (CAMBIA AQUÍ LOS NOMBRES)
-// ==============================================
-const SCREENS = {
-    PUBLIC: 'public',
-    LOGIN: 'login',
-    REGISTER: 'register',
-    ACTIVATION_PENDING: 'activation_pending',
-    ROOSTER: 'rooster',        // ← Cambia "rooster" por lo que quieras
-    VENTAS: 'ventas',          // ← Cambia "ventas" por lo que quieras
-    SHARE: 'share',            // ← Cambia "share" por lo que quieras
-    PERFIL: 'perfil',
-    CONFIGURACIONES: 'configuraciones',
-    ADMIN: 'admin',
-    PUBLICACIONES: 'publicaciones',
-    PEDIGRI: 'pedigri',
-    JUEZ: 'juez'
-};
-
-const PUBLIC_SCREENS = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
-
-    
-
 // ==============================================
 // GESTOR DE ESTADO (AppState)
 // ==============================================
@@ -727,8 +703,8 @@ const AppState = {
     },
     
     ui: {
-    currentScreen: SCREENS.PUBLIC,
-    pendingScreen: null,
+        currentScreen: 'public',
+        pendingScreen: null,
         isLoading: true,
         isLoadingScreen: false,
         loadingScreenName: null,
@@ -819,12 +795,12 @@ const AppState = {
     },
     
     setScreen(screen) {
-    if (this.ui.currentScreen === screen) return;
-    if (this.ui.currentScreen === SCREENS.PUBLIC && window.publicKiller) window.publicKiller();
-    if (this.ui.currentScreen === SCREENS.VENTAS && window.ventasKiller) window.ventasKiller();
-    if (screen && screen !== SCREENS.LOGIN && screen !== SCREENS.ACTIVATION_PENDING) {
-        localStorage.setItem('lastScreen', screen);
-    }
+        if (this.ui.currentScreen === screen) return;
+        if (this.ui.currentScreen === 'public' && window.publicKiller) window.publicKiller();
+        if (this.ui.currentScreen === 'ventas' && window.ventasKiller) window.ventasKiller();
+        if (screen && screen !== 'login' && screen !== 'activation_pending') {
+            localStorage.setItem('lastScreen', screen);
+        }
         this.ui.currentScreen = screen;
         this.notify('screen');
     },
@@ -1317,11 +1293,11 @@ function renderPublicTopBar() {
     const currentScreen = AppState.ui.currentScreen;
     
     let botonCentral;
-    if (currentScreen === SCREENS.PUBLIC) botonCentral = { texto: 'Ver Subastas', accion: `navigateTo('${SCREENS.VENTAS}')` };
-    else if (currentScreen === SCREENS.VENTAS) botonCentral = { texto: 'Ver Torneos', accion: `navigateTo('${SCREENS.ROOSTER}')` };
-    else if (currentScreen === SCREENS.ROOSTER) botonCentral = { texto: 'Ver Publicaciones', accion: `navigateTo('${SCREENS.SHARE}')` };
-    else if (currentScreen === SCREENS.SHARE) botonCentral = { texto: 'Ir a Inicio', accion: `navigateTo('${SCREENS.PUBLIC}')` };
-    else botonCentral = { texto: 'Ir a INICIO', accion: `navigateTo('${SCREENS.PUBLIC}')` };
+    if (currentScreen === 'public') botonCentral = { texto: 'Ver Subastas', accion: "navigateTo('ventas')" };
+    else if (currentScreen === 'ventas') botonCentral = { texto: 'Ver Torneos', accion: "navigateTo('rooster')" };
+    else if (currentScreen === 'rooster') botonCentral = { texto: 'Ver Publicaciones', accion: "navigateTo('share')" };
+    else if (currentScreen === 'share') botonCentral = { texto: 'Ir a Inicio', accion: "navigateTo('public')" };
+    else botonCentral = { texto: 'Ir a INICIO', accion: "navigateTo('public')" };
     
     return `
         <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
@@ -1329,22 +1305,22 @@ function renderPublicTopBar() {
                 <span style="font-size: 12px;">🔑</span>
             </button>
             <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px; flex: 1; justify-content: center;">
-                <button onclick="navigateTo('${SCREENS.PUBLIC}')" style="background: ${currentScreen === SCREENS.PUBLIC ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : '#FFD700'};">🏠</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">INICIO</span>
+                <button onclick="navigateTo('public')" style="background: ${currentScreen === 'public' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'public' ? '#1a1a2e' : '#FFD700'};">🏠</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'public' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">INICIO</span>
                 </button>
-                <button onclick="navigateTo('${SCREENS.VENTAS}')" style="background: ${currentScreen === SCREENS.VENTAS ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : '#FFD700'};">💰</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">SUBASTAS</span>
+                <button onclick="navigateTo('ventas')" style="background: ${currentScreen === 'ventas' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'ventas' ? '#1a1a2e' : '#FFD700'};">💰</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'ventas' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">SUBASTAS</span>
                 </button>
-                <button onclick="navigateTo('${SCREENS.ROOSTER}')" style="background: ${currentScreen === SCREENS.ROOSTER ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : '#FFD700'};">🏆</span>
-    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">TORNEOS</span>
-</button>
-                <button onclick="navigateTo('${SCREENS.SHARE}')" style="background: ${currentScreen === SCREENS.SHARE ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : '#FFD700'};">🐔</span>
-    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">EVENTOS</span>
-</button>
+                <button onclick="navigateTo('rooster')" style="background: ${currentScreen === 'rooster' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'rooster' ? '#1a1a2e' : '#FFD700'};">🏆</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'rooster' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">TORNEOS</span>
+                </button>
+                <button onclick="navigateTo('share')" style="background: ${currentScreen === 'share' ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
+                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === 'share' ? '#1a1a2e' : '#FFD700'};">🐔</span>
+                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === 'share' ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">EVENTOS</span>
+                </button>
             </div>
         </nav>
     `;
@@ -1356,13 +1332,13 @@ function renderMobileNavBar() {
     if (!currentUser || !userProfile) return '';
     
     const topMenuItems = [];
-topMenuItems.push({ id: SCREENS.PUBLIC, icon: '🏠', label: 'Inicio' });
-topMenuItems.push({ id: SCREENS.SHARE, icon: '🔗', label: 'Publicaciones' });
-topMenuItems.push({ id: SCREENS.ROOSTER, icon: '🏆', label: 'TORNEOS' });
-if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: '⚔️', label: 'Enfrentamientos' });
-if (userProfile.pedigri === true) topMenuItems.push({ id: SCREENS.PEDIGRI, icon: '🧬', label: 'Pedigrí' });
-if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: '⚖️', label: 'Juez' });
-if (userProfile.ventas === true) topMenuItems.push({ id: SCREENS.VENTAS, icon: '💰', label: 'Subasta' });
+    topMenuItems.push({ id: 'public', icon: '🏠', label: 'Inicio' });
+    topMenuItems.push({ id: 'share', icon: '🔗', label: 'Publicaciones' });
+    topMenuItems.push({ id: 'rooster', icon: '🏆', label: 'TORNEOS' });
+    if (userProfile.publicaciones === true) topMenuItems.push({ id: 'publicaciones', icon: '⚔️', label: 'Enfrentamientos' });
+    if (userProfile.pedigri === true) topMenuItems.push({ id: 'pedigri', icon: '🧬', label: 'Pedigrí' });
+    if (userProfile.isJudge === true) topMenuItems.push({ id: 'juez', icon: '⚖️', label: 'Juez' });
+    if (userProfile.ventas === true) topMenuItems.push({ id: 'ventas', icon: '💰', label: 'Subasta' });
     
     const photoURL = userProfile.photoURL || currentUser.photoURL || '';
     const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
@@ -1454,10 +1430,10 @@ function renderLoginScreen() {
                 <div style="text-align:center; background: black; border-radius: 12px; padding: 8px; margin-bottom: 10px;">
                     <div style="font-size:12px; font-weight:700; color:#D4AF37;">🔗 MENU DE NAVEGACIÓN:</div>
                     <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
-                        <a href="/?section=${SCREENS.PUBLIC}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏠 INICIO</a>
-<a href="/?section=${SCREENS.ROOSTER}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏆 TORNEOS</a>
-<a href="/?section=${SCREENS.VENTAS}" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">💰 SUBASTAS</a>
-</div>
+                        <a href="/?section=public" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏠 INICIO</a>
+                        <a href="/?section=rooster" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">🏆 TORNEOS</a>
+                        <a href="/?section=ventas" style="color:rgba(255,255,255,0.7); font-size:11px; text-decoration:none;">💰 SUBASTAS</a>
+                    </div>
                 </div>
                 <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
                     <div style="display:flex; gap:8px; margin-bottom:20px;">
@@ -1551,24 +1527,24 @@ function renderScreenSkeleton(screenName) {
 // ==============================================
 window.handleLoginClick = function() {
     if (AppState.firebase.isEnabled && AppState.firebase.auth) {
-navigateTo(SCREENS.LOGIN);
+        navigateTo('login');
         return;
     }
     AppState.addNotification('Espere por favor. Cargando aplicación...', 'warning');
-AppState.ui.pendingScreen = SCREENS.LOGIN;
+    AppState.ui.pendingScreen = 'login';
     initializeFirebase();
 };
 
 function showLoginForm() {
     AppState.ui.activeTab = 'login';
-    AppState.setScreen(SCREENS.LOGIN);
+    AppState.setScreen('login');
     document.getElementById('loginForm')?.classList.remove('hidden');
     document.getElementById('registerForm')?.classList.add('hidden');
 }
 
 function showRegisterForm() {
     AppState.ui.activeTab = 'register';
-    AppState.setScreen(SCREENS.REGISTER);
+    AppState.setScreen('register');
     document.getElementById('loginForm')?.classList.add('hidden');
     document.getElementById('registerForm')?.classList.remove('hidden');
 }
@@ -1788,38 +1764,39 @@ window.navigateTo = function(section) {
     if (overlay) overlay.style.display = 'none';
     document.body.style.overflow = '';
     
-    if (section && section !== SCREENS.LOGIN && section !== SCREENS.ACTIVATION_PENDING) {
+    if (section && section !== 'login' && section !== 'activation_pending') {
         localStorage.setItem('lastScreen', section);
     }
     
-    if (section === SCREENS.LOGIN && AppState.user.current) {
-        section = AppState.user.profile?.activated === false ? SCREENS.ACTIVATION_PENDING : SCREENS.PUBLIC;
+    if (section === 'login' && AppState.user.current) {
+        section = AppState.user.profile?.activated === false ? 'activation_pending' : 'public';
     }
     
+    // ✅ SOLO CAMBIAR LA URL SI HAY INTERNET
     if (navigator.onLine) {
         const shareId = new URLSearchParams(window.location.search).get('share');
-        if (section === SCREENS.SHARE && shareId) {
+        if (section === 'share' && shareId) {
             window.history.pushState({}, '', `/?share=${shareId}`);
         } else {
             window.history.pushState({}, '', `/?section=${section}`);
         }
     }
     
-    if (!AppState.user.current && section !== SCREENS.PUBLIC && section !== SCREENS.LOGIN && 
-        section !== SCREENS.SHARE && section !== SCREENS.VENTAS && section !== SCREENS.ROOSTER) {
+    if (!AppState.user.current && section !== 'public' && section !== 'login' && section !== 'share' && section !== 'ventas' && section !== 'rooster') {
         AppState.ui.pendingScreen = section;
         if (!AppState.firebase.isEnabled) initializeFirebase();
-        section = SCREENS.LOGIN;
+        section = 'login';
     }
     
-    if (section === SCREENS.LOGIN && !AppState.firebase.isEnabled) {
-        AppState.ui.pendingScreen = SCREENS.LOGIN;
+    if (section === 'login' && !AppState.firebase.isEnabled) {
+        AppState.ui.pendingScreen = 'login';
         initializeFirebase();
         return;
     }
     
     AppState.setScreen(section);
 };
+
 // ==============================================
 // FUNCIONES DE ADMIN
 // ==============================================
@@ -2001,11 +1978,12 @@ function updateSideMenuContent() {
             <button onclick="toggleSideMenu()" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
         </div>
         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
-            <button onclick="navigateTo('${SCREENS.PERFIL}')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>👤</span><span>Mi Perfil</span></button>
-            <button onclick="navigateTo('${SCREENS.SHARE}')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔗</span><span>Compartir</span></button>
-${userProfile.ventas === true ? `<button onclick="navigateTo('${SCREENS.VENTAS}')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>💰</span><span>Subastas</span></button>` : ''}            ${userProfile.isJudge === true ? `<button onclick="navigateTo('${SCREENS.JUEZ}')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚖️</span><span>Panel Juez</span></button>` : ''}
-            <button onclick="navigateTo('${SCREENS.CONFIGURACIONES}')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚙️</span><span>Configuraciones</span></button>
-            ${isAdmin ? `<button onclick="navigateTo('${SCREENS.ADMIN}')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔧</span><span>CREAR COTEJO</span></button>` : ''}
+            <button onclick="navigateTo('perfil')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>👤</span><span>Mi Perfil</span></button>
+            <button onclick="navigateTo('share')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔗</span><span>Compartir</span></button>
+            ${userProfile.ventas === true ? `<button onclick="navigateTo('ventas')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>💰</span><span>Subastas</span></button>` : ''}
+            ${userProfile.isJudge === true ? `<button onclick="navigateTo('juez')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚖️</span><span>Panel Juez</span></button>` : ''}
+            <button onclick="navigateTo('configuraciones')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚙️</span><span>Configuraciones</span></button>
+            ${isAdmin ? `<button onclick="navigateTo('admin')" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔧</span><span>CREAR COTEJO</span></button>` : ''}
             <div style="height:1px; background:#eee; margin:16px 0;"></div>
             <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>🚪</span><span>Cerrar Sesión</span></button>
         </div>
@@ -2066,8 +2044,8 @@ function setupAuthListener() {
     }
     
     // ✅ OFFLINE: NO cambiar la URL, usar solo localStorage
-const lastScreen = localStorage.getItem('lastScreen');
-const pantallasPublicas = PUBLIC_SCREENS;
+    const lastScreen = localStorage.getItem('lastScreen');
+    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
     
     let pantallaFinal = 'public';
     
@@ -2107,7 +2085,7 @@ const pantallasPublicas = PUBLIC_SCREENS;
             const shareIdActual = new URLSearchParams(window.location.search).get('share');
             
             if (shareIdActual) {
-    pantallaADestino = SCREENS.SHARE;
+                pantallaADestino = 'share';
                 sessionStorage.setItem('currentShareId', shareIdActual);
             } else if (!profile?.activated) {
                 pantallaADestino = 'public';
@@ -2124,10 +2102,10 @@ const pantallasPublicas = PUBLIC_SCREENS;
     const sectionParam = urlParams.get('section');
     
     // Lista de pantallas públicas que se pueden ver SIN login
-const pantallasPublicas = PUBLIC_SCREENS;
+    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
     
     if (shareId !== null) {
-    AppState.setScreen(SCREENS.SHARE);
+        AppState.setScreen('share');
         window.history.pushState({}, '', `/?share=${shareId}`);
     } 
     // ✅ Verificar si el parámetro section está en la lista de públicas
@@ -2140,7 +2118,7 @@ const pantallasPublicas = PUBLIC_SCREENS;
         AppState.setScreen(pantallaPendiente);
     }
     else {
-    AppState.setScreen(SCREENS.PUBLIC);
+        AppState.setScreen('public');
     }
     
     AppState.clearUser();
@@ -2222,32 +2200,33 @@ if (isOffline && currentScreen !== 'login' && currentScreen !== 'activation_pend
     }, 500);
 }
         
-      const coreScreens = {
-    [SCREENS.LOGIN]: renderLoginScreen,
-    [SCREENS.ACTIVATION_PENDING]: renderActivationPendingScreen,
-    [SCREENS.PUBLIC]: renderPublicScreen
-};
+        const coreScreens = {
+            'login': renderLoginScreen,
+            'activation_pending': renderActivationPendingScreen,
+            'public': renderPublicScreen
+        };
         
         if (coreScreens[currentScreen]) {
             let topBarHtml = '';
             if (currentUser) topBarHtml = renderMobileNavBar();
-else if (currentScreen === SCREENS.PUBLIC) topBarHtml = renderPublicTopBar();            
+            else if (currentScreen === 'public') topBarHtml = renderPublicTopBar();
+            
             app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${coreScreens[currentScreen]()}</div>`;
             AppState.setLoading(false);
             return;
         }
         
         const screenFunctions = {
-    [SCREENS.ROOSTER]: window.renderRoosterScreen,
-    [SCREENS.PUBLICACIONES]: window.renderPublicacionesScreen,
-    [SCREENS.PEDIGRI]: window.renderPedigriScreen,
-    [SCREENS.JUEZ]: window.renderJuezScreen,
-    [SCREENS.SHARE]: window.renderShareScreen,
-    [SCREENS.VENTAS]: window.renderVentasScreen,
-    [SCREENS.PERFIL]: window.renderPerfilScreen,
-    [SCREENS.CONFIGURACIONES]: window.renderConfiguracionesScreen,
-    [SCREENS.ADMIN]: window.renderAdminScreen
-};
+            'rooster': window.renderRoosterScreen,
+            'publicaciones': window.renderPublicacionesScreen,
+            'pedigri': window.renderPedigriScreen,
+            'juez': window.renderJuezScreen,
+            'share': window.renderShareScreen,
+            'ventas': window.renderVentasScreen,
+            'perfil': window.renderPerfilScreen,
+            'configuraciones': window.renderConfiguracionesScreen,
+            'admin': window.renderAdminScreen
+        };
         
         if (screenFunctions[currentScreen]) {
             let topBarHtml = '';
@@ -2304,13 +2283,13 @@ window.addEventListener('load', () => {
     
  
     const sectionParam = urlParams.get('section');
-const allowedSections = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PENDING, SCREENS.ROOSTER, SCREENS.PUBLICACIONES, SCREENS.PEDIGRI, SCREENS.JUEZ, SCREENS.VENTAS, SCREENS.PERFIL, SCREENS.CONFIGURACIONES, SCREENS.ADMIN, SCREENS.SHARE];
-    let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
+const allowedSections = ['public', 'login', 'activation_pending', 'rooster', 'publicaciones', 'pedigri', 'juez', 'ventas', 'perfil', 'configuraciones', 'admin', 'share'];
+let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
 
 if (!pantallaInicial) {
     const lastScreen = localStorage.getItem('lastScreen');
-if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN) {
-    pantallaInicial = lastScreen;
+    if (lastScreen && lastScreen !== 'public' && lastScreen !== 'login') {
+        pantallaInicial = lastScreen;
     }
 }
 
