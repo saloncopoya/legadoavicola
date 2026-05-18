@@ -2453,10 +2453,19 @@ const NotificationsManager = {
                 }
             }
             
-            // Configurar Service Worker específico para FCM
-            await this.messaging.useServiceWorker(
-                await navigator.serviceWorker.register('/firebase-messaging-sw.js')
-            );
+          // Configurar Service Worker específico para FCM
+// En Firebase 9, no necesitas useServiceWorker, solo registrar el SW
+try {
+    const existingSW = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+    if (!existingSW) {
+        console.log('📦 Registrando firebase-messaging-sw.js...');
+        await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    } else {
+        console.log('✅ Service Worker de messaging ya registrado');
+    }
+} catch (swError) {
+    console.warn('⚠️ Error con Service Worker:', swError);
+}
             
             // Obtener token FCM
             await this.getToken();
