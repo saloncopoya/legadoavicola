@@ -1246,6 +1246,8 @@ if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN)
 }
 
 function hideLoadingScreen() {
+        console.log("🔄 Ocultando loading screen..."); // ✅ AGREGA ESTO
+
     if (loadingTimeoutId) {
         clearTimeout(loadingTimeoutId);
         loadingTimeoutId = null;
@@ -1690,7 +1692,10 @@ async function handleLogin() {
         await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
         localStorage.removeItem(`rate_${emailKey}`);
+        hideLoadingScreen(); 
     } catch (error) {
+                console.log("🔴 ERROR DETECTADO:", error.code); // ✅ AGREGA ESTO
+
         hideLoadingScreen();
         if (error.code === 'auth/invalid-login-credentials') {
             AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
