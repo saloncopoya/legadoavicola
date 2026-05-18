@@ -704,35 +704,80 @@ const SCREENS = {
 };
 
 
-    // ==============================================
+// ==============================================
 // CONSTANTES DE TEXTOS PARA NAVEGACIÓN (FÁCIL DE EDITAR)
 // ==============================================
 const TEXTS = {
-    // Textos para usuarios NO logueados (barra superior)
+    // ==========================================
+    // TEXTOS E ICONOS PARA USUARIOS NO LOGUEADOS (barra superior)
+    // ==========================================
     PUBLIC_BTN_PUBLIC: 'A',
+    icon_PUBLIC: '🏠',
+
     PUBLIC_BTN_VENTAS: 'B',
+    icon_VENTAS: '💰',
+
     PUBLIC_BTN_ROOSTER: 'C',
+    icon_ROOSTER: '🏆',
+
     PUBLIC_BTN_SHARE: 'D',
+    icon_SHARE: '🐔',
+
+    // Botón de Login (solo cuando hay internet)
+    PUBLIC_BTN_LOGIN: 'Login',
+    icon_LOGIN: '🔑',
     
-    // Textos para usuarios logueados (menú móvil inferior)
+    // ==========================================
+    // TEXTOS E ICONOS PARA USUARIOS LOGUEADOS (menú móvil inferior)
+    // ==========================================
     MENU_BTN_PUBLIC: 'A',
+    menu_icon_PUBLIC: '🏠',
+
     MENU_BTN_SHARE: 'D',
+    menu_icon_SHARE: '🔗',
+
     MENU_BTN_ROOSTER: 'C',
+    menu_icon_ROOSTER: '🏆',
+
     MENU_BTN_PUBLICACIONES: 'E',
+    menu_icon_PUBLICACIONES: '⚔️',
+
     MENU_BTN_PEDIGRI: 'F',
+    menu_icon_PEDIGRI: '🧬',
+
     MENU_BTN_JUEZ: 'G',
+    menu_icon_JUEZ: '⚖️',
+
     MENU_BTN_VENTAS: 'B',
+    menu_icon_VENTAS: '💰',
     
-    // Textos del menú lateral
+    // ==========================================
+    // TEXTOS E ICONOS PARA MENÚ LATERAL
+    // ==========================================
     SIDE_BTN_PERFIL: 'A',
+    side_icon_PERFIL: '👤',
+
     SIDE_BTN_SHARE: 'D',
+    side_icon_SHARE: '🔗',
+
     SIDE_BTN_VENTAS: 'B',
+    side_icon_VENTAS: '💰',
+
     SIDE_BTN_JUEZ: 'G',
+    side_icon_JUEZ: '⚖️',
+
     SIDE_BTN_CONFIGURACIONES: 'E',
+    side_icon_CONFIG: '⚙️',
+
     SIDE_BTN_ADMIN: 'F',
+    side_icon_ADMIN: '🔧',
+
     SIDE_BTN_LOGOUT: 'Cerrar Sesión',
+    side_icon_LOGOUT: '🚪',
     
-    // Badges
+    // ==========================================
+    // BADGES
+    // ==========================================
     BADGE_ADMIN: '👑 Administrador',
     BADGE_MEMBER: '👤 Miembro'
 };
@@ -1349,14 +1394,13 @@ function renderPublicTopBar() {
     const isOffline = !navigator.onLine;  // 👈 AGREGAR esta línea
     
     // Los 5 botones juntos (incluyendo Login) - PERO con condición
-    const botones = [
-        { id: SCREENS.PUBLIC, icono: '🏠', texto: TEXTS.PUBLIC_BTN_PUBLIC, accion: `navigateTo('${SCREENS.PUBLIC}')` },
-        { id: SCREENS.VENTAS, icono: '💰', texto: TEXTS.PUBLIC_BTN_VENTAS, accion: `navigateTo('${SCREENS.VENTAS}')` },
-        { id: SCREENS.ROOSTER, icono: '🏆', texto: TEXTS.PUBLIC_BTN_ROOSTER, accion: `navigateTo('${SCREENS.ROOSTER}')` },
-        { id: SCREENS.SHARE, icono: '🐔', texto: TEXTS.PUBLIC_BTN_SHARE, accion: `navigateTo('${SCREENS.SHARE}')` },
-        // 👇 SOLO agregar el login si NO estamos offline
-        ...(!isOffline ? [{ id: SCREENS.LOGIN, icono: '🔑', texto: 'Login', accion: `handleLoginClick()` }] : [])
-    ];
+   const botones = [
+    { id: SCREENS.PUBLIC, icono: TEXTS.icon_PUBLIC, texto: TEXTS.PUBLIC_BTN_PUBLIC, accion: `navigateTo('${SCREENS.PUBLIC}')` },
+    { id: SCREENS.VENTAS, icono: TEXTS.icon_VENTAS, texto: TEXTS.PUBLIC_BTN_VENTAS, accion: `navigateTo('${SCREENS.VENTAS}')` },
+    { id: SCREENS.ROOSTER, icono: TEXTS.icon_ROOSTER, texto: TEXTS.PUBLIC_BTN_ROOSTER, accion: `navigateTo('${SCREENS.ROOSTER}')` },
+    { id: SCREENS.SHARE, icono: TEXTS.icon_SHARE, texto: TEXTS.PUBLIC_BTN_SHARE, accion: `navigateTo('${SCREENS.SHARE}')` },
+    ...(!isOffline ? [{ id: SCREENS.LOGIN, icono: TEXTS.icon_LOGIN, texto: TEXTS.PUBLIC_BTN_LOGIN, accion: `handleLoginClick()` }] : [])
+];
     
     return `
         <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
@@ -1379,13 +1423,13 @@ function renderMobileNavBar() {
     if (!currentUser || !userProfile) return '';
     
  const topMenuItems = [];
-    topMenuItems.push({ id: SCREENS.PUBLIC, icon: '🏠', label: TEXTS.MENU_BTN_PUBLIC });
-    topMenuItems.push({ id: SCREENS.SHARE, icon: '🔗', label: TEXTS.MENU_BTN_SHARE });
-    topMenuItems.push({ id: SCREENS.ROOSTER, icon: '🏆', label: TEXTS.MENU_BTN_ROOSTER });
-    if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: '⚔️', label: TEXTS.MENU_BTN_PUBLICACIONES });
-    if (userProfile.pedigri === true) topMenuItems.push({ id: SCREENS.PEDIGRI, icon: '🧬', label: TEXTS.MENU_BTN_PEDIGRI });
-    if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: '⚖️', label: TEXTS.MENU_BTN_JUEZ });
-    if (userProfile.ventas === true) topMenuItems.push({ id: SCREENS.VENTAS, icon: '💰', label: TEXTS.MENU_BTN_VENTAS });
+  topMenuItems.push({ id: SCREENS.PUBLIC, icon: TEXTS.menu_icon_PUBLIC, label: TEXTS.MENU_BTN_PUBLIC });
+topMenuItems.push({ id: SCREENS.SHARE, icon: TEXTS.menu_icon_SHARE, label: TEXTS.MENU_BTN_SHARE });
+topMenuItems.push({ id: SCREENS.ROOSTER, icon: TEXTS.menu_icon_ROOSTER, label: TEXTS.MENU_BTN_ROOSTER });
+if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: TEXTS.menu_icon_PUBLICACIONES, label: TEXTS.MENU_BTN_PUBLICACIONES });
+if (userProfile.pedigri === true) topMenuItems.push({ id: SCREENS.PEDIGRI, icon: TEXTS.menu_icon_PEDIGRI, label: TEXTS.MENU_BTN_PEDIGRI });
+if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TEXTS.menu_icon_JUEZ, label: TEXTS.MENU_BTN_JUEZ });
+if (userProfile.ventas === true) topMenuItems.push({ id: SCREENS.VENTAS, icon: TEXTS.menu_icon_VENTAS, label: TEXTS.MENU_BTN_VENTAS });
     
     const photoURL = userProfile.photoURL || currentUser.photoURL || '';
     const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
@@ -2034,14 +2078,14 @@ function updateSideMenuContent() {
             <button onclick="toggleSideMenu()" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
         </div>
         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
-            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>👤</span><span>${TEXTS.SIDE_BTN_PERFIL}</span></button>
-            <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔗</span><span>${TEXTS.SIDE_BTN_SHARE}</span></button>
-            ${userProfile.ventas === true ? `<button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>💰</span><span>${TEXTS.SIDE_BTN_VENTAS}</span></button>` : ''}
-            ${userProfile.isJudge === true ? `<button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚖️</span><span>${TEXTS.SIDE_BTN_JUEZ}</span></button>` : ''}
-            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>⚙️</span><span>${TEXTS.SIDE_BTN_CONFIGURACIONES}</span></button>
-            ${isAdmin ? `<button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>🔧</span><span>${TEXTS.SIDE_BTN_ADMIN}</span></button>` : ''}
+            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_PERFIL}</span><span>${TEXTS.SIDE_BTN_PERFIL}</span></button>
+            <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_SHARE}</span><span>${TEXTS.SIDE_BTN_SHARE}</span></button>
+            ${userProfile.ventas === true ? `<button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_VENTAS}</span><span>${TEXTS.SIDE_BTN_VENTAS}</span></button>` : ''}
+            ${userProfile.isJudge === true ? `<button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_JUEZ}</span><span>${TEXTS.SIDE_BTN_JUEZ}</span></button>` : ''}
+            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_CONFIG}</span><span>${TEXTS.SIDE_BTN_CONFIGURACIONES}</span></button>
+            ${isAdmin ? `<button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_ADMIN}</span><span>${TEXTS.SIDE_BTN_ADMIN}</span></button>` : ''}
             <div style="height:1px; background:#eee; margin:16px 0;"></div>
-            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>🚪</span><span>${TEXTS.SIDE_BTN_LOGOUT}</span></button>
+            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>${TEXTS.side_icon_LOGOUT}</span><span>${TEXTS.SIDE_BTN_LOGOUT}</span></button>
         </div>
     `;
 }
