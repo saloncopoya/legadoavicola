@@ -1344,44 +1344,32 @@ const municipiosChiapas = [
 // ==============================================
 // FUNCIONES DE RENDERIZADO (PANTALLAS COMPLETAS)
 // ==============================================
-
 function renderPublicTopBar() {
     const currentScreen = AppState.ui.currentScreen;
     
-    let botonCentral;
-    if (currentScreen === SCREENS.PUBLIC) botonCentral = { texto: `Ver ${TEXTS.PUBLIC_BTN_VENTAS}`, accion: `navigateTo('${SCREENS.VENTAS}')` };
-    else if (currentScreen === SCREENS.VENTAS) botonCentral = { texto: `Ver ${TEXTS.PUBLIC_BTN_ROOSTER}`, accion: `navigateTo('${SCREENS.ROOSTER}')` };
-    else if (currentScreen === SCREENS.ROOSTER) botonCentral = { texto: `Ver ${TEXTS.PUBLIC_BTN_SHARE}`, accion: `navigateTo('${SCREENS.SHARE}')` };
-    else if (currentScreen === SCREENS.SHARE) botonCentral = { texto: `Ir a ${TEXTS.PUBLIC_BTN_PUBLIC}`, accion: `navigateTo('${SCREENS.PUBLIC}')` };
-    else botonCentral = { texto: `Ir a ${TEXTS.PUBLIC_BTN_PUBLIC}`, accion: `navigateTo('${SCREENS.PUBLIC}')` };
-    
+    // Los 5 botones juntos (incluyendo Login)
+    const botones = [
+        { id: SCREENS.PUBLIC, icono: '🏠', texto: TEXTS.PUBLIC_BTN_PUBLIC, accion: `navigateTo('${SCREENS.PUBLIC}')` },
+        { id: SCREENS.VENTAS, icono: '💰', texto: TEXTS.PUBLIC_BTN_VENTAS, accion: `navigateTo('${SCREENS.VENTAS}')` },
+        { id: SCREENS.ROOSTER, icono: '🏆', texto: TEXTS.PUBLIC_BTN_ROOSTER, accion: `navigateTo('${SCREENS.ROOSTER}')` },
+        { id: SCREENS.SHARE, icono: '🐔', texto: TEXTS.PUBLIC_BTN_SHARE, accion: `navigateTo('${SCREENS.SHARE}')` },
+        { id: SCREENS.LOGIN, icono: '🔑', texto: 'Login', accion: `handleLoginClick()` }
+    ];
     
     return `
-        <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
-            <button onclick="handleLoginClick()" style="background: transparent; border: none; color: #FFD700; padding: 6px 4px; border-radius: 40px; font-weight: 700; font-size: 11px; cursor: pointer;">
-                <span style="font-size: 12px;">🔑</span>
-            </button>
-            <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px; flex: 1; justify-content: center;">
-                <button onclick="navigateTo(SCREENS.PUBLIC)" style="background: ${currentScreen === SCREENS.PUBLIC ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : '#FFD700'};">🏠</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.PUBLIC ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_PUBLIC}</span>
-                </button>
-                <button onclick="navigateTo(SCREENS.VENTAS)" style="background: ${currentScreen === SCREENS.VENTAS ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : '#FFD700'};">💰</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.VENTAS ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_VENTAS}</span>
-                </button>
-                <button onclick="navigateTo(SCREENS.ROOSTER)" style="background: ${currentScreen === SCREENS.ROOSTER ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : '#FFD700'};">🏆</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.ROOSTER ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_ROOSTER}</span>
-                </button>
-                <button onclick="navigateTo(SCREENS.SHARE)" style="background: ${currentScreen === SCREENS.SHARE ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; flex: 1; min-width: 55px;">
-                    <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : '#FFD700'};">🐔</span>
-                    <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === SCREENS.SHARE ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${TEXTS.PUBLIC_BTN_SHARE}</span>
-                </button>
+        <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
+            <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px;">
+                ${botones.map(btn => `
+                    <button onclick="${btn.accion}" style="background: ${currentScreen === btn.id ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 55px;">
+                        <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === btn.id ? '#1a1a2e' : '#FFD700'};">${btn.icono}</span>
+                        <span style="font-size: clamp(8px,3vw,10px); font-weight: 700; color: ${currentScreen === btn.id ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
+                    </button>
+                `).join('')}
             </div>
         </nav>
     `;
 }
+
 
 function renderMobileNavBar() {
     const currentUser = AppState.user.current;
@@ -1482,8 +1470,7 @@ function renderLoginScreen() {
     }, 2000);
     
     return `
-        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifOZH9-0lYvE26eERqh2GlCJ8FluQTtfWIv0511ORLE78-buORw3OT-V5jHrU8yRK-HX_AmMD3FQRF2wiVUVLNKkEhepibWafLLBPvX6YNsTuRL3uJ1OpVD1bcJ9R4FBXfBN9xyYOG3b_v1fMuqZOLkaZrfCJmltGJZsZhKN-5IM7WfstdaM_0ry0nLEY/s320/Gemini_Generated_Image_4l1ocl4l1ocl4l1o.png'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
-            <div style="width: 100%; max-width: 400px; margin: auto;">
+<div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 20px;">            <div style="width: 100%; max-width: 400px; margin: auto;">
                 <div style="text-align:center; background: black; border-radius: 12px; padding: 8px; margin-bottom: 10px;">
                     <div style="font-size:12px; font-weight:700; color:#D4AF37;">🔗 MENU DE NAVEGACIÓN:</div>
                     <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
@@ -2274,15 +2261,19 @@ if (isOffline && currentScreen !== SCREENS.LOGIN && currentScreen !== SCREENS.AC
     [SCREENS.PUBLIC]: renderPublicScreen
 };
         
-        if (coreScreens[currentScreen]) {
-            let topBarHtml = '';
-            if (currentUser) topBarHtml = renderMobileNavBar();
-else if (currentScreen === SCREENS.PUBLIC) topBarHtml = renderPublicTopBar();
-            
-            app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${coreScreens[currentScreen]()}</div>`;
-            AppState.setLoading(false);
-            return;
-        }
+       if (coreScreens[currentScreen]) {
+    let topBarHtml = '';
+    
+    if (currentUser) {
+        topBarHtml = renderMobileNavBar();
+    } else if (currentScreen === SCREENS.PUBLIC || currentScreen === SCREENS.LOGIN) {
+        topBarHtml = renderPublicTopBar();
+    }
+    
+    app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${coreScreens[currentScreen]()}</div>`;
+    AppState.setLoading(false);
+    return;
+}
         
        const screenFunctions = {
     [SCREENS.ROOSTER]: window.renderRoosterScreen,
