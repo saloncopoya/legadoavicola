@@ -2290,7 +2290,9 @@ if (isOffline && currentScreen !== SCREENS.LOGIN && currentScreen !== SCREENS.AC
             if (currentUser) topBarHtml = renderMobileNavBar();
             else topBarHtml = renderPublicTopBar();
             
-            app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${screenFunctions[currentScreen]()}</div>`;
+                const screenContent = await screenFunctions[currentScreen](); 
+            
+    app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${screenContent}</div>`;
         } else {
             app.innerHTML = !currentUser ? renderPublicScreen() : (window.renderRoosterScreen || (() => '<div>Página en construcción</div>'))();
         }
