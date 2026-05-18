@@ -1692,7 +1692,7 @@ async function handleLogin() {
         localStorage.removeItem(`rate_${emailKey}`);
         hideLoadingScreen();
         
-    catch (error) {
+    } catch (error) {
     console.log("🔴 CÓDIGO DE ERROR:", error.code);
     console.log("🔴 MENSAJE:", error.message);
     
