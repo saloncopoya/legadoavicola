@@ -1666,7 +1666,6 @@ function updatePhonePrefix() {
 async function handleLogin() {
     const email = document.getElementById('loginPhone')?.value.trim();
     const password = document.getElementById('loginPassword')?.value;
-    const loginBtn = document.querySelector('#loginForm .btn-primary');
     
     if (!email || !password) {
         AppState.addNotification('Completa todos los campos', 'warning');
@@ -1685,21 +1684,22 @@ async function handleLogin() {
     }
     
     showLoadingScreen('Iniciando sesión...', 30);
-    if (loginBtn) loginBtn.disabled = true;
     
     try {
         RateLimiter.recordAttempt(emailKey);
         await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
         localStorage.removeItem(`rate_${emailKey}`);
+        hideLoadingScreen();
+        
     } catch (error) {
         hideLoadingScreen();
+        
         if (error.code === 'auth/invalid-login-credentials') {
             AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
         } else {
-            AppState.addNotification('Error al iniciar sesión', 'error');
+            AppState.addNotification('Error al iniciar sesión: ' + error.message, 'error');
         }
-        if (loginBtn) loginBtn.disabled = false;
     }
 }
 
@@ -2158,7 +2158,6 @@ let pantallaFinal = SCREENS.PUBLIC;
     AppState.setScreen(pantallaFinal);
     hideLoadingScreen();
     AppState.setLoading(false);
-    renderApp();
     return;
 }
         
