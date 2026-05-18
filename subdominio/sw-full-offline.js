@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.58';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.58';
+const CACHE_NAME = 'legado-offline-v2.0.59';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.59';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -17,7 +17,6 @@ const urlsToCache = [
     'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js'
 ];
 
-console.log('[SW] URLs a cachear:', urlsToCache.length);
 
 // Instalar Service Worker
 self.addEventListener('install', event => {
@@ -25,11 +24,9 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(async cache => {
-                console.log('[SW] Cache abierto:', CACHE_NAME);
                 for (const url of urlsToCache) {
                     try {
                         await cache.add(url);
-                        console.log('[SW] Cacheado correctamente:', url);
                     } catch (err) {
                         console.warn('[SW] Falló al cachear:', url, err.message);
                     }
@@ -38,15 +35,12 @@ self.addEventListener('install', event => {
             })
     );
     self.skipWaiting();
-    console.log('[SW] skipWaiting ejecutado');
 });
 
 // Activar Service Worker
 self.addEventListener('activate', event => {
-    console.log('[SW] Evento activate - Service Worker activando...');
     event.waitUntil(
         caches.keys().then(cacheNames => {
-            console.log('[SW] Caches existentes:', cacheNames);
             return Promise.all(
                 cacheNames.map(cache => {
                     if (cache !== CACHE_NAME && cache !== DYNAMIC_CACHE) {
@@ -75,7 +69,6 @@ self.addEventListener('fetch', event => {
     
     // 🔥 CAMBIO 1: IGNORAR peticiones que NO sean GET
     if (event.request.method !== 'GET') {
-        console.log('[SW] Método no-GET ignorado:', event.request.method);
         event.respondWith(fetch(event.request));
         return;
     }
