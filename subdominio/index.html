@@ -1346,14 +1346,16 @@ const municipiosChiapas = [
 // ==============================================
 function renderPublicTopBar() {
     const currentScreen = AppState.ui.currentScreen;
+    const isOffline = !navigator.onLine;  // 👈 AGREGAR esta línea
     
-    // Los 5 botones juntos (incluyendo Login)
+    // Los 5 botones juntos (incluyendo Login) - PERO con condición
     const botones = [
         { id: SCREENS.PUBLIC, icono: '🏠', texto: TEXTS.PUBLIC_BTN_PUBLIC, accion: `navigateTo('${SCREENS.PUBLIC}')` },
         { id: SCREENS.VENTAS, icono: '💰', texto: TEXTS.PUBLIC_BTN_VENTAS, accion: `navigateTo('${SCREENS.VENTAS}')` },
         { id: SCREENS.ROOSTER, icono: '🏆', texto: TEXTS.PUBLIC_BTN_ROOSTER, accion: `navigateTo('${SCREENS.ROOSTER}')` },
         { id: SCREENS.SHARE, icono: '🐔', texto: TEXTS.PUBLIC_BTN_SHARE, accion: `navigateTo('${SCREENS.SHARE}')` },
-        { id: SCREENS.LOGIN, icono: '🔑', texto: 'Login', accion: `handleLoginClick()` }
+        // 👇 SOLO agregar el login si NO estamos offline
+        ...(!isOffline ? [{ id: SCREENS.LOGIN, icono: '🔑', texto: 'Login', accion: `handleLoginClick()` }] : [])
     ];
     
     return `
