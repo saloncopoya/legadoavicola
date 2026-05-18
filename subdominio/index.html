@@ -1537,16 +1537,26 @@ window.handleLoginClick = function() {
 
 function showLoginForm() {
     AppState.ui.activeTab = 'login';
-    AppState.setScreen('login');
+    // NO cambies la pantalla, solo actualiza la interfaz
     document.getElementById('loginForm')?.classList.remove('hidden');
     document.getElementById('registerForm')?.classList.add('hidden');
+    // Forzar que se vea bien
+    if (AppState.ui.currentScreen === 'login') {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) mainContent.innerHTML = renderLoginScreen();
+    }
 }
 
 function showRegisterForm() {
     AppState.ui.activeTab = 'register';
-    AppState.setScreen('register');
+    // NO cambies la pantalla, solo actualiza la interfaz
     document.getElementById('loginForm')?.classList.add('hidden');
     document.getElementById('registerForm')?.classList.remove('hidden');
+    // Forzar que se vea bien
+    if (AppState.ui.currentScreen === 'login') {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) mainContent.innerHTML = renderLoginScreen();
+    }
 }
 
 function updatePhonePrefix() {
@@ -1782,7 +1792,7 @@ window.navigateTo = function(section) {
         }
     }
     
-    if (!AppState.user.current && section !== 'public' && section !== 'login' && section !== 'share' && section !== 'ventas' && section !== 'rooster') {
+if (!AppState.user.current && !pantallasPublicas.includes(section)) {
         AppState.ui.pendingScreen = section;
         if (!AppState.firebase.isEnabled) initializeFirebase();
         section = 'login';
@@ -2102,8 +2112,8 @@ function setupAuthListener() {
     const sectionParam = urlParams.get('section');
     
     // Lista de pantallas públicas que se pueden ver SIN login
-    const pantallasPublicas = ['public', 'ventas', 'rooster', 'share'];
-    
+const pantallasPublicas = ['public', 'login', 'activation_pending', 'ventas', 'rooster', 'share'];
+            
     if (shareId !== null) {
         AppState.setScreen('share');
         window.history.pushState({}, '', `/?share=${shareId}`);
