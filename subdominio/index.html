@@ -2524,36 +2524,39 @@ try {
     },
     
     // Guardar token en Firebase Database
-   async saveTokenToDatabase() {
-    const currentUser = AppState.user.current;
-    if (!currentUser || !this.fcmToken) return;  // ← Aquí está el problema
-    
-    if (!AppState.firebase.database) {
-        AppState.firebase.database = firebase.database();
-    }
-    
-    try {
-        const tokenData = {
-            token: this.fcmToken,
-            userId: currentUser.uid,
-            userEmail: currentUser.email,
-            userName: AppState.user.profile?.displayName || currentUser.displayName,
-            userAgent: navigator.userAgent,
-            platform: this.getPlatform(),
-            registeredAt: firebase.database.ServerValue.TIMESTAMP,
-            lastActive: firebase.database.ServerValue.TIMESTAMP,
-            active: true
-        };
+ async saveTokenToDatabase() {
+        const currentUser = AppState.user.current;
+        if (!currentUser || !this.fcmToken) return;
         
-        await AppState.firebase.database.ref(`fcm_tokens/${currentUser.uid}/${this.fcmToken}`).set(tokenData);
-        await AppState.firebase.database.ref(`all_fcm_tokens/${this.fcmToken}`).set(tokenData);
+        if (!AppState.firebase.database) {
+            AppState.firebase.database = firebase.database();
+        }
         
-        console.log('✅ Token FCM guardado en base de datos');
-        
-    } catch (error) {
-        console.error('❌ Error guardando token:', error);
-    }
-},
+        try {
+            const tokenData = {
+                token: this.fcmToken,
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                userName: AppState.user.profile?.displayName || currentUser.displayName,
+                userAgent: navigator.userAgent,
+                platform: this.getPlatform(),
+                registeredAt: firebase.database.ServerValue.TIMESTAMP,
+                lastActive: firebase.database.ServerValue.TIMESTAMP,
+                active: true
+            };
+            
+            // Guardar en la colección de tokens del usuario
+            await AppState.firebase.database.ref(`fcm_tokens/${currentUser.uid}/${this.fcmToken}`).set(tokenData);
+            
+            // También guardar en la colección global para enviar a todos
+            await AppState.firebase.database.ref(`all_fcm_tokens/${this.fcmToken}`).set(tokenData);
+            
+            console.log('✅ Token FCM guardado en base de datos');
+            
+        } catch (error) {
+            console.error('❌ Error guardando token:', error);
+        }
+    },
     
     // Obtener plataforma del dispositivo
     getPlatform() {
