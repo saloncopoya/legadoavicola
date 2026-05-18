@@ -682,6 +682,24 @@ const FIREBASE_ADMIN_CONFIG = {
     appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
 };
 
+    // ==============================================
+// CONSTANTES DE PANTALLAS (FÁCIL DE EDITAR)
+// ==============================================
+const SCREENS = {
+    PUBLIC: 'public',
+    LOGIN: 'login',
+    ACTIVATION_PENDING: 'activation_pending',
+    VENTAS: 'ventas',        // ← Cambia 'ventas' por lo que quieras
+    ROOSTER: 'rooster',      // ← Cambia 'rooster' por lo que quieras
+    SHARE: 'share',          // ← Cambia 'share' por lo que quieras
+    PERFIL: 'perfil',
+    CONFIGURACIONES: 'configuraciones',
+    ADMIN: 'admin',
+    JUEZ: 'juez',
+    PUBLICACIONES: 'publicaciones',
+    PEDIGRI: 'pedigri'
+};
+    
 // ==============================================
 // GESTOR DE ESTADO (AppState)
 // ==============================================
@@ -1792,8 +1810,8 @@ window.navigateTo = function(section) {
         }
     }
     
-if (!AppState.user.current && !pantallasPublicas.includes(section)) {
-        AppState.ui.pendingScreen = section;
+if (!AppState.user.current && section !== 'public' && section !== 'login' && section !== 'share' && section !== 'ventas' && section !== 'rooster') {
+    AppState.ui.pendingScreen = section;
         if (!AppState.firebase.isEnabled) initializeFirebase();
         section = 'login';
     }
