@@ -8,6 +8,7 @@ const urlsToCache = [
     '/index.html',
     '/manifest.json',
     '/offline.html',
+ '/.well-known/pwa-url-handler.json',
    '/firebase-messaging-sw.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
