@@ -2488,12 +2488,9 @@ window.formatTime = formatTime;
 
 
 
-
-
-
-
-    <!-- ==============================================
+<!-- ==============================================
      SCRIPTS DE PANTALLAS SEPARADAS (SIN MENÚ SUPERIOR)
+     TODAS CON SISTEMA OFFLINE UNIFICADO
      ============================================== -->
 
 <!-- PANTALLA 1: ROOSTER (TORNEOS) -->
@@ -2502,7 +2499,6 @@ window.renderRoosterScreen = async function() {
     const torneos = await getDataOfflineFirst('torneos');
     const torneosArray = torneos ? Object.values(torneos) : [];
     
-    // IMPORTANTE: SIN ${renderMobileNavBar()} - EL MENÚ YA ESTÁ FUERA
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
@@ -2553,19 +2549,32 @@ window.renderVentasScreen = async function() {
 console.log('✅ Pantalla VENTAS cargada desde script separado');
 </script>
 
-<!-- PANTALLA 3: SHARE (COMPARTIR) -->
+<!-- PANTALLA 3: SHARE (COMPARTIR) - CON OFFLINE -->
 <script>
 window.renderShareScreen = async function() {
     const shareId = sessionStorage.getItem('currentShareId') || 
                     new URLSearchParams(window.location.search).get('share');
     
+    // Si hay shareId, intentar obtener datos offline
+    let sharedData = null;
+    if (shareId) {
+        sharedData = await getDataOfflineFirst('contenido_compartido', shareId);
+    }
+    
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
                 <h2 style="color: #8B4513;">🔗 Contenido Compartido</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline</div>' : ''}
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="shared-content">
-                    ${shareId ? `<p>Compartido ID: ${shareId}</p><button onclick="navigateTo('public')" style="padding:12px; background:#8B4513; color:white; border:none; border-radius:8px;">Volver al inicio</button>` : '<p>No hay contenido compartido</p>'}
+                    ${sharedData ? 
+                        `<div style="background: white; border-radius: 12px; padding: 20px;">
+                            <h3>${sharedData.titulo || 'Contenido compartido'}</h3>
+                            <p>${sharedData.descripcion || ''}</p>
+                         </div>` : 
+                        (shareId ? '<p>Cargando contenido compartido...</p>' : '<p>No hay contenido compartido</p>')
+                    }
+                    ${shareId ? `<button onclick="navigateTo('public')" style="margin-top:20px; padding:12px; background:#8B4513; color:white; border:none; border-radius:8px;">Volver al inicio</button>` : ''}
                 </div>
             </div>
         </div>
@@ -2603,16 +2612,26 @@ window.renderPublicacionesScreen = async function() {
 console.log('✅ Pantalla PUBLICACIONES cargada desde script separado');
 </script>
 
-<!-- PANTALLA 5: PEDIGRI -->
+<!-- PANTALLA 5: PEDIGRI - CON OFFLINE -->
 <script>
 window.renderPedigriScreen = async function() {
+    const pedigris = await getDataOfflineFirst('pedigris');
+    const pedigrisArray = pedigris ? Object.values(pedigris) : [];
+    
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
                 <h2 style="color: #8B4513;">🧬 Pedigrí - Gestión Genética</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline</div>' : ''}
-                <div style="background: white; border-radius: 12px; padding: 20px; text-align: center;">
-                    <p>Sistema de pedigrí profesional - Próximamente</p>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <div id="pedigris-list">
+                    ${pedigrisArray.length === 0 ? '<p>No hay registros de pedigrí</p>' : 
+                        pedigrisArray.map(p => `
+                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3>${p.nombre || 'Registro de pedigrí'}</h3>
+                                <p>${p.raza || ''} - ${p.generacion || ''}</p>
+                            </div>
+                        `).join('')
+                    }
                 </div>
             </div>
         </div>
@@ -2621,11 +2640,17 @@ window.renderPedigriScreen = async function() {
 console.log('✅ Pantalla PEDIGRI cargada desde script separado');
 </script>
 
-<!-- PANTALLA 6: PERFIL -->
+<!-- PANTALLA 6: PERFIL - CON OFFLINE (ya usa localStorage) -->
 <script>
 window.renderPerfilScreen = async function() {
-    const userProfile = AppState.user.profile;
-    const currentUser = AppState.user.current;
+    // Intentar obtener perfil de IndexedDB primero, luego de AppState
+    let userProfile = AppState.user.profile;
+    let currentUser = AppState.user.current;
+    
+    if (!userProfile) {
+        const cachedProfile = await getDataOfflineFirst('users', currentUser?.uid);
+        if (cachedProfile) userProfile = cachedProfile;
+    }
     
     if (!userProfile) return '<div style="padding:20px; text-align:center;">Cargando perfil...</div>';
     
@@ -2655,16 +2680,27 @@ window.renderPerfilScreen = async function() {
 console.log('✅ Pantalla PERFIL cargada desde script separado');
 </script>
 
-<!-- PANTALLA 7: JUEZ -->
+<!-- PANTALLA 7: JUEZ - CON OFFLINE -->
 <script>
 window.renderJuezScreen = async function() {
+    const peleas = await getDataOfflineFirst('peleas');
+    const peleasArray = peleas ? Object.values(peleas) : [];
+    
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
                 <h2 style="color: #8B4513;">⚖️ Panel de Juez</h2>
-                <div style="background: white; border-radius: 12px; padding: 20px; text-align: center;">
-                    <p>Herramientas de arbitraje y calificación</p>
-                    <p style="color:#666; font-size:14px; margin-top:10px;">Próximamente disponible</p>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <div id="peleas-list">
+                    ${peleasArray.length === 0 ? '<p>No hay peleas asignadas</p>' : 
+                        peleasArray.map(pelea => `
+                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <h3>${pelea.nombre || 'Pelea'}</h3>
+                                <p>Fecha: ${pelea.fecha || ''}</p>
+                                <p>Estado: ${pelea.estado || 'Pendiente'}</p>
+                            </div>
+                        `).join('')
+                    }
                 </div>
             </div>
         </div>
@@ -2673,24 +2709,34 @@ window.renderJuezScreen = async function() {
 console.log('✅ Pantalla JUEZ cargada desde script separado');
 </script>
 
-<!-- PANTALLA 8: CONFIGURACIONES -->
+<!-- PANTALLA 8: CONFIGURACIONES - CON OFFLINE (guarda preferencias) -->
 <script>
 window.renderConfiguracionesScreen = async function() {
+    // Cargar preferencias guardadas offline
+    const preferencias = await getDataOfflineFirst('configuraciones', 'user_prefs') || {};
+    
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
                 <h2 style="color: #8B4513;">⚙️ Configuraciones</h2>
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Los cambios se guardarán localmente</div>' : ''}
                 <div style="background: white; border-radius: 12px; padding: 20px;">
                     <div style="margin-bottom: 15px;">
                         <label style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>Notificaciones push</span>
-                            <button onclick="AppState.addNotification('Configuración guardada', 'success')" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px;">Guardar</button>
+                            <span>🔔 Notificaciones push</span>
+                            <button onclick="guardarConfiguracion('notificaciones', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.notificaciones === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                        </label>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>🌙 Modo oscuro</span>
+                            <button onclick="guardarConfiguracion('modo_oscuro', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.modo_oscuro === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                     <div>
                         <label style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>Modo oscuro</span>
-                            <button onclick="AppState.addNotification('Próximamente', 'info')" style="padding:8px 16px; background:#666; color:white; border:none; border-radius:8px;">Activar</button>
+                            <span>💾 Sincronización automática</span>
+                            <button onclick="guardarConfiguracion('sincronizacion', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.sincronizacion === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                 </div>
@@ -2698,14 +2744,42 @@ window.renderConfiguracionesScreen = async function() {
         </div>
     `;
 };
+
+// Función auxiliar para guardar configuraciones offline
+async function guardarConfiguracion(key, event) {
+    const boton = event.target;
+    const preferencias = await getDataOfflineFirst('configuraciones', 'user_prefs') || {};
+    const nuevoEstado = preferencias[key] === 'activado' ? 'desactivado' : 'activado';
+    preferencias[key] = nuevoEstado;
+    await OfflineDB.set('configuraciones', 'user_prefs', preferencias);
+    boton.textContent = nuevoEstado === 'activado' ? '✅ Activado' : 'Activar';
+    AppState.addNotification(`Configuración guardada offline: ${key}`, 'success');
+}
+
 console.log('✅ Pantalla CONFIGURACIONES cargada desde script separado');
 </script>
 
-<!-- PANTALLA 9: ADMIN -->
+<!-- PANTALLA 9: ADMIN - SIN OFFLINE (requiere internet para admin) -->
 <script>
 window.renderAdminScreen = async function() {
     if (!AppState.user.profile?.gallo) {
-        return '<div style="padding:20px; text-align:center;">Acceso denegado</div>';
+        return '<div style="padding:20px; text-align:center;">🔒 Acceso denegado. Se requieren permisos de administrador.</div>';
+    }
+    
+    // Verificar si hay internet para admin
+    if (!navigator.onLine) {
+        return `
+            <div style="min-height: 100vh; background: #f8f9fa;">
+                <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+                    <div style="background: #ffebee; border-radius: 12px; padding: 30px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🌐</div>
+                        <h2 style="color: #c62828;">Se requiere conexión a internet</h2>
+                        <p>El panel de administración necesita conexión activa para funcionar correctamente.</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">Reintentar</button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     
     return `
@@ -2721,7 +2795,7 @@ window.renderAdminScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla ADMIN cargada desde script separado');
+console.log('✅ Pantalla ADMIN cargada desde script separado (requiere internet)');
 </script>
 
 
