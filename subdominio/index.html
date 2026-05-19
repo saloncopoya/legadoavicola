@@ -1689,6 +1689,18 @@ async function handleLogin() {
         RateLimiter.recordAttempt(emailKey);
         await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
+
+
+        
+  const user = AppState.firebase.auth.currentUser;
+        localStorage.setItem('offline_user', JSON.stringify({
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email
+        }));
+
+        
+        
         localStorage.removeItem(`rate_${emailKey}`);
         hideLoadingScreen();
         
@@ -1808,6 +1820,9 @@ async function loadUserProfile(uid) {
         const cachedProfile = AppState.persistentCache.get('profile', uid);
         if (cachedProfile) {
             AppState.setUser(AppState.firebase.auth.currentUser, cachedProfile);
+
+    localStorage.setItem('offline_profile', JSON.stringify(cachedProfile));
+
             return true;
         }
         
@@ -1823,6 +1838,10 @@ async function loadUserProfile(uid) {
             
             AppState.persistentCache.set('profile', profile, uid);
             AppState.setUser(AppState.firebase.auth.currentUser, profile);
+
+  localStorage.setItem('offline_profile', JSON.stringify(profile));
+
+            
             return true;
         }
         return false;
@@ -1994,6 +2013,16 @@ async function handleGoogleCredentialResponse(response) {
             
             if (profile.activated === true) RecurrentUserManager.markAsRecurrent();
             AppState.setUser(result.user, { id: result.user.uid, ...profile });
+
+            
+            localStorage.setItem('offline_user', JSON.stringify({
+    uid: result.user.uid,
+    displayName: result.user.displayName,
+    email: result.user.email
+}));
+localStorage.setItem('offline_profile', JSON.stringify({ id: result.user.uid, ...profile }));
+
+            
         }
         
 AppState.setScreen(SCREENS.PUBLIC);
@@ -2374,17 +2403,49 @@ AppState.subscribe((propriedadCambiada) => {
 window.addEventListener('load', () => {
     console.log('🚀 Aplicación iniciando');
     
+    // ========== INICIO - CÓDIGO NUEVO QUE AGREGAR ==========
+    const isOffline = !navigator.onLine;
+    
+    // Si estamos OFFLINE, mostrar la última pantalla sin intentar Firebase
+    if (isOffline) {
+        console.log('📴 Modo offline - Mostrando última pantalla guardada');
+        
+        // Ocultar loading inmediatamente
+        hideLoadingScreen();
+        
+        // Obtener la última pantalla guardada
+        const lastScreen = localStorage.getItem('lastScreen');
+        
+        // Pantallas que pueden verse offline
+        const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+        let pantallaMostrar = SCREENS.PUBLIC;
+        
+        if (lastScreen && pantallasOffline.includes(lastScreen)) {
+            pantallaMostrar = lastScreen;
+        }
+        
+        // Mostrar la pantalla
+        AppState.setScreen(pantallaMostrar);
+        AppState.setLoading(false);
+        renderApp(); // <-- Esto es lo que faltaba
+        
+        // Cuando vuelva internet, recargar
+        window.addEventListener('online', () => {
+            location.reload();
+        }, { once: true });
+        
+        return; // SALIR - No ejecutar el resto
+    }
+    // ========== FIN - CÓDIGO NUEVO AGREGADO ==========
+    
+    // TODO LO DEMÁS SIGUE IGUAL, NO SE ELIMINA NADA
     const urlParams = new URLSearchParams(window.location.search);
     const shareId = urlParams.get('share');
-    
-    // 🔥 NUEVA LÍNEA 1
-    const isOffline = !navigator.onLine;
     
     if (shareId !== null) {
         sessionStorage.setItem('currentShareId', shareId);
         AppState.ui.pendingScreen = SCREENS.SHARE;
         
-        // 🔥 CAMBIO 1
         if (!isOffline) {
             showLoadingScreen('Cargando contenido compartido...', 0);
         }
@@ -2395,23 +2456,21 @@ window.addEventListener('load', () => {
         return;
     }
     
- 
     const sectionParam = urlParams.get('section');
-const allowedSections = Object.values(SCREENS);
+    const allowedSections = Object.values(SCREENS);
     let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
 
-if (!pantallaInicial) {
-    const lastScreen = localStorage.getItem('lastScreen');
-if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN) {
-        pantallaInicial = lastScreen;
+    if (!pantallaInicial) {
+        const lastScreen = localStorage.getItem('lastScreen');
+        if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN) {
+            pantallaInicial = lastScreen;
+        }
     }
-}
 
-if (pantallaInicial && pantallaInicial !== SCREENS.PUBLIC) {
-    AppState.ui.pendingScreen = pantallaInicial;
-}
+    if (pantallaInicial && pantallaInicial !== SCREENS.PUBLIC) {
+        AppState.ui.pendingScreen = pantallaInicial;
+    }
     
-    // 🔥 CAMBIO 2
     if (!isOffline) {
         showLoadingScreen(pantallaInicial ? `Cargando ${pantallaInicial}...` : 'Cargando...', 0);
     }
