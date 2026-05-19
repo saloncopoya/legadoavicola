@@ -531,7 +531,6 @@ window.addEventListener('online', async () => {
 
 window.addEventListener('offline', () => {
     console.log('📴 Sin conexión - Modo offline activado');
-    AppState.addNotification('📴 Modo offline - Los datos se guardarán localmente', 'warning', 4000);
 });
 
 // Cargar TODOS los datos de Firebase al iniciar (para tenerlos offline)
