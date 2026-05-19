@@ -702,16 +702,16 @@ const TEXTS = {
     // TEXTOS E ICONOS PARA USUARIOS NO LOGUEADOS (barra superior)
     // ==========================================
     // Los botones de la barra superior (máximo 5 por espacio)
-    PUBLIC_BTN_PUBLIC: '🏠',
+    PUBLIC_BTN_PUBLIC: 'INICIO',
     icon_PUBLIC: '🏠',
 
-    PUBLIC_BTN_VENTAS: '💰',
+    PUBLIC_BTN_VENTAS: 'VENTAS',
     icon_VENTAS: '💰',
 
-    PUBLIC_BTN_ROOSTER: '🏆',
+    PUBLIC_BTN_ROOSTER: 'ROOSTER',
     icon_ROOSTER: '🏆',
 
-    PUBLIC_BTN_SHARE: '🔗',
+    PUBLIC_BTN_SHARE: 'SHARE',
     icon_SHARE: '🔗',
 
     PUBLIC_BTN_LOGIN: 'Login',
@@ -720,47 +720,46 @@ const TEXTS = {
     // ==========================================
     // TEXTOS E ICONOS PARA USUARIOS LOGUEADOS (menú móvil inferior)
     // ==========================================
-    // Los mismos textos que arriba (consistencia)
-    MENU_BTN_PUBLIC: '🏠',
+    MENU_BTN_PUBLIC: 'INICIO',
     menu_icon_PUBLIC: '🏠',
 
-    MENU_BTN_VENTAS: '💰',
+    MENU_BTN_VENTAS: 'VENTAS',
     menu_icon_VENTAS: '💰',
 
-    MENU_BTN_ROOSTER: '🏆',
+    MENU_BTN_ROOSTER: 'ROOSTER',
     menu_icon_ROOSTER: '🏆',
 
-    MENU_BTN_SHARE: '🔗',
+    MENU_BTN_SHARE: 'SHARE',
     menu_icon_SHARE: '🔗',
 
-    MENU_BTN_PUBLICACIONES: '⚔️',
+    MENU_BTN_PUBLICACIONES: 'PUBLICACIONES',
     menu_icon_PUBLICACIONES: '⚔️',
 
-    MENU_BTN_PEDIGRI: '🧬',
+    MENU_BTN_PEDIGRI: 'PEDIGRI',
     menu_icon_PEDIGRI: '🧬',
 
-    MENU_BTN_JUEZ: '⚖️',
+    MENU_BTN_JUEZ: 'JUEZ',
     menu_icon_JUEZ: '⚖️',
     
     // ==========================================
     // TEXTOS E ICONOS PARA MENÚ LATERAL
     // ==========================================
-    SIDE_BTN_PERFIL: '👤',
+    SIDE_BTN_PERFIL: 'PERFIL',
     side_icon_PERFIL: '👤',
 
-    SIDE_BTN_SHARE: '🔗',
+    SIDE_BTN_SHARE: 'SHARE',
     side_icon_SHARE: '🔗',
 
-    SIDE_BTN_VENTAS: '💰',
+    SIDE_BTN_VENTAS: 'VENTAS',
     side_icon_VENTAS: '💰',
 
-    SIDE_BTN_JUEZ: '⚖️',
+    SIDE_BTN_JUEZ: 'JUEZ',
     side_icon_JUEZ: '⚖️',
 
-    SIDE_BTN_CONFIGURACIONES: '⚙️',
+    SIDE_BTN_CONFIGURACIONES: 'CONFIGURACIONES',
     side_icon_CONFIG: '⚙️',
 
-    SIDE_BTN_ADMIN: '🔧',
+    SIDE_BTN_ADMIN: 'ADMIN',
     side_icon_ADMIN: '🔧',
 
     SIDE_BTN_LOGOUT: 'Cerrar Sesión',
@@ -1844,6 +1843,12 @@ async function handleLogout() {
 // NAVEGACIÓN
 // ==============================================
 window.navigateTo = function(section) {
+    const pantallasValidas = Object.values(SCREENS);
+    if (section && !pantallasValidas.includes(section)) {
+        console.warn(`⚠️ Navegación a pantalla inválida: "${section}"`);
+        section = SCREENS.PUBLIC;
+    }
+    
     const sideMenu = document.getElementById('side-menu');
     const overlay = document.getElementById('side-menu-overlay');
     if (sideMenu) sideMenu.style.right = '-350px';
