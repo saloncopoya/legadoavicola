@@ -630,24 +630,330 @@ window.renderVentasScreen = async function() {
 };
 
 window.renderRoosterScreen = async function() {
-    const torneos = await getDataOfflineFirst('torneos');
-    const torneosArray = torneos ? Object.values(torneos) : [];
+    // ==============================================
+    // SISTEMA DE RECORDATORIOS CON NOTIFICACIONES NATIVAS
+    // ==============================================
     
-    return `
-        <div style="padding-top: 80px; min-height: 100vh; background: #f8f9fa;">
-            ${renderMobileNavBar()}
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #8B4513;">🏆 Torneos Activos</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
-                <div id="torneos-list">
-                    ${torneosArray.length === 0 ? '<p>No hay torneos disponibles</p>' : 
-                        torneosArray.map(torneo => `
-                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <h3>${torneo.nombre || 'Torneo'}</h3>
-                                <p>${torneo.fecha || ''}</p>
+    // ========== 1. CONFIGURACIÓN INICIAL ==========
+    let recordatorios = [];
+    let intervaloVerificacion = null;
+    
+    // Cargar recordatorios guardados
+    try {
+        const saved = localStorage.getItem('recordatorios_medicamentos');
+        if (saved) recordatorios = JSON.parse(saved);
+    } catch(e) {}
+    
+    // Verificar permisos de notificación al cargar la pantalla
+    if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        setTimeout(async () => {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                AppState.addNotification('🔔 Notificaciones activadas para recordatorios', 'success');
+            }
+        }, 2000);
+    }
+    
+    // ========== 2. FUNCIONES AUXILIARES ==========
+    
+    // Función para mostrar notificación nativa CON imagen y sonido
+    function mostrarNotificacionNativa(recordatorio) {
+        if (!('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
+        
+        // Crear un sonido de notificación (Web Audio API)
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 880;
+            gainNode.gain.value = 0.3;
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
+            setTimeout(() => oscillator.stop(), 500);
+        } catch(e) { console.log('Sonido no soportado'); }
+        
+        // Mostrar notificación nativa
+        const notification = new Notification(`💊 ${recordatorio.medicamento}`, {
+            body: `${recordatorio.dosis} - ${recordatorio.notas || 'Toma tu medicamento a tiempo'}`,
+            icon: '/miniatura.jpg',
+            badge: '/miniatura.jpg',
+            image: '/miniatura.jpg',
+            tag: `med_${recordatorio.id}`,
+            renotify: true,
+            requireInteraction: true,
+            vibrate: [200, 100, 200],
+            silent: false,
+            timestamp: Date.now()
+        });
+        
+        notification.onclick = function() {
+            window.focus();
+            window.parent.focus();
+            notification.close();
+            // Redirigir a la pantalla de recordatorios
+            if (typeof navigateTo === 'function') navigateTo('menu2');
+        };
+        
+        notification.onclose = function() {
+            console.log('Notificación cerrada');
+        };
+        
+        console.log(`🔔 Notificación enviada: ${recordatorio.medicamento}`);
+    }
+    
+    // Función para verificar recordatorios (se ejecuta cada minuto)
+    function verificarRecordatorios() {
+        const ahora = new Date();
+        const horaActual = ahora.getHours();
+        const minutosActual = ahora.getMinutes();
+        const horaEnMinutos = horaActual * 60 + minutosActual;
+        
+        recordatorios.forEach(recordatorio => {
+            // Convertir hora del recordatorio a minutos
+            let horaRecordatorio = recordatorio.hora;
+            if (recordatorio.ampm === 'PM' && horaRecordatorio !== 12) horaRecordatorio += 12;
+            if (recordatorio.ampm === 'AM' && horaRecordatorio === 12) horaRecordatorio = 0;
+            const minutosRecordatorio = horaRecordatorio * 60;
+            
+            // Verificar si es la hora exacta (margen de 1 minuto)
+            const diferencia = Math.abs(horaEnMinutos - minutosRecordatorio);
+            
+            if (diferencia <= 1 && !recordatorio.notificadoHoy) {
+                // Verificar si aplica hoy
+                let debeNotificar = true;
+                if (recordatorio.frecuencia === 'dias_especificos' && recordatorio.diasSeleccionados) {
+                    const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+                    const hoy = diasSemana[ahora.getDay()];
+                    debeNotificar = recordatorio.diasSeleccionados.includes(hoy);
+                }
+                
+                if (debeNotificar) {
+                    mostrarNotificacionNativa(recordatorio);
+                    recordatorio.notificadoHoy = true;
+                    recordatorio.ultimaNotificacion = Date.now();
+                    guardarRecordatorios();
+                }
+            }
+            
+            // Resetear notificadoHoy al cambiar de día
+            const ultimaFecha = recordatorio.ultimaNotificacion ? new Date(recordatorio.ultimaNotificacion) : null;
+            if (ultimaFecha && ultimaFecha.getDate() !== ahora.getDate()) {
+                recordatorio.notificadoHoy = false;
+                guardarRecordatorios();
+            }
+        });
+    }
+    
+    // Guardar recordatorios en localStorage
+    function guardarRecordatorios() {
+        localStorage.setItem('recordatorios_medicamentos', JSON.stringify(recordatorios));
+    }
+    
+    // Eliminar recordatorio
+    function eliminarRecordatorio(id) {
+        recordatorios = recordatorios.filter(r => r.id !== id);
+        guardarRecordatorios();
+        renderRecordatoriosLista();
+        AppState.addNotification('🗑️ Recordatorio eliminado', 'info');
+    }
+    
+    // Renderizar lista de recordatorios
+    function renderRecordatoriosLista() {
+        const container = document.getElementById('recordatorios-lista');
+        if (!container) return;
+        
+        if (recordatorios.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    🕐 No hay recordatorios programados
+                    <br><small>Presiona "Agregar Recordatorio" para comenzar</small>
+                </div>
+            `;
+            return;
+        }
+        
+        const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+        const hoy = diasSemana[new Date().getDay()];
+        
+        container.innerHTML = recordatorios.map(rec => {
+            let frecuenciaTexto = rec.frecuencia === 'todos' ? '📅 Todos los días' : `📆 ${rec.diasSeleccionados?.join(', ') || ''}`;
+            let esHoy = rec.frecuencia === 'todos' || (rec.diasSeleccionados && rec.diasSeleccionados.includes(hoy));
+            
+            return `
+                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 5px solid ${esHoy ? '#4CAF50' : '#999'};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 800; font-size: 18px; color: #8B4513;">💊 ${rec.medicamento}</div>
+                            <div style="font-size: 24px; font-weight: bold; margin: 8px 0;">${rec.hora}:00 ${rec.ampm}</div>
+                            <div style="color: #666; font-size: 14px;">📦 ${rec.dosis}</div>
+                            ${rec.notas ? `<div style="color: #888; font-size: 12px; margin-top: 5px;">📝 ${rec.notas}</div>` : ''}
+                            <div style="color: ${esHoy ? '#4CAF50' : '#999'}; font-size: 12px; margin-top: 8px;">
+                                ${frecuenciaTexto} ${esHoy ? '✅ Aplica hoy' : '⏸️ No aplica hoy'}
                             </div>
-                        `).join('')
-                    }
+                        </div>
+                        <button onclick="eliminarRecordatorio(${rec.id})" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #d32f2f;">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ========== 3. MOSTRAR FORMULARIO AGREGAR ==========
+    function mostrarFormularioAgregar() {
+        const modal = document.createElement('div');
+        modal.id = 'modal-recordatorio';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: flex; align-items: center;
+            justify-content: center; z-index: 10000; backdrop-filter: blur(4px);
+        `;
+        
+        modal.innerHTML = `
+            <div style="background: white; border-radius: 24px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #8B4513;">➕ Nuevo Recordatorio</h2>
+                    <button onclick="document.getElementById('modal-recordatorio').remove()" style="background: none; border: none; font-size: 28px; cursor: pointer;">✕</button>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <input type="text" id="rec-medicamento" placeholder="💊 Nombre del medicamento *" style="padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                    <input type="text" id="rec-dosis" placeholder="📦 Dosis (ej: 1 tableta, 2 cucharadas) *" style="padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                    
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select id="rec-hora" style="flex: 2; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                            ${Array.from({length: 12}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+                        </select>
+                        <select id="rec-ampm" style="flex: 1; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="document.getElementById('rec-frecuencia-todos').checked = true; toggleDiasEspecificos(false)" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: #f5f5f5; cursor: pointer;">📅 Todos los días</button>
+                        <button onclick="document.getElementById('rec-frecuencia-dias').checked = true; toggleDiasEspecificos(true)" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: #f5f5f5; cursor: pointer;">📆 Días específicos</button>
+                    </div>
+                    <input type="radio" id="rec-frecuencia-todos" name="frecuencia" value="todos" checked style="display: none;">
+                    <input type="radio" id="rec-frecuencia-dias" name="frecuencia" value="dias_especificos" style="display: none;">
+                    
+                    <div id="rec-dias-container" style="display: none;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">Selecciona los días:</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'].map(dia => `
+                                <label style="display: flex; align-items: center; gap: 5px; background: #f0f0f0; padding: 6px 12px; border-radius: 20px;">
+                                    <input type="checkbox" value="${dia}" class="rec-dia-checkbox"> ${dia.substring(0,3)}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <textarea id="rec-notas" placeholder="📝 Notas adicionales (opcional)" rows="2" style="padding: 14px; border: 1px solid #ddd; border-radius: 12px;"></textarea>
+                    
+                    <button id="guardar-recordatorio-btn" style="padding: 16px; background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">💾 GUARDAR RECORDATORIO</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Configurar toggle de días
+        window.toggleDiasEspecificos = (mostrar) => {
+            const container = document.getElementById('rec-dias-container');
+            if (container) container.style.display = mostrar ? 'block' : 'none';
+        };
+        
+        // Evento guardar
+        document.getElementById('guardar-recordatorio-btn').onclick = () => {
+            const medicamento = document.getElementById('rec-medicamento')?.value.trim();
+            const dosis = document.getElementById('rec-dosis')?.value.trim();
+            const hora = parseInt(document.getElementById('rec-hora')?.value);
+            const ampm = document.getElementById('rec-ampm')?.value;
+            const frecuencia = document.querySelector('input[name="frecuencia"]:checked')?.value;
+            const notas = document.getElementById('rec-notas')?.value.trim() || '';
+            
+            let diasSeleccionados = [];
+            if (frecuencia === 'dias_especificos') {
+                const checkboxes = document.querySelectorAll('.rec-dia-checkbox');
+                checkboxes.forEach(cb => {
+                    if (cb.checked) diasSeleccionados.push(cb.value);
+                });
+                if (diasSeleccionados.length === 0) {
+                    AppState.addNotification('Selecciona al menos un día', 'warning');
+                    return;
+                }
+            }
+            
+            if (!medicamento || !dosis) {
+                AppState.addNotification('Completa los campos obligatorios', 'warning');
+                return;
+            }
+            
+            const nuevoRecordatorio = {
+                id: Date.now(),
+                medicamento: medicamento,
+                dosis: dosis,
+                hora: hora,
+                ampm: ampm,
+                frecuencia: frecuencia,
+                diasSeleccionados: diasSeleccionados,
+                notas: notas,
+                creado: Date.now(),
+                notificadoHoy: false,
+                ultimaNotificacion: null
+            };
+            
+            recordatorios.push(nuevoRecordatorio);
+            guardarRecordatorios();
+            renderRecordatoriosLista();
+            modal.remove();
+            AppState.addNotification('✅ Recordatorio guardado', 'success');
+        };
+    }
+    
+    // ========== 4. INICIAR VERIFICACIÓN CADA MINUTO ==========
+    if (intervaloVerificacion) clearInterval(intervaloVerificacion);
+    intervaloVerificacion = setInterval(verificarRecordatorios, 60000);
+    verificarRecordatorios(); // Verificar inmediatamente
+    
+    // Guardar intervalo para limpiar después
+    window.recordatoriosInterval = intervaloVerificacion;
+    
+    // ========== 5. RENDERIZAR PANTALLA COMPLETA ==========
+    setTimeout(() => {
+        renderRecordatoriosLista();
+    }, 100);
+    
+    // Exponer funciones globalmente
+    window.eliminarRecordatorio = eliminarRecordatorio;
+    window.mostrarFormularioAgregar = mostrarFormularioAgregar;
+    
+    // Retornar HTML de la pantalla
+    return `
+        <div style="padding-top: 80px; min-height: 100vh; background: #f5f5f5;">
+            ${renderMobileNavBar()}
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #8B4513;">💊 Mis Recordatorios</h2>
+                    <button onclick="mostrarFormularioAgregar()" style="background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; cursor: pointer;">
+                        ➕ AGREGAR
+                    </button>
+                </div>
+                
+                <div id="recordatorios-lista" style="margin-top: 20px;">
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        🕐 Cargando recordatorios...
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 16px; background: #fff3e0; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 14px; color: #666;">
+                        🔔 Las notificaciones aparecerán aunque la página esté cerrada
+                        <br>
+                        <small>⚠️ Asegúrate de tener los permisos de notificación activados</small>
+                    </div>
                 </div>
             </div>
         </div>
