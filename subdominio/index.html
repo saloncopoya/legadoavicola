@@ -324,28 +324,42 @@ const OfflineDB = {
             };
             
             request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                
-                // Crear almacenes para cada tipo de dato
-                if (!db.objectStoreNames.contains('users')) {
-                    db.createObjectStore('users', { keyPath: 'uid' });
-                }
-                if (!db.objectStoreNames.contains('subastas')) {
-                    db.createObjectStore('subastas', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('torneos')) {
-                    db.createObjectStore('torneos', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('publicaciones')) {
-                    db.createObjectStore('publicaciones', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('pendingSync')) {
-                    db.createObjectStore('pendingSync', { keyPath: 'id', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('appState')) {
-                    db.createObjectStore('appState', { keyPath: 'key' });
-                }
-            };
+    const db = event.target.result;
+    
+    // Crear almacenes para cada tipo de dato
+    if (!db.objectStoreNames.contains('users')) {
+        db.createObjectStore('users', { keyPath: 'uid' });
+    }
+    if (!db.objectStoreNames.contains('subastas')) {
+        db.createObjectStore('subastas', { keyPath: 'id' });
+    }
+    if (!db.objectStoreNames.contains('torneos')) {
+        db.createObjectStore('torneos', { keyPath: 'id' });
+    }
+    if (!db.objectStoreNames.contains('publicaciones')) {
+        db.createObjectStore('publicaciones', { keyPath: 'id' });
+    }
+
+     if (!db.objectStoreNames.contains('pedigris')) {
+        db.createObjectStore('pedigris', { keyPath: 'id' });
+    }
+    if (!db.objectStoreNames.contains('peleas')) {
+        db.createObjectStore('peleas', { keyPath: 'id' });
+    }
+    if (!db.objectStoreNames.contains('configuraciones')) {
+        db.createObjectStore('configuraciones', { keyPath: 'key' });
+    }
+    if (!db.objectStoreNames.contains('contenido_compartido')) {
+        db.createObjectStore('contenido_compartido', { keyPath: 'id' });
+    }
+    // ================================================
+    if (!db.objectStoreNames.contains('pendingSync')) {
+        db.createObjectStore('pendingSync', { keyPath: 'id', autoIncrement: true });
+    }
+    if (!db.objectStoreNames.contains('appState')) {
+        db.createObjectStore('appState', { keyPath: 'key' });
+    }
+};
         });
     },
     
