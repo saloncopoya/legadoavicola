@@ -1395,7 +1395,9 @@ function renderMobileNavBar() {
   topMenuItems.push({ id: SCREENS.PUBLIC, icon: TEXTS.menu_icon_PUBLIC, label: TEXTS.MENU_BTN_PUBLIC });
 topMenuItems.push({ id: SCREENS.SHARE, icon: TEXTS.menu_icon_SHARE, label: TEXTS.MENU_BTN_SHARE });
 topMenuItems.push({ id: SCREENS.ROOSTER, icon: TEXTS.menu_icon_ROOSTER, label: TEXTS.MENU_BTN_ROOSTER });
-if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: TEXTS.menu_icon_PUBLICACIONES, label: TEXTS.MENU_BTN_PUBLICACIONES });
+topMenuItems.push({ id: SCREENS.VENTAS, icon: TEXTS.menu_icon_VENTAS, label: TEXTS.MENU_BTN_VENTAS });
+    
+    if (userProfile.publicaciones === true) topMenuItems.push({ id: SCREENS.PUBLICACIONES, icon: TEXTS.menu_icon_PUBLICACIONES, label: TEXTS.MENU_BTN_PUBLICACIONES });
 if (userProfile.pedigri === true) topMenuItems.push({ id: SCREENS.PEDIGRI, icon: TEXTS.menu_icon_PEDIGRI, label: TEXTS.MENU_BTN_PEDIGRI });
 if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TEXTS.menu_icon_JUEZ, label: TEXTS.MENU_BTN_JUEZ });
 if (userProfile.ventas === true) topMenuItems.push({ id: SCREENS.VENTAS, icon: TEXTS.menu_icon_VENTAS, label: TEXTS.MENU_BTN_VENTAS });
