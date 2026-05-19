@@ -1777,6 +1777,7 @@ async function loadUserProfile(uid) {
                 displayName: cachedProfile.displayName,
                 email: cachedProfile.realEmail
             }));
+            
             AppState.setUser(AppState.firebase.auth.currentUser, cachedProfile);
             return true;
         }
@@ -2190,26 +2191,53 @@ limpiarPantallasInvalidas();
         // ==============================================
         // CASO 1: ESTAMOS OFFLINE (NO hay internet)
         // ==============================================
-      if (isOffline) {
+     if (isOffline) {
     console.log('📴 Modo offline - Usando datos guardados');
     
-    // Intentar recuperar usuario guardado de localStorage
+    // Intentar recuperar usuario guardado de localStorage (solo datos básicos)
     const cachedUser = localStorage.getItem('offline_user');
-    const cachedProfile = localStorage.getItem('offline_profile');
     
-    if (cachedUser && cachedProfile) {
+    if (cachedUser) {
         try {
             const userData = JSON.parse(cachedUser);
-            const profileData = JSON.parse(cachedProfile);
-            AppState.setUser(userData, profileData);
-        } catch(e) {}
+            
+            // Buscar perfil en IndexedDB (NO en localStorage)
+            let profileData = null;
+            try {
+                profileData = await OfflineDB.get('users', userData.uid);
+            } catch(e) {
+                console.warn('Error al leer IndexedDB:', e);
+            }
+            
+            if (profileData) {
+                AppState.setUser(userData, profileData);
+                console.log('✅ Usuario restaurado desde IndexedDB:', userData.displayName);
+            } else {
+                // Si no hay perfil en IndexedDB, crear uno básico
+                const basicProfile = {
+                    uid: userData.uid,
+                    displayName: userData.displayName,
+                    email: userData.email,
+                    gallo: false,
+                    isJudge: false,
+                    publicaciones: false,
+                    ventas: false,
+                    pedigri: false,
+                    activated: true
+                };
+                AppState.setUser(userData, basicProfile);
+                console.log('✅ Usuario básico creado offline:', userData.displayName);
+            }
+        } catch(e) {
+            console.warn('Error restaurando usuario:', e);
+        }
     }
     
     // ✅ OFFLINE: NO cambiar la URL, usar solo localStorage
     const lastScreen = localStorage.getItem('lastScreen');
-const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+    const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
     
-let pantallaFinal = SCREENS.PUBLIC;    
+    let pantallaFinal = SCREENS.PUBLIC;    
     if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
         pantallaFinal = pantallaPendiente;
     } else if (lastScreen && pantallasPublicas.includes(lastScreen)) {
