@@ -1874,29 +1874,8 @@ async function handleLogout() {
 // NAVEGACIÓN
 // ==============================================
 window.navigateTo = function(section) {
-     // ✅ NO cerrar el modal de instalación si está visible
-    const installOverlay = document.getElementById('installOverlay');
-    if (installOverlay && installOverlay.style.display === 'block') {
-        // Si el modal de instalación está abierto, no cerrarlo
-        // Solo cambiar la pantalla sin afectar el overlay
-        const pantallasValidas = Object.values(SCREENS);
-        if (section && !pantallasValidas.includes(section)) {
-            console.warn(`⚠️ Navegación a pantalla inválida: "${section}"`);
-            section = SCREENS.PUBLIC;
-        }
-        
-        // Cambiar pantalla SIN cerrar overlays
-        if (section && section !== SCREENS.LOGIN && section !== SCREENS.ACTIVATION_PENDING) {
-            localStorage.setItem('lastScreen', section);
-        }
-        AppState.setScreen(section);
-        return; // Salir sin cerrar el modal
-    }
-    
-    // Resto del código normal de navigateTo...
+   
 
-
-    
     const pantallasValidas = Object.values(SCREENS);
     if (section && !pantallasValidas.includes(section)) {
         console.warn(`⚠️ Navegación a pantalla inválida: "${section}"`);
