@@ -2103,6 +2103,39 @@ function initializeFirebase() {
     }
 }
 
+    // ==============================================
+// VALIDACIÓN DE PANTALLAS PARA EVITAR ERRORES POR DATOS OBSOLETOS
+// ==============================================
+function validarPantallaGuardada(pantalla) {
+    if (!pantalla) return null;
+    const pantallasValidas = Object.values(SCREENS);
+    if (pantallasValidas.includes(pantalla)) {
+        return pantalla;
+    }
+    console.warn(`⚠️ Pantalla inválida detectada: "${pantalla}". Eliminando...`);
+    return null;
+}
+
+function limpiarPantallasInvalidas() {
+    // 1. Validar lastScreen
+    const lastScreen = localStorage.getItem('lastScreen');
+    const lastScreenValido = validarPantallaGuardada(lastScreen);
+    if (!lastScreenValido && lastScreen) {
+        localStorage.removeItem('lastScreen');
+        console.log('🗑️ lastScreen inválida eliminada:', lastScreen);
+    }
+
+    // 2. Validar pendingScreen en AppState
+    if (AppState.ui.pendingScreen) {
+        const pendingValido = validarPantallaGuardada(AppState.ui.pendingScreen);
+        if (!pendingValido) {
+            AppState.ui.pendingScreen = null;
+            console.log('🗑️ pendingScreen inválido eliminado:', AppState.ui.pendingScreen);
+        }
+    }
+}
+
+    
 function setupAuthListener() {
     if (!AppState.firebase.auth) return;
     
@@ -2110,8 +2143,10 @@ function setupAuthListener() {
         const pantallaPendiente = AppState.ui.pendingScreen;
         AppState.ui.pendingScreen = null;
 
+        //  Validar pantallas guardadas al inicio
+limpiarPantallasInvalidas();
 
-         // 🔥 DETECTAR SI ESTAMOS OFFLINE
+         //  DETECTAR SI ESTAMOS OFFLINE
         const isOffline = !navigator.onLine;
         
         // ==============================================
@@ -2426,6 +2461,15 @@ window.addEventListener('load', () => {
     const allowedSections = Object.values(SCREENS);
     let pantallaInicial = sectionParam && allowedSections.includes(sectionParam) ? sectionParam : null;
 
+
+    // Validar que la pantalla inicial no sea obsoleta
+const pantallasValidas = Object.values(SCREENS);
+if (pantallaInicial && !pantallasValidas.includes(pantallaInicial)) {
+    console.warn(`⚠️ Pantalla inicial inválida desde URL: "${pantallaInicial}". Usando PUBLIC.`);
+    pantallaInicial = null;
+}
+
+    
     if (!pantallaInicial) {
         const lastScreen = localStorage.getItem('lastScreen');
         if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN) {
