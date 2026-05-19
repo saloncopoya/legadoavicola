@@ -1422,7 +1422,9 @@ function renderPublicTopBar() {
 function renderMobileNavBar() {
     const currentUser = AppState.user.current;
     const userProfile = AppState.user.profile;
-    if (!currentUser || !userProfile) return '';
+  if (!currentUser || !userProfile) {
+        return renderPublicTopBar();
+    }
     
  const topMenuItems = [];
   topMenuItems.push({ id: SCREENS.PUBLIC, icon: TEXTS.menu_icon_PUBLIC, label: TEXTS.MENU_BTN_PUBLIC });
@@ -2412,6 +2414,22 @@ window.addEventListener('load', () => {
         
         // Ocultar loading inmediatamente
         hideLoadingScreen();
+
+            // RESTAURA USUARIO OFFLINE
+         const cachedUser = localStorage.getItem('offline_user');
+    const cachedProfile = localStorage.getItem('offline_profile');
+    if (cachedUser && cachedProfile) {
+        try {
+            const userData = JSON.parse(cachedUser);
+            const profileData = JSON.parse(cachedProfile);
+            AppState.setUser(userData, profileData);
+            console.log('✅ Usuario restaurado offline:', userData.displayName);
+        } catch(e) {
+            console.warn('Error restaurando usuario:', e);
+        }
+    }
+
+        
         
         // Obtener la última pantalla guardada
         const lastScreen = localStorage.getItem('lastScreen');
