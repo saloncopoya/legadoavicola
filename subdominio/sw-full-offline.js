@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.61';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.61';
+const CACHE_NAME = 'legado-offline-v2.0.62';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.62';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -86,7 +86,6 @@ self.addEventListener('fetch', event => {
     }
     
     // Estrategia: Cache First, luego Network
-    console.log('[SW] Buscando en cache:', url.pathname);
     event.respondWith(
 caches.match(url.pathname)
         .then(response => {
