@@ -977,6 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.addEventListener('click', async () => {
 
                             overlay.style.display = 'none';
+            if (navigator.vibrate) navigator.vibrate([100, 50, 300]);
 
             
             if (deferredPrompt) {
