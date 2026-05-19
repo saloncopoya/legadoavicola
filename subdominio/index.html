@@ -675,183 +675,131 @@ const FIREBASE_ADMIN_CONFIG = {
     appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
 };
 
-    // ==============================================
-// CONSTANTES DE PANTALLAS (FÁCIL DE EDITAR)
-// ==============================================
-const SCREENS = {
-    PUBLIC: 'public',
-    LOGIN: 'login',
-    ACTIVATION_PENDING: 'activation_pending',
-    VENTAS: 'ventas',           // ← Cambiado de 'menu1' a 'ventas' (más consistente)
-    ROOSTER: 'rooster',         // ← Cambiado de 'menu2' a 'rooster'
-    SHARE: 'share',             // ← Cambiado de 'menu3' a 'share'
-    PERFIL: 'perfil',           // ← Cambiado de 'menu4' a 'perfil'
-    CONFIGURACIONES: 'configuraciones',  // ← Cambiado de 'menu5'
-    ADMIN: 'admin',             // ← Cambiado de 'menu6'
-    JUEZ: 'juez',               // ← Cambiado de 'menu7'
-    PUBLICACIONES: 'publicaciones',     // ← Cambiado de 'menu8'
-    PEDIGRI: 'pedigri'          // ← Cambiado de 'menu9'
-};
 
-// ==============================================
-// CONSTANTES DE TEXTOS PARA NAVEGACIÓN (FÁCIL DE EDITAR)
-// ==============================================
-const TEXTS = {
-    // ==========================================
-    // DEFINICIÓN ÚNICA (SOLO CAMBIAS AQUÍ)
-    // ==========================================
-    txt_public: 'INICIO',
+// PASO 1: Definir los textos e iconos (SOLO CAMBIAS AQUÍ)
+const TEXTS_VALUES = {
+    txt_public: 'INICIO1',
     ico_public: '🏠',
     
-    txt_ventas: 'VENTAS',
+    txt_ventas: 'VENTAS2',
     ico_ventas: '💰',
     
-    txt_rooster: 'ROOSTER',
+    txt_rooster: 'ROOSTER3',
     ico_rooster: '🏆',
     
-    txt_share: 'SHARE',
+    txt_share: 'SHARE4',
     ico_share: '🔗',
     
-    txt_publicaciones: 'PUBLICACIONES',
+    txt_publicaciones: 'PUBLICACIONES5',
     ico_publicaciones: '⚔️',
     
-    txt_pedigri: 'PEDIGRI',
+    txt_pedigri: 'PEDIGRI6',
     ico_pedigri: '🧬',
     
-    txt_juez: 'JUEZ',
+    txt_juez: 'JUEZ7',
     ico_juez: '⚖️',
     
-    txt_perfil: 'PERFIL',
+    txt_perfil: 'PERFIL8',
     ico_perfil: '👤',
     
-    txt_configuraciones: 'CONFIGURACIONES',
+    txt_configuraciones: 'CONFIGURACIONES9',
     ico_configuraciones: '⚙️',
     
-    txt_admin: 'ADMIN',
+    txt_admin: 'ADMIN10',
     ico_admin: '🔧',
     
     txt_login: 'Login',
     ico_login: '🔑',
     
     txt_logout: 'Cerrar Sesión',
-    ico_logout: '🚪',
+    ico_logout: '🚪'
+};
+
+// PASO 2: SCREENS usa los textos como valores (TODO REFERENCIADO)
+const SCREENS = {
+    PUBLIC: TEXTS_VALUES.txt_public,
+    LOGIN: TEXTS_VALUES.txt_login,
+    ACTIVATION_PENDING: 'activation_pending',
+    VENTAS: TEXTS_VALUES.txt_ventas,
+    ROOSTER: TEXTS_VALUES.txt_rooster,
+    SHARE: TEXTS_VALUES.txt_share,
+    PERFIL: TEXTS_VALUES.txt_perfil,
+    CONFIGURACIONES: TEXTS_VALUES.txt_configuraciones,
+    ADMIN: TEXTS_VALUES.txt_admin,
+    JUEZ: TEXTS_VALUES.txt_juez,
+    PUBLICACIONES: TEXTS_VALUES.txt_publicaciones,
+    PEDIGRI: TEXTS_VALUES.txt_pedigri,
     
-    // ==========================================
-    // TEXTOS PARA USUARIOS NO LOGUEADOS (barra superior)
-    // ==========================================
-    PUBLIC_BTN_PUBLIC: '',
-    icon_PUBLIC: '',
+    // Guardar también los textos e iconos para TEXTS
+    ...TEXTS_VALUES
+};
+
+// PASO 3: TEXTS referencia a SCREENS (NO TOCAR)
+const TEXTS = {
+    // Usuarios NO logueados (barra superior)
+    PUBLIC_BTN_PUBLIC: SCREENS.txt_public,
+    icon_PUBLIC: SCREENS.ico_public,
     
-    PUBLIC_BTN_VENTAS: '',
-    icon_VENTAS: '',
+    PUBLIC_BTN_VENTAS: SCREENS.txt_ventas,
+    icon_VENTAS: SCREENS.ico_ventas,
     
-    PUBLIC_BTN_ROOSTER: '',
-    icon_ROOSTER: '',
+    PUBLIC_BTN_ROOSTER: SCREENS.txt_rooster,
+    icon_ROOSTER: SCREENS.ico_rooster,
     
-    PUBLIC_BTN_SHARE: '',
-    icon_SHARE: '',
+    PUBLIC_BTN_SHARE: SCREENS.txt_share,
+    icon_SHARE: SCREENS.ico_share,
     
-    PUBLIC_BTN_LOGIN: '',
-    icon_LOGIN: '',
+    PUBLIC_BTN_LOGIN: SCREENS.txt_login,
+    icon_LOGIN: SCREENS.ico_login,
     
-    // ==========================================
-    // TEXTOS PARA USUARIOS LOGUEADOS (menú móvil)
-    // ==========================================
-    MENU_BTN_PUBLIC: '',
-    menu_icon_PUBLIC: '',
+    // Usuarios logueados (menú móvil inferior)
+    MENU_BTN_PUBLIC: SCREENS.txt_public,
+    menu_icon_PUBLIC: SCREENS.ico_public,
     
-    MENU_BTN_VENTAS: '',
-    menu_icon_VENTAS: '',
+    MENU_BTN_VENTAS: SCREENS.txt_ventas,
+    menu_icon_VENTAS: SCREENS.ico_ventas,
     
-    MENU_BTN_ROOSTER: '',
-    menu_icon_ROOSTER: '',
+    MENU_BTN_ROOSTER: SCREENS.txt_rooster,
+    menu_icon_ROOSTER: SCREENS.ico_rooster,
     
-    MENU_BTN_SHARE: '',
-    menu_icon_SHARE: '',
+    MENU_BTN_SHARE: SCREENS.txt_share,
+    menu_icon_SHARE: SCREENS.ico_share,
     
-    MENU_BTN_PUBLICACIONES: '',
-    menu_icon_PUBLICACIONES: '',
+    MENU_BTN_PUBLICACIONES: SCREENS.txt_publicaciones,
+    menu_icon_PUBLICACIONES: SCREENS.ico_publicaciones,
     
-    MENU_BTN_PEDIGRI: '',
-    menu_icon_PEDIGRI: '',
+    MENU_BTN_PEDIGRI: SCREENS.txt_pedigri,
+    menu_icon_PEDIGRI: SCREENS.ico_pedigri,
     
-    MENU_BTN_JUEZ: '',
-    menu_icon_JUEZ: '',
+    MENU_BTN_JUEZ: SCREENS.txt_juez,
+    menu_icon_JUEZ: SCREENS.ico_juez,
     
-    // ==========================================
-    // TEXTOS PARA MENÚ LATERAL
-    // ==========================================
-    SIDE_BTN_PERFIL: '',
-    side_icon_PERFIL: '',
+    // Menú lateral
+    SIDE_BTN_PERFIL: SCREENS.txt_perfil,
+    side_icon_PERFIL: SCREENS.ico_perfil,
     
-    SIDE_BTN_SHARE: '',
-    side_icon_SHARE: '',
+    SIDE_BTN_SHARE: SCREENS.txt_share,
+    side_icon_SHARE: SCREENS.ico_share,
     
-    SIDE_BTN_VENTAS: '',
-    side_icon_VENTAS: '',
+    SIDE_BTN_VENTAS: SCREENS.txt_ventas,
+    side_icon_VENTAS: SCREENS.ico_ventas,
     
-    SIDE_BTN_JUEZ: '',
-    side_icon_JUEZ: '',
+    SIDE_BTN_JUEZ: SCREENS.txt_juez,
+    side_icon_JUEZ: SCREENS.ico_juez,
     
-    SIDE_BTN_CONFIGURACIONES: '',
-    side_icon_CONFIG: '',
+    SIDE_BTN_CONFIGURACIONES: SCREENS.txt_configuraciones,
+    side_icon_CONFIG: SCREENS.ico_configuraciones,
     
-    SIDE_BTN_ADMIN: '',
-    side_icon_ADMIN: '',
+    SIDE_BTN_ADMIN: SCREENS.txt_admin,
+    side_icon_ADMIN: SCREENS.ico_admin,
     
-    SIDE_BTN_LOGOUT: '',
-    side_icon_LOGOUT: '',
+    SIDE_BTN_LOGOUT: SCREENS.txt_logout,
+    side_icon_LOGOUT: SCREENS.ico_logout,
     
-    // ==========================================
-    // BADGES
-    // ==========================================
+    // Badges
     BADGE_ADMIN: '👑 Administrador',
     BADGE_MEMBER: '👤 Miembro'
 };
-
-// ==============================================
-// ASIGNACIÓN DE REFERENCIAS (NO TOCAR)
-// ==============================================
-TEXTS.PUBLIC_BTN_PUBLIC = TEXTS.txt_public;
-TEXTS.icon_PUBLIC = TEXTS.ico_public;
-TEXTS.PUBLIC_BTN_VENTAS = TEXTS.txt_ventas;
-TEXTS.icon_VENTAS = TEXTS.ico_ventas;
-TEXTS.PUBLIC_BTN_ROOSTER = TEXTS.txt_rooster;
-TEXTS.icon_ROOSTER = TEXTS.ico_rooster;
-TEXTS.PUBLIC_BTN_SHARE = TEXTS.txt_share;
-TEXTS.icon_SHARE = TEXTS.ico_share;
-TEXTS.PUBLIC_BTN_LOGIN = TEXTS.txt_login;
-TEXTS.icon_LOGIN = TEXTS.ico_login;
-
-TEXTS.MENU_BTN_PUBLIC = TEXTS.txt_public;
-TEXTS.menu_icon_PUBLIC = TEXTS.ico_public;
-TEXTS.MENU_BTN_VENTAS = TEXTS.txt_ventas;
-TEXTS.menu_icon_VENTAS = TEXTS.ico_ventas;
-TEXTS.MENU_BTN_ROOSTER = TEXTS.txt_rooster;
-TEXTS.menu_icon_ROOSTER = TEXTS.ico_rooster;
-TEXTS.MENU_BTN_SHARE = TEXTS.txt_share;
-TEXTS.menu_icon_SHARE = TEXTS.ico_share;
-TEXTS.MENU_BTN_PUBLICACIONES = TEXTS.txt_publicaciones;
-TEXTS.menu_icon_PUBLICACIONES = TEXTS.ico_publicaciones;
-TEXTS.MENU_BTN_PEDIGRI = TEXTS.txt_pedigri;
-TEXTS.menu_icon_PEDIGRI = TEXTS.ico_pedigri;
-TEXTS.MENU_BTN_JUEZ = TEXTS.txt_juez;
-TEXTS.menu_icon_JUEZ = TEXTS.ico_juez;
-
-TEXTS.SIDE_BTN_PERFIL = TEXTS.txt_perfil;
-TEXTS.side_icon_PERFIL = TEXTS.ico_perfil;
-TEXTS.SIDE_BTN_SHARE = TEXTS.txt_share;
-TEXTS.side_icon_SHARE = TEXTS.ico_share;
-TEXTS.SIDE_BTN_VENTAS = TEXTS.txt_ventas;
-TEXTS.side_icon_VENTAS = TEXTS.ico_ventas;
-TEXTS.SIDE_BTN_JUEZ = TEXTS.txt_juez;
-TEXTS.side_icon_JUEZ = TEXTS.ico_juez;
-TEXTS.SIDE_BTN_CONFIGURACIONES = TEXTS.txt_configuraciones;
-TEXTS.side_icon_CONFIG = TEXTS.ico_configuraciones;
-TEXTS.SIDE_BTN_ADMIN = TEXTS.txt_admin;
-TEXTS.side_icon_ADMIN = TEXTS.ico_admin;
-TEXTS.SIDE_BTN_LOGOUT = TEXTS.txt_logout;
-TEXTS.side_icon_LOGOUT = TEXTS.ico_logout;
 
     
 // ==============================================
