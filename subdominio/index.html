@@ -310,7 +310,7 @@ background: rgba(26, 34, 52, 0.55);
 // Configurar IndexedDB para almacenar datos offline
 const OfflineDB = {
     dbName: 'LegadoAvicolaDB',
-    dbVersion: 1,
+    dbVersion: 2,
     db: null,
     
     async init() {
@@ -542,6 +542,17 @@ async function loadAllFirebaseDataOffline() {
     console.log('📥 Cargando datos de Firebase para modo offline...');
     
     try {
+        // ========== NUEVO: Cargar usuarios ==========
+        const usersSnapshot = await AppState.firebase.database.ref('users').once('value');
+        if (usersSnapshot.exists()) {
+            const users = usersSnapshot.val();
+            for (const [uid, data] of Object.entries(users)) {
+                await OfflineDB.set('users', uid, { uid, ...data });
+            }
+            console.log(`✅ Cargados ${Object.keys(users).length} usuarios`);
+        }
+        // ============================================
+        
         // Cargar subastas
         const subastasSnapshot = await AppState.firebase.database.ref('subastas').once('value');
         if (subastasSnapshot.exists()) {
@@ -792,66 +803,6 @@ const AppState = {
         formData: { register: {}, login: {} }
     },
     
-    persistentCache: {
-        enabled: true,
-        version: '2.0',
-        
-        set(key, data, uid) {
-            if (!this.enabled) return;
-            const cacheKey = `app_${key}_${uid}`;
-            const cacheData = { version: this.version, timestamp: Date.now(), uid: uid, data: data };
-            try {
-                localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-            } catch(e) { console.warn('Error guardando cache:', e); }
-        },
-        
-        get(key, uid, maxAge = 30 * 24 * 60 * 60 * 1000) {
-            if (!this.enabled) return null;
-            const cacheKey = `app_${key}_${uid}`;
-            try {
-                const cached = localStorage.getItem(cacheKey);
-                if (!cached) return null;
-                const cacheData = JSON.parse(cached);
-                if (cacheData.version !== this.version || cacheData.uid !== uid || Date.now() - cacheData.timestamp > maxAge) {
-                    this.remove(key, uid);
-                    return null;
-                }
-                return cacheData.data;
-            } catch(e) { return null; }
-        },
-        
-        remove(key, uid) {
-            localStorage.removeItem(`app_${key}_${uid}`);
-        },
-        
-        clearUserCache(uid) {
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('app_') && key.endsWith(uid)) {
-                    localStorage.removeItem(key);
-                }
-            }
-        },
-        
-        setGlobal(key, data) {
-            if (!this.enabled) return;
-            localStorage.setItem(`global_${key}`, JSON.stringify({ version: this.version, timestamp: Date.now(), data: data }));
-        },
-        
-        getGlobal(key, maxAge = 30 * 24 * 60 * 60 * 1000) {
-            if (!this.enabled) return null;
-            try {
-                const cached = localStorage.getItem(`global_${key}`);
-                if (!cached) return null;
-                const cacheData = JSON.parse(cached);
-                if (cacheData.version !== this.version || Date.now() - cacheData.timestamp > maxAge) {
-                    localStorage.removeItem(`global_${key}`);
-                    return null;
-                }
-                return cacheData.data;
-            } catch(e) { return null; }
-        }
-    },
     
     rooster: { cotejoState: false, listener: null, tournamentInfo: null, roosters: [] },
     subscribers: [],
@@ -1667,39 +1618,28 @@ async function handleLogin() {
         RateLimiter.recordAttempt(emailKey);
         await AppState.firebase.auth.signInWithEmailAndPassword(email, password);
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
-
-
-        
-  const user = AppState.firebase.auth.currentUser;
-        localStorage.setItem('offline_user', JSON.stringify({
-            uid: user.uid,
-            displayName: user.displayName,
-            email: user.email
-        }));
-
-        
-        
+             
         localStorage.removeItem(`rate_${emailKey}`);
         hideLoadingScreen();
         
     } catch (error) {
-    console.log("🔴 CÓDIGO DE ERROR:", error.code);
-    console.log("🔴 MENSAJE:", error.message);
-    
-    hideLoadingScreen();
-    
-    if (error.code === 'auth/invalid-login-credentials') {
-        AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
-    } else if (error.code === 'auth/user-not-found') {
-        AppState.addNotification('❌ No existe una cuenta con este email', 'error');
-    } else if (error.code === 'auth/wrong-password') {
-        AppState.addNotification('❌ Contraseña incorrecta', 'error');
-    } else if (error.code === 'auth/too-many-requests') {
-        AppState.addNotification('⚠️ Demasiados intentos. Espera unos minutos', 'error');
-    } else {
-        AppState.addNotification('❌ Error: ' + error.message, 'error');
+        console.log("🔴 CÓDIGO DE ERROR:", error.code);
+        console.log("🔴 MENSAJE:", error.message);
+        
+        hideLoadingScreen();
+        
+        if (error.code === 'auth/invalid-login-credentials') {
+            AppState.addNotification('❌ Email o contraseña incorrectos', 'error');
+        } else if (error.code === 'auth/user-not-found') {
+            AppState.addNotification('❌ No existe una cuenta con este email', 'error');
+        } else if (error.code === 'auth/wrong-password') {
+            AppState.addNotification('❌ Contraseña incorrecta', 'error');
+        } else if (error.code === 'auth/too-many-requests') {
+            AppState.addNotification('⚠️ Demasiados intentos. Espera unos minutos', 'error');
+        } else {
+            AppState.addNotification('❌ Error: ' + error.message, 'error');
+        }
     }
-}
 }
 
 async function resetPassword() {
@@ -1795,18 +1735,33 @@ async function loadUserProfile(uid) {
     if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
     
     try {
-        const cachedProfile = AppState.persistentCache.get('profile', uid);
+        // 1. PRIMERO: Intentar obtener de IndexedDB (NO localStorage)
+        const cachedProfile = await OfflineDB.get('users', uid);
+        
         if (cachedProfile) {
+            console.log('📀 Perfil desde INDEXEDDB (offline)');
+            // Guardar SOLO lo mínimo en localStorage para startup rápido
+            localStorage.setItem('offline_user', JSON.stringify({
+                uid: uid,
+                displayName: cachedProfile.displayName,
+                email: cachedProfile.realEmail
+            }));
             AppState.setUser(AppState.firebase.auth.currentUser, cachedProfile);
-
-    localStorage.setItem('offline_profile', JSON.stringify(cachedProfile));
-
             return true;
         }
         
+        // 2. SEGUNDO: Si no hay offline, traer de Firebase
+        console.log('🌐 Perfil desde ONLINE (Firebase)');
         const snapshot = await AppState.firebase.database.ref('users/' + uid).once('value');
+        
         if (snapshot.exists()) {
-            const profile = { id: uid, ...snapshot.val() };
+            const profile = { uid: uid, ...snapshot.val() };
+             if (profile.id && !profile.uid) {
+                profile.uid = profile.id;
+                delete profile.id;
+            }
+            
+            // Valores por defecto
             if (profile.activated === undefined) profile.activated = false;
             if (profile.gallo === undefined) profile.gallo = false;
             if (profile.isJudge === undefined) profile.isJudge = false;
@@ -1814,16 +1769,23 @@ async function loadUserProfile(uid) {
             if (profile.pedigri === undefined) profile.pedigri = false;
             if (profile.ventas === undefined) profile.ventas = false;
             
-            AppState.persistentCache.set('profile', profile, uid);
-            AppState.setUser(AppState.firebase.auth.currentUser, profile);
-
-  localStorage.setItem('offline_profile', JSON.stringify(profile));
-
+            // Guardar en IndexedDB (el lugar CORRECTO para datos grandes)
+            await OfflineDB.set('users', uid, profile);
             
+            // Guardar SOLO lo mínimo en localStorage para startup rápido
+            localStorage.setItem('offline_user', JSON.stringify({
+                uid: uid,
+                displayName: profile.displayName,
+                email: profile.realEmail
+            }));
+            
+            AppState.setUser(AppState.firebase.auth.currentUser, profile);
             return true;
         }
         return false;
+        
     } catch (error) {
+        console.error('Error cargando perfil:', error);
         AppState.addNotification('Error cargando perfil', 'error');
         return false;
     }
@@ -1991,15 +1953,6 @@ async function handleGoogleCredentialResponse(response) {
             
             if (profile.activated === true) RecurrentUserManager.markAsRecurrent();
             AppState.setUser(result.user, { id: result.user.uid, ...profile });
-
-            
-            localStorage.setItem('offline_user', JSON.stringify({
-    uid: result.user.uid,
-    displayName: result.user.displayName,
-    email: result.user.email
-}));
-localStorage.setItem('offline_profile', JSON.stringify({ id: result.user.uid, ...profile }));
-
             
         }
         
