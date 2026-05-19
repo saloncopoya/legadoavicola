@@ -975,6 +975,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('installOverlay');
     if (overlay) {
         overlay.addEventListener('click', async () => {
+
+                            overlay.style.display = 'none';
+
+            
             if (deferredPrompt) {
 
       AppState.addNotification('📱 Instala la aplicación para continuar', 'info', 14000);
