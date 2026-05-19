@@ -693,77 +693,114 @@ const SCREENS = {
     PEDIGRI: 'pedigri'          // ← Cambiado de 'menu9'
 };
 
-
 // ==============================================
 // CONSTANTES DE TEXTOS PARA NAVEGACIÓN (FÁCIL DE EDITAR)
 // ==============================================
 const TEXTS = {
     // ==========================================
-    // TEXTOS E ICONOS PARA USUARIOS NO LOGUEADOS (barra superior)
+    // DEFINICIÓN ÚNICA (SOLO CAMBIAS AQUÍ)
     // ==========================================
-    // Los botones de la barra superior (máximo 5 por espacio)
-    PUBLIC_BTN_PUBLIC: 'INICIO',
-    icon_PUBLIC: '🏠',
-
-    PUBLIC_BTN_VENTAS: 'VENTAS',
-    icon_VENTAS: '💰',
-
-    PUBLIC_BTN_ROOSTER: 'ROOSTER',
-    icon_ROOSTER: '🏆',
-
-    PUBLIC_BTN_SHARE: 'SHARE',
-    icon_SHARE: '🔗',
-
-    PUBLIC_BTN_LOGIN: 'Login',
-    icon_LOGIN: '🔑',
+    txt_public: 'INICIO',
+    ico_public: '🏠',
+    
+    txt_ventas: 'VENTAS',
+    ico_ventas: '💰',
+    
+    txt_rooster: 'ROOSTER',
+    ico_rooster: '🏆',
+    
+    txt_share: 'SHARE',
+    ico_share: '🔗',
+    
+    txt_publicaciones: 'PUBLICACIONES',
+    ico_publicaciones: '⚔️',
+    
+    txt_pedigri: 'PEDIGRI',
+    ico_pedigri: '🧬',
+    
+    txt_juez: 'JUEZ',
+    ico_juez: '⚖️',
+    
+    txt_perfil: 'PERFIL',
+    ico_perfil: '👤',
+    
+    txt_configuraciones: 'CONFIGURACIONES',
+    ico_configuraciones: '⚙️',
+    
+    txt_admin: 'ADMIN',
+    ico_admin: '🔧',
+    
+    txt_login: 'Login',
+    ico_login: '🔑',
+    
+    txt_logout: 'Cerrar Sesión',
+    ico_logout: '🚪',
     
     // ==========================================
-    // TEXTOS E ICONOS PARA USUARIOS LOGUEADOS (menú móvil inferior)
+    // TEXTOS PARA USUARIOS NO LOGUEADOS (barra superior)
     // ==========================================
-    MENU_BTN_PUBLIC: 'INICIO',
-    menu_icon_PUBLIC: '🏠',
-
-    MENU_BTN_VENTAS: 'VENTAS',
-    menu_icon_VENTAS: '💰',
-
-    MENU_BTN_ROOSTER: 'ROOSTER',
-    menu_icon_ROOSTER: '🏆',
-
-    MENU_BTN_SHARE: 'SHARE',
-    menu_icon_SHARE: '🔗',
-
-    MENU_BTN_PUBLICACIONES: 'PUBLICACIONES',
-    menu_icon_PUBLICACIONES: '⚔️',
-
-    MENU_BTN_PEDIGRI: 'PEDIGRI',
-    menu_icon_PEDIGRI: '🧬',
-
-    MENU_BTN_JUEZ: 'JUEZ',
-    menu_icon_JUEZ: '⚖️',
+    PUBLIC_BTN_PUBLIC: '',
+    icon_PUBLIC: '',
+    
+    PUBLIC_BTN_VENTAS: '',
+    icon_VENTAS: '',
+    
+    PUBLIC_BTN_ROOSTER: '',
+    icon_ROOSTER: '',
+    
+    PUBLIC_BTN_SHARE: '',
+    icon_SHARE: '',
+    
+    PUBLIC_BTN_LOGIN: '',
+    icon_LOGIN: '',
     
     // ==========================================
-    // TEXTOS E ICONOS PARA MENÚ LATERAL
+    // TEXTOS PARA USUARIOS LOGUEADOS (menú móvil)
     // ==========================================
-    SIDE_BTN_PERFIL: 'PERFIL',
-    side_icon_PERFIL: '👤',
-
-    SIDE_BTN_SHARE: 'SHARE',
-    side_icon_SHARE: '🔗',
-
-    SIDE_BTN_VENTAS: 'VENTAS',
-    side_icon_VENTAS: '💰',
-
-    SIDE_BTN_JUEZ: 'JUEZ',
-    side_icon_JUEZ: '⚖️',
-
-    SIDE_BTN_CONFIGURACIONES: 'CONFIGURACIONES',
-    side_icon_CONFIG: '⚙️',
-
-    SIDE_BTN_ADMIN: 'ADMIN',
-    side_icon_ADMIN: '🔧',
-
-    SIDE_BTN_LOGOUT: 'Cerrar Sesión',
-    side_icon_LOGOUT: '🚪',
+    MENU_BTN_PUBLIC: '',
+    menu_icon_PUBLIC: '',
+    
+    MENU_BTN_VENTAS: '',
+    menu_icon_VENTAS: '',
+    
+    MENU_BTN_ROOSTER: '',
+    menu_icon_ROOSTER: '',
+    
+    MENU_BTN_SHARE: '',
+    menu_icon_SHARE: '',
+    
+    MENU_BTN_PUBLICACIONES: '',
+    menu_icon_PUBLICACIONES: '',
+    
+    MENU_BTN_PEDIGRI: '',
+    menu_icon_PEDIGRI: '',
+    
+    MENU_BTN_JUEZ: '',
+    menu_icon_JUEZ: '',
+    
+    // ==========================================
+    // TEXTOS PARA MENÚ LATERAL
+    // ==========================================
+    SIDE_BTN_PERFIL: '',
+    side_icon_PERFIL: '',
+    
+    SIDE_BTN_SHARE: '',
+    side_icon_SHARE: '',
+    
+    SIDE_BTN_VENTAS: '',
+    side_icon_VENTAS: '',
+    
+    SIDE_BTN_JUEZ: '',
+    side_icon_JUEZ: '',
+    
+    SIDE_BTN_CONFIGURACIONES: '',
+    side_icon_CONFIG: '',
+    
+    SIDE_BTN_ADMIN: '',
+    side_icon_ADMIN: '',
+    
+    SIDE_BTN_LOGOUT: '',
+    side_icon_LOGOUT: '',
     
     // ==========================================
     // BADGES
@@ -771,6 +808,51 @@ const TEXTS = {
     BADGE_ADMIN: '👑 Administrador',
     BADGE_MEMBER: '👤 Miembro'
 };
+
+// ==============================================
+// ASIGNACIÓN DE REFERENCIAS (NO TOCAR)
+// ==============================================
+TEXTS.PUBLIC_BTN_PUBLIC = TEXTS.txt_public;
+TEXTS.icon_PUBLIC = TEXTS.ico_public;
+TEXTS.PUBLIC_BTN_VENTAS = TEXTS.txt_ventas;
+TEXTS.icon_VENTAS = TEXTS.ico_ventas;
+TEXTS.PUBLIC_BTN_ROOSTER = TEXTS.txt_rooster;
+TEXTS.icon_ROOSTER = TEXTS.ico_rooster;
+TEXTS.PUBLIC_BTN_SHARE = TEXTS.txt_share;
+TEXTS.icon_SHARE = TEXTS.ico_share;
+TEXTS.PUBLIC_BTN_LOGIN = TEXTS.txt_login;
+TEXTS.icon_LOGIN = TEXTS.ico_login;
+
+TEXTS.MENU_BTN_PUBLIC = TEXTS.txt_public;
+TEXTS.menu_icon_PUBLIC = TEXTS.ico_public;
+TEXTS.MENU_BTN_VENTAS = TEXTS.txt_ventas;
+TEXTS.menu_icon_VENTAS = TEXTS.ico_ventas;
+TEXTS.MENU_BTN_ROOSTER = TEXTS.txt_rooster;
+TEXTS.menu_icon_ROOSTER = TEXTS.ico_rooster;
+TEXTS.MENU_BTN_SHARE = TEXTS.txt_share;
+TEXTS.menu_icon_SHARE = TEXTS.ico_share;
+TEXTS.MENU_BTN_PUBLICACIONES = TEXTS.txt_publicaciones;
+TEXTS.menu_icon_PUBLICACIONES = TEXTS.ico_publicaciones;
+TEXTS.MENU_BTN_PEDIGRI = TEXTS.txt_pedigri;
+TEXTS.menu_icon_PEDIGRI = TEXTS.ico_pedigri;
+TEXTS.MENU_BTN_JUEZ = TEXTS.txt_juez;
+TEXTS.menu_icon_JUEZ = TEXTS.ico_juez;
+
+TEXTS.SIDE_BTN_PERFIL = TEXTS.txt_perfil;
+TEXTS.side_icon_PERFIL = TEXTS.ico_perfil;
+TEXTS.SIDE_BTN_SHARE = TEXTS.txt_share;
+TEXTS.side_icon_SHARE = TEXTS.ico_share;
+TEXTS.SIDE_BTN_VENTAS = TEXTS.txt_ventas;
+TEXTS.side_icon_VENTAS = TEXTS.ico_ventas;
+TEXTS.SIDE_BTN_JUEZ = TEXTS.txt_juez;
+TEXTS.side_icon_JUEZ = TEXTS.ico_juez;
+TEXTS.SIDE_BTN_CONFIGURACIONES = TEXTS.txt_configuraciones;
+TEXTS.side_icon_CONFIG = TEXTS.ico_configuraciones;
+TEXTS.SIDE_BTN_ADMIN = TEXTS.txt_admin;
+TEXTS.side_icon_ADMIN = TEXTS.ico_admin;
+TEXTS.SIDE_BTN_LOGOUT = TEXTS.txt_logout;
+TEXTS.side_icon_LOGOUT = TEXTS.ico_logout;
+
     
 // ==============================================
 // GESTOR DE ESTADO (AppState)
