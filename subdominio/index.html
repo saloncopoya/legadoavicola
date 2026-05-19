@@ -629,112 +629,155 @@ window.renderVentasScreen = async function() {
     `;
 };
 
+
+    
+
+
 window.renderRoosterScreen = async function() {
     // ==============================================
-    // SISTEMA DE RECORDATORIOS CON NOTIFICACIONES NATIVAS
+    // SISTEMA DE RECORDATORIOS MEJORADO
+    // Con selector de minutos, sonido real, notificaciones persistentes
+    // TOTALMENTE PÚBLICO - No requiere login
     // ==============================================
     
     // ========== 1. CONFIGURACIÓN INICIAL ==========
     let recordatorios = [];
     let intervaloVerificacion = null;
+    let audioContext = null;
     
-    // Cargar recordatorios guardados
+    // Cargar recordatorios guardados (localStorage público)
     try {
-        const saved = localStorage.getItem('recordatorios_medicamentos');
+        const saved = localStorage.getItem('recordatorios_publicos');
         if (saved) recordatorios = JSON.parse(saved);
     } catch(e) {}
     
-    // Verificar permisos de notificación al cargar la pantalla
+    // Solicitar permisos de notificación inmediatamente
     if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-        setTimeout(async () => {
-            const permission = await Notification.requestPermission();
+        Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
-                AppState.addNotification('🔔 Notificaciones activadas para recordatorios', 'success');
+                console.log('✅ Notificaciones permitidas');
+                if (typeof AppState !== 'undefined' && AppState.addNotification) {
+                    AppState.addNotification('🔔 Notificaciones activadas', 'success');
+                }
             }
-        }, 2000);
+        });
     }
     
-    // ========== 2. FUNCIONES AUXILIARES ==========
-    
-    // Función para mostrar notificación nativa CON imagen y sonido
-    function mostrarNotificacionNativa(recordatorio) {
-        if (!('Notification' in window)) return;
-        if (Notification.permission !== 'granted') return;
-        
-        // Crear un sonido de notificación (Web Audio API)
+    // Precargar sonido (AudioContext para sonido real)
+    function playNotificationSound() {
         try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
+            
+            // Sonido tipo "ding" con dos tonos
             oscillator.frequency.value = 880;
             gainNode.gain.value = 0.3;
             oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
-            setTimeout(() => oscillator.stop(), 500);
-        } catch(e) { console.log('Sonido no soportado'); }
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+            
+            setTimeout(() => {
+                try {
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioContext.destination);
+                    osc2.frequency.value = 660;
+                    gain2.gain.value = 0.3;
+                    osc2.start();
+                    gain2.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3);
+                    setTimeout(() => osc2.stop(), 300);
+                } catch(e) {}
+            }, 200);
+            
+            setTimeout(() => oscillator.stop(), 300);
+        } catch(e) {
+            console.log('Sonido no soportado:', e);
+        }
+    }
+    
+    // Función para mostrar notificación nativa con imagen y sonido
+    function mostrarNotificacionNativa(recordatorio) {
+        if (!('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
         
-        // Mostrar notificación nativa
+        // Reproducir sonido
+        playNotificationSound();
+        
+        // Formatear hora
+        const horaStr = `${recordatorio.hora.toString().padStart(2, '0')}:${recordatorio.minutos.toString().padStart(2, '0')} ${recordatorio.ampm}`;
+        
+        // Mostrar notificación
         const notification = new Notification(`💊 ${recordatorio.medicamento}`, {
-            body: `${recordatorio.dosis} - ${recordatorio.notas || 'Toma tu medicamento a tiempo'}`,
+            body: `${recordatorio.dosis} - ${horaStr}\n${recordatorio.notas || '¡Toma tu medicamento a tiempo!'}`,
             icon: '/miniatura.jpg',
             badge: '/miniatura.jpg',
             image: '/miniatura.jpg',
-            tag: `med_${recordatorio.id}`,
+            tag: `recordatorio_${recordatorio.id}`,
             renotify: true,
             requireInteraction: true,
-            vibrate: [200, 100, 200],
+            vibrate: [200, 100, 200, 100, 300],
             silent: false,
             timestamp: Date.now()
         });
         
         notification.onclick = function() {
             window.focus();
-            window.parent.focus();
             notification.close();
-            // Redirigir a la pantalla de recordatorios
             if (typeof navigateTo === 'function') navigateTo('menu2');
         };
         
-        notification.onclose = function() {
-            console.log('Notificación cerrada');
-        };
+        console.log(`🔔 Notificación: ${recordatorio.medicamento} a las ${horaStr}`);
         
-        console.log(`🔔 Notificación enviada: ${recordatorio.medicamento}`);
+        // También mostrar notificación en toast
+        if (typeof AppState !== 'undefined' && AppState.addNotification) {
+            AppState.addNotification(`💊 ${recordatorio.medicamento} - ${recordatorio.dosis}`, 'info', 10000);
+        }
     }
     
-    // Función para verificar recordatorios (se ejecuta cada minuto)
+    // Convertir hora a minutos desde medianoche
+    function convertirHoraAMinutos(hora, minutos, ampm) {
+        let hour = hora;
+        if (ampm === 'PM' && hour !== 12) hour += 12;
+        if (ampm === 'AM' && hour === 12) hour = 0;
+        return hour * 60 + minutos;
+    }
+    
+    // Verificar si hoy es día de recordatorio
+    function isTodayReminder(diasSeleccionados) {
+        if (!diasSeleccionados || diasSeleccionados.length === 0) return true;
+        const days = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+        const today = days[new Date().getDay()];
+        return diasSeleccionados.includes(today);
+    }
+    
+    // Verificar recordatorios cada minuto
     function verificarRecordatorios() {
         const ahora = new Date();
-        const horaActual = ahora.getHours();
-        const minutosActual = ahora.getMinutes();
-        const horaEnMinutos = horaActual * 60 + minutosActual;
+        const minutosActual = ahora.getHours() * 60 + ahora.getMinutes();
         
         recordatorios.forEach(recordatorio => {
-            // Convertir hora del recordatorio a minutos
-            let horaRecordatorio = recordatorio.hora;
-            if (recordatorio.ampm === 'PM' && horaRecordatorio !== 12) horaRecordatorio += 12;
-            if (recordatorio.ampm === 'AM' && horaRecordatorio === 12) horaRecordatorio = 0;
-            const minutosRecordatorio = horaRecordatorio * 60;
+            const minutosRecordatorio = convertirHoraAMinutos(recordatorio.hora, recordatorio.minutos, recordatorio.ampm);
+            const diferencia = Math.abs(minutosActual - minutosRecordatorio);
             
-            // Verificar si es la hora exacta (margen de 1 minuto)
-            const diferencia = Math.abs(horaEnMinutos - minutosRecordatorio);
-            
+            // Verificar si es la hora exacta (margen 0-1 minuto)
             if (diferencia <= 1 && !recordatorio.notificadoHoy) {
-                // Verificar si aplica hoy
-                let debeNotificar = true;
-                if (recordatorio.frecuencia === 'dias_especificos' && recordatorio.diasSeleccionados) {
-                    const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
-                    const hoy = diasSemana[ahora.getDay()];
-                    debeNotificar = recordatorio.diasSeleccionados.includes(hoy);
-                }
+                const debeNotificar = isTodayReminder(recordatorio.diasSeleccionados);
                 
                 if (debeNotificar) {
                     mostrarNotificacionNativa(recordatorio);
                     recordatorio.notificadoHoy = true;
                     recordatorio.ultimaNotificacion = Date.now();
                     guardarRecordatorios();
+                    renderRecordatoriosLista();
                 }
             }
             
@@ -743,13 +786,14 @@ window.renderRoosterScreen = async function() {
             if (ultimaFecha && ultimaFecha.getDate() !== ahora.getDate()) {
                 recordatorio.notificadoHoy = false;
                 guardarRecordatorios();
+                renderRecordatoriosLista();
             }
         });
     }
     
-    // Guardar recordatorios en localStorage
+    // Guardar recordatorios
     function guardarRecordatorios() {
-        localStorage.setItem('recordatorios_medicamentos', JSON.stringify(recordatorios));
+        localStorage.setItem('recordatorios_publicos', JSON.stringify(recordatorios));
     }
     
     // Eliminar recordatorio
@@ -757,7 +801,14 @@ window.renderRoosterScreen = async function() {
         recordatorios = recordatorios.filter(r => r.id !== id);
         guardarRecordatorios();
         renderRecordatoriosLista();
-        AppState.addNotification('🗑️ Recordatorio eliminado', 'info');
+        if (typeof AppState !== 'undefined' && AppState.addNotification) {
+            AppState.addNotification('🗑️ Recordatorio eliminado', 'info');
+        }
+    }
+    
+    // Formatear hora para mostrar
+    function formatearHoraMostrar(hora, minutos, ampm) {
+        return `${hora.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')} ${ampm}`;
     }
     
     // Renderizar lista de recordatorios
@@ -767,9 +818,10 @@ window.renderRoosterScreen = async function() {
         
         if (recordatorios.length === 0) {
             container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #999;">
-                    🕐 No hay recordatorios programados
-                    <br><small>Presiona "Agregar Recordatorio" para comenzar</small>
+                <div style="text-align: center; padding: 60px 20px; color: #999;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🕐</div>
+                    <div style="font-size: 16px;">No hay recordatorios programados</div>
+                    <div style="font-size: 13px; margin-top: 8px;">Presiona "Agregar Recordatorio" para comenzar</div>
                 </div>
             `;
             return;
@@ -779,90 +831,135 @@ window.renderRoosterScreen = async function() {
         const hoy = diasSemana[new Date().getDay()];
         
         container.innerHTML = recordatorios.map(rec => {
-            let frecuenciaTexto = rec.frecuencia === 'todos' ? '📅 Todos los días' : `📆 ${rec.diasSeleccionados?.join(', ') || ''}`;
+            let frecuenciaTexto = rec.frecuencia === 'todos' ? '📅 Todos los días' : `📆 ${rec.diasSeleccionados?.slice(0, 3).join(', ')}${rec.diasSeleccionados?.length > 3 ? '...' : ''}`;
             let esHoy = rec.frecuencia === 'todos' || (rec.diasSeleccionados && rec.diasSeleccionados.includes(hoy));
+            let horaMostrar = formatearHoraMostrar(rec.hora, rec.minutos, rec.ampm);
+            let proximaHora = new Date();
+            proximaHora.setHours(rec.hora + (rec.ampm === 'PM' && rec.hora !== 12 ? 12 : (rec.ampm === 'AM' && rec.hora === 12 ? 0 : rec.hora)), rec.minutos, 0);
             
             return `
                 <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 5px solid ${esHoy ? '#4CAF50' : '#999'};">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div style="flex: 1;">
                             <div style="font-weight: 800; font-size: 18px; color: #8B4513;">💊 ${rec.medicamento}</div>
-                            <div style="font-size: 24px; font-weight: bold; margin: 8px 0;">${rec.hora}:00 ${rec.ampm}</div>
+                            <div style="font-size: 22px; font-weight: bold; margin: 8px 0; color: #333;">${horaMostrar}</div>
                             <div style="color: #666; font-size: 14px;">📦 ${rec.dosis}</div>
                             ${rec.notas ? `<div style="color: #888; font-size: 12px; margin-top: 5px;">📝 ${rec.notas}</div>` : ''}
-                            <div style="color: ${esHoy ? '#4CAF50' : '#999'}; font-size: 12px; margin-top: 8px;">
+                            <div style="color: ${esHoy ? '#4CAF50' : '#999'}; font-size: 11px; margin-top: 8px;">
                                 ${frecuenciaTexto} ${esHoy ? '✅ Aplica hoy' : '⏸️ No aplica hoy'}
                             </div>
                         </div>
-                        <button onclick="eliminarRecordatorio(${rec.id})" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #d32f2f;">🗑️</button>
+                        <button onclick="eliminarRecordatorio(${rec.id})" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #d32f2f; padding: 8px;">🗑️</button>
                     </div>
                 </div>
             `;
         }).join('');
     }
     
-    // ========== 3. MOSTRAR FORMULARIO AGREGAR ==========
+    // ========== 3. FORMULARIO COMPLETO CON MINUTOS ==========
     function mostrarFormularioAgregar() {
         const modal = document.createElement('div');
         modal.id = 'modal-recordatorio';
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: flex; align-items: center;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center;
             justify-content: center; z-index: 10000; backdrop-filter: blur(4px);
         `;
         
         modal.innerHTML = `
-            <div style="background: white; border-radius: 24px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 24px;">
+            <div style="background: white; border-radius: 28px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2 style="color: #8B4513;">➕ Nuevo Recordatorio</h2>
-                    <button onclick="document.getElementById('modal-recordatorio').remove()" style="background: none; border: none; font-size: 28px; cursor: pointer;">✕</button>
+                    <button onclick="this.closest('#modal-recordatorio').remove()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666;">✕</button>
                 </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <input type="text" id="rec-medicamento" placeholder="💊 Nombre del medicamento *" style="padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
-                    <input type="text" id="rec-dosis" placeholder="📦 Dosis (ej: 1 tableta, 2 cucharadas) *" style="padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
-                    
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <select id="rec-hora" style="flex: 2; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
-                            ${Array.from({length: 12}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
-                        </select>
-                        <select id="rec-ampm" style="flex: 1; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
-                            <option value="AM">AM</option>
-                            <option value="PM">PM</option>
-                        </select>
+                    <div>
+                        <label style="font-weight: 600; font-size: 14px; color: #666;">💊 Medicamento *</label>
+                        <input type="text" id="rec-medicamento" placeholder="Ej: Paracetamol, Ibuprofeno..." style="width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-top: 4px;">
                     </div>
                     
-                    <div style="display: flex; gap: 12px;">
-                        <button onclick="document.getElementById('rec-frecuencia-todos').checked = true; toggleDiasEspecificos(false)" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: #f5f5f5; cursor: pointer;">📅 Todos los días</button>
-                        <button onclick="document.getElementById('rec-frecuencia-dias').checked = true; toggleDiasEspecificos(true)" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: #f5f5f5; cursor: pointer;">📆 Días específicos</button>
+                    <div>
+                        <label style="font-weight: 600; font-size: 14px; color: #666;">📦 Dosis *</label>
+                        <input type="text" id="rec-dosis" placeholder="Ej: 1 tableta, 2 cucharadas, 5ml..." style="width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-top: 4px;">
                     </div>
-                    <input type="radio" id="rec-frecuencia-todos" name="frecuencia" value="todos" checked style="display: none;">
-                    <input type="radio" id="rec-frecuencia-dias" name="frecuencia" value="dias_especificos" style="display: none;">
+                    
+                    <div>
+                        <label style="font-weight: 600; font-size: 14px; color: #666;">⏰ Hora *</label>
+                        <div style="display: flex; gap: 12px; margin-top: 4px;">
+                            <select id="rec-hora" style="flex: 2; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                                ${Array.from({length: 12}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+                            </select>
+                            <select id="rec-minutos" style="flex: 2; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                                ${Array.from({length: 60}, (_, i) => `<option value="${i}">${i.toString().padStart(2, '0')}</option>`).join('')}
+                            </select>
+                            <select id="rec-ampm" style="flex: 1; padding: 14px; border: 1px solid #ddd; border-radius: 12px;">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="font-weight: 600; font-size: 14px; color: #666;">📅 Frecuencia</label>
+                        <div style="display: flex; gap: 12px; margin-top: 8px;">
+                            <button type="button" onclick="toggleFrecuencia('todos')" id="freq-todos-btn" style="flex: 1; padding: 12px; border-radius: 30px; border: 2px solid #8B4513; background: #8B4513; color: white; cursor: pointer;">📅 Todos los días</button>
+                            <button type="button" onclick="toggleFrecuencia('dias')" id="freq-dias-btn" style="flex: 1; padding: 12px; border-radius: 30px; border: 2px solid #ddd; background: white; color: #666; cursor: pointer;">📆 Días específicos</button>
+                        </div>
+                        <input type="hidden" id="rec-frecuencia" value="todos">
+                    </div>
                     
                     <div id="rec-dias-container" style="display: none;">
-                        <div style="font-weight: 600; margin-bottom: 8px;">Selecciona los días:</div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <label style="font-weight: 600; font-size: 14px; color: #666;">Selecciona los días:</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
                             ${['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'].map(dia => `
-                                <label style="display: flex; align-items: center; gap: 5px; background: #f0f0f0; padding: 6px 12px; border-radius: 20px;">
-                                    <input type="checkbox" value="${dia}" class="rec-dia-checkbox"> ${dia.substring(0,3)}
+                                <label style="display: flex; align-items: center; gap: 6px; background: #f0f0f0; padding: 8px 14px; border-radius: 30px; cursor: pointer;">
+                                    <input type="checkbox" value="${dia}" class="rec-dia-checkbox"> ${dia.substring(0, 3)}
                                 </label>
                             `).join('')}
                         </div>
                     </div>
                     
-                    <textarea id="rec-notas" placeholder="📝 Notas adicionales (opcional)" rows="2" style="padding: 14px; border: 1px solid #ddd; border-radius: 12px;"></textarea>
+                    <div>
+                        <label style="font-weight: 600; font-size: 14px; color: #666;">📝 Notas (opcional)</label>
+                        <textarea id="rec-notas" placeholder="Ej: Tomar después de comer, con agua..." rows="2" style="width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-top: 4px;"></textarea>
+                    </div>
                     
-                    <button id="guardar-recordatorio-btn" style="padding: 16px; background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">💾 GUARDAR RECORDATORIO</button>
+                    <button id="guardar-recordatorio-btn" style="padding: 16px; background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: none; border-radius: 40px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 8px;">
+                        💾 GUARDAR RECORDATORIO
+                    </button>
                 </div>
             </div>
         `;
         
         document.body.appendChild(modal);
         
-        // Configurar toggle de días
-        window.toggleDiasEspecificos = (mostrar) => {
-            const container = document.getElementById('rec-dias-container');
-            if (container) container.style.display = mostrar ? 'block' : 'none';
+        // Función para toggle de frecuencia
+        window.toggleFrecuencia = (tipo) => {
+            const freqInput = document.getElementById('rec-frecuencia');
+            const todosBtn = document.getElementById('freq-todos-btn');
+            const diasBtn = document.getElementById('freq-dias-btn');
+            const diasContainer = document.getElementById('rec-dias-container');
+            
+            if (tipo === 'todos') {
+                freqInput.value = 'todos';
+                todosBtn.style.background = '#8B4513';
+                todosBtn.style.color = 'white';
+                todosBtn.style.border = '2px solid #8B4513';
+                diasBtn.style.background = 'white';
+                diasBtn.style.color = '#666';
+                diasBtn.style.border = '2px solid #ddd';
+                if (diasContainer) diasContainer.style.display = 'none';
+            } else {
+                freqInput.value = 'dias_especificos';
+                diasBtn.style.background = '#8B4513';
+                diasBtn.style.color = 'white';
+                diasBtn.style.border = '2px solid #8B4513';
+                todosBtn.style.background = 'white';
+                todosBtn.style.color = '#666';
+                todosBtn.style.border = '2px solid #ddd';
+                if (diasContainer) diasContainer.style.display = 'block';
+            }
         };
         
         // Evento guardar
@@ -870,8 +967,9 @@ window.renderRoosterScreen = async function() {
             const medicamento = document.getElementById('rec-medicamento')?.value.trim();
             const dosis = document.getElementById('rec-dosis')?.value.trim();
             const hora = parseInt(document.getElementById('rec-hora')?.value);
+            const minutos = parseInt(document.getElementById('rec-minutos')?.value);
             const ampm = document.getElementById('rec-ampm')?.value;
-            const frecuencia = document.querySelector('input[name="frecuencia"]:checked')?.value;
+            const frecuencia = document.getElementById('rec-frecuencia')?.value;
             const notas = document.getElementById('rec-notas')?.value.trim() || '';
             
             let diasSeleccionados = [];
@@ -881,13 +979,21 @@ window.renderRoosterScreen = async function() {
                     if (cb.checked) diasSeleccionados.push(cb.value);
                 });
                 if (diasSeleccionados.length === 0) {
-                    AppState.addNotification('Selecciona al menos un día', 'warning');
+                    if (typeof AppState !== 'undefined' && AppState.addNotification) {
+                        AppState.addNotification('⚠️ Selecciona al menos un día', 'warning');
+                    } else {
+                        alert('Selecciona al menos un día');
+                    }
                     return;
                 }
             }
             
             if (!medicamento || !dosis) {
-                AppState.addNotification('Completa los campos obligatorios', 'warning');
+                if (typeof AppState !== 'undefined' && AppState.addNotification) {
+                    AppState.addNotification('⚠️ Completa los campos obligatorios', 'warning');
+                } else {
+                    alert('Completa los campos obligatorios');
+                }
                 return;
             }
             
@@ -896,6 +1002,7 @@ window.renderRoosterScreen = async function() {
                 medicamento: medicamento,
                 dosis: dosis,
                 hora: hora,
+                minutos: minutos,
                 ampm: ampm,
                 frecuencia: frecuencia,
                 diasSeleccionados: diasSeleccionados,
@@ -909,56 +1016,71 @@ window.renderRoosterScreen = async function() {
             guardarRecordatorios();
             renderRecordatoriosLista();
             modal.remove();
-            AppState.addNotification('✅ Recordatorio guardado', 'success');
+            
+            if (typeof AppState !== 'undefined' && AppState.addNotification) {
+                AppState.addNotification('✅ Recordatorio guardado exitosamente', 'success');
+            } else {
+                alert('✅ Recordatorio guardado');
+            }
         };
     }
     
-    // ========== 4. INICIAR VERIFICACIÓN CADA MINUTO ==========
+    // ========== 4. INICIAR VERIFICACIÓN ==========
     if (intervaloVerificacion) clearInterval(intervaloVerificacion);
-    intervaloVerificacion = setInterval(verificarRecordatorios, 60000);
-    verificarRecordatorios(); // Verificar inmediatamente
+    intervaloVerificacion = setInterval(verificarRecordatorios, 10000); // Cada 10 segundos para mayor precisión
+    verificarRecordatorios();
     
-    // Guardar intervalo para limpiar después
     window.recordatoriosInterval = intervaloVerificacion;
     
-    // ========== 5. RENDERIZAR PANTALLA COMPLETA ==========
+    // ========== 5. RENDERIZAR ==========
     setTimeout(() => {
         renderRecordatoriosLista();
     }, 100);
     
-    // Exponer funciones globalmente
     window.eliminarRecordatorio = eliminarRecordatorio;
     window.mostrarFormularioAgregar = mostrarFormularioAgregar;
+    window.toggleFrecuencia = window.toggleFrecuencia;
     
-    // Retornar HTML de la pantalla
+    // Retornar HTML
     return `
-        <div style="padding-top: 80px; min-height: 100vh; background: #f5f5f5;">
-            ${renderMobileNavBar()}
+        <div style="padding-top: 80px; min-height: 100vh; background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);">
+            ${typeof renderMobileNavBar === 'function' ? renderMobileNavBar() : ''}
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="color: #8B4513;">💊 Mis Recordatorios</h2>
-                    <button onclick="mostrarFormularioAgregar()" style="background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; cursor: pointer;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="color: #8B4513; margin: 0;">💊 Mis Recordatorios</h2>
+                        <p style="color: #666; font-size: 12px; margin: 5px 0 0;">Recibirás notificaciones aunque la app esté cerrada</p>
+                    </div>
+                    <button onclick="mostrarFormularioAgregar()" style="background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
                         ➕ AGREGAR
                     </button>
                 </div>
                 
                 <div id="recordatorios-lista" style="margin-top: 20px;">
                     <div style="text-align: center; padding: 40px; color: #999;">
-                        🕐 Cargando recordatorios...
+                        <div class="spinner" style="width: 30px; height: 30px; border: 3px solid #ddd; border-top-color: #8B4513; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px;"></div>
+                        Cargando recordatorios...
                     </div>
                 </div>
                 
-                <div style="margin-top: 30px; padding: 16px; background: #fff3e0; border-radius: 12px; text-align: center;">
-                    <div style="font-size: 14px; color: #666;">
-                        🔔 Las notificaciones aparecerán aunque la página esté cerrada
-                        <br>
-                        <small>⚠️ Asegúrate de tener los permisos de notificación activados</small>
+                <div style="margin-top: 30px; padding: 16px; background: #fff3e0; border-radius: 16px; text-align: center;">
+                    <div style="font-size: 13px; color: #666;">
+                        🔔 <strong>Notificaciones activas</strong><br>
+                        <small>Las notificaciones funcionan sin internet y aunque la página esté cerrada.<br>
+                        Permite las notificaciones cuando el navegador lo solicite.</small>
                     </div>
                 </div>
             </div>
         </div>
+        <style>
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
     `;
 };
+
+    
 
 // Registrar Service Worker con el nuevo sistema
 if ('serviceWorker' in navigator) {
@@ -2632,6 +2754,10 @@ function checkIfEverythingLoaded() {
 }
 
 async function renderApp() {
+    // ✅ 1. GUARDAR estado del modal ANTES de renderizar
+      const installModal = document.getElementById('installOverlay');
+    const modalWasVisible = installModal && installModal.style.display === 'block';
+    
     if (AppState._isRendering) return;
     AppState._isRendering = true;
     
@@ -2707,6 +2833,14 @@ if (isOffline && currentScreen !== SCREENS.LOGIN && currentScreen !== SCREENS.AC
     } finally {
         AppState._isRendering = false;
         updateSideMenuContent();
+
+                // ✅ 2. RESTAURAR modal DESPUÉS de renderizar
+        if (modalWasVisible && installModal) {
+            installModal.style.display = 'block';
+            console.log('✅ Modal de instalación restaurado');
+        }
+
+        
     }
 }
 
