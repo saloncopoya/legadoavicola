@@ -1801,7 +1801,22 @@ async function handleLogout() {
     AppState.addNotification('Cerrando sesión...', 'warning');
     
     const currentUid = AppState.user.current?.uid;
-    if (currentUid) AppState.persistentCache.clearUserCache(currentUid);
+    
+    // ✅ CORREGIDO: Limpiar IndexedDB en lugar de persistentCache
+    if (currentUid) {
+        try {
+            await OfflineDB.delete('users', currentUid);
+            console.log('🗑️ Perfil eliminado de IndexedDB');
+        } catch(e) {
+            console.warn('Error limpiando IndexedDB:', e);
+        }
+    }
+    
+    // Limpiar localStorage
+    localStorage.removeItem('offline_user');
+    localStorage.removeItem('offline_profile');
+    localStorage.removeItem('lastScreen');
+    
     RecurrentUserManager.clear();
     
     try {
@@ -1809,16 +1824,19 @@ async function handleLogout() {
     } catch(e) {}
     
     AppState.clearUser();
-    localStorage.removeItem('lastScreen');
     sessionStorage.clear();
     
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('firebase:') || key.startsWith('app_'))) localStorage.removeItem(key);
+        if (key && (key.startsWith('firebase:') || key.startsWith('app_'))) {
+            localStorage.removeItem(key);
+        }
     }
     
     window.history.pushState({}, '', '/');
-    setTimeout(() => { if (!AppState.user.current) mostrarModalGoogleInferior(); }, 1000);
+    setTimeout(() => { 
+        if (!AppState.user.current) mostrarModalGoogleInferior(); 
+    }, 1000);
 }
 
 // ==============================================
