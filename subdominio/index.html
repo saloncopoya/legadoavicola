@@ -541,16 +541,15 @@ async function loadAllFirebaseDataOffline() {
     console.log('📥 Cargando datos de Firebase para modo offline...');
     
     try {
-        // ========== NUEVO: Cargar usuarios ==========
-        const usersSnapshot = await AppState.firebase.database.ref('users').once('value');
-        if (usersSnapshot.exists()) {
-            const users = usersSnapshot.val();
-            for (const [uid, data] of Object.entries(users)) {
-                await OfflineDB.set('users', uid, { uid, ...data });
+     // Solo guardar el perfil del usuario actual si está logueado
+        if (AppState.user.current) {
+            const myProfile = await AppState.firebase.database.ref('users/' + AppState.user.current.uid).once('value');
+            if (myProfile.exists()) {
+                await OfflineDB.set('users', AppState.user.current.uid, { uid: AppState.user.current.uid, ...myProfile.val() });
+                console.log('✅ Perfil propio guardado offline');
             }
-            console.log(`✅ Cargados ${Object.keys(users).length} usuarios`);
         }
-        // ============================================
+        // ================================================================
         
         // Cargar subastas
         const subastasSnapshot = await AppState.firebase.database.ref('subastas').once('value');
@@ -592,6 +591,21 @@ async function loadAllFirebaseDataOffline() {
 // Modificar las funciones de renderizado para usar OFFLINE FIRST
 // Función para obtener datos (primero offline, luego online)
 async function getDataOfflineFirst(store, id = null) {
+
+
+    // ⚠️ BLOQUEAR ACCESO A USUARIOS DE OTROS
+    if (store === 'users' && id && id !== AppState.user.current?.uid) {
+        console.warn('⚠️ Intento bloqueado: Acceso a datos de otro usuario');
+        return null;
+    }
+    
+    // Si es 'users' y no hay id específico, NO permitir
+    if (store === 'users' && id === null) {
+        console.warn('⚠️ Intento bloqueado: No se permite listar todos los usuarios');
+        return [];
+    }
+
+    
     // 1. Intentar obtener de IndexedDB
     let offlineData;
     if (id) {
@@ -2796,9 +2810,12 @@ window.renderPerfilScreen = async function() {
     let userProfile = AppState.user.profile;
     let currentUser = AppState.user.current;
     
-    if (!userProfile) {
-        const cachedProfile = await getDataOfflineFirst('users', currentUser?.uid);
-        if (cachedProfile) userProfile = cachedProfile;
+     if (!userProfile) {
+        // ✅ SOLO permitir leer el perfil del usuario actual
+        if (currentUser?.uid) {
+            const cachedProfile = await getDataOfflineFirst('users', currentUser.uid);
+            if (cachedProfile) userProfile = cachedProfile;
+        }
     }
     
     if (!userProfile) return '<div style="padding:20px; text-align:center;">Cargando perfil...</div>';
