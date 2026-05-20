@@ -1650,7 +1650,6 @@ async function handleLogin() {
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
              
         localStorage.removeItem(`rate_${emailKey}`);
-        hideLoadingScreen();
         
     } catch (error) {
         console.log("🔴 CÓDIGO DE ERROR:", error.code);
@@ -2178,9 +2177,9 @@ function setupAuthListener() {
     if (!AppState.firebase.auth) return;
     
     // Mostrar loading al iniciar (si no está visible)
-    if (navigator.onLine) {
-        showLoadingScreen('Verificando sesión...', 20);
-    }
+  if (navigator.onLine && !primeraCargaCompletada) {
+    showLoadingScreen('Verificando sesión...', 20);
+}
     
     AppState.firebase.auth.onAuthStateChanged(async (user) => {
         const pantallaPendiente = AppState.ui.pendingScreen;
