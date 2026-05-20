@@ -593,17 +593,28 @@ async function loadAllFirebaseDataOffline() {
 async function getDataOfflineFirst(store, id = null) {
 
 
-    // ⚠️ BLOQUEAR ACCESO A USUARIOS DE OTROS
-    if (store === 'users' && id && id !== AppState.user.current?.uid) {
-        console.warn('⚠️ Intento bloqueado: Acceso a datos de otro usuario');
-        return null;
+    // ⚠️ Para 'users', SOLO permitir acceso al usuario actual
+    if (store === 'users') {
+        // Si piden un usuario específico que NO es el actual, bloquear
+        if (id && id !== AppState.user.current?.uid) {
+            console.warn('⚠️ Bloqueado: Intento de acceder a usuario:', id);
+            return null;
+        }
+        // Si piden lista de usuarios (sin id), devolver solo el actual
+        if (!id) {
+            if (AppState.user.current?.uid) {
+                const currentUserData = await OfflineDB.get('users', AppState.user.current.uid);
+                if (currentUserData) {
+                    // Devolver como objeto con un solo usuario
+                    const result = {};
+                    result[AppState.user.current.uid] = currentUserData;
+                    return result;
+                }
+            }
+            return {}; // Vacío pero NO null
+        }
     }
     
-    // Si es 'users' y no hay id específico, NO permitir
-    if (store === 'users' && id === null) {
-        console.warn('⚠️ Intento bloqueado: No se permite listar todos los usuarios');
-        return [];
-    }
 
     
     // 1. Intentar obtener de IndexedDB
