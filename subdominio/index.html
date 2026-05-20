@@ -541,15 +541,16 @@ async function loadAllFirebaseDataOffline() {
     console.log('📥 Cargando datos de Firebase para modo offline...');
     
     try {
-     // Solo guardar el perfil del usuario actual si está logueado
-        if (AppState.user.current) {
-            const myProfile = await AppState.firebase.database.ref('users/' + AppState.user.current.uid).once('value');
-            if (myProfile.exists()) {
-                await OfflineDB.set('users', AppState.user.current.uid, { uid: AppState.user.current.uid, ...myProfile.val() });
-                console.log('✅ Perfil propio guardado offline');
+        // ========== NUEVO: Cargar usuarios ==========
+        const usersSnapshot = await AppState.firebase.database.ref('users').once('value');
+        if (usersSnapshot.exists()) {
+            const users = usersSnapshot.val();
+            for (const [uid, data] of Object.entries(users)) {
+                await OfflineDB.set('users', uid, { uid, ...data });
             }
+            console.log(`✅ Cargados ${Object.keys(users).length} usuarios`);
         }
-        // ================================================================
+        // ============================================
         
         // Cargar subastas
         const subastasSnapshot = await AppState.firebase.database.ref('subastas').once('value');
@@ -591,32 +592,6 @@ async function loadAllFirebaseDataOffline() {
 // Modificar las funciones de renderizado para usar OFFLINE FIRST
 // Función para obtener datos (primero offline, luego online)
 async function getDataOfflineFirst(store, id = null) {
-
-
-    // ⚠️ Para 'users', SOLO permitir acceso al usuario actual
-    if (store === 'users') {
-        // Si piden un usuario específico que NO es el actual, bloquear
-        if (id && id !== AppState.user.current?.uid) {
-            console.warn('⚠️ Bloqueado: Intento de acceder a usuario:', id);
-            return null;
-        }
-        // Si piden lista de usuarios (sin id), devolver solo el actual
-        if (!id) {
-            if (AppState.user.current?.uid) {
-                const currentUserData = await OfflineDB.get('users', AppState.user.current.uid);
-                if (currentUserData) {
-                    // Devolver como objeto con un solo usuario
-                    const result = {};
-                    result[AppState.user.current.uid] = currentUserData;
-                    return result;
-                }
-            }
-            return {}; // Vacío pero NO null
-        }
-    }
-    
-
-    
     // 1. Intentar obtener de IndexedDB
     let offlineData;
     if (id) {
@@ -1675,6 +1650,7 @@ async function handleLogin() {
         if (!AppState.firebase.database) AppState.firebase.database = firebase.database();
              
         localStorage.removeItem(`rate_${emailKey}`);
+        hideLoadingScreen();
         
     } catch (error) {
         console.log("🔴 CÓDIGO DE ERROR:", error.code);
@@ -2202,9 +2178,9 @@ function setupAuthListener() {
     if (!AppState.firebase.auth) return;
     
     // Mostrar loading al iniciar (si no está visible)
-  if (navigator.onLine && !primeraCargaCompletada) {
-    showLoadingScreen('Verificando sesión...', 20);
-}
+    if (navigator.onLine) {
+        showLoadingScreen('Verificando sesión...', 20);
+    }
     
     AppState.firebase.auth.onAuthStateChanged(async (user) => {
         const pantallaPendiente = AppState.ui.pendingScreen;
@@ -2821,12 +2797,9 @@ window.renderPerfilScreen = async function() {
     let userProfile = AppState.user.profile;
     let currentUser = AppState.user.current;
     
-     if (!userProfile) {
-        // ✅ SOLO permitir leer el perfil del usuario actual
-        if (currentUser?.uid) {
-            const cachedProfile = await getDataOfflineFirst('users', currentUser.uid);
-            if (cachedProfile) userProfile = cachedProfile;
-        }
+    if (!userProfile) {
+        const cachedProfile = await getDataOfflineFirst('users', currentUser?.uid);
+        if (cachedProfile) userProfile = cachedProfile;
     }
     
     if (!userProfile) return '<div style="padding:20px; text-align:center;">Cargando perfil...</div>';
