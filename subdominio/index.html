@@ -1250,21 +1250,24 @@ function isSlowConnection() {
     return connInfo.effectiveType === '2g' || connInfo.effectiveType === 'slow-2g' || connInfo.downlink < 0.5;
 }
 
+
+    function hideConnectionBar() {
+    const connectionBar = document.getElementById('connection-status-bar');
+    if (connectionBar) {
+        connectionBar.classList.remove('visible', 'slow-connection', 'connection-restored');
+        connectionBar.style.transform = 'translateY(100%)';
+    }
+}
+
+    
 function updateConnectionBar() {
     const connectionBar = document.getElementById('connection-status-bar');
     const connectionMessage = document.getElementById('connection-status-message');
     if (!connectionBar) return;
 
-        // Elimina el evento anterior para evitar duplicados
+      
      connectionBar.removeEventListener('click', hideConnectionBar);
-    // Define la función que ocultará la barra
-    const hideConnectionBar = () => {
-        connectionBar.classList.remove('visible', 'slow-connection', 'connection-restored');
-        connectionBar.style.transform = 'translateY(100%)';
-    };
-    // Agrega el evento de clic
     connectionBar.addEventListener('click', hideConnectionBar);
-
     
     
     connectionBar.classList.remove('slow-connection', 'connection-restored');
