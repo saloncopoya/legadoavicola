@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.113';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.113';
+const CACHE_NAME = 'legado-offline-v2.0.59';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.59';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -8,7 +8,6 @@ const urlsToCache = [
     '/index.html',
     '/manifest.json',
     '/offline.html',
- '/.well-known/pwa-url-handler.json',
    '/firebase-messaging-sw.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
@@ -87,9 +86,11 @@ self.addEventListener('fetch', event => {
     }
     
     // Estrategia: Cache First, luego Network
+    console.log('[SW] Buscando en cache:', url.pathname);
     event.respondWith(
-caches.match('/index.html').then(response => {
-    if (response) {
+caches.match(url.pathname)
+        .then(response => {
+                if (response) {
                     return response;
                 }
                 
