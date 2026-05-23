@@ -1259,6 +1259,20 @@ function isSlowConnection() {
     }
 }
 
+
+
+    function toggleLoginButtonVisibility() {
+    const loginButton = document.getElementById('dynamic-login-btn');
+    if (loginButton) {
+        if (navigator.onLine && !AppState.ui.isLoading) {
+            loginButton.style.display = 'flex';
+        } else {
+            loginButton.style.display = 'none';
+        }
+    }
+}
+
+    
     
 function updateConnectionBar() {
     const connectionBar = document.getElementById('connection-status-bar');
