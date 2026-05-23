@@ -88,11 +88,7 @@ self.addEventListener('fetch', event => {
     
     // Estrategia: Cache First, luego Network
     event.respondWith(
-
-        // Ignorar parámetros de URL para el cache
-const cacheUrl = url.pathname;
-caches.match(cacheUrl)
-    .then(response => {
+        caches.match(event.request).then(response => {
                 if (response) {
                     return response;
                 }
