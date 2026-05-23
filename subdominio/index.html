@@ -2300,10 +2300,12 @@ AppState.setScreen(SCREENS.PUBLIC);
     }
     
     AppState.clearUser();
-             AppState.setLoading(false);
+                console.log("🔍 LOGOUT - Setting isLoading to false");
+
     hideLoadingScreen();
+            AppState.setLoading(false);
 }
-        AppState.setLoading(false);
+        
     });
 }
 
