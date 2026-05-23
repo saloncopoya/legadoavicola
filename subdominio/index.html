@@ -2360,6 +2360,9 @@ function checkIfEverythingLoaded() {
     AppState._isRendering = true;
     
     try {
+
+         console.log('🔍 renderApp - isLoading:', AppState.ui.isLoading, 'user:', AppState.user.current);
+        
         const app = document.getElementById('social-app');
         if (!app) return;
         
@@ -2445,7 +2448,8 @@ if (isOffline && currentScreen !== SCREENS.LOGIN && currentScreen !== SCREENS.AC
 }
 
 AppState.subscribe((propriedadCambiada) => {
-    if (propriedadCambiada === 'screen' || propriedadCambiada === 'user') {
+    // ✅ AGREGAR 'loading' para que se actualice cuando termine la carga
+    if (propriedadCambiada === 'screen' || propriedadCambiada === 'user' || propriedadCambiada === 'loading') {
         renderApp();
     }
 });
