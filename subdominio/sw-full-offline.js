@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v2.0.109';
-const DYNAMIC_CACHE = 'legado-dynamic-v2.0.109';
+const CACHE_NAME = 'legado-offline-v2.0.110';
+const DYNAMIC_CACHE = 'legado-dynamic-v2.0.110';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
