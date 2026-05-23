@@ -2364,8 +2364,8 @@ function checkIfEverythingLoaded() {
         if (!app) return;
         
         // ✅ NUEVO: Si está cargando Y no hay usuario, mostrar skeleton
-        if (AppState.ui.isLoading && !AppState.user.current) {
-            app.innerHTML = `
+if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
+    app.innerHTML = `
                 <div style="min-height: 100vh; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
                     <div style="text-align: center;">
                         <div style="font-size: 50px; margin-bottom: 20px;">🐓</div>
