@@ -171,9 +171,25 @@
             transform: translateY(0) !important;
         }
 
-        #connection-status-bar.slow-connection {
-            background-color: #ae0404;
-        }
+      /* Para SIN ACCESO A INTERNET (gris transparente) */
+#connection-status-bar.no-connection {
+    background: rgba(98, 100, 102, 0.25) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-top: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Para CONEXIÓN LENTA (rojo transparente) */
+#connection-status-bar.slow-connection {
+    background: rgba(174, 4, 4, 0.25) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 80, 80, 0.4) !important;
+    border-top: none !important;
+    box-shadow: 0 4px 15px rgba(174, 4, 4, 0.2) !important;
+}
 
         .wifi-bar {
             width: 4px;
@@ -1280,38 +1296,41 @@ function isSlowConnection() {
 
     
     
-function updateConnectionBar() {
+
+
+    function updateConnectionBar() {
     const connectionBar = document.getElementById('connection-status-bar');
     const connectionMessage = document.getElementById('connection-status-message');
     if (!connectionBar) return;
 
-      
-     connectionBar.removeEventListener('click', hideConnectionBar);
+    connectionBar.removeEventListener('click', hideConnectionBar);
     connectionBar.addEventListener('click', hideConnectionBar);
     
-    
-    connectionBar.classList.remove('slow-connection', 'connection-restored');
+    // Limpiar clases previas
+    connectionBar.classList.remove('slow-connection', 'no-connection', 'connection-restored');
     
     if (!navigator.onLine) {
-        connectionBar.classList.add('visible');
-        connectionBar.style.backgroundColor = '#626466';
-        connectionMessage.textContent = '¡Sin acceso a internet! Conectate a una red.... ';
+        // SIN ACCESO - GRIS TRANSPARENTE
+        connectionBar.classList.add('visible', 'no-connection');
+        connectionMessage.textContent = '🌐 Sin acceso a internet! Conéctate a una red...';
     } else if (isSlowConnection()) {
+        // CONEXIÓN LENTA - ROJO TRANSPARENTE
         connectionBar.classList.add('visible', 'slow-connection');
-        connectionBar.style.backgroundColor = '#ae0404';
-        connectionMessage.textContent = 'Conexión lenta inestable! ';
+        connectionMessage.textContent = '⚠️ Conexión lenta! Puede afectar el rendimiento.';
     } else if (connectionBar.classList.contains('visible')) {
+        // CONEXIÓN RESTABLECIDA
         connectionBar.classList.add('connection-restored');
-        connectionBar.style.backgroundColor = '#4CAF50';
-        connectionMessage.textContent = '¡Conexión restablecida! Es seguro usarlo.';
+        connectionBar.style.background = 'rgba(76, 175, 80, 0.25)';
+        connectionBar.style.backdropFilter = 'blur(12px)';
+        connectionMessage.textContent = '✅ ¡Conexión restablecida! Todo funciona correctamente.';
         setTimeout(() => {
-            connectionBar.classList.remove('visible', 'connection-restored', 'slow-connection');
+            connectionBar.classList.remove('visible', 'connection-restored', 'slow-connection', 'no-connection');
             connectionBar.style.transform = 'translateY(-100%)';
         }, 9000);
         return;
     }
 }
-
+    
 window.addEventListener('online', () => {
     updateConnectionBar();
     toggleLoginButtonVisibility(); // ✅ Solo actualiza el botón Login
