@@ -2397,9 +2397,15 @@ AppState.setScreen(SCREENS.PUBLIC);
             hideLoadingScreen();
        } else {
     // Usuario NO autenticado
-    const urlParams = new URLSearchParams(window.location.search);
-    const shareId = urlParams.get('share');
-    const sectionParam = urlParams.get('section');
+            
+    // ========== VALIDACIÓN DE SEGURIDAD DE URL ==========
+
+
+// Ahora obtener los parámetros (ya validados)
+const urlParams = new URLSearchParams(window.location.search);
+const shareId = urlParams.get('share');
+const sectionParam = urlParams.get('section');
+            
     
     // Lista de pantallas públicas que se pueden ver SIN login
 const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PENDING, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
@@ -2571,12 +2577,60 @@ AppState.subscribe((propriedadCambiada) => {
 });
 
 
+
+    // ==============================================
+// VALIDACIÓN DE PARÁMETROS URL (SEGURIDAD)
+// ==============================================
+function validarParametroURL(param) {
+    const permitidos = ['share', 'section'];
+    
+    // Verificar que el parámetro está permitido
+    if (!permitidos.includes(param)) return false;
+    
+    const valor = new URLSearchParams(window.location.search).get(param);
+    
+    // Si hay valor, verificar que no contenga caracteres peligrosos
+    if (valor && /[<>'"]/g.test(valor)) {
+        console.warn(`⚠️ Parámetro URL malicioso detectado: ${param}=${valor}`);
+        // Limpiar la URL maliciosa
+        window.history.replaceState({}, '', window.location.pathname);
+        return false;
+    }
+    
+    return true;
+}
+
+// Validar parámetros al cargar la página
+function validarTodosLosParametros() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let esSeguro = true;
+    
+    for (let [key, value] of urlParams.entries()) {
+        if (!validarParametroURL(key)) {
+            esSeguro = false;
+            console.warn(`❌ Parámetro no permitido o malicioso: ${key}=${value}`);
+        }
+    }
+    
+    return esSeguro;
+}
+    
+
 // ==============================================
 // INICIO DE LA APLICACIÓN
 // ==============================================
 window.addEventListener('load', async () => { 
     console.log('🚀 Aplicación iniciando');
 
+      // ========== VALIDACIÓN DE SEGURIDAD DE URL (LO PRIMERO) ==========
+    if (!validarTodosLosParametros()) {
+        console.warn('🚨 URL maliciosa detectada - Limpiando URL');
+        window.history.replaceState({}, '', window.location.pathname);
+        if (typeof AppState !== 'undefined') {
+            AppState.addNotification('⚠️ Se ha limpiado una URL sospechosa', 'warning');
+        }
+    }
+    
     // LIMPIAR lastScreen SI NO ES VÁLIDA (AUTOMÁTICO)
     const lastScreenGuardada = localStorage.getItem('lastScreen');
     const pantallasActuales = Object.values(SCREENS);
