@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.0.19';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.0.19';
+const CACHE_NAME = 'legado-offline-v3.0.20';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.0.20';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -136,3 +136,77 @@ self.addEventListener('message', event => {
 });
 
 console.log('[SW] Service Worker completamente cargado y listo');
+
+
+
+
+
+
+
+
+
+// ==============================================
+// NOTIFICACIONES PUSH COMPLETAS (CON CLICK)
+// ==============================================
+importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+    apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+    authDomain: "galloslivebadge.firebaseapp.com",
+    databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
+    projectId: "galloslivebadge",
+    messagingSenderId: "979482928760",
+    appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
+});
+
+const messaging = firebase.messaging();
+
+// Notificaciones en segundo plano (app cerrada)
+messaging.onBackgroundMessage((payload) => {
+    console.log('[SW] Notificación en segundo plano:', payload);
+    
+    const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
+    const notificationOptions = {
+        body: payload.notification?.body || 'Notificación importante',
+        icon: '/miniatura.jpg',
+        badge: '/miniatura.jpg',
+        image: '/miniatura.jpg',
+        vibrate: [200, 100, 200],
+        data: {
+            click_action: payload.fcmOptions?.link || '/',
+            url: payload.fcmOptions?.link || '/',
+            image: payload.notification?.image || '/miniatura.jpg'
+        },
+        requireInteraction: true,
+        silent: false
+    };
+    
+    self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// Manejar clic en la notificación (ABRE LA APP)
+self.addEventListener('notificationclick', (event) => {
+    console.log('[SW] Usuario hizo clic en la notificación');
+    event.notification.close();
+    
+    const urlToOpen = event.notification.data?.click_action || '/';
+    
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then(windowClients => {
+                // Buscar una ventana abierta de la app
+                for (let client of windowClients) {
+                    if (client.url === urlToOpen && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                // Si no hay ventana abierta, crear una nueva
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
+            })
+    );
+});
+
+console.log('[SW] ✅ Firebase Messaging configurado (versión completa)');
