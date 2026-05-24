@@ -141,33 +141,33 @@
         /* ==============================================
            BARRA DE ESTADO DE CONEXIÓN
            ============================================== */
-        #connection-status-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-background: rgba(26, 34, 52, 0.55);
-            color: #ffffff;
-            text-align: center;
-            padding: 10px 5px;
-            font-size: 11px;
-            font-weight: 500;
-            z-index: 9999;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.2);
-            border-top: 2px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            cursor: pointer;
-            
-            border-radius: 50px;
+      #connection-status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(26, 34, 52, 0.55);
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 5px;
+    font-size: 11px;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateY(-100%);  /* ← CAMBIADO: ahora es -100% */
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);  /* ← CAMBIADO: sombra hacia abajo */
+    border-bottom: 2px solid rgba(255,255,255,0.1);  /* ← CAMBIADO: borde abajo */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: pointer;
+    border-radius: 0 0 50px 50px;  /* ← CAMBIADO: bordes redondeados solo abajo */
     border: 1px solid rgba(255,255,255,0.2);
-        }
+    border-top: none;  /* ← NUEVO: sin borde arriba */
+}
 
         #connection-status-bar.visible {
             transform: translateY(0) !important;
@@ -1263,7 +1263,7 @@ function isSlowConnection() {
     const connectionBar = document.getElementById('connection-status-bar');
     if (connectionBar) {
         connectionBar.classList.remove('visible', 'slow-connection', 'connection-restored');
-        connectionBar.style.transform = 'translateY(100%)';
+        connectionBar.style.transform = 'translateY(-100%)';
     }
 }
 
@@ -1308,7 +1308,7 @@ function updateConnectionBar() {
         connectionMessage.textContent = '¡Conexión restablecida! Es seguro usarlo.';
         setTimeout(() => {
             connectionBar.classList.remove('visible', 'connection-restored', 'slow-connection');
-            connectionBar.style.transform = 'translateY(100%)';
+            connectionBar.style.transform = 'translateY(-100%)';
         }, 9000);
         return;
     }
