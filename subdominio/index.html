@@ -44,6 +44,12 @@ if (self !== top) {
     top.location = self.location;
 }
 </script>
+
+    <!-- 6. CSP (Content Security Policy) - Protección XSS -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://accounts.google.com;">
+
+<!-- 7. X-Frame-Options (reemplaza el script anti-clickjacking) -->
+<meta http-equiv="X-Frame-Options" content="DENY">
     
     <style>
         /* ==============================================
@@ -323,17 +329,20 @@ if (self !== top) {
 <div id="installOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:transparent; z-index:99998; cursor:pointer;"></div>
 
 <!-- SCRIPTS DE FIREBASE Y GOOGLE -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://accounts.google.com/gsi/client"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" integrity="sha384-ViccRjS0k/lvYsrtaKXk+ES61/4PAZlFI/mPHmLC1YWzK0AIbXbI5ZXDzcm3F8gH" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" integrity="sha384-+/4lqMnmLqwbdHXshvGDmBTeWlNoPRdjXi4ZsiBj10EhQXaTBe3RF5JZktdSjug6" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js" integrity="sha384-f6/UpzjTjIXASlp20cArQsaRh1EvHVJd5kegy/gYR9W2D0a32TnEqUEiW4Zm/5O0" crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+
     <!-- LIBRERÍAS PARA OFFLINE TOTAL -->
 <!-- CORREGIDO: URL correcta para idb versión 8.0.0 (la más reciente y estable) -->
-<script src="https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js" integrity="sha384-lLGuFiulNF2N/nqC6IxFZzy3WGfLokEKQD73HN9gCx1vFouvtty5kp+wf20Rrs0Y" crossorigin="anonymous"></script>
 
 <!-- CORRECTO: localforage, esta URL sí es válida, la dejamos igual -->
-<script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js" integrity="sha384-MTDrIlFOzEqpmOxY6UIA/1Zkh0a64UlmJ6R0UrZXqXCPx99siPGi8EmtQjIeCcTH" crossorigin="anonymous"></script>
+
+    
+<script src="https://accounts.google.com/gsi/client"></script>
     
     <!-- REGISTRO DE SERVICE WORKER PARA MODO OFFLINE -->
 <script>
