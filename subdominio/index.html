@@ -1575,24 +1575,24 @@ function renderLoginScreen() {
     const isLoginActive = activeTab === 'login';
     
     setTimeout(() => {
-        if (AppState.ui.currentScreen === 'login' && !AppState.user.current && isLoginActive && typeof google !== 'undefined') {
+        if (AppState.ui.currentScreen === 'login' && !AppState.user.current && typeof google !== 'undefined') {
             mostrarModalGoogleInferior();
         }
     }, 2000);
     
     return `
-<div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 1px;">            <div style="width: 100%; max-width: 400px; margin: auto;">
-              
-                <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
-                    <div style="display:flex; gap:8px; margin-bottom:20px;">
-                        <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:${isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${isLoginActive ? '700' : '500'}; color:${isLoginActive ? 'white' : '#666'}; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
-                        <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:${!isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${!isLoginActive ? '700' : '500'}; color:${!isLoginActive ? 'white' : '#666'}; cursor:pointer;">📝 Registrar</button>
-                    </div>
-                    <div id="loginForm" class="${isLoginActive ? '' : 'hidden'}">${renderLoginForm()}</div>
-                    <div id="registerForm" class="${!isLoginActive ? '' : 'hidden'}">${renderRegisterForm()}</div>
-                </div>
+<div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 0;">
+    <div style="width: 100%; max-width: 400px; margin: auto;">
+        <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px; margin: 16px;">
+            <div style="display:flex; gap:8px; margin-bottom:20px;">
+                <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:#8B4513; border:none; border-radius:30px; font-weight:700; color:white; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
+                <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:30px; font-weight:500; color:#666; cursor:pointer;">📝 Registrar</button>
             </div>
+            <div id="loginForm" class="hidden">${renderLoginForm()}</div>
+            <div id="registerForm" class="hidden">${renderRegisterForm()}</div>
         </div>
+    </div>
+</div>
     `;
 }
 
