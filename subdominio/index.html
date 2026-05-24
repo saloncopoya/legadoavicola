@@ -239,7 +239,7 @@ if (self !== top) {
             background: white;
             box-shadow: -5px 0 30px rgba(0,0,0,0.2);
             z-index: 1001;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             transition: right 0.3s ease;
@@ -2232,7 +2232,7 @@ function updateSideMenuContent() {
 </button>
 
 </div>
-        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold;">
             <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_PERFIL}</span><span>${TEXTS.SIDE_BTN_PERFIL}</span></button>
             <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_SHARE}</span><span>${TEXTS.SIDE_BTN_SHARE}</span></button>
             ${userProfile.ventas === true ? `<button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_VENTAS}</span><span>${TEXTS.SIDE_BTN_VENTAS}</span></button>` : ''}
