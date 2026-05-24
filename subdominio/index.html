@@ -579,17 +579,7 @@ async function loadAllFirebaseDataOffline() {
     console.log('📥 Cargando datos de Firebase para modo offline...');
     
     try {
-        // ========== NUEVO: Cargar usuarios ==========
-        const usersSnapshot = await AppState.firebase.database.ref('users').once('value');
-        if (usersSnapshot.exists()) {
-            const users = usersSnapshot.val();
-            for (const [uid, data] of Object.entries(users)) {
-                await OfflineDB.set('users', uid, { uid, ...data });
-            }
-            console.log(`✅ Cargados ${Object.keys(users).length} usuarios`);
-        }
-        // ============================================
-        
+    
         // Cargar subastas
         const subastasSnapshot = await AppState.firebase.database.ref('subastas').once('value');
         if (subastasSnapshot.exists()) {
