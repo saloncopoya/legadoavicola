@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/sitemap.xml",
+    "/manifest.json",
+    "/sw-full-offline.js",
+    "/styles.css",
+    "/*.png",
+    "/*.jpg",
+    "/*.svg",
+    "/*.ico"
+  ]
+}
