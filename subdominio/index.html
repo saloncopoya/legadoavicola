@@ -1347,8 +1347,14 @@ if ('connection' in navigator) {
     const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (conn) conn.addEventListener('change', updateConnectionBar);
 }
-document.addEventListener('DOMContentLoaded', updateConnectionBar);
-window.addEventListener('load', updateConnectionBar);
+
+/ ==============================================
+// CARGA INICIAL - SOLO SI HAY INTERNET
+// ==============================================
+if (navigator.onLine) {
+    document.addEventListener('DOMContentLoaded', updateConnectionBar);
+    window.addEventListener('load', updateConnectionBar);
+}
 
 // ==============================================
 // MUNICIPIOS DE CHIAPAS
