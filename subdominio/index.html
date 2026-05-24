@@ -2235,32 +2235,32 @@ function updateSideMenuContent() {
 </div>
        <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold; font-size: 16px;">
     <!-- PERFIL -->
-    <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_PERFIL}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_PERFIL}</span>
     </button>
     
     <!-- SHARE -->
-    <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_SHARE}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_SHARE}</span>
     </button>
     
     <!-- PUBLIC (INICIO) - NUEVO -->
-    <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
     </button>
     
     <!-- ROOSTER (TORNEOS) - NUEVO -->
-    <button onclick="navigateTo(SCREENS.ROOSTER)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.ROOSTER)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.menu_icon_ROOSTER}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_ROOSTER}</span>
     </button>
     
     <!-- VENTAS -->
     ${userProfile.ventas === true ? `
-    <button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_VENTAS}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_VENTAS}</span>
     </button>
@@ -2268,7 +2268,7 @@ function updateSideMenuContent() {
     
     <!-- PUBLICACIONES - NUEVO (solo si tiene permiso) -->
     ${userProfile.publicaciones === true ? `
-    <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLICACIONES}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
     </button>
@@ -2276,7 +2276,7 @@ function updateSideMenuContent() {
     
     <!-- PEDIGRI - NUEVO (solo si tiene permiso) -->
     ${userProfile.pedigri === true ? `
-    <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.menu_icon_PEDIGRI}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
     </button>
@@ -2284,21 +2284,21 @@ function updateSideMenuContent() {
     
     <!-- JUEZ -->
     ${userProfile.isJudge === true ? `
-    <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_JUEZ}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_JUEZ}</span>
     </button>
     ` : ''}
     
     <!-- CONFIGURACIONES -->
-    <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_CONFIG}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_CONFIGURACIONES}</span>
     </button>
     
     <!-- ADMIN -->
     ${isAdmin ? `
-    <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_ADMIN}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_ADMIN}</span>
     </button>
@@ -2308,7 +2308,7 @@ function updateSideMenuContent() {
     <div style="height:2px; background:#ddd; margin:16px 0;"></div>
     
     <!-- CERRAR SESIÓN -->
-    <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
+    <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
         <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
     </button>
