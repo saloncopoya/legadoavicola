@@ -2430,13 +2430,7 @@ if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
         const currentUser = AppState.user.current;
         
         
-        // Mostrar indicador de modo offline sin bloquear
-if (isOffline && currentScreen !== SCREENS.LOGIN && currentScreen !== SCREENS.ACTIVATION_PENDING) {
-    // Solo mostrar un aviso sutil, no bloquear la pantalla
-    setTimeout(() => {
-        AppState.addNotification('📴 Modo offline - Los datos pueden estar desactualizados', 'warning', 3000);
-    }, 500);
-}
+
         
       const coreScreens = {
     [SCREENS.LOGIN]: renderLoginScreen,
