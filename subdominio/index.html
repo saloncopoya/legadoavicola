@@ -1571,8 +1571,8 @@ function renderRegisterForm() {
 }
 
 function renderLoginScreen() {
-    const activeTab = AppState.ui.activeTab || 'login';
-    const isLoginActive = activeTab === 'login';
+    // No usar activeTab para colorear botones al inicio
+    // Simplemente mostramos ambos botones neutrales
     
     setTimeout(() => {
         if (AppState.ui.currentScreen === 'login' && !AppState.user.current && typeof google !== 'undefined') {
@@ -1585,8 +1585,8 @@ function renderLoginScreen() {
     <div style="width: 100%; max-width: 400px; margin: auto;">
         <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px; margin: 16px;">
             <div style="display:flex; gap:8px; margin-bottom:20px;">
-                <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:#8B4513; border:none; border-radius:30px; font-weight:700; color:white; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
-                <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:30px; font-weight:500; color:#666; cursor:pointer;">📝 Registrar</button>
+                <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">🔐 CORREO ELECTRONICO</button>
+                <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:#f0f0f0; border:none; border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">📝 Registrar</button>
             </div>
             <div id="loginForm" class="hidden">${renderLoginForm()}</div>
             <div id="registerForm" class="hidden">${renderRegisterForm()}</div>
@@ -1658,11 +1658,11 @@ window.handleLoginClick = function() {
 };
 
 function showLoginForm() {
-AppState.ui.activeTab = 'login';
-
-    // ✅ AGREGAR ESTAS LÍNEAS:
-    const loginBtn = document.querySelector('button[onclick="showLoginForm()"]');
-    const registerBtn = document.querySelector('button[onclick="showRegisterForm()"]');
+    AppState.ui.activeTab = 'login';
+    
+    // Cambiar colores de los botones
+    const loginBtn = document.getElementById('btnLoginTab');
+    const registerBtn = document.getElementById('btnRegisterTab');
     
     if (loginBtn) {
         loginBtn.style.background = '#8B4513';
@@ -1675,22 +1675,17 @@ AppState.ui.activeTab = 'login';
         registerBtn.style.fontWeight = '500';
     }
     
-    // NO cambies la pantalla, solo actualiza la interfaz
+    // Mostrar formulario de login, ocultar registro
     document.getElementById('loginForm')?.classList.remove('hidden');
     document.getElementById('registerForm')?.classList.add('hidden');
-    // Forzar que se vea bien
-    if (AppState.ui.currentScreen === 'login') {
-        const mainContent = document.getElementById('main-content');
-        if (mainContent) mainContent.innerHTML = renderLoginScreen();
-    }
 }
 
 function showRegisterForm() {
     AppState.ui.activeTab = 'register';
-
-    // ✅ AGREGAR ESTAS LÍNEAS:
-    const loginBtn = document.querySelector('button[onclick="showLoginForm()"]');
-    const registerBtn = document.querySelector('button[onclick="showRegisterForm()"]');
+    
+    // Cambiar colores de los botones
+    const loginBtn = document.getElementById('btnLoginTab');
+    const registerBtn = document.getElementById('btnRegisterTab');
     
     if (loginBtn) {
         loginBtn.style.background = '#f0f0f0';
@@ -1702,16 +1697,10 @@ function showRegisterForm() {
         registerBtn.style.color = 'white';
         registerBtn.style.fontWeight = '700';
     }
-
     
-    // NO cambies la pantalla, solo actualiza la interfaz
+    // Mostrar formulario de registro, ocultar login
     document.getElementById('loginForm')?.classList.add('hidden');
     document.getElementById('registerForm')?.classList.remove('hidden');
-    // Forzar que se vea bien
-    if (AppState.ui.currentScreen === 'login') {
-        const mainContent = document.getElementById('main-content');
-        if (mainContent) mainContent.innerHTML = renderLoginScreen();
-    }
 }
 
 function updatePhonePrefix() {
