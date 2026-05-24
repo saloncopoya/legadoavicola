@@ -1401,7 +1401,7 @@ function renderPublicTopBar() {
     // ✅ NUEVO: Si estamos verificando autenticación, NO mostrar barra
 if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
     return `
-        <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center;">
+ <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; z-index: 1000; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center;">
             <div style="color: #FFD700; font-size: 12px; font-weight: 500;">🔄 CARGANDO BARRA...</div>
         </nav>
     `;
@@ -1425,9 +1425,8 @@ if (!AppState.ui.isLoading && navigator.onLine) {
         });
     }
     
-    return `
-        <nav style="position: relative; margin-bottom: -60px; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
-            <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px;">
+  return `
+    <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center; padding: 4px 8px; z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">            <div style="display: flex; gap: 1px; align-items: center; background: rgba(0,0,0,0.3); border-radius: 50px; padding: 0px 4px;">
                 ${botones.map(btn => `
                     <button onclick="${btn.accion}"  id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 55px;">
                         <span style="font-size: clamp(16px,5vw,20px); color: ${currentScreen === btn.id ? '#1a1a2e' : '#FFD700'};">${btn.icono}</span>
@@ -1460,7 +1459,7 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
     const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
     
     return `
-        <nav style="position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
+        <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
             <div style="display: flex; gap: 2px; align-items: center;">
                 ${topMenuItems.map(item => `
                     <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? '#8B4513' : '#666'}; font-size: 10px; font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px;">
@@ -1545,8 +1544,8 @@ function renderLoginScreen() {
               
                 <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
                     <div style="display:flex; gap:8px; margin-bottom:20px;">
-                        <button onclick="showLoginForm()" style="flex:1; padding:12px; background:${isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${isLoginActive ? '700' : '500'}; color:${isLoginActive ? 'white' : '#666'}; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
-                        <button onclick="showRegisterForm()" style="flex:1; padding:12px; background:${!isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${!isLoginActive ? '700' : '500'}; color:${!isLoginActive ? 'white' : '#666'}; cursor:pointer;">📝 Registrar</button>
+                        <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:${isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${isLoginActive ? '700' : '500'}; color:${isLoginActive ? 'white' : '#666'}; cursor:pointer;">🔐 CORREO ELECTRONICO</button>
+                        <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:${!isLoginActive ? '#8B4513' : '#f0f0f0'}; border:none; border-radius:30px; font-weight:${!isLoginActive ? '700' : '500'}; color:${!isLoginActive ? 'white' : '#666'}; cursor:pointer;">📝 Registrar</button>
                     </div>
                     <div id="loginForm" class="${isLoginActive ? '' : 'hidden'}">${renderLoginForm()}</div>
                     <div id="registerForm" class="${!isLoginActive ? '' : 'hidden'}">${renderRegisterForm()}</div>
@@ -1559,7 +1558,7 @@ function renderLoginScreen() {
 function renderPublicScreen() {
     return `
         <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
-            <div style="padding-top: 60px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
+            <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
                 <div style="font-size: 80px; margin-bottom: 20px;">🐓</div>
            
                 <h1 style="color: #8B4513; margin-bottom: 10px;">LEGADO AVICOLA</h1>
@@ -1620,6 +1619,22 @@ window.handleLoginClick = function() {
 
 function showLoginForm() {
 AppState.ui.activeTab = 'login';
+
+    // ✅ AGREGAR ESTAS LÍNEAS:
+    const loginBtn = document.querySelector('button[onclick="showLoginForm()"]');
+    const registerBtn = document.querySelector('button[onclick="showRegisterForm()"]');
+    
+    if (loginBtn) {
+        loginBtn.style.background = '#8B4513';
+        loginBtn.style.color = 'white';
+        loginBtn.style.fontWeight = '700';
+    }
+    if (registerBtn) {
+        registerBtn.style.background = '#f0f0f0';
+        registerBtn.style.color = '#666';
+        registerBtn.style.fontWeight = '500';
+    }
+    
     // NO cambies la pantalla, solo actualiza la interfaz
     document.getElementById('loginForm')?.classList.remove('hidden');
     document.getElementById('registerForm')?.classList.add('hidden');
@@ -1632,6 +1647,23 @@ AppState.ui.activeTab = 'login';
 
 function showRegisterForm() {
     AppState.ui.activeTab = 'register';
+
+    // ✅ AGREGAR ESTAS LÍNEAS:
+    const loginBtn = document.querySelector('button[onclick="showLoginForm()"]');
+    const registerBtn = document.querySelector('button[onclick="showRegisterForm()"]');
+    
+    if (loginBtn) {
+        loginBtn.style.background = '#f0f0f0';
+        loginBtn.style.color = '#666';
+        loginBtn.style.fontWeight = '500';
+    }
+    if (registerBtn) {
+        registerBtn.style.background = '#8B4513';
+        registerBtn.style.color = 'white';
+        registerBtn.style.fontWeight = '700';
+    }
+
+    
     // NO cambies la pantalla, solo actualiza la interfaz
     document.getElementById('loginForm')?.classList.add('hidden');
     document.getElementById('registerForm')?.classList.remove('hidden');
@@ -2447,8 +2479,8 @@ if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
         topBarHtml = renderPublicTopBar();
     }
     
-    app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${coreScreens[currentScreen]()}</div>`;
-    AppState.setLoading(false);
+app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: 0; margin-top: 0;">${coreScreens[currentScreen]()}</div>`;
+           AppState.setLoading(false);
     return;
 }
         
@@ -2471,7 +2503,7 @@ if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
             
                 const screenContent = await screenFunctions[currentScreen](); 
             
-    app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: ${topBarHtml ? '60px' : '0'};">${screenContent}</div>`;
+    app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: 0; margin-top: 0;">${screenContent}</div>`;
         } else {
             app.innerHTML = !currentUser ? renderPublicScreen() : (window.renderRoosterScreen || (() => '<div>Página en construcción</div>'))();
         }
@@ -2673,7 +2705,7 @@ window.renderRoosterScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">🏆 Torneos Activos</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="torneos-list">
@@ -2701,7 +2733,7 @@ window.renderVentasScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">💰 Subastas Disponibles</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="subastas-list">
@@ -2735,7 +2767,7 @@ window.renderShareScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">🔗 Contenido Compartido</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="shared-content">
@@ -2763,7 +2795,7 @@ window.renderPublicacionesScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">⚔️ Publicaciones</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="publicaciones-list">
@@ -2792,7 +2824,7 @@ window.renderPedigriScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">🧬 Pedigrí - Gestión Genética</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="pedigris-list">
@@ -2828,7 +2860,7 @@ window.renderPerfilScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <div style="background: white; border-radius: 16px; padding: 24px;">
                     <div style="text-align: center; margin-bottom: 24px;">
                         ${userProfile.photoURL ? 
@@ -2860,7 +2892,7 @@ window.renderJuezScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">⚖️ Panel de Juez</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="peleas-list">
@@ -2889,7 +2921,7 @@ window.renderConfiguracionesScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">⚙️ Configuraciones</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Los cambios se guardarán localmente</div>' : ''}
                 <div style="background: white; border-radius: 12px; padding: 20px;">
@@ -2942,7 +2974,7 @@ window.renderAdminScreen = async function() {
     if (!navigator.onLine) {
         return `
             <div style="min-height: 100vh; background: #f8f9fa;">
-                <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+                <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                     <div style="background: #ffebee; border-radius: 12px; padding: 30px; text-align: center;">
                         <div style="font-size: 48px; margin-bottom: 16px;">🌐</div>
                         <h2 style="color: #c62828;">Se requiere conexión a internet</h2>
@@ -2956,7 +2988,7 @@ window.renderAdminScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
-            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 80px;">
+            <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">👑 Panel de Administración</h2>
                 <div style="background: white; border-radius: 12px; padding: 20px;">
                     <button onclick="AppState.addNotification('Cargando usuarios...', 'info')" style="width:100%; padding:12px; margin:8px 0; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">✅ Activar Usuarios</button>
