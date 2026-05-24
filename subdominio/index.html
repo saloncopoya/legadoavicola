@@ -2228,20 +2228,90 @@ function updateSideMenuContent() {
     transition: 0.2s;
 " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
     <span style="font-size: 24px; color: white;">✕</span>
-    <span style="font-size: 18px; font-weight: bold; color: white;">CERRAR MENÚ</span>
+    <span style="font-size: 18px; font-weight: bold; color: white;">CERRAR</span>
 </button>
 
 </div>
-        <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold;">
-            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_PERFIL}</span><span>${TEXTS.SIDE_BTN_PERFIL}</span></button>
-            <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_SHARE}</span><span>${TEXTS.SIDE_BTN_SHARE}</span></button>
-            ${userProfile.ventas === true ? `<button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_VENTAS}</span><span>${TEXTS.SIDE_BTN_VENTAS}</span></button>` : ''}
-            ${userProfile.isJudge === true ? `<button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_JUEZ}</span><span>${TEXTS.SIDE_BTN_JUEZ}</span></button>` : ''}
-            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_CONFIG}</span><span>${TEXTS.SIDE_BTN_CONFIGURACIONES}</span></button>
-            ${isAdmin ? `<button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_ADMIN}</span><span>${TEXTS.SIDE_BTN_ADMIN}</span></button>` : ''}
-            <div style="height:1px; background:#eee; margin:16px 0;"></div>
-            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;"><span>${TEXTS.side_icon_LOGOUT}</span><span>${TEXTS.SIDE_BTN_LOGOUT}</span></button>
-        </div>
+       <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold; font-size: 16px;">
+    <!-- PERFIL -->
+    <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_PERFIL}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_PERFIL}</span>
+    </button>
+    
+    <!-- SHARE -->
+    <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_SHARE}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_SHARE}</span>
+    </button>
+    
+    <!-- PUBLIC (INICIO) - NUEVO -->
+    <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">🏠</span>
+        <span style="font-weight: bold;">INICIO</span>
+    </button>
+    
+    <!-- ROOSTER (TORNEOS) - NUEVO -->
+    <button onclick="navigateTo(SCREENS.ROOSTER)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">🏆</span>
+        <span style="font-weight: bold;">TORNEOS</span>
+    </button>
+    
+    <!-- VENTAS -->
+    ${userProfile.ventas === true ? `
+    <button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_VENTAS}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_VENTAS}</span>
+    </button>
+    ` : ''}
+    
+    <!-- PUBLICACIONES - NUEVO (solo si tiene permiso) -->
+    ${userProfile.publicaciones === true ? `
+    <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">⚔️</span>
+        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
+    </button>
+    ` : ''}
+    
+    <!-- PEDIGRI - NUEVO (solo si tiene permiso) -->
+    ${userProfile.pedigri === true ? `
+    <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.ico_pedigri}</span>
+        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
+    </button>
+    ` : ''}
+    
+    <!-- JUEZ -->
+    ${userProfile.isJudge === true ? `
+    <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_JUEZ}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_JUEZ}</span>
+    </button>
+    ` : ''}
+    
+    <!-- CONFIGURACIONES -->
+    <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_CONFIG}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_CONFIGURACIONES}</span>
+    </button>
+    
+    <!-- ADMIN -->
+    ${isAdmin ? `
+    <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_ADMIN}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_ADMIN}</span>
+    </button>
+    ` : ''}
+    
+    <!-- SEPARADOR -->
+    <div style="height:2px; background:#ddd; margin:16px 0;"></div>
+    
+    <!-- CERRAR SESIÓN -->
+    <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
+    </button>
+</div>
     `;
 }
 
