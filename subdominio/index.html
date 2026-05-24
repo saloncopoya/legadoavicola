@@ -2214,8 +2214,24 @@ function updateSideMenuContent() {
                 <div><div style="font-weight: 700;">${userProfile.displayName}</div>
                   <div style="font-size: 12px; color: #666;">${isAdmin ? TEXTS.BADGE_ADMIN : TEXTS.BADGE_MEMBER}</div></div>
             </div>
-            <button onclick="toggleSideMenu()" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
-        </div>
+            
+<button onclick="toggleSideMenu()" style="
+    background: #dc3545; 
+    border: 3px solid white; 
+    padding: 12px 20px; 
+    border-radius: 60px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: 0.2s;
+" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    <span style="font-size: 24px; color: white;">✕</span>
+    <span style="font-size: 18px; font-weight: bold; color: white;">CERRAR MENÚ</span>
+</button>
+
+</div>
         <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
             <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_PERFIL}</span><span>${TEXTS.SIDE_BTN_PERFIL}</span></button>
             <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:none; border:none; border-radius:8px; cursor:pointer; width:100%; text-align:left;"><span>${TEXTS.side_icon_SHARE}</span><span>${TEXTS.SIDE_BTN_SHARE}</span></button>
