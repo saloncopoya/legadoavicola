@@ -2,170 +2,29 @@
 <html lang="es-MX">
 <head>
     <meta charset="UTF-8">
-
-    <script>
-    
-const BRANDING = {
-    APP_NAME: "APLICACION 01",
-    APP_DESCRIPTION: "DESCRIPCION publicaciones y más.",
-    PRIMARY_COLOR: "#8B4513",
-    SECONDARY_COLOR: "#D2691E",
-    ACCENT_COLOR: "#FFD700",
-    APP_ICON: "🐓",
-};
-
-    
-// PASO 1: Definir los textos e iconos (SOLO CAMBIAS AQUÍ)
-const TEXTS_VALUES = {
-    txt_public: 'INICIO',
-    ico_public: '🏠',
-    
-    txt_ventas: 'MENU 1',
-    ico_ventas: '💰',
-    
-    txt_rooster: 'MENU 2',
-    ico_rooster: '🏆',
-    
-    txt_share: 'MENU 3',
-    ico_share: '🔗',
-    
-    txt_publicaciones: 'MENU 4',
-    ico_publicaciones: '⚔️',
-    
-    txt_pedigri: 'MENU 5',
-    ico_pedigri: '🧬',
-    
-    txt_juez: 'MENU 6',
-    ico_juez: '⚖️',
-    
-    txt_perfil: 'PERFIL',
-    ico_perfil: '👤',
-    
-    txt_configuraciones: 'CONFIGURACIONES',
-    ico_configuraciones: '⚙️',
-    
-    txt_admin: 'ADMIN',
-    ico_admin: '🔧',
-    
-    txt_login: 'Login',
-    ico_login: '🔑',
-    
-    txt_logout: 'Cerrar Sesión',
-    ico_logout: '🚪'
-};
-
-// PASO 2: SCREENS usa los textos como valores (TODO REFERENCIADO)
-const SCREENS = {
-    PUBLIC: TEXTS_VALUES.txt_public,
-    LOGIN: TEXTS_VALUES.txt_login,
-    ACTIVATION_PENDING: 'activation_pending',
-    VENTAS: TEXTS_VALUES.txt_ventas,
-    ROOSTER: TEXTS_VALUES.txt_rooster,
-    SHARE: TEXTS_VALUES.txt_share,
-    PERFIL: TEXTS_VALUES.txt_perfil,
-    CONFIGURACIONES: TEXTS_VALUES.txt_configuraciones,
-    ADMIN: TEXTS_VALUES.txt_admin,
-    JUEZ: TEXTS_VALUES.txt_juez,
-    PUBLICACIONES: TEXTS_VALUES.txt_publicaciones,
-    PEDIGRI: TEXTS_VALUES.txt_pedigri,
-    
-    // Guardar también los textos e iconos para TEXTS
-    ...TEXTS_VALUES
-};
-
-// PASO 3: TEXTS referencia a SCREENS (NO TOCAR)
-const TEXTS = {
-    // Usuarios NO logueados (barra superior)
-    PUBLIC_BTN_PUBLIC: SCREENS.txt_public,
-    icon_PUBLIC: SCREENS.ico_public,
-    
-    PUBLIC_BTN_VENTAS: SCREENS.txt_ventas,
-    icon_VENTAS: SCREENS.ico_ventas,
-    
-    PUBLIC_BTN_ROOSTER: SCREENS.txt_rooster,
-    icon_ROOSTER: SCREENS.ico_rooster,
-    
-    PUBLIC_BTN_SHARE: SCREENS.txt_share,
-    icon_SHARE: SCREENS.ico_share,
-    
-    PUBLIC_BTN_LOGIN: SCREENS.txt_login,
-    icon_LOGIN: SCREENS.ico_login,
-    
-    // Usuarios logueados (menú móvil inferior)
-    MENU_BTN_PUBLIC: SCREENS.txt_public,
-    menu_icon_PUBLIC: SCREENS.ico_public,
-    
-    MENU_BTN_VENTAS: SCREENS.txt_ventas,
-    menu_icon_VENTAS: SCREENS.ico_ventas,
-    
-    MENU_BTN_ROOSTER: SCREENS.txt_rooster,
-    menu_icon_ROOSTER: SCREENS.ico_rooster,
-    
-    MENU_BTN_SHARE: SCREENS.txt_share,
-    menu_icon_SHARE: SCREENS.ico_share,
-    
-    MENU_BTN_PUBLICACIONES: SCREENS.txt_publicaciones,
-    menu_icon_PUBLICACIONES: SCREENS.ico_publicaciones,
-    
-    MENU_BTN_PEDIGRI: SCREENS.txt_pedigri,
-    menu_icon_PEDIGRI: SCREENS.ico_pedigri,
-    
-    MENU_BTN_JUEZ: SCREENS.txt_juez,
-    menu_icon_JUEZ: SCREENS.ico_juez,
-    
-    // Menú lateral
-    SIDE_BTN_PERFIL: SCREENS.txt_perfil,
-    side_icon_PERFIL: SCREENS.ico_perfil,
-    
-    SIDE_BTN_SHARE: SCREENS.txt_share,
-    side_icon_SHARE: SCREENS.ico_share,
-    
-    SIDE_BTN_VENTAS: SCREENS.txt_ventas,
-    side_icon_VENTAS: SCREENS.ico_ventas,
-    
-    SIDE_BTN_JUEZ: SCREENS.txt_juez,
-    side_icon_JUEZ: SCREENS.ico_juez,
-    
-    SIDE_BTN_CONFIGURACIONES: SCREENS.txt_configuraciones,
-    side_icon_CONFIG: SCREENS.ico_configuraciones,
-    
-    SIDE_BTN_ADMIN: SCREENS.txt_admin,
-    side_icon_ADMIN: SCREENS.ico_admin,
-    
-    SIDE_BTN_LOGOUT: SCREENS.txt_logout,
-    side_icon_LOGOUT: SCREENS.ico_logout,
-    
-    // Badges
-    BADGE_ADMIN: '👑 Administrador',
-    BADGE_MEMBER: '👤 Miembro'
-};
-    </script>
-    
-    <title>APLICACION </title>
-<meta name="description" content="La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
-<meta name="keywords" content="gallos, pelea, torneo, cotejo, subasta, palenque, avícola">
-<meta name="author" content="Legado Avícola">
-<meta name="theme-color" content="#0B1121">
-<meta property="og:title" content="LEGADO AVICOLA - Torneos Gallísticos Profesionales">
-<meta property="og:description" content="La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
-<meta property="og:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
-<meta name="twitter:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
-    
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://sub-legadoavicola.pages.dev/">
-<meta property="og:type" content="website">
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0B1121">
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="robots" content="index, follow">
+    
+    <meta name="description" content="LEGADO AVICOLA - La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
+    <meta name="keywords" content="gallos, pelea, torneo, cotejo, subasta, palenque, avícola">
+    <meta name="author" content="Legado Avícola">
+    <meta name="robots" content="index, follow">
     <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%238B4513'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white'%3E🐓%3C/text%3E%3C/svg%3E">
-   
+    <title>LEGADO AVICOLA - Torneos Gallísticos Profesionales</title>
+
+    <meta property="og:title" content="LEGADO AVÍCOLA - Torneos Gallísticos Profesionales">
+    <meta property="og:description" content="Plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
+    <meta property="og:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://sub-legadoavicola.pages.dev/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
+
 
     <!-- 1. REFERRER POLICY (segura) -->
 <meta content="strict-origin-when-cross-origin" http-equiv="Referrer-Policy">
@@ -282,8 +141,8 @@ if (self !== top) {
             left: 0;
             width: 100%;
             height: 100%;
-background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-                display: flex;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -380,12 +239,10 @@ background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
             background: white;
             box-shadow: -5px 0 30px rgba(0,0,0,0.2);
             z-index: 1001;
-                padding: clamp(8px, 3vh, 20px);
+            padding: 10px;
             display: flex;
             flex-direction: column;
             transition: right 0.3s ease;
-                overflow-y: auto;
-
         }
 
         .side-menu-overlay {
@@ -406,7 +263,8 @@ background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
         
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-::-webkit-scrollbar-thumb { background: ${BRANDING.PRIMARY_COLOR}; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 10px; }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -418,7 +276,6 @@ background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
 </head>
 <body>
 
-<!-- PANTALLA DE CARGA -->
 <!-- PANTALLA DE CARGA -->
 <div id="loading-screen">
     <div style="font-size: 60px; color: white; margin-bottom: 20px;">🐓</div>
@@ -478,8 +335,6 @@ background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
     
     <!-- REGISTRO DE SERVICE WORKER PARA MODO OFFLINE -->
 <script>
-
-    
     // ==============================================
 // SISTEMA OFFLINE TOTAL - SINCRONIZACIÓN CON FIREBASE
 // ==============================================
@@ -851,6 +706,131 @@ const FIREBASE_ADMIN_CONFIG = {
     appId: "1:785051078042:web:8e749ba849c5e7e5407e23"
 };
 
+
+// PASO 1: Definir los textos e iconos (SOLO CAMBIAS AQUÍ)
+const TEXTS_VALUES = {
+    txt_public: 'INICIO1',
+    ico_public: '🏠',
+    
+    txt_ventas: 'VENTAS2',
+    ico_ventas: '💰',
+    
+    txt_rooster: 'ROOSTER3',
+    ico_rooster: '🏆',
+    
+    txt_share: 'SHARE4',
+    ico_share: '🔗',
+    
+    txt_publicaciones: 'PUBLICACIONES5',
+    ico_publicaciones: '⚔️',
+    
+    txt_pedigri: 'PEDIGRI6',
+    ico_pedigri: '🧬',
+    
+    txt_juez: 'JUEZ7',
+    ico_juez: '⚖️',
+    
+    txt_perfil: 'PERFIL8',
+    ico_perfil: '👤',
+    
+    txt_configuraciones: 'CONFIGURACIONES9',
+    ico_configuraciones: '⚙️',
+    
+    txt_admin: 'ADMIN10',
+    ico_admin: '🔧',
+    
+    txt_login: 'Login',
+    ico_login: '🔑',
+    
+    txt_logout: 'Cerrar Sesión',
+    ico_logout: '🚪'
+};
+
+// PASO 2: SCREENS usa los textos como valores (TODO REFERENCIADO)
+const SCREENS = {
+    PUBLIC: TEXTS_VALUES.txt_public,
+    LOGIN: TEXTS_VALUES.txt_login,
+    ACTIVATION_PENDING: 'activation_pending',
+    VENTAS: TEXTS_VALUES.txt_ventas,
+    ROOSTER: TEXTS_VALUES.txt_rooster,
+    SHARE: TEXTS_VALUES.txt_share,
+    PERFIL: TEXTS_VALUES.txt_perfil,
+    CONFIGURACIONES: TEXTS_VALUES.txt_configuraciones,
+    ADMIN: TEXTS_VALUES.txt_admin,
+    JUEZ: TEXTS_VALUES.txt_juez,
+    PUBLICACIONES: TEXTS_VALUES.txt_publicaciones,
+    PEDIGRI: TEXTS_VALUES.txt_pedigri,
+    
+    // Guardar también los textos e iconos para TEXTS
+    ...TEXTS_VALUES
+};
+
+// PASO 3: TEXTS referencia a SCREENS (NO TOCAR)
+const TEXTS = {
+    // Usuarios NO logueados (barra superior)
+    PUBLIC_BTN_PUBLIC: SCREENS.txt_public,
+    icon_PUBLIC: SCREENS.ico_public,
+    
+    PUBLIC_BTN_VENTAS: SCREENS.txt_ventas,
+    icon_VENTAS: SCREENS.ico_ventas,
+    
+    PUBLIC_BTN_ROOSTER: SCREENS.txt_rooster,
+    icon_ROOSTER: SCREENS.ico_rooster,
+    
+    PUBLIC_BTN_SHARE: SCREENS.txt_share,
+    icon_SHARE: SCREENS.ico_share,
+    
+    PUBLIC_BTN_LOGIN: SCREENS.txt_login,
+    icon_LOGIN: SCREENS.ico_login,
+    
+    // Usuarios logueados (menú móvil inferior)
+    MENU_BTN_PUBLIC: SCREENS.txt_public,
+    menu_icon_PUBLIC: SCREENS.ico_public,
+    
+    MENU_BTN_VENTAS: SCREENS.txt_ventas,
+    menu_icon_VENTAS: SCREENS.ico_ventas,
+    
+    MENU_BTN_ROOSTER: SCREENS.txt_rooster,
+    menu_icon_ROOSTER: SCREENS.ico_rooster,
+    
+    MENU_BTN_SHARE: SCREENS.txt_share,
+    menu_icon_SHARE: SCREENS.ico_share,
+    
+    MENU_BTN_PUBLICACIONES: SCREENS.txt_publicaciones,
+    menu_icon_PUBLICACIONES: SCREENS.ico_publicaciones,
+    
+    MENU_BTN_PEDIGRI: SCREENS.txt_pedigri,
+    menu_icon_PEDIGRI: SCREENS.ico_pedigri,
+    
+    MENU_BTN_JUEZ: SCREENS.txt_juez,
+    menu_icon_JUEZ: SCREENS.ico_juez,
+    
+    // Menú lateral
+    SIDE_BTN_PERFIL: SCREENS.txt_perfil,
+    side_icon_PERFIL: SCREENS.ico_perfil,
+    
+    SIDE_BTN_SHARE: SCREENS.txt_share,
+    side_icon_SHARE: SCREENS.ico_share,
+    
+    SIDE_BTN_VENTAS: SCREENS.txt_ventas,
+    side_icon_VENTAS: SCREENS.ico_ventas,
+    
+    SIDE_BTN_JUEZ: SCREENS.txt_juez,
+    side_icon_JUEZ: SCREENS.ico_juez,
+    
+    SIDE_BTN_CONFIGURACIONES: SCREENS.txt_configuraciones,
+    side_icon_CONFIG: SCREENS.ico_configuraciones,
+    
+    SIDE_BTN_ADMIN: SCREENS.txt_admin,
+    side_icon_ADMIN: SCREENS.ico_admin,
+    
+    SIDE_BTN_LOGOUT: SCREENS.txt_logout,
+    side_icon_LOGOUT: SCREENS.ico_logout,
+    
+    // Badges
+    BADGE_ADMIN: '👑 Administrador',
+    BADGE_MEMBER: '👤 Miembro'
+};
 
     
 // ==============================================
@@ -1534,7 +1514,7 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
         `).join('')}
     </div>
     <button onclick="toggleSideMenu()" style="background: transparent; border: none; cursor: pointer; width: clamp(45px, 10vw, 60px); height: clamp(45px, 10vw, 60px); border-radius: 50%; overflow: hidden; border: 2px solid #8B4513; flex-shrink: 0; margin-left: clamp(4px, 1.5vw, 10px);">
-        ${photoURL ? `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="width:100%; height:100%; background:${BRANDING.PRIMARY_COLOR}; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size: clamp(14px, 4vw, 18px);">${initials}</div>`}
+        ${photoURL ? `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="width:100%; height:100%; background:#8B4513; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size: clamp(14px, 4vw, 18px);">${initials}</div>`}
     </button>
 </nav>
     `;
@@ -1549,7 +1529,7 @@ function renderLoginForm() {
         <div style="display: flex; flex-direction: column; gap: 12px;">
             <input type="email" id="loginPhone" placeholder="Correo electrónico" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
             <input type="password" id="loginPassword" placeholder="Contraseña" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
-            <button onclick="handleLogin()" style="width:100%; padding:14px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">ACCEDER</button>
+            <button onclick="handleLogin()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">ACCEDER</button>
             <div style="text-align:center;"><a href="#" onclick="resetPassword()" style="color:#8B4513; text-decoration:none;">¿Olvidaste tu contraseña?</a></div>
             <div id="loginError" style="color:#d93025; text-align:center;"></div>
         </div>
@@ -1587,7 +1567,7 @@ function renderRegisterForm() {
                 <input type="checkbox" id="registerTerms"> Acepto los términos y condiciones
             </label>
             
-            <button onclick="handleCompleteRegister()" style="width:100%; padding:14px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">CREAR CUENTA</button>
+            <button onclick="handleCompleteRegister()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">CREAR CUENTA</button>
             <div id="registerError" style="color:#d93025;"></div>
             <div id="registerSuccess" style="color:#42b72a;"></div>
         </div>
@@ -1605,7 +1585,7 @@ function renderLoginScreen() {
     }, 2000);
     
     return `
-<div style="min-height: 100vh; background: linear-gradient(135deg, ${BRANDING.PRIMARY_COLOR} 0%, ${BRANDING.SECONDARY_COLOR} 100%); display: flex; align-items: center; justify-content: center; padding: 20px;">            <div style="width: 100%; max-width: 400px; margin: auto;">
+<div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 20px;">            <div style="width: 100%; max-width: 400px; margin: auto;">
               
                 <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px;">
                     <div style="display:flex; gap:8px; margin-bottom:20px;">
@@ -1624,9 +1604,10 @@ function renderPublicScreen() {
     return `
         <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
-                <div style="font-size: 80px; margin-bottom: 20px;">${BRANDING.APP_ICON}</div>
-                <h1 style="color: ${BRANDING.PRIMARY_COLOR}; margin-bottom: 10px;">${BRANDING.APP_NAME}</h1>
-                <p style="color: #666; margin-bottom: 30px;">${BRANDING.APP_DESCRIPTION}</p>
+                <div style="font-size: 80px; margin-bottom: 20px;">🐓</div>
+           
+                <h1 style="color: #8B4513; margin-bottom: 10px;">LEGADO AVICOLA</h1>
+                <p style="color: #666; margin-bottom: 30px;">La plataforma profesional para torneos gallísticos</p>
             </div>
         </div>
     `;
@@ -1637,7 +1618,7 @@ function renderActivationPendingScreen() {
     const initials = getInitials(userProfile?.displayName || 'U');
     
     return `
-        <div style="background: linear-gradient(135deg, ${BRANDING.PRIMARY_COLOR} 0%, ${BRANDING.SECONDARY_COLOR} 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
             <div style="max-width: 500px; width: 100%;">
                 <div style="text-align: center;">
                     <div style="font-size: 60px; color: white;">⏳</div>
@@ -1646,10 +1627,10 @@ function renderActivationPendingScreen() {
                 </div>
                 <div style="background: white; border-radius: 16px; padding: 24px; margin-top: 20px;">
                     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f0f8ff; border-radius: 12px;">
-                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, ${BRANDING.PRIMARY_COLOR} 0%, ${BRANDING.SECONDARY_COLOR} 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${initials}</div>
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${initials}</div>
                         <div><div style="font-size:18px; font-weight:700;">${userProfile?.displayName || 'Usuario'}</div></div>
                     </div>
-                    <button onclick="checkActivationStatusWithFeedback()" style="width:100%; padding:14px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">🔄 INGRESAR AHORA</button>
+                    <button onclick="checkActivationStatusWithFeedback()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">🔄 INGRESAR AHORA</button>
                     <button onclick="handleLogout()" style="width:100%; margin-top:12px; padding:14px; background:#f0f2f5; color:#333; border:1px solid #e4e6eb; border-radius:8px; font-weight:700; cursor:pointer;">Cerrar sesión</button>
                 </div>
             </div>
@@ -2235,13 +2216,13 @@ function updateSideMenuContent() {
 <button onclick="toggleSideMenu()" style="
     background: #dc3545; 
     border: 3px solid white; 
-    padding: 3px 8px; 
+    padding: 12px 20px; 
     border-radius: 60px; 
     cursor: pointer; 
     display: flex; 
     align-items: center; 
-    gap: 10px; 
-    box-shadow: 0 3px 3px rgba(0,0,0,0.3);
+    gap: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     transition: 0.2s;
 " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
     <span style="font-size: 24px; color: white;">✕</span>
@@ -2250,25 +2231,41 @@ function updateSideMenuContent() {
 
 </div>
        <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold; font-size: 16px;">
-
-      
-    <!-- PUBLIC (INICIO) - NUEVO -->
-    <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
-        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
-    </button>
-    
     <!-- PERFIL -->
-    <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_PERFIL}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_PERFIL}</span>
     </button>
     
-  
+    <!-- SHARE -->
+    <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_SHARE}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_SHARE}</span>
+    </button>
+    
+    <!-- PUBLIC (INICIO) - NUEVO -->
+    <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
+        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
+    </button>
+    
+    <!-- ROOSTER (TORNEOS) - NUEVO -->
+    <button onclick="navigateTo(SCREENS.ROOSTER)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.menu_icon_ROOSTER}</span>
+        <span style="font-weight: bold;">${TEXTS.MENU_BTN_ROOSTER}</span>
+    </button>
+    
+    <!-- VENTAS -->
+    ${userProfile.ventas === true ? `
+    <button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.side_icon_VENTAS}</span>
+        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_VENTAS}</span>
+    </button>
+    ` : ''}
     
     <!-- PUBLICACIONES - NUEVO (solo si tiene permiso) -->
     ${userProfile.publicaciones === true ? `
-    <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLICACIONES}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
     </button>
@@ -2276,29 +2273,29 @@ function updateSideMenuContent() {
     
     <!-- PEDIGRI - NUEVO (solo si tiene permiso) -->
     ${userProfile.pedigri === true ? `
-    <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.menu_icon_PEDIGRI}</span>
+    <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+        <span style="font-size: 28px;">${TEXTS.icon_pedigri}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
     </button>
     ` : ''}
     
     <!-- JUEZ -->
     ${userProfile.isJudge === true ? `
-    <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_JUEZ}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_JUEZ}</span>
     </button>
     ` : ''}
     
     <!-- CONFIGURACIONES -->
-    <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_CONFIG}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_CONFIGURACIONES}</span>
     </button>
     
     <!-- ADMIN -->
     ${isAdmin ? `
-    <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+    <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
         <span style="font-size: 28px;">${TEXTS.side_icon_ADMIN}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_ADMIN}</span>
     </button>
@@ -2308,7 +2305,7 @@ function updateSideMenuContent() {
     <div style="height:2px; background:#ddd; margin:16px 0;"></div>
     
     <!-- CERRAR SESIÓN -->
-    <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
+    <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
         <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
         <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
     </button>
@@ -2964,7 +2961,7 @@ window.renderShareScreen = async function() {
                          </div>` : 
                         (shareId ? '<p>Cargando contenido compartido...</p>' : '<p>No hay contenido compartido</p>')
                     }
-                    ${shareId ? `<button onclick="navigateTo('public')" style="margin-top:20px; padding:12px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px;">Volver al inicio</button>` : ''}
+                    ${shareId ? `<button onclick="navigateTo('public')" style="margin-top:20px; padding:12px; background:#8B4513; color:white; border:none; border-radius:8px;">Volver al inicio</button>` : ''}
                 </div>
             </div>
         </div>
@@ -3112,19 +3109,19 @@ window.renderConfiguracionesScreen = async function() {
                     <div style="margin-bottom: 15px;">
                         <label style="display:flex; justify-content:space-between; align-items:center;">
                             <span>🔔 Notificaciones push</span>
-                            <button onclick="guardarConfiguracion('notificaciones', event)" style="padding:8px 16px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.notificaciones === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                            <button onclick="guardarConfiguracion('notificaciones', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.notificaciones === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display:flex; justify-content:space-between; align-items:center;">
                             <span>🌙 Modo oscuro</span>
-                            <button onclick="guardarConfiguracion('modo_oscuro', event)" style="padding:8px 16px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.modo_oscuro === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                            <button onclick="guardarConfiguracion('modo_oscuro', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.modo_oscuro === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                     <div>
                         <label style="display:flex; justify-content:space-between; align-items:center;">
                             <span>💾 Sincronización automática</span>
-                            <button onclick="guardarConfiguracion('sincronizacion', event)" style="padding:8px 16px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.sincronizacion === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                            <button onclick="guardarConfiguracion('sincronizacion', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.sincronizacion === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                 </div>
@@ -3163,7 +3160,7 @@ window.renderAdminScreen = async function() {
                         <div style="font-size: 48px; margin-bottom: 16px;">🌐</div>
                         <h2 style="color: #c62828;">Se requiere conexión a internet</h2>
                         <p>El panel de administración necesita conexión activa para funcionar correctamente.</p>
-                        <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; cursor:pointer;">Reintentar</button>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">Reintentar</button>
                     </div>
                 </div>
             </div>
@@ -3175,8 +3172,8 @@ window.renderAdminScreen = async function() {
             <div style="max-width: 800px; margin: 0 auto; padding: 20px; padding-top: 10px;">
                 <h2 style="color: #8B4513;">👑 Panel de Administración</h2>
                 <div style="background: white; border-radius: 12px; padding: 20px;">
-                    <button onclick="AppState.addNotification('Cargando usuarios...', 'info')" style="width:100%; padding:12px; margin:8px 0; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; cursor:pointer;">✅ Activar Usuarios</button>
-                    <button onclick="AppState.addNotification('Estadísticas próximamente', 'info')" style="width:100%; padding:12px; margin:8px 0; background:${BRANDING.PRIMARY_COLOR}; color:white; border:none; border-radius:8px; cursor:pointer;">📊 Estadísticas</button>
+                    <button onclick="AppState.addNotification('Cargando usuarios...', 'info')" style="width:100%; padding:12px; margin:8px 0; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">✅ Activar Usuarios</button>
+                    <button onclick="AppState.addNotification('Estadísticas próximamente', 'info')" style="width:100%; padding:12px; margin:8px 0; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">📊 Estadísticas</button>
                     <button onclick="AppState.addNotification('Limpiando caché...', 'warning')" style="width:100%; padding:12px; margin:8px 0; background:#d93025; color:white; border:none; border-radius:8px; cursor:pointer;">🗑️ Limpiar Caché</button>
                 </div>
             </div>
@@ -3191,6 +3188,7 @@ console.log('✅ Pantalla ADMIN cargada desde script separado (requiere internet
 <!-- FOOTER -->
 <footer style="background:#0a0a0a; color:#fff; padding:30px 15px 25px; margin-top:40px; border-top:2px solid #D4AF37;">
     <div style="max-width:100%; margin:0 auto; text-align:center;">
+        
         
         <div style="margin-bottom:20px;">
             <div style="font-size:12px; font-weight:700; color:#D4AF37;">📞 CONTACTO DIRECTO</div>
