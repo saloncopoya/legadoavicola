@@ -6,41 +6,12 @@
     <script>
     
 const BRANDING = {
-    // Nombre de la web/app
-    APP_NAME: "LEGADO AVICOLA",
-    APP_NAME_SHORT: "LEGADO",
-
-    OG_IMAGE: "https://sub-legadoavicola.pages.dev/miniatura.jpg",
-    
-    // Descripciones
-    APP_DESCRIPTION: "La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.",
-    APP_KEYWORDS: "gallos, pelea, torneo, cotejo, subasta, palenque, avícola",
-    
-    // Autor
-    APP_AUTHOR: "Legado Avícola",
-    
-    // Versión
-    APP_VERSION: "2.0",
-    
-    // Slogan
-    APP_SLOGAN: "🐓⚡ DONDE USTED VAYA, SU TORNEO VA CON USTED",
-    
-    // Colores (opcional)
-    THEME_COLOR: "#0B1121",
+    APP_NAME: "APLICACION 01",
+    APP_DESCRIPTION: "DESCRIPCION publicaciones y más.",
     PRIMARY_COLOR: "#8B4513",
     SECONDARY_COLOR: "#D2691E",
     ACCENT_COLOR: "#FFD700",
-    
-    // Icono emoji (🐓)
     APP_ICON: "🐓",
-    
-    // Año actual (automático)
-    CURRENT_YEAR: new Date().getFullYear(),
-    
-    // Contacto
-    CONTACT_PHONE: "+52 961 115 03 94",
-    CONTACT_WHATSAPP: "529611150394",
-    CONTACT_EMAIL: "lg.w@gmail.com"
 };
 
     
@@ -170,15 +141,16 @@ const TEXTS = {
 };
     </script>
     
-    <title>${BRANDING.APP_NAME} - Torneos Gallísticos Profesionales</title>
-<meta name="description" content="${BRANDING.APP_DESCRIPTION}">
-<meta name="keywords" content="${BRANDING.APP_KEYWORDS}">
-<meta name="author" content="${BRANDING.APP_AUTHOR}">
-<meta name="theme-color" content="${BRANDING.THEME_COLOR}">
-
-<!-- Open Graph / Facebook -->
-<meta property="og:title" content="${BRANDING.APP_NAME} - Torneos Gallísticos Profesionales">
-<meta property="og:description" content="${BRANDING.APP_DESCRIPTION}">
+    <title>APLICACION </title>
+<meta name="description" content="La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
+<meta name="keywords" content="gallos, pelea, torneo, cotejo, subasta, palenque, avícola">
+<meta name="author" content="Legado Avícola">
+<meta name="theme-color" content="#0B1121">
+<meta property="og:title" content="LEGADO AVICOLA - Torneos Gallísticos Profesionales">
+<meta property="og:description" content="La plataforma profesional para torneos gallísticos. Cotejo computarizado, subastas, publicaciones y más.">
+<meta property="og:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
+<meta name="twitter:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
+    
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://sub-legadoavicola.pages.dev/">
@@ -186,8 +158,7 @@ const TEXTS = {
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-    <meta property="og:image" content="${BRANDING.OG_IMAGE}">
-<meta name="twitter:image" content="${BRANDING.OG_IMAGE}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
@@ -447,15 +418,17 @@ if (self !== top) {
 <body>
 
 <!-- PANTALLA DE CARGA -->
+<!-- PANTALLA DE CARGA -->
 <div id="loading-screen">
-    <div style="font-size: 60px; color: white; margin-bottom: 20px;">${BRANDING.APP_ICON}</div>
+    <div style="font-size: 60px; color: white; margin-bottom: 20px;">🐓</div>
     <div style="font-size: 32px; color: white; font-weight: 800; margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;">
-        ${BRANDING.APP_NAME.split('').map(letra => `<span>${letra}</span>`).join('')}
+        <span>L</span><span>E</span><span>G</span><span>A</span><span>D</span><span>O</span>
+        <span>A</span><span>V</span><span>I</span><span>C</span><span>O</span><span>L</span><span>A</span>
     </div>
     <div style="width: 80%; max-width: 300px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
-        <div id="loading-progress-bar" style="width: 0%; height: 100%; background: ${BRANDING.ACCENT_COLOR}; border-radius: 10px; transition: width 0.3s ease;"></div>
+        <div id="loading-progress-bar" style="width: 0%; height: 100%; background: #FFD700; border-radius: 10px; transition: width 0.3s ease;"></div>
     </div>
-    <div id="loading-subtitle" style="font-size: 16px; color: ${BRANDING.ACCENT_COLOR}; margin-top: 10px; font-weight: 600; display: none;">Reconectando...</div>
+    <div id="loading-subtitle" style="font-size: 16px; color: #FFD700; margin-top: 10px; font-weight: 600; display: none;">Reconectando...</div>
     <div id="loading-status" style="font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;">Inicializando aplicación</div>
     <button id="loading-reload-btn" onclick="location.reload()" style="margin-top: 25px; padding: 12px 30px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 500; cursor: pointer; backdrop-filter: blur(4px); display: none;">
         <span style="display: block; font-weight: 900; font-size: 18px;">⚠️ ACCEDER</span>
@@ -3215,18 +3188,18 @@ console.log('✅ Pantalla ADMIN cargada desde script separado (requiere internet
 
     
 <!-- FOOTER -->
-<footer style="background:#0a0a0a; color:#fff; padding:30px 15px 25px; margin-top:40px; border-top:2px solid ${BRANDING.ACCENT_COLOR};">
+<footer style="background:#0a0a0a; color:#fff; padding:30px 15px 25px; margin-top:40px; border-top:2px solid #D4AF37;">
     <div style="max-width:100%; margin:0 auto; text-align:center;">
         
         <div style="margin-bottom:20px;">
-            <div style="font-size:12px; font-weight:700; color:${BRANDING.ACCENT_COLOR};">📞 CONTACTO DIRECTO</div>
-            <a href="https://wa.me/${BRANDING.CONTACT_WHATSAPP}" style="display:inline-block; background:#25D366; padding:10px 20px; border-radius:50px; color:white; text-decoration:none; margin:10px;">📱 WHATSAPP: ${BRANDING.CONTACT_PHONE}</a>
-            <a href="mailto:${BRANDING.CONTACT_EMAIL}" style="display:inline-block; padding:10px 20px; background:rgba(255,255,255,0.1); border-radius:50px; color:white; text-decoration:none;">📧 ${BRANDING.CONTACT_EMAIL}</a>
+            <div style="font-size:12px; font-weight:700; color:#D4AF37;">📞 CONTACTO DIRECTO</div>
+            <a href="https://wa.me/529611150394" style="display:inline-block; background:#25D366; padding:10px 20px; border-radius:50px; color:white; text-decoration:none; margin:10px;">📱 WHATSAPP: +52 961 115 03 94</a>
+            <a href="mailto:lg.w@gmail.com" style="display:inline-block; padding:10px 20px; background:rgba(255,255,255,0.1); border-radius:50px; color:white; text-decoration:none;">📧 lg.w@gmail.com</a>
         </div>
         
         <div style="border-top:1px solid rgba(212,175,55,0.2); padding-top:20px;">
-            <div style="font-size:10px; color:rgba(255,255,255,0.4);">${BRANDING.APP_SLOGAN}</div>
-            <div style="font-size:9px; margin-top:10px;">© ${BRANDING.CURRENT_YEAR} ${BRANDING.APP_NAME} | Versión ${BRANDING.APP_VERSION}</div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.4);">🐓⚡ "DONDE USTED VAYA, SU TORNEO VA CON USTED"</div>
+            <div style="font-size:9px; margin-top:10px;">© 2026 LEGADO AVICOLA | Versión 2.0</div>
         </div>
     </div>
 </footer>
