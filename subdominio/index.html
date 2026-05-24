@@ -24,7 +24,26 @@
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://sub-legadoavicola.pages.dev/miniatura.jpg">
-    
+
+
+    <!-- 1. REFERRER POLICY (segura) -->
+<meta content="strict-origin-when-cross-origin" http-equiv="Referrer-Policy">
+
+<!-- 2. X-Content-Type-Options (evita MIME sniffing) -->
+<meta content="nosniff" http-equiv="X-Content-Type-Options">
+
+<!-- 3. X-XSS-Protection (para navegadores antiguos) -->
+<meta content="1; mode=block" http-equiv="X-XSS-Protection">
+
+<!-- 4. Cache Control (optimización) -->
+<meta content="private, max-age=2592000, stale-while-revalidate=604800" http-equiv="Cache-Control">
+
+<!-- 5. Prevenir clickjacking -->
+<script>
+if (self !== top) {
+    top.location = self.location;
+}
+</script>
     
     <style>
         /* ==============================================
@@ -307,7 +326,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://accounts.google.com/gsi/client"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
     <!-- LIBRERÍAS PARA OFFLINE TOTAL -->
 <!-- CORREGIDO: URL correcta para idb versión 8.0.0 (la más reciente y estable) -->
 <script src="https://cdn.jsdelivr.net/npm/idb@8.0.0/build/umd.js"></script>
@@ -1868,7 +1886,7 @@ async function loadUserProfile(uid) {
             localStorage.setItem('offline_user', JSON.stringify({
                 uid: uid,
                 displayName: cachedProfile.displayName,
-                email: cachedProfile.realEmail
+               
             }));
             
             AppState.setUser(AppState.firebase.auth.currentUser, cachedProfile);
@@ -2740,9 +2758,8 @@ window.renderRoosterScreen = async function() {
                     ${torneosArray.length === 0 ? '<p>No hay torneos disponibles</p>' : 
                         torneosArray.map(torneo => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <h3>${torneo.nombre || 'Torneo'}</h3>
-                                <p>${torneo.fecha || ''}</p>
-                            </div>
+<h3>${sanitizarInput(torneo.nombre) || 'Torneo'}</h3>
+</div>
                         `).join('')
                     }
                 </div>
@@ -2768,8 +2785,8 @@ window.renderVentasScreen = async function() {
                     ${subastasArray.length === 0 ? '<p>No hay subastas disponibles</p>' : 
                         subastasArray.map(subasta => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <h3>${subasta.titulo || 'Subasta'}</h3>
-                                <p>${subasta.descripcion || ''}</p>
+                               <h3>${sanitizarInput(subasta.titulo) || 'Subasta'}</h3>
+
                             </div>
                         `).join('')
                     }
@@ -2830,8 +2847,8 @@ window.renderPublicacionesScreen = async function() {
                     ${publicacionesArray.length === 0 ? '<p>No hay publicaciones</p>' : 
                         publicacionesArray.map(pub => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <h3>${pub.titulo || 'Publicación'}</h3>
-                                <p>${pub.contenido || ''}</p>
+                               <h3>${sanitizarInput(pub.titulo) || 'Publicación'}</h3>
+
                                 <small>${formatTime(pub.fecha)}</small>
                             </div>
                         `).join('')
@@ -2859,8 +2876,8 @@ window.renderPedigriScreen = async function() {
                     ${pedigrisArray.length === 0 ? '<p>No hay registros de pedigrí</p>' : 
                         pedigrisArray.map(p => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <h3>${p.nombre || 'Registro de pedigrí'}</h3>
-                                <p>${p.raza || ''} - ${p.generacion || ''}</p>
+                               <h3>${sanitizarInput(p.nombre) || 'Registro de pedigrí'}</h3>
+
                             </div>
                         `).join('')
                     }
@@ -2895,15 +2912,13 @@ window.renderPerfilScreen = async function() {
                             `<img src="${userProfile.photoURL}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">` :
                             `<div style="width: 100px; height: 100px; background: #8B4513; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">${getInitials(userProfile.displayName)}</div>`
                         }
-                        <h2 style="margin-top: 16px;">${userProfile.displayName || 'Usuario'}</h2>
-                        <p>${userProfile.realEmail || currentUser?.email || ''}</p>
+<h2 style="margin-top: 16px;">${sanitizarInput(userProfile.displayName) || 'Usuario'}</h2>
+<p>${sanitizarInput(userProfile.realEmail) || sanitizarInput(currentUser?.email) || ''}</p>
                         <div style="display:inline-block; background: #8B4513; color:white; padding:4px 12px; border-radius:20px; font-size:12px;">${userProfile.gallo ? '👑 Administrador' : '👤 Miembro'}</div>
                     </div>
                     <div style="border-top: 1px solid #eee; padding-top: 16px;">
-                        <p><strong>📱 Teléfono:</strong> ${userProfile.phone || 'No registrado'}</p>
-                        <p><strong>📍 Ubicación:</strong> ${userProfile.municipio || 'No registrada'}</p>
-                        <p><strong>📅 Registrado:</strong> ${userProfile.registeredAt ? new Date(userProfile.registeredAt).toLocaleDateString() : 'N/A'}</p>
-                    </div>
+<p><strong>📱 Teléfono:</strong> ${sanitizarInput(userProfile.phone) || 'No registrado'}</p>
+</div>
                 </div>
             </div>
         </div>
@@ -2927,9 +2942,9 @@ window.renderJuezScreen = async function() {
                     ${peleasArray.length === 0 ? '<p>No hay peleas asignadas</p>' : 
                         peleasArray.map(pelea => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <h3>${pelea.nombre || 'Pelea'}</h3>
-                                <p>Fecha: ${pelea.fecha || ''}</p>
-                                <p>Estado: ${pelea.estado || 'Pendiente'}</p>
+                               <h3>${sanitizarInput(pelea.nombre) || 'Pelea'}</h3>
+
+                              
                             </div>
                         `).join('')
                     }
