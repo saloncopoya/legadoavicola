@@ -923,8 +923,16 @@ let userCanceled = false;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     if (!userCanceled) deferredPrompt = e;
-    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) && !userCanceled) {
+    
+    // ✅ AGREGAR CONDICIÓN: SOLO mostrar overlay si estamos ONLINE
+    const isOnline = navigator.onLine;
+    const isNotStandalone = !(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone);
+    
+    if (isOnline && isNotStandalone && !userCanceled) {
         document.getElementById('installOverlay').style.display = 'block';
+        console.log('📱 Overlay PWA mostrado (online)');
+    } else if (!isOnline) {
+        console.log('📴 Modo offline - Overlay PWA oculto');
     }
 });
 
