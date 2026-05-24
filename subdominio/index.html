@@ -980,7 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (deferredPrompt) {
 
-      AppState.addNotification('📱 Instala la aplicación para continuar', 'info', 14000);
+      AppState.addNotification('📱 Instala la aplicación', 'info', 5000);
                 
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
@@ -2246,14 +2246,14 @@ function updateSideMenuContent() {
     
     <!-- PUBLIC (INICIO) - NUEVO -->
     <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">🏠</span>
-        <span style="font-weight: bold;">INICIO</span>
+        <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
+        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
     </button>
     
     <!-- ROOSTER (TORNEOS) - NUEVO -->
     <button onclick="navigateTo(SCREENS.ROOSTER)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">🏆</span>
-        <span style="font-weight: bold;">TORNEOS</span>
+        <span style="font-size: 28px;">${TEXTS.menu_icon_ROOSTER}</span>
+        <span style="font-weight: bold;">${TEXTS.MENU_BTN_ROOSTER}</span>
     </button>
     
     <!-- VENTAS -->
@@ -2267,7 +2267,7 @@ function updateSideMenuContent() {
     <!-- PUBLICACIONES - NUEVO (solo si tiene permiso) -->
     ${userProfile.publicaciones === true ? `
     <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">⚔️</span>
+        <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLICACIONES}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
     </button>
     ` : ''}
@@ -2275,7 +2275,7 @@ function updateSideMenuContent() {
     <!-- PEDIGRI - NUEVO (solo si tiene permiso) -->
     ${userProfile.pedigri === true ? `
     <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.ico_pedigri}</span>
+        <span style="font-size: 28px;">${TEXTS.icon_pedigri}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
     </button>
     ` : ''}
