@@ -1613,9 +1613,7 @@ function renderPublicScreen() {
                 <h1 style="color: #8B4513; margin-bottom: 10px;">LEGADO AVICOLA</h1>
                 <p style="color: #666; margin-bottom: 30px;">La plataforma profesional para torneos gallísticos</p>
 
-                <button onclick="probarPushNotification()" style="background:#2196F3; color:white; border:none; padding:14px 28px; border-radius:50px; margin-top:20px; font-size:16px; font-weight:bold; cursor:pointer;">
-    🔔 ACTIVAR NOTIFICACIONES PUSH (ANDROID)
-</button>
+         
             </div>
         </div>
     `;
@@ -2857,36 +2855,6 @@ window.formatTime = formatTime;
 
 
 
-
-
-    async function probarPushNotification() {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-        AppState.addNotification('❌ Necesitas aceptar las notificaciones', 'error');
-        return;
-    }
-    
-    try {
-        const messaging = firebase.messaging();
-        const token = await messaging.getToken({
-            vapidKey: 'BE491FF8HdcfTjoSMq8A-L61iQOrrxNMxdCBFJbEQ2npGCfEFrFYyGI88W1c3YfVy5qyd3NvtUY8-C-Gd6mzhN4'
-        });
-        
-        console.log('✅ Token FCM:', token);
-        AppState.addNotification('✅ Notificaciones push activadas!', 'success');
-        AppState.addNotification('📱 Token: ' + token.substring(0, 30) + '...', 'info', 8000);
-        
-        if (AppState.user.current) {
-            await firebase.database().ref('pushTokens/' + AppState.user.current.uid).set({
-                token: token,
-                fecha: Date.now()
-            });
-        }
-    } catch (error) {
-        console.error(error);
-        AppState.addNotification('❌ Error: ' + error.message, 'error');
-    }
-}
 </script>
 
 
