@@ -232,19 +232,20 @@ if (self !== top) {
            MENÚ LATERAL
            ============================================== */
         .side-menu {
-            position: fixed;
-            top: 0;
-            right: -350px;
-            width: 280px;
-            height: 100vh;
-            background: white;
-            box-shadow: -5px 0 30px rgba(0,0,0,0.2);
-            z-index: 1001;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            transition: right 0.3s ease;
-        }
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 30px rgba(0,0,0,0.2);
+    z-index: 1001;
+    padding: clamp(8px, 3vh, 20px);  /* ← CAMBIA ESTO */
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+    overflow-y: auto;  /* ← AÑADE ESTO */
+}
 
         .side-menu-overlay {
             position: fixed;
@@ -2217,100 +2218,81 @@ function updateSideMenuContent() {
 <button onclick="toggleSideMenu()" style="
     background: #dc3545; 
     border: 3px solid white; 
-    padding: 12px 20px; 
+    padding: 3px 8px;      /* ← MÁS COMPACTO */
     border-radius: 60px; 
     cursor: pointer; 
     display: flex; 
     align-items: center; 
-    gap: 12px; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    gap: 10px;             /* ← MENOS ESPACIO */
+    box-shadow: 0 3px 3px rgba(0,0,0,0.3);
     transition: 0.2s;
-" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+">
     <span style="font-size: 24px; color: white;">✕</span>
     <span style="font-size: 18px; font-weight: bold; color: white;">CERRAR</span>
 </button>
 
 </div>
-       <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold; font-size: 16px;">
-    <!-- PERFIL -->
-    <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_PERFIL}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_PERFIL}</span>
-    </button>
-    
-    <!-- SHARE -->
-    <button onclick="navigateTo(SCREENS.SHARE)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_SHARE}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_SHARE}</span>
-    </button>
-    
-    <!-- PUBLIC (INICIO) - NUEVO -->
-    <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
-        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
-    </button>
-    
-    <!-- ROOSTER (TORNEOS) - NUEVO -->
-    <button onclick="navigateTo(SCREENS.ROOSTER)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.menu_icon_ROOSTER}</span>
-        <span style="font-weight: bold;">${TEXTS.MENU_BTN_ROOSTER}</span>
-    </button>
-    
-    <!-- VENTAS -->
-    ${userProfile.ventas === true ? `
-    <button onclick="navigateTo(SCREENS.VENTAS)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_VENTAS}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_VENTAS}</span>
-    </button>
-    ` : ''}
-    
-    <!-- PUBLICACIONES - NUEVO (solo si tiene permiso) -->
-    ${userProfile.publicaciones === true ? `
-    <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLICACIONES}</span>
-        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
-    </button>
-    ` : ''}
-    
-    <!-- PEDIGRI - NUEVO (solo si tiene permiso) -->
-    ${userProfile.pedigri === true ? `
-    <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.icon_pedigri}</span>
-        <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
-    </button>
-    ` : ''}
-    
-    <!-- JUEZ -->
-    ${userProfile.isJudge === true ? `
-    <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_JUEZ}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_JUEZ}</span>
-    </button>
-    ` : ''}
-    
-    <!-- CONFIGURACIONES -->
-    <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_CONFIG}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_CONFIGURACIONES}</span>
-    </button>
-    
-    <!-- ADMIN -->
-    ${isAdmin ? `
-    <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_ADMIN}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_ADMIN}</span>
-    </button>
-    ` : ''}
-    
-    <!-- SEPARADOR -->
-    <div style="height:2px; background:#ddd; margin:16px 0;"></div>
-    
-    <!-- CERRAR SESIÓN -->
-    <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
-        <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
-        <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
-    </button>
-</div>
+             <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold; font-size: 16px;">
+            
+            <!-- PUBLIC (INICIO) -->
+            <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
+                <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
+            </button>
+            
+            <!-- PERFIL -->
+            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.side_icon_PERFIL}</span>
+                <span style="font-weight: bold;">${TEXTS.SIDE_BTN_PERFIL}</span>
+            </button>
+            
+            <!-- PUBLICACIONES (solo si tiene permiso) -->
+            ${userProfile.publicaciones === true ? `
+            <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLICACIONES}</span>
+                <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
+            </button>
+            ` : ''}
+            
+            <!-- PEDIGRI (solo si tiene permiso) -->
+            ${userProfile.pedigri === true ? `
+            <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.menu_icon_PEDIGRI}</span>
+                <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
+            </button>
+            ` : ''}
+            
+            <!-- JUEZ (solo si tiene permiso) -->
+            ${userProfile.isJudge === true ? `
+            <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.side_icon_JUEZ}</span>
+                <span style="font-weight: bold;">${TEXTS.SIDE_BTN_JUEZ}</span>
+            </button>
+            ` : ''}
+            
+            <!-- CONFIGURACIONES -->
+            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.side_icon_CONFIG}</span>
+                <span style="font-weight: bold;">${TEXTS.SIDE_BTN_CONFIGURACIONES}</span>
+            </button>
+            
+            <!-- ADMIN (solo si es admin) -->
+            ${isAdmin ? `
+            <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+                <span style="font-size: 28px;">${TEXTS.side_icon_ADMIN}</span>
+                <span style="font-weight: bold;">${TEXTS.SIDE_BTN_ADMIN}</span>
+            </button>
+            ` : ''}
+            
+            <!-- SEPARADOR -->
+            <div style="height:2px; background:#ddd; margin:16px 0;"></div>
+            
+            <!-- CERRAR SESIÓN -->
+            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
+                <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
+                <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
+            </button>
+        </div>
     `;
 }
 
