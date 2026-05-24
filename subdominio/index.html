@@ -1574,6 +1574,13 @@ function renderRegisterForm() {
 function renderLoginScreen() {
     // No usar activeTab para colorear botones al inicio
     // Simplemente mostramos ambos botones neutrales
+
+    setTimeout(() => {
+        if (Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }, 1500);
+
     
     setTimeout(() => {
         if (AppState.ui.currentScreen === 'login' && !AppState.user.current && typeof google !== 'undefined') {
