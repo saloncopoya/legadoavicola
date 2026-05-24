@@ -239,10 +239,12 @@ if (self !== top) {
             background: white;
             box-shadow: -5px 0 30px rgba(0,0,0,0.2);
             z-index: 1001;
-            padding: 10px;
+                padding: clamp(8px, 3vh, 20px);
             display: flex;
             flex-direction: column;
             transition: right 0.3s ease;
+                overflow-y: auto;
+
         }
 
         .side-menu-overlay {
@@ -2275,7 +2277,7 @@ function updateSideMenuContent() {
     <!-- PEDIGRI - NUEVO (solo si tiene permiso) -->
     ${userProfile.pedigri === true ? `
     <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:14px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
-        <span style="font-size: 28px;">${TEXTS.icon_pedigri}</span>
+        <span style="font-size: 28px;">${TEXTS.menu_icon_PEDIGRI}</span>
         <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
     </button>
     ` : ''}
