@@ -56,6 +56,7 @@ if (self !== top) {
         }
 
         body {
+            padding-top: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #f8f9fa;
             overflow-x: hidden;
@@ -315,8 +316,8 @@ if (self !== top) {
 <div id="toast-container"></div>
 
 <!-- CONTENEDOR PRINCIPAL -->
-<div id="social-app" style="display: none;"></div>
-
+<div id="social-app" role="main" style="display: none;"></div>
+    
 <!-- OVERLAY PARA INSTALACIÓN PWA -->
 <div id="installOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:transparent; z-index:99998; cursor:pointer;"></div>
 
