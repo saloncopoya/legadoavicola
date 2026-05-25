@@ -1628,9 +1628,27 @@ async function generarToken() {
         });
         
         console.log('✅ Token generado:', token);
+
+
         
         // Guardar token localmente
         localStorage.setItem('fcm_token', token);
+
+
+        // AHORA sí, eliminar el token viejo solo si es diferente
+const oldToken = localStorage.getItem('fcm_token_old');
+if (oldToken && oldToken !== token && AppState.user.current && AppState.firebase.database) {
+    try {
+        await AppState.firebase.database.ref('pushTokens/' + AppState.user.current.uid).remove();
+        console.log('🗑️ Token antiguo eliminado de Firebase:', oldToken);
+    } catch (err) {
+        console.warn('⚠️ No se pudo eliminar token viejo:', err);
+    }
+}
+// Guardar el token actual como "viejo" para la próxima vez
+localStorage.setItem('fcm_token_old', token);
+
+        
         
         // Guardar token en Firebase si hay usuario
         if (AppState.user.current && AppState.firebase.database) {
@@ -1701,7 +1719,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO 10</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO 11</p>
 
          
             </div>
