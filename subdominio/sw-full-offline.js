@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.13';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.13';
+const CACHE_NAME = 'legado-offline-v3.1.14';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.14';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -169,9 +169,9 @@ messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
     const notificationOptions = {
         body: payload.notification?.body || 'Notificación importante',
-       icon: self.location.origin + '/miniatura.jpg',
-        badge: self.location.origin + '/miniatura.jpg',
-        image: payload.notification?.image || self.location.origin + '/miniatura.jpg',
+       icon: self.location.origin + '/favicon.ico',
+        badge: self.location.origin + '/miniatura2.jpg',
+        image: payload.notification?.image || self.location.origin + '/miniatura2.jpg',
         
         vibrate: [200, 100, 200],
          requireInteraction: true,
