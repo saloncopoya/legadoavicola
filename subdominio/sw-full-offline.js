@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.0.29';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.0.29';
+const CACHE_NAME = 'legado-offline-v3.0.30';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.0.30';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -8,7 +8,7 @@ const urlsToCache = [
     '/index.html',
     '/manifest.json',
     '/offline.html',
-   '/firebase-messaging-sw.js',
+   'sw-full-offline.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js',
@@ -163,13 +163,28 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // Notificaciones en segundo plano (app cerrada)
+// Notificaciones en segundo plano (app cerrada)
 messaging.onBackgroundMessage((payload) => {
-    console.log('[SW] Notificación en segundo plano:', payload);
+    console.log('[SW] Notificación recibida:', payload);
+    
+    // DETECTAR si el sonido está habilitado o no
+    const tieneSonido = payload.notification?.sound === 'default' || 
+                        payload.notification?.sound === true ||
+                        (payload.notification?.sound && payload.notification?.sound !== '');
+    
+    // Si el sonido está HABILITADO, NO mostrar la notificación nuestra
+    if (tieneSonido) {
+        console.log('[SW] Sonido HABILITADO - Usando notificación original de Firebase');
+        return;
+    }
+    
+    // Si el sonido está INHABILITADO, mostramos NUESTRA notificación
+    console.log('[SW] Sonido INHABILITADO - Mostrando notificación personalizada');
     
     const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
     const notificationOptions = {
         body: payload.notification?.body || 'Notificación importante',
-       icon: self.location.origin + '/miniatura.jpg',
+        icon: self.location.origin + '/miniatura.jpg',
         badge: self.location.origin + '/miniatura.jpg',
         image: self.location.origin + '/miniatura.jpg',
         vibrate: [200, 100, 200],
@@ -179,7 +194,7 @@ messaging.onBackgroundMessage((payload) => {
             image: payload.notification?.image || '/miniatura.jpg'
         },
         requireInteraction: true,
-        silent: false
+        silent: true
     };
     
     self.registration.showNotification(notificationTitle, notificationOptions);
