@@ -2,9 +2,10 @@
 <html>
 <head>
     <title>Enviar Notificación Masiva - AUTOMÁTICO</title>
+    <meta charset="UTF-8">
 </head>
 <body>
-    <h1>Enviar Notificación a TODOS los Usuarios</h1>
+    <h1>📨 Enviar Notificación a TODOS los Usuarios</h1>
     
     <div style="background:#f0f0f0; padding:15px; border-radius:10px; margin:10px 0;">
         <strong>📱 Usuarios encontrados:</strong> <span id="totalUsuarios">Cargando...</span>
@@ -20,6 +21,22 @@
     <div id="resultado" style="margin-top:20px; white-space:pre-wrap; background:#f8f9fa; padding:15px; border-radius:10px;"></div>
 
     <script>
+    // ✅ ESPERAR a que Firebase cargue completamente
+    function esperarFirebase() {
+        return new Promise((resolve) => {
+            if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                resolve();
+            } else {
+                const checkInterval = setInterval(() => {
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+            }
+        });
+    }
+    
     // Configuración de Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
@@ -30,19 +47,40 @@
         appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
     };
     
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    
     let tokensLista = [];
+    let db = null;
+    
+    // Inicializar Firebase SOLO una vez
+    async function initFirebase() {
+        if (typeof firebase === 'undefined') {
+            console.error('Firebase no cargado');
+            return false;
+        }
+        
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        db = firebase.database();
+        return true;
+    }
     
     // Cargar tokens automáticamente desde Realtime Database
     async function cargarTokens() {
-        document.getElementById('totalUsuarios').innerHTML = 'Cargando...';
-        document.getElementById('resultado').innerHTML = '🔄 Cargando tokens desde Firebase...';
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.innerHTML = '🔄 Inicializando Firebase...';
+        
+        // Inicializar Firebase
+        const inicializado = await initFirebase();
+        if (!inicializado) {
+            resultadoDiv.innerHTML = '❌ Error: Firebase no cargó correctamente. Recarga la página.';
+            return;
+        }
+        
+        resultadoDiv.innerHTML = '🔄 Cargando tokens desde Firebase...';
         
         try {
-            const database = firebase.database();
-            const snapshot = await database.ref('pushTokens').once('value');
+            const snapshot = await db.ref('pushTokens').once('value');
             
             if (snapshot.exists()) {
                 const usuarios = snapshot.val();
@@ -59,26 +97,27 @@
                 }
                 
                 document.getElementById('totalUsuarios').innerHTML = `${tokensLista.length} usuarios registrados`;
-                document.getElementById('resultado').innerHTML = `✅ Cargados ${tokensLista.length} tokens automáticamente desde Firebase`;
+                resultadoDiv.innerHTML = `✅ Cargados ${tokensLista.length} tokens automáticamente desde Firebase`;
             } else {
                 document.getElementById('totalUsuarios').innerHTML = '0 usuarios';
-                document.getElementById('resultado').innerHTML = '⚠️ No hay tokens guardados en Firebase. Los usuarios deben activar notificaciones primero.';
+                resultadoDiv.innerHTML = '⚠️ No hay tokens guardados en Firebase. Los usuarios deben activar notificaciones primero.';
             }
         } catch(error) {
             console.error('Error cargando tokens:', error);
-            document.getElementById('resultado').innerHTML = '❌ Error cargando tokens: ' + error.message;
+            resultadoDiv.innerHTML = '❌ Error cargando tokens: ' + error.message;
         }
     }
     
     async function getAccessToken() {
         try {
-            const user = firebase.auth().currentUser;
+            const auth = firebase.auth();
+            const user = auth.currentUser;
             
             if (user) {
                 return await user.getIdToken();
             } else {
-                await firebase.auth().signInAnonymously();
-                return await firebase.auth().currentUser.getIdToken();
+                await auth.signInAnonymously();
+                return await auth.currentUser.getIdToken();
             }
         } catch(e) {
             console.error('Error obteniendo token:', e);
@@ -164,7 +203,6 @@
                 errores++;
             }
             
-            // Actualizar progreso
             document.getElementById('resultado').innerHTML = `📤 Enviando a ${tokensLista.length} dispositivos...<br>⏳ Progreso: ${i+1}/${tokensLista.length}<br>✅ Enviados: ${enviados} | ❌ Errores: ${errores}`;
         }
         
@@ -176,9 +214,12 @@
         `;
     }
     
-    // Cargar tokens automáticamente al abrir la página
-    window.addEventListener('load', () => {
-        cargarTokens();
+    // Esperar a que cargue todo y luego iniciar
+    window.addEventListener('DOMContentLoaded', () => {
+        // Esperar un poco a que Firebase cargue
+        setTimeout(() => {
+            cargarTokens();
+        }, 500);
     });
     </script>
     
