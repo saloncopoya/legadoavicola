@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enviar Notificación Masiva API v1</title>
+</head>
+<body>
+    <h1>Enviar Notificación a MÚLTIPLES Usuarios</h1>
+    
+    <textarea id="tokens" placeholder="Pega aquí los tokens (uno por línea)" style="width:100%; height:150px; margin:10px 0; padding:10px;"></textarea>
+    
+    <input type="text" id="titulo" placeholder="Título" style="width:100%; margin:10px 0; padding:10px;" value="LEGADO AVICOLA">
+    
+    <input type="text" id="mensaje" placeholder="Mensaje" style="width:100%; margin:10px 0; padding:10px;" value="Notificación importante">
+    
+    <button onclick="enviarATodos()" style="padding:10px 20px; background:#8B4513; color:white; border:none;">ENVIAR A TODOS</button>
+    
+    <div id="resultado" style="margin-top:20px; white-space:pre-wrap;"></div>
+
+    <script>
+    // Configuración de Firebase (la que ya usas)
+    const firebaseConfig = {
+        apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
+        authDomain: "galloslivebadge.firebaseapp.com",
+        projectId: "galloslivebadge",
+        messagingSenderId: "979482928760"
+    };
+    
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    async function getAccessToken() {
+        try {
+            // Obtener token de autenticación
+            const credential = firebase.auth.OAuthCredential;
+            const user = firebase.auth().currentUser;
+            
+            if (user) {
+                return await user.getIdToken();
+            } else {
+                // Si no hay usuario, hacer login anónimo
+                await firebase.auth().signInAnonymously();
+                return await firebase.auth().currentUser.getIdToken();
+            }
+        } catch(e) {
+            console.error('Error obteniendo token:', e);
+            return null;
+        }
+    }
+    
+    async function enviarATodos() {
+        const tokensText = document.getElementById('tokens').value;
+        const tokens = tokensText.split('\n').filter(t => t.trim().length > 0);
+        const titulo = document.getElementById('titulo').value;
+        const mensaje = document.getElementById('mensaje').value;
+        
+        document.getElementById('resultado').innerHTML = 'Obteniendo token de acceso...';
+        
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+            document.getElementById('resultado').innerHTML = '❌ Error obteniendo token de acceso';
+            return;
+        }
+        
+        document.getElementById('resultado').innerHTML = 'Enviando a ' + tokens.length + ' dispositivos...';
+        
+        let enviados = 0;
+        let errores = 0;
+        
+        for (const token of tokens) {
+            try {
+                const response = await fetch(`https://fcm.googleapis.com/v1/projects/galloslivebadge/messages:send`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: {
+                            token: token.trim(),
+                            data: {
+                                title: titulo,
+                                body: mensaje,
+                                image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg'
+                            },
+                            android: {
+                                priority: "high",
+                                notification: {
+                                    title: titulo,
+                                    body: mensaje,
+                                    image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg',
+                                    icon: 'https://sub-legadoavicola.pages.dev/miniatura.jpg'
+                                }
+                            },
+                            webpush: {
+                                headers: {
+                                    Urgency: "high"
+                                },
+                                notification: {
+                                    title: titulo,
+                                    body: mensaje,
+                                    icon: 'https://sub-legadoavicola.pages.dev/miniatura.jpg',
+                                    image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg',
+                                    actions: [
+                                        { action: 'ver', title: '👁️ VER TORNEO' },
+                                        { action: 'compartir', title: '📤 COMPARTIR' },
+                                        { action: 'recordar', title: '⏰ RECORDAR' }
+                                    ]
+                                }
+                            }
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    enviados++;
+                } else {
+                    const error = await response.text();
+                    console.error('Error:', error);
+                    errores++;
+                }
+            } catch(e) {
+                console.error('Error enviando:', e);
+                errores++;
+            }
+        }
+        
+        document.getElementById('resultado').innerHTML = `
+            ✅ Enviados: ${enviados}
+            ❌ Errores: ${errores}
+            📱 Total: ${tokens.length}
+        `;
+    }
+    </script>
+    
+    <!-- Cargar Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</body>
+</html>
