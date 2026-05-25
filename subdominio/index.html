@@ -1575,6 +1575,7 @@ function renderRegisterForm() {
     // Esta función es NECESARIA para generar el token
 // Esta función es NECESARIA para generar el token
 async function probarPushNotification() {
+    
     // Caso 1: Usuario ya bloqueó las notificaciones antes
     if (Notification.permission === 'denied') {
         AppState.addNotification('⚠️ Notificaciones bloqueadas. Presiona "PERMITIR" en la ventana que aparecerá', 'warning');
@@ -1585,6 +1586,12 @@ async function probarPushNotification() {
         }
         return;
     }
+
+    if (Notification.permission === 'granted') {
+        console.log('🔔 Notificaciones ya activadas, no se solicita');
+        return;
+    }
+    
     
     // Caso 2: Usuario nunca ha decidido
     if (Notification.permission === 'default') {
@@ -1691,24 +1698,24 @@ localStorage.setItem('fcm_token_old', token);
 
     
 function renderLoginScreen() {
-    // No usar activeTab para colorear botones al inicio
-    // Simplemente mostramos ambos botones neutrales
-
-  setTimeout(() => {
-        probarPushNotification();  // ← ASÍ DE SIMPLE
-    }, 1500);
-
+ if (AppState.user.current) {
+        console.log('✅ Usuario ya logueado, redirigiendo a pantalla principal');
+        navigateTo(SCREENS.PUBLIC);
+        return ''; // No renderizar nada
+    }
     
-    setTimeout(() => {
-        if (AppState.ui.currentScreen === 'login' && !AppState.user.current && typeof google !== 'undefined') {
-            mostrarModalGoogleInferior();
-        }
-    }, 2000);
+        probarPushNotification(); 
+
     
     return `
 <div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 0;">
     <div style="width: 100%; max-width: 400px; margin: auto;">
         <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px; margin: 16px;">
+           
+               <!-- BOTON PARA LLAMAR A LA FUNCION DE MODAL DE GOOGLE  -->
+            <button onclick="mostrarModalGoogleInferior()" style="width:100%; padding:14px; margin-bottom:15px; background:#4285F4; color:white; border:none; border-radius:8px; font-weight:700; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">🔵 <span>ACCEDER CON GOOGLE</span></button>
+            
+            <div style="text-align: center; margin: 15px 0; color: #666;">━━━━━ o ━━━━━</div>
             <div style="display:flex; gap:8px; margin-bottom:20px;">
                 <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:#f0f0f0; border: 2px solid #8B4513; border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">🔐 CORREO ELECTRONICO</button>
                 <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:#f0f0f0; border: 2px solid #8B4513; border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">📝 Registrar</button>
@@ -1722,11 +1729,12 @@ function renderLoginScreen() {
 }
 
 function renderPublicScreen() {
+    
     return `
         <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO 13</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO 14</p>
 
          
             </div>
