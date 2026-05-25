@@ -1,43 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Enviar Notificación Masiva API v1</title>
+    <title>Enviar Notificación Masiva - AUTOMÁTICO</title>
 </head>
 <body>
-    <h1>Enviar Notificación a MÚLTIPLES Usuarios</h1>
+    <h1>Enviar Notificación a TODOS los Usuarios</h1>
     
-    <textarea id="tokens" placeholder="Pega aquí los tokens (uno por línea)" style="width:100%; height:150px; margin:10px 0; padding:10px;"></textarea>
+    <div style="background:#f0f0f0; padding:15px; border-radius:10px; margin:10px 0;">
+        <strong>📱 Usuarios encontrados:</strong> <span id="totalUsuarios">Cargando...</span>
+        <button onclick="cargarTokens()" style="margin-left:10px; padding:5px 10px;">🔄 Recargar</button>
+    </div>
     
     <input type="text" id="titulo" placeholder="Título" style="width:100%; margin:10px 0; padding:10px;" value="LEGADO AVICOLA">
     
     <input type="text" id="mensaje" placeholder="Mensaje" style="width:100%; margin:10px 0; padding:10px;" value="Notificación importante">
     
-    <button onclick="enviarATodos()" style="padding:10px 20px; background:#8B4513; color:white; border:none;">ENVIAR A TODOS</button>
+    <button onclick="enviarATodos()" style="padding:10px 20px; background:#8B4513; color:white; border:none;">📤 ENVIAR A TODOS</button>
     
-    <div id="resultado" style="margin-top:20px; white-space:pre-wrap;"></div>
+    <div id="resultado" style="margin-top:20px; white-space:pre-wrap; background:#f8f9fa; padding:15px; border-radius:10px;"></div>
 
     <script>
-    // Configuración de Firebase (la que ya usas)
+    // Configuración de Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
         authDomain: "galloslivebadge.firebaseapp.com",
+        databaseURL: "https://galloslivebadge-default-rtdb.firebaseio.com",
         projectId: "galloslivebadge",
-        messagingSenderId: "979482928760"
+        messagingSenderId: "979482928760",
+        appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
     };
     
     // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     
+    let tokensLista = [];
+    
+    // Cargar tokens automáticamente desde Realtime Database
+    async function cargarTokens() {
+        document.getElementById('totalUsuarios').innerHTML = 'Cargando...';
+        document.getElementById('resultado').innerHTML = '🔄 Cargando tokens desde Firebase...';
+        
+        try {
+            const database = firebase.database();
+            const snapshot = await database.ref('pushTokens').once('value');
+            
+            if (snapshot.exists()) {
+                const usuarios = snapshot.val();
+                tokensLista = [];
+                
+                for (const [uid, data] of Object.entries(usuarios)) {
+                    if (data.token && data.token.trim()) {
+                        tokensLista.push({
+                            uid: uid,
+                            token: data.token,
+                            fecha: data.fecha
+                        });
+                    }
+                }
+                
+                document.getElementById('totalUsuarios').innerHTML = `${tokensLista.length} usuarios registrados`;
+                document.getElementById('resultado').innerHTML = `✅ Cargados ${tokensLista.length} tokens automáticamente desde Firebase`;
+            } else {
+                document.getElementById('totalUsuarios').innerHTML = '0 usuarios';
+                document.getElementById('resultado').innerHTML = '⚠️ No hay tokens guardados en Firebase. Los usuarios deben activar notificaciones primero.';
+            }
+        } catch(error) {
+            console.error('Error cargando tokens:', error);
+            document.getElementById('resultado').innerHTML = '❌ Error cargando tokens: ' + error.message;
+        }
+    }
+    
     async function getAccessToken() {
         try {
-            // Obtener token de autenticación
-            const credential = firebase.auth.OAuthCredential;
             const user = firebase.auth().currentUser;
             
             if (user) {
                 return await user.getIdToken();
             } else {
-                // Si no hay usuario, hacer login anónimo
                 await firebase.auth().signInAnonymously();
                 return await firebase.auth().currentUser.getIdToken();
             }
@@ -48,12 +87,15 @@
     }
     
     async function enviarATodos() {
-        const tokensText = document.getElementById('tokens').value;
-        const tokens = tokensText.split('\n').filter(t => t.trim().length > 0);
+        if (tokensLista.length === 0) {
+            document.getElementById('resultado').innerHTML = '⚠️ No hay usuarios para enviar. Carga los tokens primero.';
+            return;
+        }
+        
         const titulo = document.getElementById('titulo').value;
         const mensaje = document.getElementById('mensaje').value;
         
-        document.getElementById('resultado').innerHTML = 'Obteniendo token de acceso...';
+        document.getElementById('resultado').innerHTML = '🔑 Obteniendo token de acceso...';
         
         const accessToken = await getAccessToken();
         if (!accessToken) {
@@ -61,12 +103,14 @@
             return;
         }
         
-        document.getElementById('resultado').innerHTML = 'Enviando a ' + tokens.length + ' dispositivos...';
+        document.getElementById('resultado').innerHTML = `📤 Enviando a ${tokensLista.length} dispositivos...<br>⏳ Progreso: 0/${tokensLista.length}`;
         
         let enviados = 0;
         let errores = 0;
         
-        for (const token of tokens) {
+        for (let i = 0; i < tokensLista.length; i++) {
+            const usuario = tokensLista[i];
+            
             try {
                 const response = await fetch(`https://fcm.googleapis.com/v1/projects/galloslivebadge/messages:send`, {
                     method: 'POST',
@@ -76,7 +120,7 @@
                     },
                     body: JSON.stringify({
                         message: {
-                            token: token.trim(),
+                            token: usuario.token,
                             data: {
                                 title: titulo,
                                 body: mensaje,
@@ -114,26 +158,33 @@
                 if (response.ok) {
                     enviados++;
                 } else {
-                    const error = await response.text();
-                    console.error('Error:', error);
                     errores++;
                 }
             } catch(e) {
-                console.error('Error enviando:', e);
                 errores++;
             }
+            
+            // Actualizar progreso
+            document.getElementById('resultado').innerHTML = `📤 Enviando a ${tokensLista.length} dispositivos...<br>⏳ Progreso: ${i+1}/${tokensLista.length}<br>✅ Enviados: ${enviados} | ❌ Errores: ${errores}`;
         }
         
         document.getElementById('resultado').innerHTML = `
-            ✅ Enviados: ${enviados}
+            ✅ ENVÍO COMPLETADO
+            📱 Total usuarios: ${tokensLista.length}
+            ✅ Enviados correctamente: ${enviados}
             ❌ Errores: ${errores}
-            📱 Total: ${tokens.length}
         `;
     }
+    
+    // Cargar tokens automáticamente al abrir la página
+    window.addEventListener('load', () => {
+        cargarTokens();
+    });
     </script>
     
     <!-- Cargar Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </body>
 </html>
