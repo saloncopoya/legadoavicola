@@ -7,14 +7,12 @@
     <style>
         body { font-family: system-ui, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #8B4513; font-size: 1.8rem; margin-top: 0; }
+        h1 { color: #8B4513; }
         label { font-weight: bold; display: block; margin: 15px 0 5px; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; box-sizing: border-box; }
-        button { background: #8B4513; color: white; border: none; padding: 12px 24px; border-radius: 40px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; }
-        button:hover { background: #5a2e0c; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        button { background: #8B4513; color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; }
         .info { background: #e8f0fe; border-left: 4px solid #8B4513; padding: 15px; border-radius: 12px; margin: 20px 0; }
-        .result { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; white-space: pre-wrap; font-family: monospace; font-size: 0.85rem; max-height: 300px; overflow-y: auto; }
-        .badge { background: #8B4513; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin-left: 10px; }
+        .result { background: #f0f0f0; padding: 15px; border-radius: 12px; margin-top: 20px; white-space: pre-wrap; font-size: 0.85rem; max-height: 300px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -22,25 +20,24 @@
     <h1>📨 Enviar Notificación Masiva</h1>
     
     <div class="info">
-        <strong>📱 Usuarios con token:</strong> <span id="totalUsuarios">Cargando...</span>
-        <button onclick="cargarTokens()" style="width: auto; margin: 0 0 0 10px; padding: 4px 12px; font-size: 0.8rem;">🔄 Recargar</button>
+        <strong>📱 Usuarios:</strong> <span id="totalUsuarios">Cargando...</span>
+        <button onclick="cargarTokens()" style="width: auto; margin-left: 10px; padding: 4px 12px;">🔄 Recargar</button>
     </div>
 
-    <label>📝 Título de la notificación</label>
-    <input type="text" id="titulo" value="LEGADO AVICOLA" placeholder="Ej: TORNEO ESTE FIN DE SEMANA">
+    <label>📝 Título</label>
+    <input type="text" id="titulo" value="LEGADO AVICOLA">
 
     <label>💬 Mensaje</label>
-    <textarea id="mensaje" rows="3" placeholder="Escribe el mensaje aquí...">¡Notificación importante! 🏆</textarea>
+    <textarea id="mensaje" rows="3">¡Notificación importante! 🏆</textarea>
 
-    <button onclick="enviarATodos()">📤 ENVIAR A TODOS LOS USUARIOS</button>
+    <button onclick="enviarATodos()">📤 ENVIAR A TODOS</button>
 
-    <div class="result" id="resultado">
-        Esperando acción...
-    </div>
+    <div class="result" id="resultado">Esperando acción...</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/google-auth-library@9.4.2/build/index.js"></script>
 <script>
-    // 🔥 TU CUENTA DE SERVICIO (PEGA TU JSON AQUÍ)
+    // 🔥 TU CUENTA DE SERVICIO
     const serviceAccount = {
         "type": "service_account",
         "project_id": "galloslivebadge",
@@ -48,65 +45,31 @@
         "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDcdxdSext1sy7g\nJ19+NePPsAHQF6n5LhIjiI5AeFEzyDRMXoIl628Rg04euXc9dSlGiFaGLVzPHaeT\nEwEbzi2Jv09ESXkEZkrgyJ7GCFXgVXYd9CJKml1wyBb3Y3387e//4VOjPuuqNBfS\nKS/nGCx3GFFzrdl1cIajtFy394F6FNhMmBEK0MAlwf6373lkB419oCv/AEx7ASOE\nMX3SDcz2jHlp+krLuVzxRk46Yw5ktUEQJtutsAikcsvYPYWBopCj1s3RzQT68Qbb\nY2XzVMZs7QIC9bs6pDoUoGDqWkuwRfoIlkeU7FH+PapiGm/1BuptxQZ6KZ3tK+SZ\ncyWPb317AgMBAAECggEAHFgB8JcRNbWes4TRsHPp4PwGOk8AiZ+psgB5bBfL4Mtp\nezQJ/tQLndsdbQfNKQ0/YZO1BAp1oc8fNI0Umb2NJJDVoQ2NIx//mnH7L7Hx+yXM\nSheRXQ6xhVwZenQZG4PU/4xkPgWgiMD/xa4z5r24jGsySvFb7CRWZa+SMrioYHMW\ngs5gAO+sebPPUPcQbiY/Ed+xCdKCAuLM+5akjShEEI6bVlEMsfMOyn7nzapaUkcc\nEq5vve6P8DgJNgIsqkRfM7ZGR5CahwdVbZNVinEXbkpta1EvcB6FYK2lCrBK9tgq\nUn4rUJ0zthtIpQQG6M6ZXV9YcyQQRZyveXo4x6/e2QKBgQDzOgZKNXwRbU6bbQbQ\n4RIYit+HfQAVRxVyUwGeZd7QmMtp2vvqOuLKB2uHWhDXAT8136vEXhhYaQ6u/ZsS\ncOz8lglGY4zQmQgJ5iRKYlx0WUg6fNPPioRM1dBzC1cjgnfZxOqc9WfY5UEqSjzU\nYQt9epyQvagUr9HFJxddINuLPQKBgQDoCw7e6GF95KZcRVEdRK7J4uZPfV2wpKs7\nmMPdpWvTqG0YMyxtihxXiaj1lqgzn0Co3XVBNV9hwimKcgiBxxRE3Lq41Cj9KrUw\n3Zr5KKzU/KsETGVZSBfmi3qXQiIG3+X4zocfBKh3qQOBl9muMBYjMKcSnwdXitdM\ns+zGTDmXFwKBgQDtbBWZuM3MIRwbYfjGSv2kEWOTWTSMkJ/hwh8RZLV0f8IIKafA\nhAy/UzDmpcdMaT4vs49zFrrDCoI31PzbqnnbMgYJvMFHGiqbpxiDt7IyLLjxxsnn\njHoKmqhotIgx9HhTjgHKh08AjQDobCEm2zghG1/bdhatYtbskXUgBiPorQKBgCoa\n95PTLv2dI+LSYSmicOUJWylJYlrPRpMF4WSyw6Igics+Xe1yhjoMLLCDqfnUB/Oc\nW859VNV0Wf1ZO9nwuejU9LzdIqLtwPsg+yIDE3mCb7XT9wAAaPXYkWIpCeudbSl8\nsGAchEVSUeSOHV3SM/ImvepPGRH1i6PLckd5RWn5AoGAYLh9q3GdXulg+TajhDJY\nsqP7xW6kvK1aBpBHkYvr0StxxzS82+wlRa33bP+wLsUUuqfoC0FrRbSveIE4Ibyc\ndaewz3CgkZZcRqVTjIelJljIl8NjbXjws240TZqz4Hs54OvKpL8eAjCZIunwKAl5\npjbG+CD+UdnngdeADx8nE54=\n-----END PRIVATE KEY-----\n",
         "client_email": "firebase-adminsdk-fbsvc@galloslivebadge.iam.gserviceaccount.com",
         "client_id": "110274859869360664911",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token"
     };
     
     let tokensLista = [];
-    let accessToken = null;
     
-    // Cargar tokens desde Firebase Database
     async function cargarTokens() {
-        const resultadoDiv = document.getElementById('resultado');
-        resultadoDiv.innerHTML = '🔄 Cargando tokens desde Firebase...';
-        
+        document.getElementById('resultado').innerHTML = '🔄 Cargando tokens...';
         try {
             const response = await fetch('https://galloslivebadge-default-rtdb.firebaseio.com/pushTokens.json');
             const data = await response.json();
-            
             if (data) {
                 tokensLista = [];
                 for (const [uid, tokenData] of Object.entries(data)) {
-                    if (tokenData.token && tokenData.token.trim() && tokenData.token.length > 30) {
-                        tokensLista.push(tokenData.token);
-                    }
+                    if (tokenData.token) tokensLista.push(tokenData.token);
                 }
-                
                 document.getElementById('totalUsuarios').innerHTML = `${tokensLista.length} usuarios`;
-                resultadoDiv.innerHTML = `✅ Cargados ${tokensLista.length} tokens correctamente.`;
-                
-                if (tokensLista.length === 0) {
-                    resultadoDiv.innerHTML += '\n\n⚠️ No hay tokens. Los usuarios deben abrir la app y aceptar notificaciones.';
-                }
-            } else {
-                document.getElementById('totalUsuarios').innerHTML = '0 usuarios';
-                resultadoDiv.innerHTML = '⚠️ No se encontraron tokens en la base de datos.';
+                document.getElementById('resultado').innerHTML = `✅ Cargados ${tokensLista.length} tokens`;
             }
-        } catch (error) {
-            console.error(error);
-            resultadoDiv.innerHTML = '❌ Error al cargar tokens: ' + error.message;
+        } catch(error) {
+            document.getElementById('resultado').innerHTML = '❌ Error: ' + error.message;
         }
     }
     
-    // Obtener Access Token usando la cuenta de servicio
     async function getAccessToken() {
-        const jwt = await crearJWT();
-        
-        const response = await fetch('https://oauth2.googleapis.com/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
-        });
-        
-        const data = await response.json();
-        if (!data.access_token) {
-            throw new Error('No se pudo obtener access token: ' + JSON.stringify(data));
-        }
-        return data.access_token;
-    }
-    
-    // Crear JWT para autenticación
-    async function crearJWT() {
+        // Usar fetch directo con JWT manual (CORREGIDO)
         const header = { alg: 'RS256', typ: 'JWT' };
         const now = Math.floor(Date.now() / 1000);
         const claim = {
@@ -117,67 +80,69 @@
             iat: now
         };
         
+        // Codificar header y claim
         const encodedHeader = btoa(JSON.stringify(header));
         const encodedClaim = btoa(JSON.stringify(claim));
-        const signatureInput = `${encodedHeader}.${encodedClaim}`;
+        const toSign = `${encodedHeader}.${encodedClaim}`;
         
-        // Convertir PEM a ArrayBuffer para la firma
-        const privateKey = await importPrivateKey(serviceAccount.private_key);
-        
-        const signature = await crypto.subtle.sign(
-            { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-            privateKey,
-            new TextEncoder().encode(signatureInput)
-        );
-        
-        const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)));
-        return `${signatureInput}.${encodedSignature}`;
-    }
-    
-    async function importPrivateKey(pem) {
-        // Limpiar el formato PEM
-        const pemClean = pem.replace(/-----BEGIN PRIVATE KEY-----/, '')
-                            .replace(/-----END PRIVATE KEY-----/, '')
-                            .replace(/\n/g, '');
-        
-        const binaryDer = Uint8Array.from(atob(pemClean), c => c.charCodeAt(0));
-        
-        return await crypto.subtle.importKey(
+        // Importar clave privada correctamente
+        const privateKey = await crypto.subtle.importKey(
             'pkcs8',
-            binaryDer,
+            str2ab(atob(serviceAccount.private_key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g, ''))),
             { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
             false,
             ['sign']
         );
+        
+        const signature = await crypto.subtle.sign(
+            'RSASSA-PKCS1-v1_5',
+            privateKey,
+            new TextEncoder().encode(toSign)
+        );
+        
+        const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)));
+        const jwt = `${toSign}.${encodedSignature}`;
+        
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+        });
+        
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error_description || 'Error getting token');
+        return data.access_token;
     }
     
-    // Enviar notificación a todos usando API V1
+    function str2ab(str) {
+        const buf = new ArrayBuffer(str.length);
+        const bufView = new Uint8Array(buf);
+        for (let i = 0; i < str.length; i++) bufView[i] = str.charCodeAt(i);
+        return buf;
+    }
+    
     async function enviarATodos() {
         if (tokensLista.length === 0) {
-            document.getElementById('resultado').innerHTML = '⚠️ No hay usuarios para enviar. Carga los tokens primero.';
+            document.getElementById('resultado').innerHTML = '⚠️ No hay usuarios';
             return;
         }
         
-        const titulo = document.getElementById('titulo').value.trim() || "LEGADO AVICOLA";
-        const mensaje = document.getElementById('mensaje').value.trim() || "Notificación importante";
-        
-        document.getElementById('resultado').innerHTML = '🔑 Obteniendo token de acceso...';
-        
+        document.getElementById('resultado').innerHTML = '🔑 Obteniendo token...';
+        let accessToken;
         try {
             accessToken = await getAccessToken();
-            document.getElementById('resultado').innerHTML = `📤 Enviando a ${tokensLista.length} dispositivos...<br>⏳ Progreso: 0/${tokensLista.length}`;
-        } catch (error) {
-            document.getElementById('resultado').innerHTML = '❌ Error de autenticación: ' + error.message;
+        } catch(e) {
+            document.getElementById('resultado').innerHTML = '❌ Error auth: ' + e.message;
             return;
         }
         
-        let enviados = 0;
-        let errores = 0;
-        const detalles = [];
+        const titulo = document.getElementById('titulo').value;
+        const mensaje = document.getElementById('mensaje').value;
+        let enviados = 0, errores = 0;
         
         for (let i = 0; i < tokensLista.length; i++) {
             try {
-                const response = await fetch(`https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`, {
+                const response = await fetch(`https://fcm.googleapis.com/v1/projects/galloslivebadge/messages:send`, {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + accessToken,
@@ -186,67 +151,19 @@
                     body: JSON.stringify({
                         message: {
                             token: tokensLista[i],
-                            data: {
-                                title: titulo,
-                                body: mensaje,
-                                image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg'
-                            },
-                            android: {
-                                priority: "high",
-                                notification: {
-                                    title: titulo,
-                                    body: mensaje,
-                                    image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg'
-                                }
-                            },
-                            webpush: {
-                                headers: { Urgency: "high" },
-                                notification: {
-                                    title: titulo,
-                                    body: mensaje,
-                                    icon: 'https://sub-legadoavicola.pages.dev/miniatura.jpg',
-                                    image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg',
-                                    actions: [
-                                        { action: 'ver', title: '👁️ VER TORNEO' },
-                                        { action: 'compartir', title: '📤 COMPARTIR' },
-                                        { action: 'recordar', title: '⏰ RECORDAR' }
-                                    ]
-                                }
-                            }
+                            data: { title: titulo, body: mensaje, image: 'https://sub-legadoavicola.pages.dev/miniatura.jpg' }
                         }
                     })
                 });
-                
-                if (response.ok) {
-                    enviados++;
-                    detalles.push(`✅ Usuario ${i+1}: OK`);
-                } else {
-                    errores++;
-                    const errorText = await response.text();
-                    detalles.push(`❌ Usuario ${i+1}: ${errorText.substring(0, 100)}`);
-                }
-            } catch (e) {
-                errores++;
-                detalles.push(`❌ Usuario ${i+1}: ${e.message}`);
-            }
-            
-            document.getElementById('resultado').innerHTML = `📤 Progreso: ${i+1}/${tokensLista.length}<br>✅ Enviados: ${enviados} | ❌ Errores: ${errores}<br><br><div style="font-size:0.7rem;">${detalles.slice(-5).join('<br>')}</div>`;
+                if (response.ok) enviados++;
+                else errores++;
+            } catch(e) { errores++; }
+            document.getElementById('resultado').innerHTML = `📤 Progreso: ${i+1}/${tokensLista.length}<br>✅ ${enviados} | ❌ ${errores}`;
         }
-        
-        document.getElementById('resultado').innerHTML = `
-✅ ENVÍO COMPLETADO
-📱 Total usuarios: ${tokensLista.length}
-✅ Enviados correctamente: ${enviados}
-❌ Errores: ${errores}
-
-${detalles.join('\n')}
-        `;
+        document.getElementById('resultado').innerHTML = `✅ COMPLETADO\nTotal: ${tokensLista.length}\n✅ ${enviados}\n❌ ${errores}`;
     }
     
-    // Inicializar
-    window.addEventListener('DOMContentLoaded', () => {
-        cargarTokens();
-    });
+    window.addEventListener('DOMContentLoaded', cargarTokens);
 </script>
 </body>
 </html>
