@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.9';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.9';
+const CACHE_NAME = 'legado-offline-v3.1.10';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.10';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -171,14 +171,17 @@ messaging.onBackgroundMessage((payload) => {
         body: payload.notification?.body || 'Notificación importante',
        icon: self.location.origin + '/miniatura.jpg',
         badge: self.location.origin + '/miniatura.jpg',
+        image: payload.notification?.image || self.location.origin + '/miniatura.jpg',
+        
         vibrate: [200, 100, 200],
          requireInteraction: true,
         priority: 'high',
         // ✅ SOLO AGREGA ESTAS 2 LÍNEAS (los botones)
         actions: [
-            { action: 'ver', title: '👁️ VER TORNEO' },
-            { action: 'compartir', title: '📤 COMPARTIR' }
-        ],
+    { action: 'ver', title: '👁️ VER TORNEO' },
+    { action: 'compartir', title: '📤 COMPARTIR' },
+    { action: 'recordar', title: '⏰ RECORDAR' }
+],
         
         data: {
             click_action: payload.fcmOptions?.link || '/',
@@ -200,6 +203,7 @@ self.addEventListener('notificationclick', (event) => {
     let urlToOpen = '/';
     if (event.action === 'ver') { urlToOpen = '/?section=rooster'; }
     else if (event.action === 'compartir') { urlToOpen = '/?section=share'; }
+        else if (event.action === 'recordar') { urlToOpen = '/?section=public'; }
     else { urlToOpen = event.notification.data?.click_action || '/'; }
 
     
