@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.31';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.31';
+const CACHE_NAME = 'legado-offline-v3.1.32';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.32';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -177,6 +177,9 @@ self.addEventListener('push', (event) => {
                 vibrate: [200, 100, 200],
                 requireInteraction: true,
                 priority: 'high',
+    silent: false,  
+    renotify: true, 
+                 tag: 'legado_notificacion_' + Date.now(),
                 actions: [
                     { action: 'ver', title: '👁️ 1VER TORNEO' },
                     { action: 'compartir', title: '📤 2COMPARTIR' },
