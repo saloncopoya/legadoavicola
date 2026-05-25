@@ -1573,34 +1573,94 @@ function renderRegisterForm() {
 
 
     // Esta función es NECESARIA para generar el token
+// Esta función es NECESARIA para generar el token
 async function probarPushNotification() {
-    // Solo pedir permiso si aún no se ha pedido
-    if (Notification.permission !== 'default') return;
+    // Caso 1: Usuario ya bloqueó las notificaciones antes
+    if (Notification.permission === 'denied') {
+        AppState.addNotification('⚠️ Notificaciones bloqueadas. Presiona "PERMITIR" en la ventana que aparecerá', 'warning');
+        // Forzar a que vuelva a preguntar (solo funciona si el usuario nunca bloqueó)
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            await generarToken();
+        }
+        return;
+    }
     
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
+    // Caso 2: Usuario nunca ha decidido
+    if (Notification.permission === 'default') {
+        AppState.addNotification('🔔 Presiona "PERMITIR" en la ventana para activar notificaciones', 'info');
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+            AppState.addNotification('❌ Debes presionar "PERMITIR" para recibir notificaciones', 'error');
+            // Reintentar después de 3 segundos
+            setTimeout(() => probarPushNotification(), 3000);
+            return;
+        }
+        await generarToken();
+        return;
+    }
     
+    // Caso 3: Ya tiene permiso, solo generar token
+    if (Notification.permission === 'granted') {
+        await generarToken();
+    }
+}
+
+// Función separada para generar el token
+async function generarToken() {
     try {
+        // Verificar si ya tenemos un token guardado
+        const tokenGuardado = localStorage.getItem('fcm_token');
+        if (tokenGuardado) {
+            console.log('✅ Token ya existe:', tokenGuardado);
+            AppState.addNotification('✅ Notificaciones ya estaban activadas', 'success');
+            return tokenGuardado;
+        }
+        
         const messaging = firebase.messaging();
-        // ✅ ESTO es lo IMPORTANTE - genera el token
+        
+        // Esperar a que el Service Worker esté listo
+        let registration = await navigator.serviceWorker.ready;
+        
         const token = await messaging.getToken({
-            vapidKey: 'BE491FF8HdcfTjoSMq8A-L61iQOrrxNMxdCBFJbEQ2npGCfEFrFYyGI88W1c3YfVy5qyd3NvtUY8-C-Gd6mzhN4'
+            vapidKey: 'BE491FF8HdcfTjoSMq8A-L61iQOrrxNMxdCBFJbEQ2npGCfEFrFYyGI88W1c3YfVy5qyd3NvtUY8-C-Gd6mzhN4',
+            serviceWorkerRegistration: registration
         });
         
         console.log('✅ Token generado:', token);
+        
+        // Guardar token localmente
+        localStorage.setItem('fcm_token', token);
         
         // Guardar token en Firebase si hay usuario
         if (AppState.user.current && AppState.firebase.database) {
             await AppState.firebase.database.ref('pushTokens/' + AppState.user.current.uid).set({
                 token: token,
-                fecha: Date.now()
+                fecha: Date.now(),
+                dispositivo: navigator.userAgent
             });
         }
         
-        AppState.addNotification('✅ Notificaciones activadas', 'success');
+        AppState.addNotification('✅ ¡Notificaciones activadas correctamente!', 'success');
+        return token;
         
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al generar token:', error);
+        
+        // Si hay error, mostrar mensaje y reintentar
+        AppState.addNotification('⚠️ Error al activar. Presiona "PERMITIR" en la ventana', 'warning');
+        
+        // Si el error es por Service Worker, reintentar
+        if (error.message.includes('Service Worker')) {
+            setTimeout(() => probarPushNotification(), 2000);
+        } else {
+            // Otro error, pedir permiso nuevamente
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                setTimeout(() => generarToken(), 1000);
+            }
+        }
+        return null;
     }
 }
 
