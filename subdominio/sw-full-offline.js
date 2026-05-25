@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.19';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.19';
+const CACHE_NAME = 'legado-offline-v3.1.21';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.21';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -165,7 +165,8 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     console.log('[SW] Notificación en segundo plano:', payload);
     
-const notificationTitle = 'MI NUEVO TÍTULO';
+const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
+
     
     const notificationOptions = {
         body: payload.notification?.body || 'Notificación importante',
