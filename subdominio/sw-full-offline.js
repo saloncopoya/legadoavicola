@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.10';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.10';
+const CACHE_NAME = 'legado-offline-v3.1.12';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.12';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -178,9 +178,9 @@ messaging.onBackgroundMessage((payload) => {
         priority: 'high',
         // ✅ SOLO AGREGA ESTAS 2 LÍNEAS (los botones)
         actions: [
-    { action: 'ver', title: '👁️ VER TORNEO' },
-    { action: 'compartir', title: '📤 COMPARTIR' },
-    { action: 'recordar', title: '⏰ RECORDAR' }
+    { action: 'ver', title: '👁️ 1VER TORNEO' },
+    { action: 'compartir', title: '📤 2COMPARTIR' },
+    { action: 'recordar', title: '⏰ 3RECORDAR' }
 ],
         
         data: {
