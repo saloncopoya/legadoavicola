@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.3';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.3';
+const CACHE_NAME = 'legado-offline-v3.1.4';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.4';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -173,6 +173,14 @@ messaging.onBackgroundMessage((payload) => {
         badge: self.location.origin + '/miniatura.jpg',
         image: self.location.origin + '/miniatura.jpg',
         vibrate: [200, 100, 200],
+         requireInteraction: true,
+        priority: 'high',
+        // ✅ SOLO AGREGA ESTAS 2 LÍNEAS (los botones)
+        actions: [
+            { action: 'ver', title: '👁️ VER TORNEO' },
+            { action: 'compartir', title: '📤 COMPARTIR' }
+        ],
+        
         data: {
             click_action: payload.fcmOptions?.link || '/',
             url: payload.fcmOptions?.link || '/',
@@ -190,7 +198,11 @@ self.addEventListener('notificationclick', (event) => {
     console.log('[SW] Usuario hizo clic en la notificación');
     event.notification.close();
     
-    const urlToOpen = event.notification.data?.click_action || '/';
+    let urlToOpen = '/';
+    if (event.action === 'ver') { urlToOpen = '/?section=rooster'; }
+    else if (event.action === 'compartir') { urlToOpen = '/?section=share'; }
+    else { urlToOpen = event.notification.data?.click_action || '/'; }
+
     
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
