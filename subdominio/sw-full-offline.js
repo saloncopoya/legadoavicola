@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.5';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.5';
+const CACHE_NAME = 'legado-offline-v1.1.1';
+const DYNAMIC_CACHE = 'legado-dynamic-v1.1.1';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -140,20 +140,11 @@ console.log('[SW] Service Worker completamente cargado y listo');
 
 
 
-
-
-
-
-
-
-
 // ==============================================
-// NOTIFICACIONES PUSH COMPLETAS (CON CLICK)
+// NOTIFICACIONES PUSH - VERSIÓN CORREGIDA (SIN DUPLICADOS)
 // ==============================================
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
-
-
 
 firebase.initializeApp({
     apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
@@ -164,65 +155,72 @@ firebase.initializeApp({
     appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
 });
 
-const messaging = firebase.messaging();
-
-// Notificaciones en segundo plano (app cerrada)
-messaging.onBackgroundMessage((payload) => {
-    console.log('[SW] Notificación en segundo plano:', payload);
+// ESTO BLOQUEA LA NOTIFICACIÓN NATIVA DE FIREBASE
+self.addEventListener('push', (event) => {
+    console.log('[SW] Push interceptado');
     
-const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
-
-    
-    const notificationOptions = {
-        body: payload.notification?.body || 'Notificación importante',
-       icon: self.location.origin + '/miniatura.jpg',
-        badge: self.location.origin + '/favicon.ico',
-        image: payload.notification?.image || self.location.origin + '/miniatura.jpg',
-        
-        vibrate: [200, 100, 200],
-         requireInteraction: true,
-        priority: 'high',
-        // ✅ SOLO AGREGA ESTAS 2 LÍNEAS (los botones)
-        actions: [
-    { action: 'ver', title: '👁️ 1VER TORNEO' },
-    { action: 'compartir', title: '📤 2COMPARTIR' },
-    { action: 'recordar', title: '⏰ 3RECORDAR' }
-],
-        
-        data: {
-            click_action: payload.fcmOptions?.link || '/',
-            url: payload.fcmOptions?.link || '/',
-            image: payload.notification?.image || '/miniatura.jpg'
-        },
-        requireInteraction: true,
-        silent: false
-    };
-    
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    event.waitUntil(
+        (async () => {
+            let payload = {};
+            if (event.data) {
+                try {
+                    payload = event.data.json();
+                } catch(e) {}
+            }
+            
+            const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
+            const notificationOptions = {
+                body: payload.notification?.body || 'Notificación importante',
+                icon: self.location.origin + '/miniatura.jpg',
+                badge: self.location.origin + '/favicon.ico',
+                image: payload.notification?.image || self.location.origin + '/miniatura.jpg',
+                vibrate: [200, 100, 200],
+                requireInteraction: true,
+                priority: 'high',
+    silent: false,  
+    renotify: true, 
+                 tag: 'legado_notificacion_' + Date.now(),
+                actions: [
+                    { action: 'ver', title: '👁️ 1VER TORNEO' },
+                    { action: 'compartir', title: '📤 2COMPARTIR' },
+                    { action: 'recordar', title: '⏰ 3RECORDAR' }
+                ],
+                data: {
+                    click_action: payload.fcmOptions?.link || '/',
+                    url: payload.fcmOptions?.link || '/',
+                    image: payload.notification?.image || '/miniatura.jpg'
+                }
+            };
+            
+            await self.registration.showNotification(notificationTitle, notificationOptions);
+        })()
+    );
 });
 
-// Manejar clic en la notificación (ABRE LA APP)
+// MANEJAR CLIC EN BOTONES
 self.addEventListener('notificationclick', (event) => {
-    console.log('[SW] Usuario hizo clic en la notificación');
+    console.log('[SW] Clic en notificación');
     event.notification.close();
     
     let urlToOpen = '/';
-    if (event.action === 'ver') { urlToOpen = '/?section=rooster'; }
-    else if (event.action === 'compartir') { urlToOpen = '/?section=share'; }
-        else if (event.action === 'recordar') { urlToOpen = '/?section=public'; }
-    else { urlToOpen = event.notification.data?.click_action || '/'; }
-
+    if (event.action === 'ver') { 
+        urlToOpen = '/?section=rooster'; 
+    } else if (event.action === 'compartir') { 
+        urlToOpen = '/?section=share'; 
+    } else if (event.action === 'recordar') { 
+        urlToOpen = '/?section=public'; 
+    } else { 
+        urlToOpen = '/'; 
+    }
     
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then(windowClients => {
-                // Buscar una ventana abierta de la app
                 for (let client of windowClients) {
                     if (client.url === urlToOpen && 'focus' in client) {
                         return client.focus();
                     }
                 }
-                // Si no hay ventana abierta, crear una nueva
                 if (clients.openWindow) {
                     return clients.openWindow(urlToOpen);
                 }
@@ -230,4 +228,4 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-console.log('[SW] ✅ Firebase Messaging configurado (versión completa)');
+console.log('[SW] ✅ CORREGIDO - Una sola notificación con botones');
