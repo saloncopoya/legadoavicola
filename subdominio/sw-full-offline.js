@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.5';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.5';
+const CACHE_NAME = 'legado-offline-v3.1.6';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.6';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -171,7 +171,7 @@ messaging.onBackgroundMessage((payload) => {
         body: payload.notification?.body || 'Notificación importante',
        icon: self.location.origin + '/miniatura.jpg',
         badge: self.location.origin + '/miniatura.jpg',
-        image: self.location.origin + '/miniatura.jpg',
+image: payload.notification?.image || self.location.origin + '/miniatura.jpg',
         vibrate: [200, 100, 200],
          requireInteraction: true,
         priority: 'high',
