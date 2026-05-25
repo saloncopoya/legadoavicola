@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.21';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.21';
+const CACHE_NAME = 'legado-offline-v3.1.22';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.22';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -149,6 +149,8 @@ console.log('[SW] Service Worker completamente cargado y listo');
 // ==============================================
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
+
+
 
 firebase.initializeApp({
     apiKey: "AIzaSyASox7mRak5V0py29htEVWCVeipGpA0yfs",
