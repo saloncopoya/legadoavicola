@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v3.1.30';
-const DYNAMIC_CACHE = 'legado-dynamic-v3.1.30';
+const CACHE_NAME = 'legado-offline-v3.1.31';
+const DYNAMIC_CACHE = 'legado-dynamic-v3.1.31';
 
 
 // TODAS las URLs a cachear (incluyendo Firebase)
@@ -140,11 +140,8 @@ console.log('[SW] Service Worker completamente cargado y listo');
 
 
 
-
-
-
 // ==============================================
-// NOTIFICACIONES PUSH - SOLO UNA NOTIFICACIÓN (CON BOTONES)
+// NOTIFICACIONES PUSH - VERSIÓN CORREGIDA (SIN DUPLICADOS)
 // ==============================================
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
@@ -158,29 +155,21 @@ firebase.initializeApp({
     appId: "1:979482928760:web:3ea879dc4ee1e020df6f8d"
 });
 
-const messaging = firebase.messaging();
-
-// ==============================================
-// INTERCEPTAR PUSH - BLOQUEA NOTIFICACIÓN NATIVA
-// ==============================================
+// ESTO BLOQUEA LA NOTIFICACIÓN NATIVA DE FIREBASE
 self.addEventListener('push', (event) => {
-    console.log('[SW] 🚨 Push interceptado - Bloqueando notificación nativa de Firebase');
+    console.log('[SW] Push interceptado');
     
     event.waitUntil(
         (async () => {
-            // Obtener los datos del push
             let payload = {};
             if (event.data) {
                 try {
                     payload = event.data.json();
-                } catch(e) {
-                    console.log('[SW] Error al parsear:', e);
-                }
+                } catch(e) {}
             }
             
-            // Datos de la notificación
-            const title = payload.notification?.title || 'LEGADO AVICOLA';
-            const options = {
+            const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
+            const notificationOptions = {
                 body: payload.notification?.body || 'Notificación importante',
                 icon: self.location.origin + '/miniatura.jpg',
                 badge: self.location.origin + '/favicon.ico',
@@ -195,20 +184,19 @@ self.addEventListener('push', (event) => {
                 ],
                 data: {
                     click_action: payload.fcmOptions?.link || '/',
-                    url: payload.fcmOptions?.link || '/'
+                    url: payload.fcmOptions?.link || '/',
+                    image: payload.notification?.image || '/miniatura.jpg'
                 }
             };
             
-            // Mostrar SOLO esta notificación (la tuya con botones)
-            await self.registration.showNotification(title, options);
-            console.log('[SW] ✅ Notificación CON BOTONES mostrada (única)');
+            await self.registration.showNotification(notificationTitle, notificationOptions);
         })()
     );
 });
 
-// MANEJAR CLIC EN LOS BOTONES
+// MANEJAR CLIC EN BOTONES
 self.addEventListener('notificationclick', (event) => {
-    console.log('[SW] Usuario hizo clic en la notificación');
+    console.log('[SW] Clic en notificación');
     event.notification.close();
     
     let urlToOpen = '/';
@@ -219,7 +207,7 @@ self.addEventListener('notificationclick', (event) => {
     } else if (event.action === 'recordar') { 
         urlToOpen = '/?section=public'; 
     } else { 
-        urlToOpen = event.notification.data?.click_action || '/'; 
+        urlToOpen = '/'; 
     }
     
     event.waitUntil(
@@ -237,4 +225,4 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
-console.log('[SW] ✅ Service Worker configurado - Modo UNA SOLA NOTIFICACIÓN');
+console.log('[SW] ✅ CORREGIDO - Una sola notificación con botones');
