@@ -3288,24 +3288,399 @@ window.renderRoosterScreen = async function() {
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
 <script>
 window.renderVentasScreen = async function() {
-    const subastas = await getDataOfflineFirst('subastas');
-    const subastasArray = subastas ? Object.values(subastas) : [];
     
-    return `
-        <div style="min-height: 100vh; background: var(--bg-body);">
-            <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: var(--color-primary);"> Disponibles</h2>
-                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
-                <div id="subastas-list">
-                    ${subastasArray.length === 0 ? '<p>No hay </p>' : 
-                        subastasArray.map(subasta => `
-                            <div style="background: var(--bg-white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                               <h3>${sanitizarInput(subasta.titulo) || 'Subasta'}</h3>
-
-                            </div>
-                        `).join('')
-                    }
+    // ==============================================
+    // TODAS LAS CONSTANTES DENTRO DE LA PANTALLA
+    // ==============================================
+    const TEXTOS = {
+        btn_valores_normales: 'VALORES NORMALES',
+        btn_medicamentos: 'MEDICAMENTOS',
+        btn_conocimientos: 'CONOCIMIENTOS',
+        
+        herramienta_glasgow: 'Escala de Glasgow',
+        herramienta_norton: 'Escala de Norton',
+        herramienta_braden: 'Escala de Braden',
+        herramienta_barthel: 'Índice de Barthel',
+        herramienta_eva: 'Escala EVA',
+        
+        desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
+        desc_norton: 'Evaluar el riesgo de desarrollar úlceras por presión. Valora cinco parámetros: estado físico, estado mental, actividad, movilidad e incontinencia.',
+        desc_braden: 'Predecir el riesgo de úlceras por presión. Valora percepción sensorial, exposición a humedad, actividad, movilidad, nutrición y fricción.',
+        desc_barthel: 'Evaluar la independencia en actividades de la vida diaria. 10 actividades puntuadas de 0 a 10 o 15.',
+        desc_eva: 'Evaluar la intensidad del dolor. Del 0 (sin dolor) al 10 (peor dolor imaginable).',
+        
+        herramienta_antibioticos: 'Antibióticos',
+        herramienta_analgesicos: 'Analgésicos',
+        herramienta_cardiovasculares: 'Cardiovasculares',
+        herramienta_antihipertensivos: 'Antihipertensivos',
+        
+        herramienta_rcep: 'RCP Actualizado',
+        herramienta_guias: 'Guías Clínicas',
+        herramienta_protocolos: 'Protocolos Enfermería',
+        herramienta_actualizaciones: 'Actualizaciones',
+        
+        // Valores para Glasgow
+        apertura_ocular: 'Apertura Ocular',
+        respuesta_verbal: 'Respuesta Verbal',
+        respuesta_motora: 'Respuesta Motora',
+        
+        // Valores para Norton
+        estado_fisico: 'Estado Físico General',
+        estado_mental: 'Estado Mental',
+        actividad: 'Actividad',
+        movilidad: 'Movilidad',
+        incontinencia: 'Incontinencia',
+        
+        // Valores para Braden
+        percepcion_sensorial: 'Percepción Sensorial',
+        humedad: 'Exposición a Humedad',
+        nutricion: 'Nutrición',
+        friccion: 'Fricción y Corte',
+        
+        // Valores para Barthel
+        comer: 'Comer',
+        banarse: 'Bañarse',
+        vestirse: 'Vestirse',
+        arreglarse: 'Arreglarse',
+        deposiciones: 'Deposiciones',
+        miccion: 'Micción',
+        usar_retrete: 'Usar retrete',
+        trasladarse: 'Trasladarse',
+        deambular: 'Deambular',
+        escaleras: 'Subir escaleras'
+    };
+    
+    // ==============================================
+    // OBTENER HERRAMIENTA ACTUAL DESDE URL
+    // ==============================================
+    const urlParams = new URLSearchParams(window.location.search);
+    let herramientaActual = urlParams.get('tool');
+    let subHerramientaActual = urlParams.get('subtool');
+    
+    // Validar herramientas válidas
+    const herramientasValidas = ['valores-normales', 'medicamentos', 'conocimientos'];
+    if (!herramientasValidas.includes(herramientaActual)) {
+        herramientaActual = 'valores-normales';
+    }
+    
+    // ==============================================
+    // FUNCIONES DE NAVEGACIÓN (se inyectan al window)
+    // ==============================================
+    window.cambiarHerramienta = function(herramienta, subtool) {
+        const nuevaUrl = new URL(window.location);
+        nuevaUrl.searchParams.set('tool', herramienta);
+        nuevaUrl.searchParams.set('subtool', subtool || '');
+        window.history.pushState({}, '', nuevaUrl);
+        renderApp();
+    };
+    
+    window.cambiarSubHerramienta = function(subtool) {
+        const nuevaUrl = new URL(window.location);
+        nuevaUrl.searchParams.set('subtool', subtool);
+        window.history.pushState({}, '', nuevaUrl);
+        renderApp();
+    };
+    
+    // ==============================================
+    // CONTENIDO DE CADA SUB-HERRAMIENTA
+    // ==============================================
+    const contenidos = {
+        // VALORES NORMALES
+        glasgow: {
+            titulo: TEXTOS.herramienta_glasgow,
+            descripcion: TEXTOS.desc_glasgow,
+            secciones: [
+                { nombre: TEXTOS.apertura_ocular, valores: ['Espontánea (4)', 'A la voz (3)', 'Al dolor (2)', 'Ninguna (1)'] },
+                { nombre: TEXTOS.respuesta_verbal, valores: ['Orientado (5)', 'Confuso (4)', 'Palabras inapropiadas (3)', 'Sonidos incomprensibles (2)', 'Ninguna (1)'] },
+                { nombre: TEXTOS.respuesta_motora, valores: ['Obedece órdenes (6)', 'Localiza dolor (5)', 'Retirada al dolor (4)', 'Flexión anormal (3)', 'Extensión anormal (2)', 'Ninguna (1)'] }
+            ]
+        },
+        norton: {
+            titulo: TEXTOS.herramienta_norton,
+            descripcion: TEXTOS.desc_norton,
+            secciones: [
+                { nombre: TEXTOS.estado_fisico, valores: ['Bueno (4)', 'Regular (3)', 'Malo (2)', 'Muy malo (1)'] },
+                { nombre: TEXTOS.estado_mental, valores: ['Alerta (4)', 'Apático (3)', 'Confuso (2)', 'Estupor (1)'] },
+                { nombre: TEXTOS.actividad, valores: ['Ambulante (4)', 'Con ayuda (3)', 'Limitada (2)', 'Inmóvil (1)'] },
+                { nombre: TEXTOS.movilidad, valores: ['Total (4)', 'Ligeramente limitada (3)', 'Muy limitada (2)', 'Inmóvil (1)'] },
+                { nombre: TEXTOS.incontinencia, valores: ['Continente (4)', 'Ocasional (3)', 'Urinaria (2)', 'Doble (1)'] }
+            ]
+        },
+        braden: {
+            titulo: TEXTOS.herramienta_braden,
+            descripcion: TEXTOS.desc_braden,
+            secciones: [
+                { nombre: TEXTOS.percepcion_sensorial, valores: ['No comprometida (4)', 'Ligeramente comprometida (3)', 'Muy limitada (2)', 'Completamente limitada (1)'] },
+                { nombre: TEXTOS.humedad, valores: ['Rara vez (4)', 'Ocasional (3)', 'Frecuente (2)', 'Constantemente (1)'] },
+                { nombre: TEXTOS.actividad, valores: ['Deambula (4)', 'Camina ocasionalmente (3)', 'Silla de ruedas (2)', 'Encamado (1)'] },
+                { nombre: TEXTOS.movilidad, valores: ['Sin limitaciones (4)', 'Ligeramente limitada (3)', 'Muy limitada (2)', 'Completamente inmóvil (1)'] },
+                { nombre: TEXTOS.nutricion, valores: ['Excelente (4)', 'Adecuada (3)', 'Probablemente inadecuada (2)', 'Muy pobre (1)'] },
+                { nombre: TEXTOS.friccion, valores: ['Sin problema (3)', 'Problema potencial (2)', 'Problema evidente (1)'] }
+            ]
+        },
+        barthel: {
+            titulo: TEXTOS.herramienta_barthel,
+            descripcion: TEXTOS.desc_barthel,
+            secciones: [
+                { nombre: TEXTOS.comer, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.banarse, valores: ['Independiente (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.vestirse, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.arreglarse, valores: ['Independiente (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.deposiciones, valores: ['Continente (10)', 'Accidente ocasional (5)', 'Incontinente (0)'] },
+                { nombre: TEXTOS.miccion, valores: ['Continente (10)', 'Accidente ocasional (5)', 'Incontinente (0)'] },
+                { nombre: TEXTOS.usar_retrete, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.trasladarse, valores: ['Independiente (15)', 'Mínima ayuda (10)', 'Gran ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.deambular, valores: ['Independiente (15)', 'Necesita ayuda (10)', 'Silla ruedas (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.escaleras, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] }
+            ]
+        },
+        eva: {
+            titulo: TEXTOS.herramienta_eva,
+            descripcion: TEXTOS.desc_eva,
+            secciones: [
+                { nombre: 'Nivel de Dolor', valores: [
+                    '0: Sin dolor',
+                    '1-3: Dolor leve',
+                    '4-6: Dolor moderado',
+                    '7-9: Dolor intenso',
+                    '10: Peor dolor imaginable'
+                ]}
+            ]
+        }
+    };
+    
+    // ==============================================
+    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
+    // ==============================================
+    const herramientasConfig = {
+        'valores-normales': {
+            titulo: TEXTOS.btn_valores_normales,
+            descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
+            color: '#0D9488',
+            icono: '📊',
+            subherramientas: ['glasgow', 'norton', 'braden', 'barthel', 'eva'],
+            nombres: {
+                glasgow: TEXTOS.herramienta_glasgow,
+                norton: TEXTOS.herramienta_norton,
+                braden: TEXTOS.herramienta_braden,
+                barthel: TEXTOS.herramienta_barthel,
+                eva: TEXTOS.herramienta_eva
+            }
+        },
+        'medicamentos': {
+            titulo: TEXTOS.btn_medicamentos,
+            descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
+            color: '#3B82F6',
+            icono: '💊',
+            subherramientas: ['antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos'],
+            nombres: {
+                antibioticos: TEXTOS.herramienta_antibioticos,
+                analgesicos: TEXTOS.herramienta_analgesicos,
+                cardiovasculares: TEXTOS.herramienta_cardiovasculares,
+                antihipertensivos: TEXTOS.herramienta_antihipertensivos
+            }
+        },
+        'conocimientos': {
+            titulo: TEXTOS.btn_conocimientos,
+            descripcion: 'Guías, protocolos, actualizaciones, RCP',
+            color: '#F59E0B',
+            icono: '📚',
+            subherramientas: ['rcep', 'guias', 'protocolos', 'actualizaciones'],
+            nombres: {
+                rcep: TEXTOS.herramienta_rcep,
+                guias: TEXTOS.herramienta_guias,
+                protocolos: TEXTOS.herramienta_protocolos,
+                actualizaciones: TEXTOS.herramienta_actualizaciones
+            }
+        }
+    };
+    
+    const configActual = herramientasConfig[herramientaActual];
+    
+    // Validar subherramienta actual
+    let subHerramientaMostrar = subHerramientaActual;
+    if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
+        subHerramientaMostrar = configActual.subherramientas[0];
+    }
+    
+    const contenidoActual = contenidos[subHerramientaMostrar];
+    const esValoresNormales = herramientaActual === 'valores-normales';
+    
+    // ==============================================
+    // GENERAR HTML DE PESTAÑAS
+    // ==============================================
+    const generarPestanas = () => {
+        return `
+            <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch;">
+                ${configActual.subherramientas.map(sub => `
+                    <button onclick="window.cambiarSubHerramienta('${sub}')" style="
+                        padding: 10px 16px;
+                        background: ${subHerramientaMostrar === sub ? configActual.color : '#F3F4F6'};
+                        color: ${subHerramientaMostrar === sub ? 'white' : '#4B5563'};
+                        border: none;
+                        border-radius: 30px;
+                        font-size: 13px;
+                        font-weight: ${subHerramientaMostrar === sub ? '700' : '500'};
+                        cursor: pointer;
+                        white-space: nowrap;
+                        transition: all 0.2s;
+                    ">
+                        ${configActual.nombres[sub]}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    };
+    
+    // ==============================================
+    // GENERAR CONTENIDO DE LA HERRAMIENTA SELECCIONADA
+    // ==============================================
+    const generarContenido = () => {
+        if (!contenidoActual || !esValoresNormales) {
+            // Contenido vacío para medicamentos y conocimientos
+            return `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">${configActual.icono}</div>
+                    <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${configActual.titulo}</h3>
+                    <p style="color: #6B7280; margin-top: 8px;">${configActual.descripcion}</p>
+                    <div style="background: #F3F4F6; border-radius: 16px; padding: 30px; margin-top: 30px;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
+                    </div>
                 </div>
+            `;
+        }
+        
+        // Contenido para Glasgow, Norton, Braden, Barthel, EVA
+        return `
+            <div style="padding: 4px 0 20px 0;">
+                <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
+                    <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
+                </div>
+                
+                ${contenidoActual.secciones.map(seccion => `
+                    <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${seccion.valores.map(valor => `
+                                <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">
+                                    ${valor}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                
+                <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">
+                        Calcular puntuación
+                    </button>
+                </div>
+            </div>
+        `;
+    };
+    
+    // ==============================================
+    // GENERAR BOTONES PRINCIPALES (SOLO SI NO HAY TOOL SELECCIONADA)
+    // ==============================================
+    const mostrarMenuPrincipal = !urlParams.get('tool');
+    
+    if (mostrarMenuPrincipal) {
+        // VISTA PRINCIPAL: 3 BOTONES GRANDES
+        return `
+            <div style="min-height: 100vh; background: #F9FAFB;">
+                <!-- ENCABEZADO CON FONDO VERDE Y SVG -->
+                <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                        <path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 14px;">Herramientas clínicas para profesionales</p>
+                </div>
+                
+                <!-- BOTONES GRANDES -->
+                <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
+                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3>
+                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Constantes vitales, laboratorio, parámetros</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                    <line x1="12" y1="4" x2="12" y2="20"/>
+                                    <line x1="4" y1="12" x2="20" y2="12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3>
+                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Dosis, indicaciones, contraindicaciones</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4M12 8h.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3>
+                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Guías, protocolos, actualizaciones</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ==============================================
+    // VISTA DE HERRAMIENTA SELECCIONADA (CON PESTAÑAS)
+    // ==============================================
+    return `
+        <div style="min-height: 100vh; background: #F9FAFB;">
+            <!-- ENCABEZADO QUE SE COLAPSA (solo muestra título) -->
+            <div style="background: ${configActual.color}; padding: 20px 16px; text-align: center; cursor: pointer;" onclick="window.cambiarHerramienta('valores-normales', 'glasgow')">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span style="font-size: 24px;">${configActual.icono}</span>
+                    <h2 style="color: white; margin: 0; font-size: 18px;">${configActual.titulo}</h2>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+                <p style="color: rgba(255,255,255,0.85); margin: 4px 0 0; font-size: 12px;">${configActual.descripcion}</p>
+            </div>
+            
+            <!-- PESTAÑAS -->
+            <div style="padding: 16px 16px 0 16px; background: white; border-bottom: 1px solid #E5E7EB;">
+                ${generarPestanas()}
+            </div>
+            
+            <!-- CONTENIDO -->
+            <div style="padding: 16px;">
+                ${generarContenido()}
             </div>
         </div>
     `;
