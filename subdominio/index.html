@@ -722,7 +722,7 @@ ico_ventas: '❤️',
     txt_rooster: 'MENU3',
     ico_rooster: '🏆',
     
-    txt_share: 'PUBLICACIONES',
+    txt_share: 'BUSCAR',
     ico_share: '🔍',
     
     txt_publicaciones: 'MENU5',
@@ -3066,10 +3066,10 @@ window.renderRoosterScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">🏆 Torneos Activos</h2>
+                <h2 style="color: #8B4513;"> Activos</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="torneos-list">
-                    ${torneosArray.length === 0 ? '<p>No hay torneos disponibles</p>' : 
+                    ${torneosArray.length === 0 ? '<p>No hay </p>' : 
                         torneosArray.map(torneo => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
 <h3>${sanitizarInput(torneo.nombre) || 'Torneo'}</h3>
@@ -3093,10 +3093,10 @@ window.renderVentasScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">💰 Subastas Disponibles</h2>
+                <h2 style="color: #8B4513;"> Disponibles</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="subastas-list">
-                    ${subastasArray.length === 0 ? '<p>No hay subastas disponibles</p>' : 
+                    ${subastasArray.length === 0 ? '<p>No hay </p>' : 
                         subastasArray.map(subasta => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(subasta.titulo) || 'Subasta'}</h3>
@@ -3127,7 +3127,7 @@ window.renderShareScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">🔗 Contenido Compartido</h2>
+                <h2 style="color: #8B4513;">🔗 Contenido</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="shared-content">
                     ${sharedData ? 
@@ -3135,7 +3135,7 @@ window.renderShareScreen = async function() {
                             <h3>${sharedData.titulo || 'Contenido compartido'}</h3>
                             <p>${sharedData.descripcion || ''}</p>
                          </div>` : 
-                        (shareId ? '<p>Cargando contenido compartido...</p>' : '<p>No hay contenido compartido</p>')
+                        (shareId ? '<p>Cargando contenido compartido...</p>' : '<p>No hay </p>')
                     }
                     ${shareId ? `<button onclick="navigateTo('public')" style="margin-top:20px; padding:12px; background:#8B4513; color:white; border:none; border-radius:8px;">Volver al inicio</button>` : ''}
                 </div>
@@ -3155,10 +3155,10 @@ window.renderPublicacionesScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">⚔️ Publicaciones</h2>
+                <h2 style="color: #8B4513;">TITULO </h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="publicaciones-list">
-                    ${publicacionesArray.length === 0 ? '<p>No hay publicaciones</p>' : 
+                    ${publicacionesArray.length === 0 ? '<p>No hay</p>' : 
                         publicacionesArray.map(pub => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(pub.titulo) || 'Publicación'}</h3>
@@ -3184,10 +3184,10 @@ window.renderPedigriScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">🧬 Pedigrí - Gestión Genética</h2>
+                <h2 style="color: #8B4513;">TITULO PANTALLA 5</h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="pedigris-list">
-                    ${pedigrisArray.length === 0 ? '<p>No hay registros de pedigrí</p>' : 
+                    ${pedigrisArray.length === 0 ? '<p>No hay</p>' : 
                         pedigrisArray.map(p => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(p.nombre) || 'Registro de pedigrí'}</h3>
@@ -3250,10 +3250,10 @@ window.renderJuezScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #f8f9fa;">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">⚖️ Panel de Juez</h2>
+                <h2 style="color: #8B4513;">PANTALLA 7 </h2>
                 ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="peleas-list">
-                    ${peleasArray.length === 0 ? '<p>No hay peleas asignadas</p>' : 
+                    ${peleasArray.length === 0 ? '<p>No hay </p>' : 
                         peleasArray.map(pelea => `
                             <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(pelea.nombre) || 'Pelea'}</h3>
