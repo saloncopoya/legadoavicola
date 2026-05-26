@@ -1503,7 +1503,7 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
     
     return `
 <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(55px, 14vw, 65px); background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
-<div style="display: flex; gap: clamp(2px, 1vw, 16px); align-items: center; justify-content: flex-start; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;">        ${topMenuItems.map(item => `
+<div style="display: flex; gap: clamp(0px, 1.5vw, 20px); align-items: center; justify-content: flex-start; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;">        ${topMenuItems.map(item => `
            <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? '#8B4513' : '#666'}; font-size: clamp(9px, 3vw, 11px); font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px; min-width: 65px; flex: 0 0 auto; white-space: nowrap;">
     <span style="font-size: clamp(20px, 6vw, 28px); ${AppState.ui.currentScreen === item.id ? 'background: #8B4513; border-radius: 50%; padding: 5px; margin: -1px;' : ''}">${item.icon}</span>
     <span style="font-size: clamp(8px, 2.5vw, 10px);">${item.label}</span>
@@ -1731,7 +1731,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO 15</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO 16</p>
 
          
             </div>
@@ -2732,7 +2732,7 @@ function checkIfEverythingLoaded() {
             if (loadingScreen) loadingScreen.style.display = 'none';
             if (socialApp) socialApp.style.display = 'block';
         }
-    }, 200);
+    }, 500);
 }
 
 
@@ -2819,6 +2819,7 @@ app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: 0; marg
     } finally {
         AppState._isRendering = false;
         updateSideMenuContent();
+         window.scrollTo(0, 0);  // scroll arriba subir hasta arriba 
     }
 }
 
