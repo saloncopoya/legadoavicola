@@ -588,6 +588,20 @@ OfflineDB.init().then(() => {
     console.error('❌ Error inicializando IndexedDB:', err);
 });
 
+
+
+
+    // FUNCION NUEVA GENERAR ID DEVICE NOTIFICACIONES
+function generarDeviceId() {
+    let deviceId = localStorage.getItem('device_id');
+    if (!deviceId) {
+        deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+        localStorage.setItem('device_id', deviceId);
+    }
+    return deviceId;
+}
+
+    
 // Sincronizador de datos cuando hay conexión
 let syncInProgress = false;
 
