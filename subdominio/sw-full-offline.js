@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v1.1.11';
-const DYNAMIC_CACHE = 'legado-dynamic-v1.1.11';
+const CACHE_NAME = 'legado-offline-v1.1.13';
+const DYNAMIC_CACHE = 'legado-dynamic-v1.1.13';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -177,8 +177,8 @@ const customData = payload.data || {};
 // ✅ CONSTRUIR BOTONES DINÁMICOS
 const botones = [];
 for (let i = 1; i <= 3; i++) {
-    const nombreBoton = customData[`boton_${i}_nombre`];
-    const urlBoton = customData[`boton_${i}_url`];
+    const nombreBoton = customData[`letra${i}`];     // ← Cambiado
+    const urlBoton = customData[`boton${i}`];         // ← Cambiado
     
     if (nombreBoton && urlBoton) {
         botones.push({
@@ -198,7 +198,7 @@ const actions = botones.length > 0 ? botones : [
 // ✅ GUARDAR URLs DE LOS BOTONES
 const urlsBotones = {};
 for (let i = 1; i <= 3; i++) {
-    const urlBoton = customData[`boton_${i}_url`];
+    const urlBoton = customData[`boton${i}`];        // ← Cambiado
     if (urlBoton) {
         urlsBotones[`boton_${i}`] = urlBoton;
     }
@@ -208,7 +208,7 @@ for (let i = 1; i <= 3; i++) {
             const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
             const notificationOptions = {
                 body: payload.notification?.body || 'Notificación importante',
-                icon: self.location.origin + '/miniatura.jpg',
+                icon: payload.notification?.image || self.location.origin + '/miniatura.jpg',
                 badge: self.location.origin + '/favicon.ico',
                 image: payload.notification?.image || self.location.origin + '/miniatura.jpg',
                 vibrate: [200, 100, 200],
@@ -222,7 +222,7 @@ for (let i = 1; i <= 3; i++) {
 actions: actions,
 data: {
     urls: urlsBotones,
-    url_por_defecto: customData.url_principal || '/'
+    url_por_defecto: customData.url || '/'
 }
             };
             
