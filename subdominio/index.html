@@ -1701,15 +1701,7 @@ localStorage.setItem('fcm_token_old', token);
 
     
 function renderLoginScreen() {
- if (AppState.user.current) {
-        console.log('✅ Usuario ya logueado, redirigiendo a pantalla principal');
-        navigateTo(SCREENS.PUBLIC);
-        return ''; // No renderizar nada
-    }
-    
-        probarPushNotification(); 
-
-    
+  probarPushNotification();     
     return `
 <div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 0;">
     <div style="width: 100%; max-width: 400px; margin: auto;">
