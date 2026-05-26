@@ -2722,8 +2722,14 @@ AppState.setScreen(SCREENS.PUBLIC);
             if (sectionFromUrl === SCREENS.LOGIN) {
                 // Limpiar la URL si intenta entrar a login estando logueado
                 window.history.pushState({}, '', window.location.pathname);
+                 // Forzar pantalla
+    AppState.ui.currentScreen = SCREENS.PUBLIC;
+    // Forzar renderizado manual
+    renderApp()
                 console.log('🚫 URL de login ignorada - Usuario ya logueado');
+                 return;
             }
+
 
             
             
