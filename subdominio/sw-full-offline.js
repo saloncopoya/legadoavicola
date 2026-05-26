@@ -1,6 +1,5 @@
-const CACHE_NAME = 'legado-offline-v1.1.9';
-const DYNAMIC_CACHE = 'legado-dynamic-v1.1.9';
-
+const CACHE_NAME = 'legado-offline-v1.1.11';
+const DYNAMIC_CACHE = 'legado-dynamic-v1.1.11';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -167,6 +166,44 @@ self.addEventListener('push', (event) => {
                     payload = event.data.json();
                 } catch(e) {}
             }
+
+
+
+            
+
+                // ✅ OBTENER DATOS PERSONALIZADOS
+const customData = payload.data || {};
+
+// ✅ CONSTRUIR BOTONES DINÁMICOS
+const botones = [];
+for (let i = 1; i <= 3; i++) {
+    const nombreBoton = customData[`boton_${i}_nombre`];
+    const urlBoton = customData[`boton_${i}_url`];
+    
+    if (nombreBoton && urlBoton) {
+        botones.push({
+            action: `boton_${i}`,
+            title: nombreBoton
+        });
+    }
+}
+
+// ✅ SI NO HAY BOTONES PERSONALIZADOS, USAR LOS QUE YA TENÍAS
+const actions = botones.length > 0 ? botones : [
+    { action: 'ver', title: '👁️ 1VER TORNEO' },
+    { action: 'compartir', title: '📤 2COMPARTIR' },
+    { action: 'recordar', title: '⏰ 3RECORDAR' }
+];
+
+// ✅ GUARDAR URLs DE LOS BOTONES
+const urlsBotones = {};
+for (let i = 1; i <= 3; i++) {
+    const urlBoton = customData[`boton_${i}_url`];
+    if (urlBoton) {
+        urlsBotones[`boton_${i}`] = urlBoton;
+    }
+}
+
             
             const notificationTitle = payload.notification?.title || 'LEGADO AVICOLA';
             const notificationOptions = {
@@ -180,16 +217,13 @@ self.addEventListener('push', (event) => {
     silent: false,  
     renotify: true, 
                  tag: 'legado_notificacion_' + Date.now(),
-                actions: [
-                    { action: 'ver', title: '👁️ 1VER TORNEO' },
-                    { action: 'compartir', title: '📤 2COMPARTIR' },
-                    { action: 'recordar', title: '⏰ 3RECORDAR' }
-                ],
-                data: {
-                    click_action: payload.fcmOptions?.link || '/',
-                    url: payload.fcmOptions?.link || '/',
-                    image: payload.notification?.image || '/miniatura.jpg'
-                }
+              
+
+actions: actions,
+data: {
+    urls: urlsBotones,
+    url_por_defecto: customData.url_principal || '/'
+}
             };
             
             await self.registration.showNotification(notificationTitle, notificationOptions);
@@ -202,16 +236,26 @@ self.addEventListener('notificationclick', (event) => {
     console.log('[SW] Clic en notificación');
     event.notification.close();
     
-    let urlToOpen = '/';
-    if (event.action === 'ver') { 
-        urlToOpen = '/?section=rooster'; 
-    } else if (event.action === 'compartir') { 
-        urlToOpen = '/?section=share'; 
-    } else if (event.action === 'recordar') { 
-        urlToOpen = '/?section=public'; 
-    } else { 
-        urlToOpen = '/'; 
-    }
+    // Obtener las URLs guardadas
+const urlsGuardadas = event.notification.data?.urls || {};
+const urlPorDefecto = event.notification.data?.url_por_defecto || '/';
+
+let urlToOpen = urlPorDefecto;
+
+// Verificar qué botón se presionó
+if (event.action === 'boton_1' && urlsGuardadas['boton_1']) {
+    urlToOpen = urlsGuardadas['boton_1'];
+} else if (event.action === 'boton_2' && urlsGuardadas['boton_2']) {
+    urlToOpen = urlsGuardadas['boton_2'];
+} else if (event.action === 'boton_3' && urlsGuardadas['boton_3']) {
+    urlToOpen = urlsGuardadas['boton_3'];
+} else if (event.action === 'ver') {
+    urlToOpen = '/?section=rooster';
+} else if (event.action === 'compartir') {
+    urlToOpen = '/?section=share';
+} else if (event.action === 'recordar') {
+    urlToOpen = '/?section=public';
+}
     
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
