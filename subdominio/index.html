@@ -982,10 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (navigator.vibrate) navigator.vibrate([100, 50, 300]);
 
             
-            if (deferredPrompt) {
-
-      AppState.addNotification('📱 Instala la aplicación', 'info', 5000);
-                
+            if (deferredPrompt) {                
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') userCanceled = false;
