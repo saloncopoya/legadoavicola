@@ -1,7 +1,7 @@
 {
-    "name": "sub - Legado Avícola",
-    "short_name": "sub - LegadoAV",
-    "description": "Cotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en VivoCotejo Computarizado - Tabla de Posiciones en Vivo",
+    "name": "MI WEB NOMBRE 01",
+    "short_name": "MIMWEB NOMBRE CORTO",
+    "description": "Descripcion de la aplicacion aqui",
     "start_url": "/",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
@@ -12,7 +12,7 @@
     "lang": "es-MX",
     "dir": "ltr",
     "categories": ["sports", "entertainment", "productivity"],
-    "id": "legado-avicola-main",
+    "id": "mi-app-main",
     "version": "2.0.0",
      "edge_side_panel": {
         "preferred_width": 400
@@ -34,32 +34,32 @@
 
     "shortcuts": [
         {
-            "name": "⚡ COTEJO", 
-            "short_name": "Cotejo", 
-            "description": "Ver tabla de cotejo", 
-            "url": "/?tab=cotejo", 
+            "name": "⚡ Bienestar", 
+            "short_name": "Bienestar", 
+            "description": "abrir menu", 
+            "url": "/?tab=bienestar", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=⚡", "sizes": "96x96", "type": "image/png"}]
         },
         {
-            "name": "🏆 POSICIONES", 
-            "short_name": "Posiciones", 
-            "description": "Ver tabla de posiciones", 
-            "url": "/?tab=posicion", 
+            "name": "🏆 Informacion", 
+            "short_name": "Informacion", 
+            "description": "Ver menu", 
+            "url": "/?tab=informacion", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=🏆", "sizes": "96x96", "type": "image/png"}]
         },
         {
-            "name": "📥 IMPORTAR", 
-            "short_name": "Importar", 
-            "description": "Importar torneo desde JSON", 
-            "url": "/?tab=cotejo", 
+            "name": "📥 Buscador", 
+            "short_name": "Buscador", 
+            "description": "Ver buscador", 
+            "url": "/?tab=buscador", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=📥", "sizes": "96x96", "type": "image/png"}]
         }
     ],
 
     "screenshots": [
-        {"src": "https://placehold.co/1280x720/8B4513/white?text=Cotejo+Computarizado", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Tabla de Cotejo"},
-        {"src": "https://placehold.co/1280x720/8B4513/white?text=Tabla+de+Posiciones", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Tabla de Posiciones"},
-        {"src": "https://placehold.co/720x1280/8B4513/white?text=Calificar+Peleas", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow", "label": "Calificación de peleas"}
+        {"src": "https://placehold.co/1280x720/8B4513/white?text=BIENESTAR", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Tabla de Cotejo"},
+        {"src": "https://placehold.co/1280x720/8B4513/white?text=INFORAMCION", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Tabla de Posiciones"},
+        {"src": "https://placehold.co/720x1280/8B4513/white?text=BUSCADOR", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow", "label": "Calificación de peleas"}
     ],
 
     
@@ -77,7 +77,7 @@
     "cache": {"strategy": "cache-first", "max_age": 2592000, "max_entries": 100},
     "prefetch": {"urls": ["/", "/offline.html"], "strategy": "eager"},
     
-    "splash_screen": {"background_color": "#8B4513", "image": "https://placehold.co/512x512/8B4513/white?text=🐓", "image_purpose": "any"},
+    "splash_screen": {"background_color": "#8B4513", "image": "https://placehold.co/512x512/8B4513/white?text=MIAPP", "image_purpose": "any"},
     
     "analytics": {"enabled": false},
     "features": {"cross_window": true, "fullscreen": true, "picture_in_picture": false, "wake_lock": false},
