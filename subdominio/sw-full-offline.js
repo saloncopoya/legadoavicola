@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v1.0.4';
-const DYNAMIC_CACHE = 'legado-dynamic-v1.0.4';
+const CACHE_NAME = 'legado-offline-v0.0.1';
+const DYNAMIC_CACHE = 'legado-dynamic-v0.0.1';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -150,8 +150,7 @@ firebase.initializeApp({
 // ESTO BLOQUEA LA NOTIFICACIÓN NATIVA DE FIREBASE
 self.addEventListener('push', (event) => {
     
-event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(() => {
+    event.waitUntil(
         (async () => {
             let payload = {};
             if (event.data) {
@@ -221,8 +220,7 @@ data: {
             
             await self.registration.showNotification(notificationTitle, notificationOptions);
         })()
-        }).catch(err => console.log('[SW] Error:', err)));
-
+    );
 });
 
 // MANEJAR CLIC EN BOTONES
@@ -265,12 +263,3 @@ if (event.action === 'boton_1' && urlsGuardadas['boton_1']) {
     );
 });
 
-
-
-// FORZAR NOTIFICACIONES EN WINDOWS
-self.addEventListener('pushsubscriptionchange', function(event) {
-    console.log('[SW] Suscripción renovada automáticamente');
-    event.waitUntil(
-        self.registration.pushManager.subscribe({ userVisibleOnly: true })
-    );
-});
