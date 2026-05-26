@@ -821,36 +821,92 @@ const FIREBASE_ADMIN_CONFIG = {
 
 // PASO 1: Definir los textos e iconos (SOLO CAMBIAS AQUÍ)
 const TEXTS_VALUES = {
-    
     txt_public: 'INICIO',
-    ico_public: '🏠',
+    ico_public: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H5a2 2 0 0 1-2-2z"/>
+        </svg>
+    `,
     
     txt_ventas: 'BIENESTAR',
-ico_ventas: '❤️',
+    ico_ventas: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+    `,
     
-    txt_rooster: 'INFORAMCION',
-    ico_rooster: '📑',
+    txt_rooster: 'INFORMACION',
+    ico_rooster: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+    `,
     
     txt_share: 'BUSCADOR',
-    ico_share: '🔍',
+    ico_share: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+    `,
     
     txt_publicaciones: 'MENU5',
-    ico_publicaciones: '⚔️',
+    ico_publicaciones: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16v16H4z"/>
+            <line x1="8" y1="8" x2="16" y2="8"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+            <line x1="8" y1="16" x2="12" y2="16"/>
+        </svg>
+    `,
     
     txt_pedigri: 'MENU6',
-    ico_pedigri: '🧬',
+    ico_pedigri: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+        </svg>
+    `,
     
     txt_juez: 'MENU7',
-    ico_juez: '⚖️',
+    ico_juez: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6-6 6 6"/>
+            <path d="M6 15l6 6 6-6"/>
+            <line x1="12" y1="3" x2="12" y2="21"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+        </svg>
+    `,
     
     txt_perfil: 'MENU8',
-    ico_perfil: '👤',
+    ico_perfil: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+    `,
     
     txt_configuraciones: 'CONFIGURACIONES9',
-    ico_configuraciones: '⚙️',
+    ico_configuraciones: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+    `,
     
     txt_admin: 'ADMIN10',
-    ico_admin: '🔧',
+    ico_admin: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7h6V5a3 3 0 0 0-3-3z"/>
+            <path d="M19 10h-2v4h2v-4z"/>
+            <path d="M5 10H3v4h2v-4z"/>
+            <path d="M8 21h8"/>
+            <path d="M12 17v4"/>
+        </svg>
+    `,
     
     txt_login: 'Login',
     ico_login: '',
@@ -1584,7 +1640,7 @@ if (!AppState.ui.isLoading && navigator.onLine) {
 <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(60px, 14vw, 65px); background: var(--bg-dark-gradient); display: flex; align-items: center; justify-content: space-evenly; padding: clamp(4px, 2vw, 12px) clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
     ${botones.map(btn => `
         <button onclick="${btn.accion}" id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'var(--color-secondary-gradient)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 0; flex: 1; max-width: 90px;">
-            <span style="font-size: clamp(20px, 6vw, 28px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
+<span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
             <span style="font-size: clamp(8px, 3vw, 11px); font-weight: 700; color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
         </button>
     `).join('')}
@@ -1615,7 +1671,7 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
 <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(55px, 14vw, 65px); background: var(--bg-white); box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
 <div style="display: flex; gap: clamp(0px, 1.5vw, 20px); align-items: center; justify-content: flex-start; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;">        ${topMenuItems.map(item => `
            <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'}; font-size: clamp(9px, 3vw, 11px); font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px; min-width: 65px; flex: 0 0 auto; white-space: nowrap;">
-    <span style="font-size: clamp(20px, 6vw, 28px); ${AppState.ui.currentScreen === item.id ? 'background: var(--color-primary); border-radius: 50%; padding: 5px; margin: -1px;' : ''}">${item.icon}</span>
+<span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'};">${item.icon}</span>
     <span style="font-size: clamp(8px, 2.5vw, 10px);">${item.label}</span>
 </button>
         `).join('')}
