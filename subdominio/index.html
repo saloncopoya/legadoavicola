@@ -58,6 +58,33 @@ if (self !== top) {
            VARIABLES GLOBALES DE DISEÑO 
            ============================================== */
         :root {
+
+
+            /* ===== TEXTOS (faltantes) ===== */
+    --text-white: #ffffff;
+    --text-gray: #CCCCCC;
+    --text-muted: #666666;
+    --text-dark: #333333;
+    
+    /* ===== BORDES ===== */
+    --border-color: #ddd;
+    --border-light: #e4e6eb;
+    
+    /* ===== ESTADOS ===== */
+    --danger-color: #d32f2f;
+    
+    /* ===== WHATSAPP ===== */
+    --whatsapp-bg: #075E54;
+    
+    /* ===== ADMIN ===== */
+    --admin-error-bg: #ffebee;
+    --admin-error-text: #c62828;
+    
+    /* ===== BOTONES TOGGLE ===== */
+    --toggle-bg: #f0f0f0;
+    --toggle-text: #666;
+
+            
             /* ===== COLORES PRINCIPALES ===== */
             --color-primary: #8B4513;
             --color-primary-dark: #5e2e0e;
@@ -158,7 +185,7 @@ if (self !== top) {
 
         .toast-message {
             background: #323232;
-            color: white;
+            color: var(--text-white, white);
             padding: 12px 20px;
             border-radius: 12px;
             font-weight: 500;
@@ -289,7 +316,7 @@ background: var(--color-primary-gradient);
 
         .wifi-bar {
             width: 4px;
-background: var(--wifi-color); }
+background: var(--wifi-color); 
         border-radius: 2px;
             transition: all 0.3s ease;
         }
@@ -329,7 +356,7 @@ box-shadow: var(--shadow-menu);
             left: 0;
             width: 100%;
             height: 100vh;
-            background: var(--bg-overlay)
+            background: var(--bg-overlay);
             z-index: 1000;
             display: none;
         }
@@ -356,17 +383,17 @@ box-shadow: var(--shadow-menu);
 
 <!-- PANTALLA DE CARGA -->
 <div id="loading-screen">
-    <div style="font-size: 60px; color: white; margin-bottom: 20px;">🐓</div>
-    <div style="font-size: 32px; color: white; font-weight: 800; margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;">
+    <div style="font-size: 60px; color: var(--text-white, white); margin-bottom: 20px;">🐓</div>
+    <div style="font-size: 32px; color: var(--text-white, white); font-weight: 800; margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;">
         <span>C</span><span>A</span><span>R</span><span>G</span><span>A</span><span>N</span>
         <span>D</span><span>O</span>
     </div>
     <div style="width: 80%; max-width: 300px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
         <div id="loading-progress-bar" style="width: 0%; height: 100%; background: var(--color-secondary); border-radius: 10px; transition: width 0.3s ease;"></div>
     </div>
-    <div id="loading-subtitle" style="font-size: 16px; color: #FFD700; margin-top: 10px; font-weight: 600; display: none;">Reconectando...</div>
+    <div id="loading-subtitle" style="font-size: 16px; color: var(--color-secondary); margin-top: 10px; font-weight: 600; display: none;">Reconectando...</div>
     <div id="loading-status" style="font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;">Inicializando aplicación</div>
-    <button id="loading-reload-btn" onclick="location.reload()" style="margin-top: 25px; padding: 12px 30px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 500; cursor: pointer; backdrop-filter: blur(4px); display: none;">
+    <button id="loading-reload-btn" onclick="location.reload()" style="margin-top: 25px; padding: 12px 30px; background: rgba(255,255,255,0.15); color: var(--text-white, white); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-weight: 500; cursor: pointer; backdrop-filter: blur(4px); display: none;">
         <span style="display: block; font-weight: 900; font-size: 18px;">⚠️ ACCEDER</span>
         <span style="display: block; font-weight: 500; font-size: 12px; opacity: 0.8;">RECARGAR PÁGINA</span>
     </button>
@@ -1516,7 +1543,7 @@ function renderPublicTopBar() {
 if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
     return `
  <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; z-index: 1000; background: var(--bg-dark-gradient); display: flex; align-items: center; justify-content: center;">
-            <div style="color: #FFD700; font-size: 12px; font-weight: 500;">🔄 CARGANDO BARRA...</div>
+            <div style="color: var(--color-secondary); font-size: 12px; font-weight: 500;">🔄 CARGANDO BARRA...</div>
         </nav>
     `;
 }
@@ -1540,11 +1567,11 @@ if (!AppState.ui.isLoading && navigator.onLine) {
     }
     
   return `
-<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(60px, 14vw, 65px); background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: space-evenly; padding: clamp(4px, 2vw, 12px) clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
+<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(60px, 14vw, 65px); background: var(--bg-dark-gradient); display: flex; align-items: center; justify-content: space-evenly; padding: clamp(4px, 2vw, 12px) clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
     ${botones.map(btn => `
         <button onclick="${btn.accion}" id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'var(--color-secondary-gradient)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 0; flex: 1; max-width: 90px;">
             <span style="font-size: clamp(20px, 6vw, 28px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
-            <span style="font-size: clamp(8px, 3vw, 11px); font-weight: 700; color: ${currentScreen === btn.id ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
+            <span style="font-size: clamp(8px, 3vw, 11px); font-weight: 700; color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
         </button>
     `).join('')}
 </nav>
@@ -1792,7 +1819,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO 18</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO 19</p>
 
          
             </div>
@@ -1808,13 +1835,13 @@ function renderActivationPendingScreen() {
         <div style="background: var(--color-primary-gradient); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
             <div style="max-width: 500px; width: 100%;">
                 <div style="text-align: center;">
-                    <div style="font-size: 60px; color: white;">⏳</div>
-                    <h1 style="color: white;">Cuenta en revisión</h1>
+                    <div style="font-size: 60px; color: var(--text-white, white);">⏳</div>
+                    <h1 style="color: var(--text-white, white);">Cuenta en revisión</h1>
                     <p style="color: rgba(255,255,255,0.9);">Tu cuenta está siendo verificada por un administrador</p>
                 </div>
                 <div style="background: var(--bg-white); border-radius: 16px; padding: 24px; margin-top: 20px;">
                     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f0f8ff; border-radius: 12px;">
-                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${initials}</div>
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: var(--text-white, white); font-size: 24px; font-weight: bold;">${initials}</div>
                         <div><div style="font-size:18px; font-weight:700;">${userProfile?.displayName || 'Usuario'}</div></div>
                     </div>
                     <button onclick="checkActivationStatusWithFeedback()" style="width:100%; padding:14px; background:var(--color-primary); color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">🔄 INGRESAR AHORA</button>
@@ -2433,7 +2460,7 @@ function updateSideMenuContent() {
     menuContent.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                ${photoURL ? `<img src="${photoURL}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div style="width:50px; height:50px; border-radius:50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px;">${initials}</div>`}
+                ${photoURL ? `<img src="${photoURL}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div style="width:50px; height:50px; border-radius:50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: var(--text-white, white); font-weight: bold; font-size:20px;">${initials}</div>`}
                 <div><div style="font-weight: 700;">${userProfile.displayName}</div>
                   <div style="font-size: 12px; color: #666;">${isAdmin ? TEXTS.BADGE_ADMIN : TEXTS.BADGE_MEMBER}</div></div>
             </div>
@@ -2450,8 +2477,8 @@ function updateSideMenuContent() {
     box-shadow: 0 3px 3px rgba(0,0,0,0.3);
     transition: 0.2s;
 ">
-    <span style="font-size: 24px; color: white;">✕</span>
-    <span style="font-size: 18px; font-weight: bold; color: white;">CERRAR</span>
+    <span style="font-size: 24px; color: var(--text-white, white);">✕</span>
+    <span style="font-size: 18px; font-weight: bold; color: var(--text-white, white);">CERRAR</span>
 </button>
 
 </div>
@@ -3279,7 +3306,7 @@ window.renderPerfilScreen = async function() {
                     <div style="text-align: center; margin-bottom: 24px;">
                         ${userProfile.photoURL ? 
                             `<img src="${userProfile.photoURL}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">` :
-                            `<div style="width: 100px; height: 100px; background: var(--color-primary); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">${getInitials(userProfile.displayName)}</div>`
+                            `<div style="width: 100px; height: 100px; background: var(--color-primary); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: var(--text-white, white); font-size: 40px;">${getInitials(userProfile.displayName)}</div>`
                         }
 <h2 style="margin-top: 16px;">${sanitizarInput(userProfile.displayName) || 'Usuario'}</h2>
 <p>${sanitizarInput(userProfile.realEmail) || sanitizarInput(currentUser?.email) || ''}</p>
@@ -3402,7 +3429,7 @@ window.renderAdminScreen = async function() {
                 <div style="background: var(--bg-white); border-radius: 12px; padding: 20px;">
                     <button onclick="AppState.addNotification('Cargando usuarios...', 'info')" style="width:100%; padding:12px; margin:8px 0; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">✅ Activar Usuarios</button>
                     <button onclick="AppState.addNotification('Estadísticas próximamente', 'info')" style="width:100%; padding:12px; margin:8px 0; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">📊 Estadísticas</button>
-                    <button onclick="AppState.addNotification('Limpiando caché...', 'warning')" style="width:100%; padding:12px; margin:8px 0; background:#d93025; color:white; border:none; border-radius:8px; cursor:pointer;">🗑️ Limpiar Caché</button>
+                    <button onclick="AppState.addNotification('Limpiando caché...', 'warning')" style="width:100%; padding:12px; margin:8px 0; background:var(--error-bg); color:white; border:none; border-radius:8px; cursor:pointer;">🗑️ Limpiar Caché</button>
                 </div>
             </div>
         </div>
@@ -3419,7 +3446,7 @@ window.renderAdminScreen = async function() {
         
         <div style="margin-bottom:20px;">
             <div style="font-size:14px; font-weight:700; color:var(--color-secondary); margin-bottom:12px;">📞 CONTACTO DIRECTO</div>
-<a href="https://wa.me/529611150394" style="display: inline-block; background: #075E54; padding: 10px 20px; color: white; font-weight: bold; border-radius: 50px;">
+<a href="https://wa.me/529611150394" style="display: inline-block; background: #075E54; padding: 10px 20px; color: var(--text-white, white); font-weight: bold; border-radius: 50px;">
     📱 WHATSAPP: 
 </a>            <a href="mailto:lg.w@gmail.com" style="display:inline-block; padding:12px 24px; background:rgba(255,255,255,0.15); border-radius:50px; color:var(--color-secondary); text-decoration:none; margin:10px; font-weight:bold;">📧 @gmail.com</a>
         </div>
