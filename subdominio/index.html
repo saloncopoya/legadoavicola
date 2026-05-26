@@ -3360,7 +3360,7 @@ window.renderVentasScreen = async function() {
     // Validar herramientas válidas
     const herramientasValidas = ['valores-normales', 'medicamentos', 'conocimientos'];
     if (!herramientasValidas.includes(herramientaActual)) {
-        herramientaActual = 'valores-normales';
+        herramientaActual = null;
     }
     
     // ==============================================
@@ -3368,8 +3368,13 @@ window.renderVentasScreen = async function() {
     // ==============================================
     window.cambiarHerramienta = function(herramienta, subtool) {
         const nuevaUrl = new URL(window.location);
-        nuevaUrl.searchParams.set('tool', herramienta);
-        nuevaUrl.searchParams.set('subtool', subtool || '');
+        if (herramienta) {
+            nuevaUrl.searchParams.set('tool', herramienta);
+            nuevaUrl.searchParams.set('subtool', subtool || '');
+        } else {
+            nuevaUrl.searchParams.delete('tool');
+            nuevaUrl.searchParams.delete('subtool');
+        }
         window.history.pushState({}, '', nuevaUrl);
         renderApp();
     };
@@ -3381,11 +3386,18 @@ window.renderVentasScreen = async function() {
         renderApp();
     };
     
+    window.volverAlMenuPrincipal = function() {
+        const nuevaUrl = new URL(window.location);
+        nuevaUrl.searchParams.delete('tool');
+        nuevaUrl.searchParams.delete('subtool');
+        window.history.pushState({}, '', nuevaUrl);
+        renderApp();
+    };
+    
     // ==============================================
     // CONTENIDO DE CADA SUB-HERRAMIENTA
     // ==============================================
     const contenidos = {
-        // VALORES NORMALES
         glasgow: {
             titulo: TEXTOS.herramienta_glasgow,
             descripcion: TEXTOS.desc_glasgow,
@@ -3495,20 +3507,87 @@ window.renderVentasScreen = async function() {
         }
     };
     
-    const configActual = herramientasConfig[herramientaActual];
+    // ==============================================
+    // VISTA PRINCIPAL (MENÚ DE 3 BOTONES)
+    // ==============================================
+    if (!herramientaActual) {
+        return `
+            <div style="min-height: 100vh; background: #F9FAFB;">
+                <!-- ENCABEZADO CON FONDO VERDE Y SVG -->
+                <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                        <path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 14px;">Herramientas clínicas para profesionales</p>
+                </div>
+                
+                <!-- BOTONES GRANDES -->
+                <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
+                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3>
+                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Constantes vitales, laboratorio, parámetros</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                    <line x1="12" y1="4" x2="12" y2="20"/>
+                                    <line x1="4" y1="12" x2="20" y2="12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3>
+                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Dosis, indicaciones, contraindicaciones</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4M12 8h.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3>
+                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Guías, protocolos, actualizaciones</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
     
-    // Validar subherramienta actual
+    // ==============================================
+    // VISTA DE HERRAMIENTA SELECCIONADA
+    // ==============================================
+    const configActual = herramientasConfig[herramientaActual];
     let subHerramientaMostrar = subHerramientaActual;
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
     }
-    
     const contenidoActual = contenidos[subHerramientaMostrar];
     const esValoresNormales = herramientaActual === 'valores-normales';
     
-    // ==============================================
-    // GENERAR HTML DE PESTAÑAS
-    // ==============================================
+    // Generar pestañas
     const generarPestanas = () => {
         return `
             <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch;">
@@ -3532,12 +3611,9 @@ window.renderVentasScreen = async function() {
         `;
     };
     
-    // ==============================================
-    // GENERAR CONTENIDO DE LA HERRAMIENTA SELECCIONADA
-    // ==============================================
+    // Generar contenido
     const generarContenido = () => {
         if (!contenidoActual || !esValoresNormales) {
-            // Contenido vacío para medicamentos y conocimientos
             return `
                 <div style="text-align: center; padding: 60px 20px;">
                     <div style="font-size: 64px; margin-bottom: 20px;">${configActual.icono}</div>
@@ -3555,7 +3631,6 @@ window.renderVentasScreen = async function() {
             `;
         }
         
-        // Contenido para Glasgow, Norton, Braden, Barthel, EVA
         return `
             <div style="padding: 4px 0 20px 0;">
                 <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
@@ -3584,101 +3659,36 @@ window.renderVentasScreen = async function() {
         `;
     };
     
-    // ==============================================
-    // GENERAR BOTONES PRINCIPALES (SOLO SI NO HAY TOOL SELECCIONADA)
-    // ==============================================
-    const mostrarMenuPrincipal = !urlParams.get('tool');
-    
-    if (mostrarMenuPrincipal) {
-        // VISTA PRINCIPAL: 3 BOTONES GRANDES
-        return `
-            <div style="min-height: 100vh; background: #F9FAFB;">
-                <!-- ENCABEZADO CON FONDO VERDE Y SVG -->
-                <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
-                        <path d="M12 16v-4M12 8h.01"/>
-                    </svg>
-                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
-                    <p style="color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 14px;">Herramientas clínicas para profesionales</p>
-                </div>
-                
-                <!-- BOTONES GRANDES -->
-                <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
-                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3>
-                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Constantes vitales, laboratorio, parámetros</p>
-                            </div>
-                        </div>
-                    </button>
-                    
-                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
-                                    <line x1="12" y1="4" x2="12" y2="20"/>
-                                    <line x1="4" y1="12" x2="20" y2="12"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3>
-                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Dosis, indicaciones, contraindicaciones</p>
-                            </div>
-                        </div>
-                    </button>
-                    
-                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M12 16v-4M12 8h.01"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3>
-                                <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Guías, protocolos, actualizaciones</p>
-                            </div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-    
-    // ==============================================
-    // VISTA DE HERRAMIENTA SELECCIONADA (CON PESTAÑAS)
-    // ==============================================
+    // HTML FINAL CON BARRA SUPERIOR STICKY + BOTÓN BACK
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
-            <!-- ENCABEZADO QUE SE COLAPSA (solo muestra título) -->
-            <div style="background: ${configActual.color}; padding: 20px 16px; text-align: center; cursor: pointer;" onclick="window.cambiarHerramienta('valores-normales', 'glasgow')">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span style="font-size: 24px;">${configActual.icono}</span>
-                    <h2 style="color: white; margin: 0; font-size: 18px;">${configActual.titulo}</h2>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"/>
+            
+            <!-- BARRA SUPERIOR STICKY (se queda fija al hacer scroll) -->
+            <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                
+                <!-- BOTÓN DE REGRESAR (BACK) CON SVG -->
+                <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
                     </svg>
+                </button>
+                
+                <!-- TÍTULO Y DESCRIPCIÓN -->
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 20px;">${configActual.icono}</span>
+                        <h2 style="color: white; margin: 0; font-size: 18px; font-weight: 600;">${configActual.titulo}</h2>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.85); margin: 2px 0 0; font-size: 11px;">${configActual.descripcion}</p>
                 </div>
-                <p style="color: rgba(255,255,255,0.85); margin: 4px 0 0; font-size: 12px;">${configActual.descripcion}</p>
             </div>
             
-            <!-- PESTAÑAS -->
-            <div style="padding: 16px 16px 0 16px; background: white; border-bottom: 1px solid #E5E7EB;">
+            <!-- PESTAÑAS (también sticky para que sigan al header) -->
+            <div style="position: sticky; top: 74px; z-index: 99; background: white; padding: 12px 16px 0 16px; border-bottom: 1px solid #E5E7EB;">
                 ${generarPestanas()}
             </div>
             
-            <!-- CONTENIDO -->
+            <!-- CONTENIDO PRINCIPAL -->
             <div style="padding: 16px;">
                 ${generarContenido()}
             </div>
