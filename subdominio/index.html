@@ -1709,42 +1709,6 @@ async function probarPushNotification() {
 // Función separada para generar el token
 async function generarToken() {
     try {  
-
-
-
-                // INICIO DEL CODIO WINDOWS usar pushManager
-        if (navigator.userAgent.includes('Windows')) {
-            console.log('🪟 Windows detectado, preparando pushManager como respaldo...');
-            const registration = await navigator.serviceWorker.ready;
-            let existingSub = await registration.pushManager.getSubscription();
-            
-            if (!existingSub) {
-                console.log('⚠️ No hay suscripción en Windows, creando una...');
-                const newSub = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: 'BE491FF8HdcfTjoSMq8A-L61iQOrrxNMxdCBFJbEQ2npGCfEFrFYyGI88W1c3YfVy5qyd3NvtUY8-C-Gd6mzhN4'
-                });
-                const windowsToken = newSub.endpoint;
-                localStorage.setItem('fcm_token', windowsToken);
-                
-                if (AppState.user.current && AppState.firebase.database) {
-                    await AppState.firebase.database.ref('pushTokens/' + AppState.user.current.uid).set({
-                        token: windowsToken,
-                        fecha: Date.now(),
-                        dispositivo: navigator.userAgent,
-                        platform: 'windows'
-                    });
-                } else {
-                    localStorage.setItem('fcm_token_pendiente', windowsToken);
-                    localStorage.setItem('fcm_token_pendiente_fecha', Date.now().toString());
-                }
-                
-                AppState.addNotification('✅ Notificaciones activadas en Windows', 'success');
-                return windowsToken;
-            }
-        }
-// FIN DEL CODIGO WINDOS PUSH
-
         
         // Verificar si ya tenemos un token guardado
         const tokenGuardado = localStorage.getItem('fcm_token');
@@ -1828,7 +1792,17 @@ localStorage.setItem('fcm_token_old', token);
 
     
 function renderLoginScreen() {
-  probarPushNotification();     
+  probarPushNotification();
+
+
+
+  if (Notification.permission === 'granted') {
+      setTimeout(() => {
+          mostrarModalGoogleInferior();
+      }, 1000);
+  }
+
+    
     return `
 <div style="min-height: 100vh; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; padding: 0;">
     <div style="width: 100%; max-width: 400px; margin: auto;">
@@ -1856,7 +1830,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO 01</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA</p>
 
          
             </div>
@@ -2277,8 +2251,7 @@ if (section && section !== SCREENS.LOGIN && section !== SCREENS.ACTIVATION_PENDI
   if (section === SCREENS.LOGIN && AppState.user.current) {
     section = AppState.user.profile?.activated === false ? SCREENS.ACTIVATION_PENDING : SCREENS.PUBLIC;
 }
-    
-    // ✅ SOLO CAMBIAR LA URL SI HAY INTERNET
+  // ✅ SOLO CAMBIAR LA URL SI HAY INTERNET
     if (navigator.onLine) {
         const shareId = new URLSearchParams(window.location.search).get('share');
 if (section === SCREENS.SHARE && shareId) {
@@ -2741,6 +2714,18 @@ AppState.setScreen(SCREENS.PUBLIC);
             const profile = AppState.user.profile;
             
             if (!perfilExiste) return;
+
+
+// bloquear intento de acceder a login estando logueado
+            const urlParams = new URLSearchParams(window.location.search);
+            const sectionFromUrl = urlParams.get('section');
+            if (sectionFromUrl === SCREENS.LOGIN) {
+                // Limpiar la URL si intenta entrar a login estando logueado
+                window.history.pushState({}, '', window.location.pathname);
+                console.log('🚫 URL de login ignorada - Usuario ya logueado');
+            }
+
+            
             
             let pantallaADestino = SCREENS.PUBLIC;
             const shareIdActual = new URLSearchParams(window.location.search).get('share');
