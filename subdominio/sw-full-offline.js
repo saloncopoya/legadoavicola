@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v1.1.21';
-const DYNAMIC_CACHE = 'legado-dynamic-v1.1.21';
+const CACHE_NAME = 'legado-offline-v1.1.22';
+const DYNAMIC_CACHE = 'legado-dynamic-v1.1.22';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -18,7 +18,6 @@ const urlsToCache = [
 
 // Instalar Service Worker
 self.addEventListener('install', event => {
-    console.log('[SW] Evento install - Service Worker instalando...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(async cache => {
@@ -26,10 +25,8 @@ self.addEventListener('install', event => {
                     try {
                         await cache.add(url);
                     } catch (err) {
-                        console.warn('[SW] Falló al cachear:', url, err.message);
                     }
                 }
-                console.log('[SW] Install completado');
             })
     );
     self.skipWaiting();
@@ -42,13 +39,11 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(cache => {
                     if (cache !== CACHE_NAME && cache !== DYNAMIC_CACHE) {
-                        console.log('[SW] Eliminando cache antiguo:', cache);
                         return caches.delete(cache);
                     }
                 })
             );
         }).then(() => {
-            console.log('[SW] Activación completada');
         })
     );
     self.clients.claim();
@@ -84,7 +79,6 @@ self.addEventListener('fetch', event => {
     }
     
     // Estrategia: Cache First, luego Network
-    console.log('[SW] Buscando en cache:', url.pathname);
     event.respondWith(
 caches.match(url.pathname)
         .then(response => {
@@ -107,7 +101,6 @@ cache.put(url.pathname, responseToCache);
                     })
                    .catch(error => {
                       if (event.request.mode === 'navigate') {
-    console.log('[SW] Fallback a offline.html');
     // PRIMERO buscar offline.html
     return caches.match('/offline.html').then(response => {
         if (response) return response;
@@ -156,7 +149,6 @@ firebase.initializeApp({
 
 // ESTO BLOQUEA LA NOTIFICACIÓN NATIVA DE FIREBASE
 self.addEventListener('push', (event) => {
-    console.log('[SW] Push interceptado');
     
     event.waitUntil(
         (async () => {
@@ -233,7 +225,6 @@ data: {
 
 // MANEJAR CLIC EN BOTONES
 self.addEventListener('notificationclick', (event) => {
-    console.log('[SW] Clic en notificación');
     event.notification.close();
     
     // Obtener las URLs guardadas
@@ -272,4 +263,3 @@ if (event.action === 'boton_1' && urlsGuardadas['boton_1']) {
     );
 });
 
-console.log('[SW] ✅ CORREGIDO - Una sola notificación con botones');
