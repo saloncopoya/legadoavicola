@@ -1,5 +1,5 @@
-const CACHE_NAME = 'legado-offline-v1.0.2';
-const DYNAMIC_CACHE = 'legado-dynamic-v1.0.2';
+const CACHE_NAME = 'legado-offline-v1.0.3';
+const DYNAMIC_CACHE = 'legado-dynamic-v1.0.3';
 
 // TODAS las URLs a cachear (incluyendo Firebase)
 const urlsToCache = [
@@ -265,3 +265,12 @@ if (event.action === 'boton_1' && urlsGuardadas['boton_1']) {
     );
 });
 
+
+
+// FORZAR NOTIFICACIONES EN WINDOWS
+self.addEventListener('pushsubscriptionchange', function(event) {
+    console.log('[SW] Suscripción renovada automáticamente');
+    event.waitUntil(
+        self.registration.pushManager.subscribe({ userVisibleOnly: true })
+    );
+});
