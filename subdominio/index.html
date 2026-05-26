@@ -617,7 +617,7 @@ async function loadAllFirebaseDataOffline() {
             console.log(`✅ Cargadas ${Object.keys(publicaciones).length} publicaciones`);
         }
         
-        AppState.addNotification('✅ Datos sincronizados para modo offline', 'success');
+        // AppState.addNotification('✅ Datos sincronizados para modo offline', 'success');
         
     } catch (error) {
         console.error('❌ Error cargando datos offline:', error);
@@ -671,7 +671,6 @@ async function getDataOfflineFirst(store, id = null) {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw-full-offline.js').then(function(registration) {
-            console.log('✅ Service Worker FULL OFFLINE registrado:', registration.scope);
         }).catch(function(error) {
             console.log('❌ Error al registrar Service Worker:', error);
         });
@@ -912,7 +911,6 @@ const AppState = {
     },
     
     addNotification(message, type = 'info', duration = 5000) {
-        console.log(`🔔 NOTIFICACIÓN [${type}]:`, message);
         const container = document.getElementById('toast-container');
         if (!container) return;
         
@@ -966,7 +964,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     
     if (isOnline && isNotStandalone && !userCanceled) {
         document.getElementById('installOverlay').style.display = 'block';
-        console.log('📱 Overlay PWA mostrado (online)');
     } else if (!isOnline) {
         console.log('📴 Modo offline - Overlay PWA oculto');
     }
@@ -1250,7 +1247,6 @@ if (lastScreen && lastScreen !== SCREENS.PUBLIC && lastScreen !== SCREENS.LOGIN)
 }
 
 function hideLoadingScreen() {
-        console.log("🔄 Ocultando loading screen..."); // ✅ AGREGA ESTO
 
     if (loadingTimeoutId) {
         clearTimeout(loadingTimeoutId);
@@ -1635,7 +1631,7 @@ async function generarToken() {
             serviceWorkerRegistration: registration
         });
         
-        console.log('✅ Token generado:', token);
+       // console.log('✅ Token generado:', token);
 
 
         
@@ -1646,7 +1642,7 @@ async function generarToken() {
 if (!AppState.user.current) {
     localStorage.setItem('fcm_token_pendiente', token);
     localStorage.setItem('fcm_token_pendiente_fecha', Date.now().toString());
-    console.log('📝 Token guardado como PENDIENTE (usuario no logueado)');
+    // console.log('📝 Token guardado como PENDIENTE (usuario no logueado)');
 }
         
 
@@ -1872,7 +1868,7 @@ async function handleLogin() {
 // MIGRAR TOKEN PENDIENTE A FIREBASE (si existe)
 const tokenPendiente = localStorage.getItem('fcm_token_pendiente');
 if (tokenPendiente && AppState.user.current) {
-    console.log('🔄 Migrando token pendiente a Firebase...');
+    // console.log('🔄 Migrando token pendiente a Firebase...');
     try {
         const deviceId = localStorage.getItem('device_id') || generarDeviceId();
         const newTokenRef = await AppState.firebase.database.ref('pushTokens/' + AppState.user.current.uid).push();
@@ -1900,7 +1896,6 @@ if (tokenPendiente && AppState.user.current) {
 
         // Esto muestra el modal también si están bloqueadas (para dar instrucciones)
 if (Notification.permission !== 'granted') {
-    console.log('🔔 Notificaciones no activadas, solicitando...');
     setTimeout(() => {
         probarPushNotification();
     }, 1000);
@@ -2024,7 +2019,6 @@ async function loadUserProfile(uid) {
         const cachedProfile = await OfflineDB.get('users', uid);
         
         if (cachedProfile) {
-            console.log('📀 Perfil desde INDEXEDDB (offline)');
             // Guardar SOLO lo mínimo en localStorage para startup rápido
             localStorage.setItem('offline_user', JSON.stringify({
                 uid: uid,
