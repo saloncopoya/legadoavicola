@@ -1649,7 +1649,7 @@ if (!AppState.ui.isLoading && navigator.onLine) {
     ${botones.map(btn => `
         <button onclick="${btn.accion}" id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'var(--color-secondary-gradient)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 0; flex: 1; max-width: 90px;">
 <span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
-            <span style="font-size: clamp(8px, 3vw, 11px); font-weight: 700; color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
+            <span style="font-size: clamp(6px, 2vw, 15px); font-weight: 700; color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
         </button>
     `).join('')}
 </nav>
@@ -1680,7 +1680,7 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
 <div style="display: flex; gap: clamp(0px, 1.5vw, 20px); align-items: center; justify-content: flex-start; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;">        ${topMenuItems.map(item => `
            <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'}; font-size: clamp(9px, 3vw, 11px); font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px; min-width: 65px; flex: 0 0 auto; white-space: nowrap;">
 <span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'};">${item.icon}</span>
-    <span style="font-size: clamp(8px, 2.5vw, 10px);">${item.label}</span>
+    <span style="font-size: clamp(6px, 2vw, 13px);">${item.label}</span>
 </button>
         `).join('')}
     </div>
