@@ -2732,7 +2732,7 @@ function checkIfEverythingLoaded() {
     
     try {
 
-         console.log('🔍 renderApp - isLoading:', AppState.ui.isLoading, 'user:', AppState.user.current);
+         // console.log('🔍 renderApp - isLoading:', AppState.ui.isLoading, 'user:', AppState.user.current);
         
         const app = document.getElementById('social-app');
         if (!app) return;
@@ -3072,7 +3072,6 @@ window.renderRoosterScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla ROOSTER cargada desde script separado');
 </script>
 
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
@@ -3100,7 +3099,6 @@ window.renderVentasScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla VENTAS cargada desde script separado');
 </script>
 
 <!-- PANTALLA 3: SHARE (COMPARTIR) - CON OFFLINE -->
@@ -3134,7 +3132,6 @@ window.renderShareScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla SHARE cargada desde script separado');
 </script>
 
 <!-- PANTALLA 4: PUBLICACIONES -->
@@ -3163,7 +3160,6 @@ window.renderPublicacionesScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla PUBLICACIONES cargada desde script separado');
 </script>
 
 <!-- PANTALLA 5: PEDIGRI - CON OFFLINE -->
@@ -3191,7 +3187,6 @@ window.renderPedigriScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla PEDIGRI cargada desde script separado');
 </script>
 
 <!-- PANTALLA 6: PERFIL - CON OFFLINE (ya usa localStorage) -->
@@ -3229,7 +3224,6 @@ window.renderPerfilScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla PERFIL cargada desde script separado');
 </script>
 
 <!-- PANTALLA 7: JUEZ - CON OFFLINE -->
@@ -3258,7 +3252,6 @@ window.renderJuezScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla JUEZ cargada desde script separado');
 </script>
 
 <!-- PANTALLA 8: CONFIGURACIONES - CON OFFLINE (guarda preferencias) -->
@@ -3308,7 +3301,6 @@ async function guardarConfiguracion(key, event) {
     AppState.addNotification(`Configuración guardada offline: ${key}`, 'success');
 }
 
-console.log('✅ Pantalla CONFIGURACIONES cargada desde script separado');
 </script>
 
 <!-- PANTALLA 9: ADMIN - SIN OFFLINE (requiere internet para admin) -->
@@ -3347,7 +3339,6 @@ window.renderAdminScreen = async function() {
         </div>
     `;
 };
-console.log('✅ Pantalla ADMIN cargada desde script separado (requiere internet)');
 </script>
 
 
