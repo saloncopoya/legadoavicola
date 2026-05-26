@@ -1616,7 +1616,7 @@ async function generarToken() {
         // Verificar si ya tenemos un token guardado
         const tokenGuardado = localStorage.getItem('fcm_token');
         if (tokenGuardado) {
-            console.log('✅ Token ya existe:', tokenGuardado);
+           // console.log('✅ Token ya existe:', tokenGuardado);
             AppState.addNotification('✅ Notificaciones ya estaban activadas', 'success');
             return tokenGuardado;
         }
