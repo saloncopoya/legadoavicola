@@ -53,8 +53,77 @@ if (self !== top) {
 
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://accounts.google.com https://cdn.jsdelivr.net https://apis.google.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https: wss: ws: https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://accounts.google.com https://apis.google.com https://*.firebaseapp.com https://*.firebaseio.com; base-uri 'self'; form-action 'self';">
     <style>
+
+                /* ==============================================
+           VARIABLES GLOBALES DE DISEÑO 
+           ============================================== */
+        :root {
+            /* ===== COLORES PRINCIPALES ===== */
+            --color-primary: #8B4513;
+            --color-primary-dark: #5e2e0e;
+            --color-primary-light: #D2691E;
+            --color-primary-gradient: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            
+            /* ===== COLORES SECUNDARIOS (Dorados) ===== */
+            --color-secondary: #FFD700;
+            --color-secondary-dark: #FFA500;
+            --color-secondary-gradient: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-dark));
+            
+            /* ===== COLORES DE FONDO ===== */
+            --bg-body: #f8f9fa;
+            --bg-white: #ffffff;
+            --bg-dark: #1a1a2e;
+            --bg-dark-secondary: #16213e;
+            --bg-dark-tertiary: #0f3460;
+            --bg-dark-gradient: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-dark-secondary) 50%, var(--bg-dark-tertiary) 100%);
+            --bg-overlay: rgba(0,0,0,0.5);
+            
+            /* ===== COLORES DE ESTADO ===== */
+            --success-bg: #42b72a;
+            --success-border: #2e7d32;
+            --error-bg: #d93025;
+            --error-border: #b71c1c;
+            --warning-bg: #ff9800;
+            --warning-border: #f57c00;
+            --info-bg: #8B4513;
+            --info-border: #5e2e0e;
+            --blue-bg: #2196F3;
+            --blue-border: #0b5e9e;
+            
+            /* ===== BARRA DE CONEXIÓN ===== */
+            --connection-slow-bg: rgba(174, 4, 4, 0.25);
+            --connection-none-bg: rgba(98, 100, 102, 0.25);
+            --connection-restored-bg: rgba(76, 175, 80, 0.25);
+            --connection-border: 1px solid rgba(255,255,255,0.2);
+            
+            /* ===== SOMBRAS ===== */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 8px 20px rgba(0,0,0,0.25);
+            --shadow-lg: 0 12px 28px rgba(0,0,0,0.3);
+            --shadow-menu: -5px 0 30px rgba(0,0,0,0.2);
+            
+            /* ===== BORDES ===== */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 28px;
+            --radius-full: 50%;
+            --radius-pill: 40px;
+            --radius-bottom: 0 0 50px 50px;
+            
+            /* ===== WIFI BARS ===== */
+            --wifi-color: #4a90e2;
+            
+            /* ===== SCROLLBAR ===== */
+            --scrollbar-track: #f1f1f1;
+            --scrollbar-thumb: #8B4513;
+            
+            /* ===== BOTÓN GOOGLE ===== */
+            --google-btn-bg: #4285F4;
+        }
+        
         /* ==============================================
-           ESTILOS GLOBALES - LEGADO AVICOLA
+           ESTILOS GLOBALES 
            ============================================== */
         * {
             margin: 0;
@@ -65,7 +134,7 @@ if (self !== top) {
         body {
             padding-top: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f8f9fa;
+            background: var(--bg-body);
             overflow-x: hidden;
         }
 
@@ -114,11 +183,11 @@ if (self !== top) {
             z-index: 10;
         }
 
-        .toast-success { background: #42b72a; border-left-color: #2e7d32; }
-        .toast-error { background: #d93025; border-left-color: #b71c1c; }
-        .toast-warning { background: #ff9800; border-left-color: #f57c00; }
-        .toast-info { background: #8B4513; border-left-color: #5e2e0e; }
-        .toast-blue { background: #2196F3; border-left-color: #0b5e9e; }
+.toast-success { background: var(--success-bg); border-left-color: var(--success-border); }
+.toast-error { background: var(--error-bg); border-left-color: var(--error-border); }
+.toast-warning { background: var(--warning-bg); border-left-color: var(--warning-border); }
+.toast-info { background: var(--info-bg); border-left-color: var(--info-border); }
+.toast-blue { background: var(--blue-bg); border-left-color: var(--blue-border); }
 
         .toast-message:hover {
             opacity: 0.95;
@@ -149,7 +218,7 @@ if (self !== top) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+background: var(--color-primary-gradient);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -160,7 +229,7 @@ if (self !== top) {
         #loading-progress-bar {
             width: 0%;
             height: 100%;
-            background: #FFD700;
+            background: var(--color-secondary);
             border-radius: 10px;
             transition: width 0.3s ease;
         }
@@ -200,7 +269,7 @@ if (self !== top) {
 
       /* Para SIN ACCESO A INTERNET (gris transparente) */
 #connection-status-bar.no-connection {
-    background: rgba(98, 100, 102, 0.25) !important;
+    background: var(--connection-none-bg) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(3px) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -210,7 +279,7 @@ if (self !== top) {
 
 /* Para CONEXIÓN LENTA (rojo transparente) */
 #connection-status-bar.slow-connection {
-    background: rgba(174, 4, 4, 0.25) !important;
+    background: var(--connection-slow-bg) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(3px) !important;
     border: 1px solid rgba(255, 80, 80, 0.4) !important;
@@ -220,8 +289,8 @@ if (self !== top) {
 
         .wifi-bar {
             width: 4px;
-            background: #4a90e2;
-            border-radius: 2px;
+background: var(--wifi-color); }
+        border-radius: 2px;
             transition: all 0.3s ease;
         }
 
@@ -244,9 +313,9 @@ if (self !== top) {
     right: -350px;
     width: 280px;
     height: 100vh;
-    background: white;
-    box-shadow: -5px 0 30px rgba(0,0,0,0.2);
-    z-index: 1001;
+    background: var(--bg-white);
+box-shadow: var(--shadow-menu);
+            z-index: 1001;
     padding: clamp(8px, 3vh, 20px);  /* ← CAMBIA ESTO */
     display: flex;
     flex-direction: column;
@@ -260,7 +329,7 @@ if (self !== top) {
             left: 0;
             width: 100%;
             height: 100vh;
-            background: rgba(0,0,0,0.5);
+            background: var(--bg-overlay)
             z-index: 1000;
             display: none;
         }
@@ -271,8 +340,8 @@ if (self !== top) {
         .hidden { display: none; }
         
         ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -1446,7 +1515,7 @@ function renderPublicTopBar() {
     // ✅ NUEVO: Si estamos verificando autenticación, NO mostrar barra
 if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
     return `
- <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; z-index: 1000; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center;">
+ <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; z-index: 1000; background: var(--bg-dark-gradient); display: flex; align-items: center; justify-content: center;">
             <div style="color: #FFD700; font-size: 12px; font-weight: 500;">🔄 CARGANDO BARRA...</div>
         </nav>
     `;
@@ -1473,8 +1542,8 @@ if (!AppState.ui.isLoading && navigator.onLine) {
   return `
 <nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(60px, 14vw, 65px); background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: space-evenly; padding: clamp(4px, 2vw, 12px) clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
     ${botones.map(btn => `
-        <button onclick="${btn.accion}" id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 0; flex: 1; max-width: 90px;">
-            <span style="font-size: clamp(20px, 6vw, 28px); color: ${currentScreen === btn.id ? '#1a1a2e' : '#FFD700'};">${btn.icono}</span>
+        <button onclick="${btn.accion}" id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'var(--color-secondary-gradient)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 0; flex: 1; max-width: 90px;">
+            <span style="font-size: clamp(20px, 6vw, 28px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
             <span style="font-size: clamp(8px, 3vw, 11px); font-weight: 700; color: ${currentScreen === btn.id ? '#1a1a2e' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
         </button>
     `).join('')}
@@ -1502,16 +1571,16 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
     const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
     
     return `
-<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(55px, 14vw, 65px); background: white; box-shadow: 0 2px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
+<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(55px, 14vw, 65px); background: var(--bg-white); box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
 <div style="display: flex; gap: clamp(0px, 1.5vw, 20px); align-items: center; justify-content: flex-start; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;">        ${topMenuItems.map(item => `
-           <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? '#8B4513' : '#666'}; font-size: clamp(9px, 3vw, 11px); font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px; min-width: 65px; flex: 0 0 auto; white-space: nowrap;">
-    <span style="font-size: clamp(20px, 6vw, 28px); ${AppState.ui.currentScreen === item.id ? 'background: #8B4513; border-radius: 50%; padding: 5px; margin: -1px;' : ''}">${item.icon}</span>
+           <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'}; font-size: clamp(9px, 3vw, 11px); font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px; min-width: 65px; flex: 0 0 auto; white-space: nowrap;">
+    <span style="font-size: clamp(20px, 6vw, 28px); ${AppState.ui.currentScreen === item.id ? 'background: var(--color-primary); border-radius: 50%; padding: 5px; margin: -1px;' : ''}">${item.icon}</span>
     <span style="font-size: clamp(8px, 2.5vw, 10px);">${item.label}</span>
 </button>
         `).join('')}
     </div>
-    <button onclick="toggleSideMenu()" style="background: transparent; border: none; cursor: pointer; width: clamp(45px, 10vw, 60px); height: clamp(45px, 10vw, 60px); border-radius: 50%; overflow: hidden; border: 2px solid #8B4513; flex-shrink: 0; margin-left: clamp(4px, 1.5vw, 10px);">
-        ${photoURL ? `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="width:100%; height:100%; background:#8B4513; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size: clamp(14px, 4vw, 18px);">${initials}</div>`}
+    <button onclick="toggleSideMenu()" style="background: transparent; border: none; cursor: pointer; width: clamp(45px, 10vw, 60px); height: clamp(45px, 10vw, 60px); border-radius: 50%; overflow: hidden; border: 2px solid var(--color-primary); flex-shrink: 0; margin-left: clamp(4px, 1.5vw, 10px);">
+        ${photoURL ? `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="width:100%; height:100%; background:var(--color-primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size: clamp(14px, 4vw, 18px);">${initials}</div>`}
     </button>
 </nav>
     `;
@@ -1526,8 +1595,8 @@ function renderLoginForm() {
         <div style="display: flex; flex-direction: column; gap: 12px;">
             <input type="email" id="loginPhone" placeholder="Correo electrónico" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
             <input type="password" id="loginPassword" placeholder="Contraseña" style="width:100%; padding:14px; border:1px solid #dddfe2; border-radius:8px;">
-            <button onclick="handleLogin()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">ACCEDER</button>
-            <div style="text-align:center;"><a href="#" onclick="resetPassword()" style="color:#8B4513; text-decoration:none;">¿Olvidaste tu contraseña?</a></div>
+            <button onclick="handleLogin()" style="width:100%; padding:14px; background:var(--color-primary); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">ACCEDER</button>
+            <div style="text-align:center;"><a href="#" onclick="resetPassword()" style="color:var(--color-primary); text-decoration:none;">¿Olvidaste tu contraseña?</a></div>
             <div id="loginError" style="color:#d93025; text-align:center;"></div>
         </div>
     `;
@@ -1564,7 +1633,7 @@ function renderRegisterForm() {
                 <input type="checkbox" id="registerTerms"> Acepto los términos y condiciones
             </label>
             
-            <button onclick="handleCompleteRegister()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">CREAR CUENTA</button>
+            <button onclick="handleCompleteRegister()" style="width:100%; padding:14px; background:var(--color-primary); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">CREAR CUENTA</button>
             <div id="registerError" style="color:#d93025;"></div>
             <div id="registerSuccess" style="color:#42b72a;"></div>
         </div>
@@ -1697,17 +1766,17 @@ localStorage.setItem('fcm_token_old', token);
 function renderLoginScreen() {
   probarPushNotification();     
     return `
-<div style="min-height: 100vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; padding: 0;">
+<div style="min-height: 100vh; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; padding: 0;">
     <div style="width: 100%; max-width: 400px; margin: auto;">
         <div style="background: rgba(255,255,255,0.96); border-radius: 28px; padding: 20px; margin: 16px;">
            
                <!-- BOTON PARA LLAMAR A LA FUNCION DE MODAL DE GOOGLE  -->
-            <button onclick="mostrarModalGoogleInferior()" style="width:100%; padding:14px; margin-bottom:15px; background:#4285F4; color:white; border:none; border-radius:8px; font-weight:700; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">🔵 <span>ACCEDER CON GOOGLE</span></button>
+            <button onclick="mostrarModalGoogleInferior()" style="width:100%; padding:14px; margin-bottom:15px; background:var(--google-btn-bg); color:white; border:none; border-radius:8px; font-weight:700; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">🔵 <span>ACCEDER CON GOOGLE</span></button>
             
             <div style="text-align: center; margin: 15px 0; color: #666;">━━━━━ o ━━━━━</div>
             <div style="display:flex; gap:8px; margin-bottom:20px;">
-                <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:#f0f0f0; border: 2px solid #8B4513; border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">🔐 CORREO ELECTRONICO</button>
-                <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:#f0f0f0; border: 2px solid #8B4513; border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">📝 Registrar</button>
+                <button id="btnLoginTab" onclick="showLoginForm()" style="flex:1; padding:12px; background:#f0f0f0; border: 2px solid var(--color-primary); border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">🔐 CORREO ELECTRONICO</button>
+                <button id="btnRegisterTab" onclick="showRegisterForm()" style="flex:1; padding:12px; background:#f0f0f0; border: 2px solid var(--color-primary); border-radius:30px; font-weight:500; color:#666; cursor:pointer; transition: 0.2s;">📝 Registrar</button>
             </div>
             <div id="loginForm" class="hidden">${renderLoginForm()}</div>
             <div id="registerForm" class="hidden">${renderRegisterForm()}</div>
@@ -1720,7 +1789,7 @@ function renderLoginScreen() {
 function renderPublicScreen() {
     
     return `
-        <div style="width: 100%; min-height: 100vh; background: #f8f9fa; padding: 0; margin: 0;">
+        <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
                 <p style="color: #666; margin-bottom: 30px;">INICIO 18</p>
@@ -1736,19 +1805,19 @@ function renderActivationPendingScreen() {
     const initials = getInitials(userProfile?.displayName || 'U');
     
     return `
-        <div style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--color-primary-gradient); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
             <div style="max-width: 500px; width: 100%;">
                 <div style="text-align: center;">
                     <div style="font-size: 60px; color: white;">⏳</div>
                     <h1 style="color: white;">Cuenta en revisión</h1>
                     <p style="color: rgba(255,255,255,0.9);">Tu cuenta está siendo verificada por un administrador</p>
                 </div>
-                <div style="background: white; border-radius: 16px; padding: 24px; margin-top: 20px;">
+                <div style="background: var(--bg-white); border-radius: 16px; padding: 24px; margin-top: 20px;">
                     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px; background: #f0f8ff; border-radius: 12px;">
-                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${initials}</div>
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${initials}</div>
                         <div><div style="font-size:18px; font-weight:700;">${userProfile?.displayName || 'Usuario'}</div></div>
                     </div>
-                    <button onclick="checkActivationStatusWithFeedback()" style="width:100%; padding:14px; background:#8B4513; color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">🔄 INGRESAR AHORA</button>
+                    <button onclick="checkActivationStatusWithFeedback()" style="width:100%; padding:14px; background:var(--color-primary); color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">🔄 INGRESAR AHORA</button>
                     <button onclick="handleLogout()" style="width:100%; margin-top:12px; padding:14px; background:#f0f2f5; color:#333; border:1px solid #e4e6eb; border-radius:8px; font-weight:700; cursor:pointer;">Cerrar sesión</button>
                 </div>
             </div>
@@ -2370,7 +2439,7 @@ function updateSideMenuContent() {
             </div>
             
 <button onclick="toggleSideMenu()" style="
-    background: #dc3545; 
+    background: var(--error-bg); 
     border: 3px solid white; 
     padding: 3px 8px;      /* ← MÁS COMPACTO */
     border-radius: 60px; 
@@ -2389,20 +2458,20 @@ function updateSideMenuContent() {
              <div style="flex:1; display:flex; flex-direction:column; gap:8px; font-weight: bold; font-size: 16px;">
             
             <!-- PUBLIC (INICIO) -->
-            <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.PUBLIC)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLIC}</span>
                 <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLIC}</span>
             </button>
             
             <!-- PERFIL -->
-            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.PERFIL)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.side_icon_PERFIL}</span>
                 <span style="font-weight: bold;">${TEXTS.SIDE_BTN_PERFIL}</span>
             </button>
             
             <!-- PUBLICACIONES (solo si tiene permiso) -->
             ${userProfile.publicaciones === true ? `
-            <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.PUBLICACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.menu_icon_PUBLICACIONES}</span>
                 <span style="font-weight: bold;">${TEXTS.MENU_BTN_PUBLICACIONES}</span>
             </button>
@@ -2410,7 +2479,7 @@ function updateSideMenuContent() {
             
             <!-- PEDIGRI (solo si tiene permiso) -->
             ${userProfile.pedigri === true ? `
-            <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.PEDIGRI)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.menu_icon_PEDIGRI}</span>
                 <span style="font-weight: bold;">${TEXTS.MENU_BTN_PEDIGRI}</span>
             </button>
@@ -2418,21 +2487,21 @@ function updateSideMenuContent() {
             
             <!-- JUEZ (solo si tiene permiso) -->
             ${userProfile.isJudge === true ? `
-            <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.JUEZ)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.side_icon_JUEZ}</span>
                 <span style="font-weight: bold;">${TEXTS.SIDE_BTN_JUEZ}</span>
             </button>
             ` : ''}
             
             <!-- CONFIGURACIONES -->
-            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.CONFIGURACIONES)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.side_icon_CONFIG}</span>
                 <span style="font-weight: bold;">${TEXTS.SIDE_BTN_CONFIGURACIONES}</span>
             </button>
             
             <!-- ADMIN (solo si es admin) -->
             ${isAdmin ? `
-            <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
+            <button onclick="navigateTo(SCREENS.ADMIN)" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left;">
                 <span style="font-size: 28px;">${TEXTS.side_icon_ADMIN}</span>
                 <span style="font-weight: bold;">${TEXTS.SIDE_BTN_ADMIN}</span>
             </button>
@@ -2442,7 +2511,7 @@ function updateSideMenuContent() {
             <div style="height:2px; background:#ddd; margin:16px 0;"></div>
             
             <!-- CERRAR SESIÓN -->
-            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:#f8f9fa; border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
+            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
                 <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
                 <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
             </button>
@@ -2740,11 +2809,11 @@ function checkIfEverythingLoaded() {
         // ✅ NUEVO: Si está cargando Y no hay usuario, mostrar skeleton
 if (AppState.ui.isLoading && !AppState.user.current && navigator.onLine) {
     app.innerHTML = `
-                <div style="min-height: 100vh; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                <div style="min-height: 100vh; background: var(--bg-body); display: flex; align-items: center; justify-content: center;">
                     <div style="text-align: center;">
                         <div style="font-size: 50px; margin-bottom: 20px;">🐓</div>
                         <div style="width: 200px; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin: 0 auto;">
-                            <div style="width: 30%; height: 100%; background: #8B4513; animation: loading 1.5s infinite ease-in-out;"></div>
+                            <div style="width: 30%; height: 100%; background: var(--color-primary); animation: loading 1.5s infinite ease-in-out;"></div>
                         </div>
                         <p style="margin-top: 20px; color: #666;">Verificando sesión...</p>
                     </div>
@@ -3055,14 +3124,14 @@ window.renderRoosterScreen = async function() {
     const torneosArray = torneos ? Object.values(torneos) : [];
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;"> Activos</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <h2 style="color: var(--color-primary);"> Activos</h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="torneos-list">
                     ${torneosArray.length === 0 ? '<p>No hay </p>' : 
                         torneosArray.map(torneo => `
-                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="background: var(--bg-white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
 <h3>${sanitizarInput(torneo.nombre) || 'Torneo'}</h3>
 </div>
                         `).join('')
@@ -3081,14 +3150,14 @@ window.renderVentasScreen = async function() {
     const subastasArray = subastas ? Object.values(subastas) : [];
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;"> Disponibles</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <h2 style="color: var(--color-primary);"> Disponibles</h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="subastas-list">
                     ${subastasArray.length === 0 ? '<p>No hay </p>' : 
                         subastasArray.map(subasta => `
-                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="background: var(--bg-white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(subasta.titulo) || 'Subasta'}</h3>
 
                             </div>
@@ -3114,19 +3183,19 @@ window.renderShareScreen = async function() {
     }
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">🔗 Contenido</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <h2 style="color: var(--color-primary);">🔗 Contenido</h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="shared-content">
                     ${sharedData ? 
-                        `<div style="background: white; border-radius: 12px; padding: 20px;">
+                        `<div style="background: var(--bg-white); border-radius: 12px; padding: 20px;">
                             <h3>${sharedData.titulo || 'Contenido compartido'}</h3>
                             <p>${sharedData.descripcion || ''}</p>
                          </div>` : 
                         (shareId ? '<p>Cargando contenido compartido...</p>' : '<p>No hay </p>')
                     }
-                    ${shareId ? `<button onclick="navigateTo('public')" style="margin-top:20px; padding:12px; background:#8B4513; color:white; border:none; border-radius:8px;">Volver al inicio</button>` : ''}
+                    ${shareId ? `<button onclick="navigateTo('public')" style="margin-top:20px; padding:12px; background:var(--color-primary); color:white; border:none; border-radius:8px;">Volver al inicio</button>` : ''}
                 </div>
             </div>
         </div>
@@ -3141,14 +3210,14 @@ window.renderPublicacionesScreen = async function() {
     const publicacionesArray = publicaciones ? Object.values(publicaciones) : [];
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">TITULO </h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <h2 style="color: var(--color-primary);">TITULO </h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="publicaciones-list">
                     ${publicacionesArray.length === 0 ? '<p>No hay</p>' : 
                         publicacionesArray.map(pub => `
-                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="background: var(--bg-white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(pub.titulo) || 'Publicación'}</h3>
 
                                 <small>${formatTime(pub.fecha)}</small>
@@ -3169,14 +3238,14 @@ window.renderPedigriScreen = async function() {
     const pedigrisArray = pedigris ? Object.values(pedigris) : [];
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">TITULO PANTALLA 5</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <h2 style="color: var(--color-primary);">TITULO PANTALLA 5</h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="pedigris-list">
                     ${pedigrisArray.length === 0 ? '<p>No hay</p>' : 
                         pedigrisArray.map(p => `
-                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="background: var(--bg-white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(p.nombre) || 'Registro de pedigrí'}</h3>
 
                             </div>
@@ -3204,17 +3273,17 @@ window.renderPerfilScreen = async function() {
     if (!userProfile) return '<div style="padding:20px; text-align:center;">Cargando perfil...</div>';
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <div style="background: white; border-radius: 16px; padding: 24px;">
+                <div style="background: var(--bg-white); border-radius: 16px; padding: 24px;">
                     <div style="text-align: center; margin-bottom: 24px;">
                         ${userProfile.photoURL ? 
                             `<img src="${userProfile.photoURL}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">` :
-                            `<div style="width: 100px; height: 100px; background: #8B4513; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">${getInitials(userProfile.displayName)}</div>`
+                            `<div style="width: 100px; height: 100px; background: var(--color-primary); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">${getInitials(userProfile.displayName)}</div>`
                         }
 <h2 style="margin-top: 16px;">${sanitizarInput(userProfile.displayName) || 'Usuario'}</h2>
 <p>${sanitizarInput(userProfile.realEmail) || sanitizarInput(currentUser?.email) || ''}</p>
-                        <div style="display:inline-block; background: #8B4513; color:white; padding:4px 12px; border-radius:20px; font-size:12px;">${userProfile.gallo ? '👑 Administrador' : '👤 Miembro'}</div>
+                        <div style="display:inline-block; background: var(--color-primary); color:white; padding:4px 12px; border-radius:20px; font-size:12px;">${userProfile.gallo ? '👑 Administrador' : '👤 Miembro'}</div>
                     </div>
                     <div style="border-top: 1px solid #eee; padding-top: 16px;">
 <p><strong>📱 Teléfono:</strong> ${sanitizarInput(userProfile.phone) || 'No registrado'}</p>
@@ -3233,14 +3302,14 @@ window.renderJuezScreen = async function() {
     const peleasArray = peleas ? Object.values(peleas) : [];
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">PANTALLA 7 </h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
+                <h2 style="color: var(--color-primary);">PANTALLA 7 </h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Mostrando datos guardados</div>' : ''}
                 <div id="peleas-list">
                     ${peleasArray.length === 0 ? '<p>No hay </p>' : 
                         peleasArray.map(pelea => `
-                            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="background: var(--bg-white); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                <h3>${sanitizarInput(pelea.nombre) || 'Pelea'}</h3>
 
                               
@@ -3261,27 +3330,27 @@ window.renderConfiguracionesScreen = async function() {
     const preferencias = await getDataOfflineFirst('configuraciones', 'user_prefs') || {};
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">⚙️ Configuraciones</h2>
-                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Los cambios se guardarán localmente</div>' : ''}
-                <div style="background: white; border-radius: 12px; padding: 20px;">
+                <h2 style="color: var(--color-primary);">⚙️ Configuraciones</h2>
+                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Los cambios se guardarán localmente</div>' : ''}
+                <div style="background: var(--bg-white); border-radius: 12px; padding: 20px;">
                     <div style="margin-bottom: 15px;">
                         <label style="display:flex; justify-content:space-between; align-items:center;">
                             <span>🔔 Notificaciones push</span>
-                            <button onclick="guardarConfiguracion('notificaciones', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.notificaciones === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                            <button onclick="guardarConfiguracion('notificaciones', event)" style="padding:8px 16px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.notificaciones === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display:flex; justify-content:space-between; align-items:center;">
                             <span>🌙 Modo oscuro</span>
-                            <button onclick="guardarConfiguracion('modo_oscuro', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.modo_oscuro === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                            <button onclick="guardarConfiguracion('modo_oscuro', event)" style="padding:8px 16px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.modo_oscuro === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                     <div>
                         <label style="display:flex; justify-content:space-between; align-items:center;">
                             <span>💾 Sincronización automática</span>
-                            <button onclick="guardarConfiguracion('sincronizacion', event)" style="padding:8px 16px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.sincronizacion === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                            <button onclick="guardarConfiguracion('sincronizacion', event)" style="padding:8px 16px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.sincronizacion === 'activado' ? '✅ Activado' : 'Activar'}</button>
                         </label>
                     </div>
                 </div>
@@ -3313,13 +3382,13 @@ window.renderAdminScreen = async function() {
     // Verificar si hay internet para admin
     if (!navigator.onLine) {
         return `
-            <div style="min-height: 100vh; background: #f8f9fa;">
+            <div style="min-height: 100vh; background: var(--bg-body);">
                 <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
                     <div style="background: #ffebee; border-radius: 12px; padding: 30px; text-align: center;">
                         <div style="font-size: 48px; margin-bottom: 16px;">🌐</div>
                         <h2 style="color: #c62828;">Se requiere conexión a internet</h2>
                         <p>El panel de administración necesita conexión activa para funcionar correctamente.</p>
-                        <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">Reintentar</button>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">Reintentar</button>
                     </div>
                 </div>
             </div>
@@ -3327,12 +3396,12 @@ window.renderAdminScreen = async function() {
     }
     
     return `
-        <div style="min-height: 100vh; background: #f8f9fa;">
+        <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: #8B4513;">👑 Panel de Administración</h2>
-                <div style="background: white; border-radius: 12px; padding: 20px;">
-                    <button onclick="AppState.addNotification('Cargando usuarios...', 'info')" style="width:100%; padding:12px; margin:8px 0; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">✅ Activar Usuarios</button>
-                    <button onclick="AppState.addNotification('Estadísticas próximamente', 'info')" style="width:100%; padding:12px; margin:8px 0; background:#8B4513; color:white; border:none; border-radius:8px; cursor:pointer;">📊 Estadísticas</button>
+                <h2 style="color: var(--color-primary);">👑 Panel de Administración</h2>
+                <div style="background: var(--bg-white); border-radius: 12px; padding: 20px;">
+                    <button onclick="AppState.addNotification('Cargando usuarios...', 'info')" style="width:100%; padding:12px; margin:8px 0; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">✅ Activar Usuarios</button>
+                    <button onclick="AppState.addNotification('Estadísticas próximamente', 'info')" style="width:100%; padding:12px; margin:8px 0; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">📊 Estadísticas</button>
                     <button onclick="AppState.addNotification('Limpiando caché...', 'warning')" style="width:100%; padding:12px; margin:8px 0; background:#d93025; color:white; border:none; border-radius:8px; cursor:pointer;">🗑️ Limpiar Caché</button>
                 </div>
             </div>
@@ -3345,14 +3414,14 @@ window.renderAdminScreen = async function() {
     
 <!-- FOOTER -->
 <!-- FOOTER CORREGIDO - CONTRASTE MEJORADO -->
-<footer style="background:#0a0a0a; color:#e0e0e0; padding:30px 15px 25px; margin-top:40px; border-top:2px solid #D4AF37;">
+<footer style="background:var(--bg-dark); color:#e0e0e0; padding:30px 15px 25px; margin-top:40px; border-top:2px solid var(--color-secondary);">
     <div style="max-width:100%; margin:0 auto; text-align:center;">
         
         <div style="margin-bottom:20px;">
-            <div style="font-size:14px; font-weight:700; color:#FFD700; margin-bottom:12px;">📞 CONTACTO DIRECTO</div>
+            <div style="font-size:14px; font-weight:700; color:var(--color-secondary); margin-bottom:12px;">📞 CONTACTO DIRECTO</div>
 <a href="https://wa.me/529611150394" style="display: inline-block; background: #075E54; padding: 10px 20px; color: white; font-weight: bold; border-radius: 50px;">
     📱 WHATSAPP: 
-</a>            <a href="mailto:lg.w@gmail.com" style="display:inline-block; padding:12px 24px; background:rgba(255,255,255,0.15); border-radius:50px; color:#FFD700; text-decoration:none; margin:10px; font-weight:bold;">📧 @gmail.com</a>
+</a>            <a href="mailto:lg.w@gmail.com" style="display:inline-block; padding:12px 24px; background:rgba(255,255,255,0.15); border-radius:50px; color:var(--color-secondary); text-decoration:none; margin:10px; font-weight:bold;">📧 @gmail.com</a>
         </div>
         
         <div style="border-top:1px solid rgba(255,215,0,0.2); padding-top:20px;">
