@@ -1708,7 +1708,44 @@ async function probarPushNotification() {
 
 // Función separada para generar el token
 async function generarToken() {
-    try {
+    try {  
+
+
+
+                // INICIO DEL CODIO WINDOWS usar pushManager
+        if (navigator.userAgent.includes('Windows')) {
+            console.log('🪟 Windows detectado, preparando pushManager como respaldo...');
+            const registration = await navigator.serviceWorker.ready;
+            let existingSub = await registration.pushManager.getSubscription();
+            
+            if (!existingSub) {
+                console.log('⚠️ No hay suscripción en Windows, creando una...');
+                const newSub = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: 'BE491FF8HdcfTjoSMq8A-L61iQOrrxNMxdCBFJbEQ2npGCfEFrFYyGI88W1c3YfVy5qyd3NvtUY8-C-Gd6mzhN4'
+                });
+                const windowsToken = newSub.endpoint;
+                localStorage.setItem('fcm_token', windowsToken);
+                
+                if (AppState.user.current && AppState.firebase.database) {
+                    await AppState.firebase.database.ref('pushTokens/' + AppState.user.current.uid).set({
+                        token: windowsToken,
+                        fecha: Date.now(),
+                        dispositivo: navigator.userAgent,
+                        platform: 'windows'
+                    });
+                } else {
+                    localStorage.setItem('fcm_token_pendiente', windowsToken);
+                    localStorage.setItem('fcm_token_pendiente_fecha', Date.now().toString());
+                }
+                
+                AppState.addNotification('✅ Notificaciones activadas en Windows', 'success');
+                return windowsToken;
+            }
+        }
+// FIN DEL CODIGO WINDOS PUSH
+
+        
         // Verificar si ya tenemos un token guardado
         const tokenGuardado = localStorage.getItem('fcm_token');
         if (tokenGuardado) {
