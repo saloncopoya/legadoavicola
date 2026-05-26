@@ -163,7 +163,7 @@ if (self !== top) {
             border-radius: 12px;
             font-weight: 500;
             font-size: 14px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            box-shadow: var(--shadow-md);
             width: 100%;
             text-align: center;
             pointer-events: auto;
@@ -179,7 +179,7 @@ if (self !== top) {
 
         .toast-message:last-child {
             margin-bottom: 0;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-lg);
             z-index: 10;
         }
 
@@ -362,7 +362,7 @@ box-shadow: var(--shadow-menu);
         <span>D</span><span>O</span>
     </div>
     <div style="width: 80%; max-width: 300px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
-        <div id="loading-progress-bar" style="width: 0%; height: 100%; background: #FFD700; border-radius: 10px; transition: width 0.3s ease;"></div>
+        <div id="loading-progress-bar" style="width: 0%; height: 100%; background: var(--color-secondary); border-radius: 10px; transition: width 0.3s ease;"></div>
     </div>
     <div id="loading-subtitle" style="font-size: 16px; color: #FFD700; margin-top: 10px; font-weight: 600; display: none;">Reconectando...</div>
     <div id="loading-status" style="font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;">Inicializando aplicación</div>
@@ -1404,7 +1404,7 @@ function isSlowConnection() {
     } else if (connectionBar.classList.contains('visible')) {
         // CONEXIÓN RESTABLECIDA
         connectionBar.classList.add('connection-restored');
-        connectionBar.style.background = 'rgba(76, 175, 80, 0.25)';
+        connectionBar.style.background = 'var(--connection-restored-bg)';
         connectionBar.style.backdropFilter = 'blur(12px)';
         connectionMessage.textContent = '✅ ¡Conexión restablecida! Todo funciona correctamente.';
         setTimeout(() => {
@@ -1856,7 +1856,7 @@ function showLoginForm() {
     const registerBtn = document.getElementById('btnRegisterTab');
     
     if (loginBtn) {
-        loginBtn.style.background = '#8B4513';
+        loginBtn.style.background = 'var(--color-primary)';
         loginBtn.style.color = 'white';
         loginBtn.style.fontWeight = '700';
     }
@@ -1884,7 +1884,7 @@ function showRegisterForm() {
         loginBtn.style.fontWeight = '500';
     }
     if (registerBtn) {
-        registerBtn.style.background = '#8B4513';
+        registerBtn.style.background = 'var(--color-primary)';
         registerBtn.style.color = 'white';
         registerBtn.style.fontWeight = '700';
     }
@@ -2433,7 +2433,7 @@ function updateSideMenuContent() {
     menuContent.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                ${photoURL ? `<img src="${photoURL}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div style="width:50px; height:50px; border-radius:50%; background: linear-gradient(135deg, #8B4513, #D2691E); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px;">${initials}</div>`}
+                ${photoURL ? `<img src="${photoURL}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div style="width:50px; height:50px; border-radius:50%; background: var(--color-primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px;">${initials}</div>`}
                 <div><div style="font-weight: 700;">${userProfile.displayName}</div>
                   <div style="font-size: 12px; color: #666;">${isAdmin ? TEXTS.BADGE_ADMIN : TEXTS.BADGE_MEMBER}</div></div>
             </div>
@@ -2508,10 +2508,10 @@ function updateSideMenuContent() {
             ` : ''}
             
             <!-- SEPARADOR -->
-            <div style="height:2px; background:#ddd; margin:16px 0;"></div>
+            <div style="height:2px; background:var(--border-color, #ddd); margin:16px 0;"></div>
             
             <!-- CERRAR SESIÓN -->
-            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color:#d32f2f;">
+            <button onclick="handleLogout()" style="display:flex; align-items:center; gap:16px; padding:3px; background:var(--bg-body); border:none; border-radius:12px; cursor:pointer; width:100%; text-align:left; color: var(--danger-color, #d32f2f);">
                 <span style="font-size: 28px;">${TEXTS.side_icon_LOGOUT}</span>
                 <span style="font-weight: bold;">${TEXTS.SIDE_BTN_LOGOUT}</span>
             </button>
@@ -3425,7 +3425,7 @@ window.renderAdminScreen = async function() {
         </div>
         
         <div style="border-top:1px solid rgba(255,215,0,0.2); padding-top:20px;">
-            <div style="font-size:12px; color:#CCCCCC; font-weight:500;">🐓⚡ "DONDE USTED VAYA, SU TORNEO VA CON USTED"</div>
+            <div style="font-size:12px; color:var(--text-gray, #CCCCCC); font-weight:500;">🐓⚡ "DONDE USTED VAYA, SU TORNEO VA CON USTED"</div>
             <div style="font-size:10px; margin-top:10px; color:#999999;">© 2026 LEGADO AVICOLA | Versión 2.0</div>
         </div>
     </div>
