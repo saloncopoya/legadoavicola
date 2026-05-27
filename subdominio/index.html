@@ -3287,10 +3287,10 @@ window.renderRoosterScreen = async function() {
 
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
 <script>
-     window.renderVentasScreen = async function() {
+      window.renderVentasScreen = async function() {
     
     // ==============================================
-    // TEXTOS CONSTANTES (NO CAMBIAN)
+    // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
     const TEXTOS = {
         btn_valores_normales: 'VALORES NORMALES',
@@ -3326,24 +3326,6 @@ window.renderRoosterScreen = async function() {
         herramienta_hemodinamia: 'Hemodinamia',
         herramienta_heridas: 'Manejo de Heridas',
         
-        herramienta_tension: 'Tensión Arterial',
-        herramienta_frecuencia: 'Frecuencia Cardíaca',
-        herramienta_respiracion: 'Frecuencia Respiratoria',
-        herramienta_temperatura: 'Temperatura',
-        herramienta_saturacion: 'Saturación O2',
-        
-        herramienta_hemograma: 'Hemograma',
-        herramienta_quimica: 'Química Sanguínea',
-        herramienta_biometria: 'Biometría Hemática',
-        herramienta_orina: 'Examen de Orina',
-        herramienta_coagulacion: 'Tiempos de Coagulación',
-        
-        herramienta_acv: 'ACV - Código Ictus',
-        herramienta_iam: 'IAM - Código Infarto',
-        herramienta_tauma: 'Trauma - ABCDE',
-        herramienta_quemaduras: 'Quemaduras - Regla de 9',
-        herramienta_intoxicacion: 'Intoxicaciones',
-        
         desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
         desc_norton: 'Evaluar el riesgo de desarrollar úlceras por presión. Valora cinco parámetros: estado físico, estado mental, actividad, movilidad e incontinencia.',
         desc_braden: 'Predecir el riesgo de úlceras por presión. Valora percepción sensorial, exposición a humedad, actividad, movilidad, nutrición y fricción.',
@@ -3378,20 +3360,63 @@ window.renderRoosterScreen = async function() {
     };
     
     // ==============================================
-    // OBTENER HERRAMIENTA ACTUAL DESDE URL (CONSTANTE)
+    // TODOS LOS ICONOS SVG SON CONSTANTES
+    // ==============================================
+    const ICONOS_SVG = {
+        // Iconos para botones principales
+        icono_valores_normales: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+        icono_medicamentos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`,
+        icono_conocimientos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>`,
+        
+        // Iconos para subtools - VALORES NORMALES
+        icono_glasgow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
+        icono_norton: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+        icono_braden: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 12H4M12 4v16"/><circle cx="12" cy="12" r="2"/></svg>`,
+        icono_barthel: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/></svg>`,
+        icono_eva: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="2"/></svg>`,
+        icono_ramos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7h6V5a3 3 0 0 0-3-3z"/><path d="M19 10h-2v4h2v-4z"/><path d="M5 10H3v4h2v-4z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`,
+        icono_waterlow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l2-5 3 9 3-7 2 3h4"/></svg>`,
+        icono_apache: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M9 10.5l3-1.5 3 1.5"/></svg>`,
+        icono_sofa: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></svg>`,
+        icono_news: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+        
+        // Iconos para subtools - MEDICAMENTOS
+        icono_antibioticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>`,
+        icono_analgesicos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
+        icono_cardiovasculares: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+        icono_antihipertensivos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>`,
+        icono_antidiabeticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+        icono_anticoagulantes: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2M12 6L8 8l4 4"/></svg>`,
+        icono_antiepilepticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+        icono_psicofarmacos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/><path d="M9 10l3 2 3-2"/></svg>`,
+        
+        // Iconos para subtools - CONOCIMIENTOS
+        icono_rcep: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
+        icono_guias: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>`,
+        icono_protocolos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+        icono_actualizaciones: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
+        icono_ecografia: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="15" y1="9" x2="19" y2="5"/><line x1="9" y1="15" x2="5" y2="19"/></svg>`,
+        icono_ventilacion: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/><path d="M8 12h8"/></svg>`,
+        icono_hemodinamia: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><line x1="12" y1="8" x2="12" y2="12"/></svg>`,
+        icono_heridas: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7h6V5a3 3 0 0 0-3-3z"/><path d="M19 10h-2v4h2v-4z"/><path d="M5 10H3v4h2v-4z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`,
+        
+        icono_default: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`
+    };
+    
+    // ==============================================
+    // OBTENER HERRAMIENTA ACTUAL DESDE URL
     // ==============================================
     const urlParams = new URLSearchParams(window.location.search);
     let herramientaActual = urlParams.get('tool');
     let subHerramientaActual = urlParams.get('subtool');
     
-    // Validar herramientas válidas
     const herramientasValidas = ['valores-normales', 'medicamentos', 'conocimientos'];
     if (!herramientasValidas.includes(herramientaActual)) {
         herramientaActual = null;
     }
     
     // ==============================================
-    // FUNCIONES DE NAVEGACIÓN (URL PERSONALIZADO CONSTANTE)
+    // FUNCIONES DE NAVEGACIÓN (CON SCROLL MANTENIDO)
     // ==============================================
     window.cambiarHerramienta = function(herramienta, subtool) {
         const nuevaUrl = new URL(window.location);
@@ -3406,11 +3431,23 @@ window.renderRoosterScreen = async function() {
         renderApp();
     };
     
-    window.cambiarSubHerramienta = function(subtool) {
+    window.cambiarSubHerramienta = function(subtool, event) {
+        if (event && event.preventDefault) event.preventDefault();
+        
+        const scrollContainer = document.querySelector('.pestanas-scroll-container');
+        const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+        
         const nuevaUrl = new URL(window.location);
         nuevaUrl.searchParams.set('subtool', subtool);
         window.history.pushState({}, '', nuevaUrl);
         renderApp();
+        
+        setTimeout(() => {
+            const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+            if (newScrollContainer) {
+                newScrollContainer.scrollLeft = scrollPosition;
+            }
+        }, 50);
     };
     
     window.volverAlMenuPrincipal = function() {
@@ -3486,66 +3523,82 @@ window.renderRoosterScreen = async function() {
                 ]}
             ]
         },
-        // Pantalla VACÍA para todas las nuevas herramientas (pero EXISTEN)
         vacia: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
     };
     
     // Agregar todas las nuevas herramientas con pantalla vacía
-    const herramientasVacias = ['ramos', 'waterlow', 'apache', 'sofa', 'news', 'antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos', 'rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas', 'tension', 'frecuencia', 'respiracion', 'temperatura', 'saturacion', 'hemograma', 'quimica', 'biometria', 'orina', 'coagulacion', 'acv', 'iam', 'tauma', 'quemaduras', 'intoxicacion'];
+    const herramientasVacias = ['ramos', 'waterlow', 'apache', 'sofa', 'news', 'antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos', 'rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas'];
     herramientasVacias.forEach(h => { if (!contenidos[h]) contenidos[h] = { ...contenidos.vacia, titulo: TEXTOS[`herramienta_${h}`] || h }; });
     
     // ==============================================
-    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL (CON MÁS SUBTOOLS)
+    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
     // ==============================================
     const herramientasConfig = {
         'valores-normales': {
             titulo: TEXTOS.btn_valores_normales,
             descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
             color: '#0D9488',
-            icono: '📊',
+            icono: ICONOS_SVG.icono_valores_normales,
             subherramientas: ['glasgow', 'norton', 'braden', 'barthel', 'eva', 'ramos', 'waterlow', 'apache', 'sofa', 'news'],
             nombres: {
                 glasgow: TEXTOS.herramienta_glasgow, norton: TEXTOS.herramienta_norton, braden: TEXTOS.herramienta_braden,
                 barthel: TEXTOS.herramienta_barthel, eva: TEXTOS.herramienta_eva, ramos: TEXTOS.herramienta_ramos,
                 waterlow: TEXTOS.herramienta_waterlow, apache: TEXTOS.herramienta_apache, sofa: TEXTOS.herramienta_sofa,
                 news: TEXTOS.herramienta_news
+            },
+            iconos: {
+                glasgow: ICONOS_SVG.icono_glasgow, norton: ICONOS_SVG.icono_norton, braden: ICONOS_SVG.icono_braden,
+                barthel: ICONOS_SVG.icono_barthel, eva: ICONOS_SVG.icono_eva, ramos: ICONOS_SVG.icono_ramos,
+                waterlow: ICONOS_SVG.icono_waterlow, apache: ICONOS_SVG.icono_apache, sofa: ICONOS_SVG.icono_sofa,
+                news: ICONOS_SVG.icono_news
             }
         },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
             descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
             color: '#3B82F6',
-            icono: '💊',
+            icono: ICONOS_SVG.icono_medicamentos,
             subherramientas: ['antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos'],
             nombres: {
                 antibioticos: TEXTOS.herramienta_antibioticos, analgesicos: TEXTOS.herramienta_analgesicos,
                 cardiovasculares: TEXTOS.herramienta_cardiovasculares, antihipertensivos: TEXTOS.herramienta_antihipertensivos,
                 antidiabeticos: TEXTOS.herramienta_antidiabeticos, anticoagulantes: TEXTOS.herramienta_anticoagulantes,
                 antiepilepticos: TEXTOS.herramienta_antiepilepticos, psicofarmacos: TEXTOS.herramienta_psicofarmacos
+            },
+            iconos: {
+                antibioticos: ICONOS_SVG.icono_antibioticos, analgesicos: ICONOS_SVG.icono_analgesicos,
+                cardiovasculares: ICONOS_SVG.icono_cardiovasculares, antihipertensivos: ICONOS_SVG.icono_antihipertensivos,
+                antidiabeticos: ICONOS_SVG.icono_antidiabeticos, anticoagulantes: ICONOS_SVG.icono_anticoagulantes,
+                antiepilepticos: ICONOS_SVG.icono_antiepilepticos, psicofarmacos: ICONOS_SVG.icono_psicofarmacos
             }
         },
         'conocimientos': {
             titulo: TEXTOS.btn_conocimientos,
             descripcion: 'Guías, protocolos, actualizaciones, RCP',
             color: '#F59E0B',
-            icono: '📚',
+            icono: ICONOS_SVG.icono_conocimientos,
             subherramientas: ['rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas'],
             nombres: {
                 rcep: TEXTOS.herramienta_rcep, guias: TEXTOS.herramienta_guias, protocolos: TEXTOS.herramienta_protocolos,
                 actualizaciones: TEXTOS.herramienta_actualizaciones, ecografia: TEXTOS.herramienta_ecografia,
                 ventilacion: TEXTOS.herramienta_ventilacion, hemodinamia: TEXTOS.herramienta_hemodinamia,
                 heridas: TEXTOS.herramienta_heridas
+            },
+            iconos: {
+                rcep: ICONOS_SVG.icono_rcep, guias: ICONOS_SVG.icono_guias, protocolos: ICONOS_SVG.icono_protocolos,
+                actualizaciones: ICONOS_SVG.icono_actualizaciones, ecografia: ICONOS_SVG.icono_ecografia,
+                ventilacion: ICONOS_SVG.icono_ventilacion, hemodinamia: ICONOS_SVG.icono_hemodinamia,
+                heridas: ICONOS_SVG.icono_heridas
             }
         }
     };
     
     // ==============================================
-    // VISTA PRINCIPAL (TUS BOTONES HORIZONTALES ORIGINALES)
+    // VISTA PRINCIPAL (TUS BOTONES ORIGINALES)
     // ==============================================
     if (!herramientaActual) {
         return `
             <div style="min-height: 100vh; background: #F9FAFB;">
-                <!-- ENCABEZADO - NO FLOTANTE -->
                 <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -3555,20 +3608,15 @@ window.renderRoosterScreen = async function() {
                     <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
                 </div>
                 
-                <!-- DESCRIPCIÓN FLOTANTE (sticky - SÍ flota) -->
                 <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
                 </div>
                 
-                <!-- TUS BOTONES HORIZONTALES ORIGINALES (NO LOS CAMBIO) -->
                 <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
-                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%;">
+                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
+                                ${ICONOS_SVG.icono_valores_normales}
                             </div>
                             <div>
                                 <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3>
@@ -3577,14 +3625,10 @@ window.renderRoosterScreen = async function() {
                         </div>
                     </button>
                     
-                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%;">
+                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
-                                    <line x1="12" y1="4" x2="12" y2="20"/>
-                                    <line x1="4" y1="12" x2="20" y2="12"/>
-                                </svg>
+                                ${ICONOS_SVG.icono_medicamentos}
                             </div>
                             <div>
                                 <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3>
@@ -3593,13 +3637,10 @@ window.renderRoosterScreen = async function() {
                         </div>
                     </button>
                     
-                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%;">
+                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 16px;">
                             <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M12 16v-4M12 8h.01"/>
-                                </svg>
+                                ${ICONOS_SVG.icono_conocimientos}
                             </div>
                             <div>
                                 <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3>
@@ -3622,22 +3663,11 @@ window.renderRoosterScreen = async function() {
     }
     const contenidoActual = contenidos[subHerramientaMostrar] || contenidos.vacia;
     
-    // Iconos constantes para subtools
-    const iconosSubtool = {
-        glasgow:'🧠', norton:'🛌', braden:'🩹', barthel:'🚶', eva:'😖', ramos:'👶', waterlow:'⚠️', apache:'📈', sofa:'🫀', news:'📊',
-        antibioticos:'💊', analgesicos:'💉', cardiovasculares:'❤️', antihipertensivos:'🩸', antidiabeticos:'🍬', anticoagulantes:'🩸', antiepilepticos:'⚡', psicofarmacos:'🧠',
-        rcep:'🫀', guias:'📖', protocolos:'📋', actualizaciones:'🔄', ecografia:'📷', ventilacion:'🌬️', hemodinamia:'💓', heridas:'🩺',
-        tension:'❤️', frecuencia:'💓', respiracion:'🌬️', temperatura:'🌡️', saturacion:'🫁',
-        hemograma:'🩸', quimica:'🧪', biometria:'🔬', orina:'🚽', coagulacion:'⏱️',
-        acv:'🧠', iam:'❤️', tauma:'🦴', quemaduras:'🔥', intoxicacion:'☠️'
-    };
-    
-    // Generar pestañas con iconos y título pequeño
     const generarPestanas = () => {
         return `
-            <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
+            <div class="pestanas-scroll-container" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
                 ${configActual.subherramientas.map(sub => `
-                    <button onclick="window.cambiarSubHerramienta('${sub}')" style="
+                    <button onclick="window.cambiarSubHerramienta('${sub}', event)" style="
                         display: flex;
                         flex-direction: column;
                         align-items: center;
@@ -3649,8 +3679,11 @@ window.renderRoosterScreen = async function() {
                         border-radius: 16px;
                         cursor: pointer;
                         transition: all 0.2s;
+                        color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};
                     ">
-                        <span style="font-size: 28px;">${iconosSubtool[sub] || '📌'}</span>
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                            ${configActual.iconos[sub] || ICONOS_SVG.icono_default}
+                        </span>
                         <span style="font-size: clamp(10px, 3vw, 12px); font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; color: ${subHerramientaMostrar === sub ? 'white' : '#4B5563'}; text-align: center; max-width: 70px; line-height: 1.3;">
                             ${configActual.nombres[sub]}
                         </span>
@@ -3660,12 +3693,11 @@ window.renderRoosterScreen = async function() {
         `;
     };
     
-    // Generar contenido
     const generarContenido = () => {
         if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
             return `
                 <div style="text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">${configActual.icono}</div>
+                    <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
                     <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
                     <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
                     <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
@@ -3701,29 +3733,26 @@ window.renderRoosterScreen = async function() {
     
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
-            <!-- BARRA SUPERIOR - NO FLOTANTE -->
             <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
                 <div style="flex: 1;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="font-size: 20px;">${configActual.icono}</span>
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">${configActual.icono}</span>
                         <h2 style="color: white; margin: 0; font-size: 18px; font-weight: 600;">${configActual.titulo}</h2>
                     </div>
                 </div>
             </div>
             
-            <!-- PESTAÑAS SCROLLABLE - FLOTANTES -->
-            <div style="position: sticky; top: 64px; z-index: 99; background: white; padding: 12px 16px; border-bottom: 1px solid #E5E7EB;">
+            <div style="position: relative; background: white; padding: 12px 16px; border-bottom: 1px solid #E5E7EB;">
                 ${generarPestanas()}
             </div>
             
-            <!-- CONTENIDO -->
             <div style="padding: 16px;">${generarContenido()}</div>
         </div>
     `;
-};             
+};          
 </script>
 
 
