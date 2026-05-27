@@ -3707,7 +3707,267 @@ window.renderVentasScreen = async function() {
 
 
 
-    
+
+
+
+
+
+    // ==============================================
+// FUNCIONES SEPARADAS - VALORES NORMALES
+// ==============================================
+
+window.renderGlasgowTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Apertura Ocular</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Espontánea (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">A la voz (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Al dolor (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Verbal</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Orientado (5)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Confuso (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Palabras inapropiadas (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sonidos incomprensibles (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Motora</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Obedece órdenes (6)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Localiza dolor (5)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Retirada al dolor (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Flexión anormal (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Extensión anormal (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+};
+
+window.renderNortonTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el riesgo de desarrollar úlceras por presión. Valora cinco parámetros: estado físico, estado mental, actividad, movilidad e incontinencia.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Estado Físico General</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Bueno (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Regular (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Malo (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Muy malo (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Estado Mental</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Alerta (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Apático (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Confuso (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Estupor (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Actividad</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ambulante (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Con ayuda (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Limitada (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Inmóvil (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Movilidad</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Total (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ligeramente limitada (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Muy limitada (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Inmóvil (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Incontinencia</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Continente (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ocasional (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Urinaria (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Doble (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+};
+
+window.renderBradenTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Predecir el riesgo de úlceras por presión. Valora percepción sensorial, exposición a humedad, actividad, movilidad, nutrición y fricción.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Percepción Sensorial</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">No comprometida (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ligeramente comprometida (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Muy limitada (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Completamente limitada (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Exposición a Humedad</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Rara vez (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ocasional (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Frecuente (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Constantemente (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Actividad</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Deambula (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Camina ocasionalmente (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Silla de ruedas (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Encamado (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Movilidad</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sin limitaciones (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ligeramente limitada (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Muy limitada (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Completamente inmóvil (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Nutrición</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Excelente (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Adecuada (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Probablemente inadecuada (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Muy pobre (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Fricción y Corte</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sin problema (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Problema potencial (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Problema evidente (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+};
+
+// ==============================================
+// FUNCIONES SEPARADAS - MEDICAMENTOS
+// ==============================================
+
+window.renderAntibioticosTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #3B82F610; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3B82F6;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Clasificación, mecanismos de acción, indicaciones, espectro antibacteriano.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de Antibióticos próximamente', 'info')" style="background: #3B82F6; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
+};
+
+window.renderAnalgesicosTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #3B82F610; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3B82F6;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Escalera analgésica de la OMS, AINEs, opioides, coadyuvantes.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de Analgésicos próximamente', 'info')" style="background: #3B82F6; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
+};
+
+window.renderCardiovascularesTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #3B82F610; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3B82F6;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Antihipertensivos, antiarrítmicos, anticoagulantes, antiagregantes, hipolipemiantes.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de Cardiovasculares próximamente', 'info')" style="background: #3B82F6; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
+};
+
+// ==============================================
+// FUNCIONES SEPARADAS - CONOCIMIENTOS
+// ==============================================
+
+window.renderRceptTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #F59E0B10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #F59E0B;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Guías actualizadas de RCP (2020-2025). Compresiones de alta calidad, desfibrilación temprana, trabajo en equipo.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de RCP próximamente', 'info')" style="background: #F59E0B; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
+};
+
+window.renderGuiasTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #F59E0B10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #F59E0B;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Recomendaciones basadas en evidencia para práctica clínica diaria. Guías NICE, SIGN, GPC.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de Guías Clínicas próximamente', 'info')" style="background: #F59E0B; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
+};
+
+window.renderProtocolosTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #F59E0B10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #F59E0B;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Procedimientos estandarizados de enfermería. Cuidados críticos, heridas, medicación segura.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de Protocolos próximamente', 'info')" style="background: #F59E0B; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
+};
 </script>          
 
 
