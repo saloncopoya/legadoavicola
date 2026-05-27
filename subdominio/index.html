@@ -3037,7 +3037,8 @@ AppState.subscribe((propriedadCambiada) => {
 // VALIDACIÓN DE PARÁMETROS URL (SEGURIDAD)
 // ==============================================
 function validarParametroURL(param) {
-    const permitidos = ['share', 'section'];
+       const permitidos = ['share', 'section', 'tool', 'subtool'];
+
     
     // Verificar que el parámetro está permitido
     if (!permitidos.includes(param)) return false;
