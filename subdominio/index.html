@@ -2829,12 +2829,11 @@ if (shareIdActual) {
     pantallaADestino = SCREENS.SHARE;
     sessionStorage.setItem('currentShareId', shareIdActual);
 } 
-// ✅ NUEVO: Si hay tool en la URL, mostrar VENTAS (Bienestar) directamente
 else if (toolParam) {
-    // Si hay una sección en la URL, usar esa. Si no, mantener la pantalla pendiente o PUBLIC
-if (sectionFromUrl && pantallasOffline.includes(sectionFromUrl)) {
+    // Si hay una sección en la URL y ES PÚBLICA, usarla
+    if (sectionFromUrl && pantallasPublicas.includes(sectionFromUrl)) {
         pantallaADestino = sectionFromUrl;
-    } else if (pantallaPendiente) {
+    } else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
         pantallaADestino = pantallaPendiente;
     } else {
         pantallaADestino = SCREENS.PUBLIC;
@@ -2899,11 +2898,20 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
     } 
         //  Si hay tool en la URL, mostrar VENTAS (Bienestar) aunque no esté logueado
 else if (toolParam) {
-    if (sectionParam && Object.values(SCREENS).includes(sectionParam)) {
-        AppState.setScreen(sectionParam);
+    // ✅ Si hay section en URL y ESA pantalla está permitida OFFLINE, usarla
+if (sectionFromUrl && pantallasOffline.includes(sectionFromUrl)) {
+    pantallaMostrar = sectionFromUrl;
+}
+// ✅ Si no, usar la última pantalla guardada (que es pública)
+else {
+    const lastScreen = localStorage.getItem('lastScreen');
+    const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+    if (lastScreen && pantallasOffline.includes(lastScreen)) {
+        pantallaMostrar = lastScreen;
     } else {
-        AppState.setScreen(SCREENS.PUBLIC);
+        pantallaMostrar = SCREENS.PUBLIC; // ✅ FORZAR PÚBLICA
     }
+}
     setTimeout(() => {
         const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
         if (barra) barra.style.display = 'none';
