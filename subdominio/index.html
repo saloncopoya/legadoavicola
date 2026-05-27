@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 0003</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 0004</p>
 
          
             </div>
@@ -3623,18 +3623,21 @@ window.renderRoosterScreen = async function() {
         window.history.pushState({}, '', nuevaUrl);
         
         // Actualizar clases activas
-              document.querySelectorAll('.subtool-btn').forEach(btn => {
+                  document.querySelectorAll('.subtool-btn').forEach(btn => {
             const btnSubtool = btn.getAttribute('data-subtool');
+            const iconSpan = btn.querySelector('.subtool-icon');
+            const textSpan = btn.querySelector('.subtool-text');
+            
             if (btnSubtool === subtool) {
                 btn.style.background = toolColor;
                 btn.style.borderColor = toolColor;
-                const spans = btn.querySelectorAll('span');
-                spans.forEach(span => span.style.color = 'white');
+                if (iconSpan) iconSpan.style.color = 'white';
+                if (textSpan) textSpan.style.color = 'white';
             } else {
                 btn.style.background = 'white';
                 btn.style.borderColor = '#E5E7EB';
-                const spans = btn.querySelectorAll('span');
-                spans.forEach(span => span.style.color = toolColor);
+                if (iconSpan) iconSpan.style.color = toolColor;
+                if (textSpan) textSpan.style.color = toolColor;
             }
         });
 
@@ -3780,9 +3783,9 @@ window.renderRoosterScreen = async function() {
                         border: 1px solid ${subHerramientaMostrar === sub ? configActual.color : '#E5E7EB'};
                         border-radius: 16px; cursor: pointer;
                     ">
-<span style="display: inline-flex; width: 32px; height: 32px; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">${configActual.iconos[sub] || ICONOS_SVG.icono_default}</span>
-<span style="font-size: 11px; font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">${configActual.nombres[sub]}</span>                    </button>
-                `).join('')}
+<span class="subtool-icon" style="display: inline-flex; width: 32px; height: 32px; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">${configActual.iconos[sub] || ICONOS_SVG.icono_default}</span>
+<span class="subtool-text" style="font-size: 11px; font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">${configActual.nombres[sub]}</span>
+`).join('')}
             </div>
         `;
     };
