@@ -13,7 +13,7 @@
     <meta name="author" content="AUTOR EDITAR AQUI">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/png" href="/favicon.ico">
-    <title> MI WEB nombre 1</title>
+    <title> MIV WEB nombre 1</title>
 
     <meta property="og:title" content="MI web site nombre 2">
     <meta property="og:description" content="descripcion 1">
@@ -2832,8 +2832,11 @@ if (shareIdActual) {
 // ✅ NUEVO: Si hay tool en la URL, mostrar VENTAS (Bienestar) directamente
 else if (toolParam) {
     pantallaADestino = SCREENS.VENTAS;
-    // Mantener los parámetros tool y subtool en la URL
-    // No hacer nada, la URL ya los tiene
+    // FORZAR OCULTAR BARRA
+    setTimeout(() => {
+        const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+        if (barra) barra.style.display = 'none';
+    }, 100);
 }
 else if (!profile?.activated) {
     pantallaADestino = SCREENS.PUBLIC;
@@ -2877,6 +2880,7 @@ AppState.setScreen(pantallaADestino);
 const urlParams = new URLSearchParams(window.location.search);
 const shareId = urlParams.get('share');
 const sectionParam = urlParams.get('section');
+const toolParam = urlParams.get('tool');
             
     
     // Lista de pantallas públicas que se pueden ver SIN login
@@ -2886,6 +2890,16 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
         AppState.setScreen(SCREENS.SHARE);
         window.history.pushState({}, '', `/?share=${shareId}`);
     } 
+        //  Si hay tool en la URL, mostrar VENTAS (Bienestar) aunque no esté logueado
+else if (toolParam) {
+    AppState.setScreen(SCREENS.VENTAS);
+    // FORZAR OCULTAR BARRA
+    setTimeout(() => {
+        const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+        if (barra) barra.style.display = 'none';
+    }, 100);
+}
+    
     // ✅ Verificar si el parámetro section está en la lista de públicas
     else if (sectionParam && pantallasPublicas.includes(sectionParam)) {
         AppState.setScreen(sectionParam);
@@ -3306,6 +3320,17 @@ window.renderRoosterScreen = async function() {
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
 <script>
       window.renderVentasScreen = async function() {
+              // ==============================================
+    // OCULTAR BARRA SI ENTRAMOS CON tool EN URL
+    // ==============================================
+    const ocultarTool = new URLSearchParams(window.location.search).get('tool');
+    if (ocultarTool) {
+        setTimeout(() => {
+            const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+            if (barra) barra.style.display = 'none';
+        }, 50);
+    }
+          
     // ==============================================
     // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
