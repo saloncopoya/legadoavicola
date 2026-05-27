@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 01</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 02</p>
 
          
             </div>
@@ -2899,8 +2899,11 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
     } 
         //  Si hay tool en la URL, mostrar VENTAS (Bienestar) aunque no esté logueado
 else if (toolParam) {
-    AppState.setScreen(SCREENS.VENTAS);
-    // FORZAR OCULTAR BARRA
+    if (sectionParam && Object.values(SCREENS).includes(sectionParam)) {
+        AppState.setScreen(sectionParam);
+    } else {
+        AppState.setScreen(SCREENS.PUBLIC);
+    }
     setTimeout(() => {
         const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
         if (barra) barra.style.display = 'none';
@@ -3151,7 +3154,7 @@ window.addEventListener('load', async () => {
     // Si estamos OFFLINE, mostrar la última pantalla sin intentar Firebase
     if (isOffline) {
         console.log('📴 Modo offline - Mostrando última pantalla guardada');
-        
+
         // Ocultar loading inmediatamente
         hideLoadingScreen();
 
@@ -3195,18 +3198,29 @@ window.addEventListener('load', async () => {
         }
         
         // Obtener la última pantalla guardada
-        const lastScreen = localStorage.getItem('lastScreen');
-        
-        // Pantallas que pueden verse offline
-        const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
-        let pantallaMostrar = SCREENS.PUBLIC;
-        
-        if (lastScreen && pantallasOffline.includes(lastScreen)) {
-            pantallaMostrar = lastScreen;
-        }
-        
-        // Mostrar la pantalla
-        AppState.setScreen(pantallaMostrar);
+      // ✅ LEER URL OFFLINE - tool y subtool para CUALQUIER pantalla
+const urlParamsOffline = new URLSearchParams(window.location.search);
+const toolFromUrl = urlParamsOffline.get('tool');
+const subtoolFromUrl = urlParamsOffline.get('subtool');
+const sectionFromUrl = urlParamsOffline.get('section');
+
+let pantallaMostrar = SCREENS.PUBLIC;
+
+
+// ✅ Si hay section en URL, usar esa pantalla
+if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
+    pantallaMostrar = sectionFromUrl;
+}
+// ✅ Si no, usar la última pantalla guardada
+else {
+    const lastScreen = localStorage.getItem('lastScreen');
+    const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+    if (lastScreen && pantallasOffline.includes(lastScreen)) {
+        pantallaMostrar = lastScreen;
+    }
+}
+
+AppState.setScreen(pantallaMostrar);
         AppState.setLoading(false);
         renderApp();
         
@@ -3470,27 +3484,103 @@ window.renderVentasScreen = async function() {
 
 
     window.cambiarSubHerramienta = function(subtool, event) {
+        
     if (event && event.preventDefault) event.preventDefault();
+
+         const urlParamsActual = new URLSearchParams(window.location.search);
+    const subtoolActual = urlParamsActual.get('subtool');
     
-    // Guardar la posición del scroll
+    // ✅ NUEVO: Si es la MISMA herramienta, NO hacer nada (solo animación visual)
+    if (subtoolActual === subtool) {
+        // Solo animación de feedback visual sin recargar
+        const newBtn = document.querySelector(`.subtool-btn[data-subtool="${subtool}"]`);
+        if (newBtn) {
+            newBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => { if(newBtn) newBtn.style.transform = ''; }, 150);
+        }
+        return; // ✅ SALIR - No hacer nada más
+    }
+        
+    
+    // ✅ Guardar la posición ACTUAL del scroll ANTES de cambiar
     const scrollContainer = document.querySelector('.pestanas-scroll-container');
     const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+    
+    // ✅ Obtener el elemento activo actual (para animación suave)
+    const activeBtn = document.querySelector('.subtool-btn-active');
+    const newBtn = document.querySelector(`.subtool-btn[data-subtool="${subtool}"]`);
+    
+    // ✅ Si existe animación CSS, aplicarla
+    if (newBtn && !newBtn.classList.contains('subtool-btn-active')) {
+        newBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => { if(newBtn) newBtn.style.transform = ''; }, 150);
+    }
     
     // Actualizar URL
     const nuevaUrl = new URL(window.location);
     nuevaUrl.searchParams.set('subtool', subtool);
     window.history.pushState({}, '', nuevaUrl);
     
-    // Recargar la pantalla para que renderApp muestre la herramienta correcta
-    renderApp();
+    // ✅ ACTUALIZAR SOLO EL CONTENIDO PRINCIPAL (no toda la pantalla)
+    const mainContent = document.getElementById('subtool-main-content');
+    if (mainContent) {
+        // Generar solo el contenido nuevo
+        let nuevoContenido = '';
+        const herramientaActual = new URLSearchParams(window.location.search).get('tool');
+        
+        if (herramientaActual === 'valores-normales') {
+            if (subtool === 'glasgow') nuevoContenido = window.renderGlasgowTool();
+            else if (subtool === 'norton') nuevoContenido = window.renderNortonTool();
+            else if (subtool === 'braden') nuevoContenido = window.renderBradenTool();
+            else if (subtool === 'presion-arterial') nuevoContenido = window.renderBloodPressureTool();
+            else if (subtool === 'glucosa') nuevoContenido = window.renderGlucosaTool();
+            else nuevoContenido = '<div style="padding:20px; text-align:center;">Contenido en desarrollo</div>';
+        } else if (herramientaActual === 'medicamentos') {
+            if (subtool === 'antibioticos') nuevoContenido = window.renderAntibioticosTool();
+            else if (subtool === 'analgesicos') nuevoContenido = window.renderAnalgesicosTool();
+            else if (subtool === 'cardiovasculares') nuevoContenido = window.renderCardiovascularesTool();
+            else nuevoContenido = '<div style="padding:20px; text-align:center;">Contenido en desarrollo</div>';
+        } else if (herramientaActual === 'conocimientos') {
+            if (subtool === 'rcep') nuevoContenido = window.renderRceptTool();
+            else if (subtool === 'guias') nuevoContenido = window.renderGuiasTool();
+            else if (subtool === 'protocolos') nuevoContenido = window.renderProtocolosTool();
+            else nuevoContenido = '<div style="padding:20px; text-align:center;">Contenido en desarrollo</div>';
+        }
+        
+        // ✅ Animar el cambio de contenido (fade)
+        mainContent.style.opacity = '0.5';
+        setTimeout(() => {
+            mainContent.innerHTML = nuevoContenido;
+            mainContent.style.opacity = '1';
+        }, 100);
+    }
     
-    // Restaurar scroll después de renderizar
+    // ✅ Actualizar SOLO las clases de los botones (sin recargar toda la pantalla)
+    document.querySelectorAll('.subtool-btn').forEach(btn => {
+        const btnSubtool = btn.getAttribute('data-subtool');
+        btn.classList.remove('subtool-btn-active');
+        if (btnSubtool === subtool) {
+            btn.classList.add('subtool-btn-active');
+            // Cambiar estilos inline también
+            btn.style.background = window.configActual?.color || '#0D9488';
+            btn.style.color = 'white';
+            const textSpan = btn.querySelector('.subtool-text');
+            if (textSpan) textSpan.style.fontWeight = '700';
+        } else {
+            btn.style.background = 'white';
+            btn.style.color = window.configActual?.color || '#0D9488';
+            const textSpan = btn.querySelector('.subtool-text');
+            if (textSpan) textSpan.style.fontWeight = '500';
+        }
+    });
+    
+    // ✅ RESTAURAR el scroll después de renderizar
     setTimeout(() => {
         const newScrollContainer = document.querySelector('.pestanas-scroll-container');
         if (newScrollContainer) {
             newScrollContainer.scrollLeft = scrollPosition;
         }
-    }, 100);
+    }, 50);
 };
 
     
@@ -3561,17 +3651,22 @@ window.renderVentasScreen = async function() {
             descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow', 'norton', 'braden'],
-            nombres: {
-                glasgow: TEXTOS.herramienta_glasgow,
-                norton: TEXTOS.herramienta_norton,
-                braden: TEXTOS.herramienta_braden
-            },
-            iconos: {
-                glasgow: ICONOS_SVG.icono_glasgow,
-                norton: ICONOS_SVG.icono_norton,
-                braden: ICONOS_SVG.icono_braden
-            }
+            subherramientas: ['glasgow', 'norton', 'braden','presion-arterial', 'glucosa'],
+nombres: {
+         'presion-arterial': 'Presión Arterial',
+    'glucosa': 'Glucosa (Diabetes)',
+    glasgow: TEXTOS.herramienta_glasgow,
+    norton: TEXTOS.herramienta_norton,
+    braden: TEXTOS.herramienta_braden
+
+},
+iconos: {
+    'presion-arterial': '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><path d="M12 8v4M12 16h.01"/></svg>',
+        'glucosa': '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M8 12h8"/></svg>',
+    glasgow: ICONOS_SVG.icono_glasgow,
+    norton: ICONOS_SVG.icono_norton,
+    braden: ICONOS_SVG.icono_braden
+}
         },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
@@ -3654,6 +3749,7 @@ window.renderVentasScreen = async function() {
     // VISTA DE HERRAMIENTA SELECCIONADA
     // ==============================================
     const configActual = herramientasConfig[herramientaActual];
+    window.configActual = configActual;
     let subHerramientaMostrar = subHerramientaActual;
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
@@ -3679,6 +3775,8 @@ window.renderVentasScreen = async function() {
             if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
             if (subHerramientaMostrar === 'norton') return window.renderNortonTool();
             if (subHerramientaMostrar === 'braden') return window.renderBradenTool();
+            if (subHerramientaMostrar === 'presion-arterial') return window.renderBloodPressureTool();
+       if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
         }
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
@@ -3922,6 +4020,650 @@ window.renderBradenTool = function() {
             </div>
             <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
                 <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+};
+
+// ==============================================
+// HERRAMIENTA DE PRESIÓN ARTERIAL (AHA 2026)
+// ==============================================
+
+window.renderBloodPressureTool = function() {
+    // Función para evaluar según edad y valores AHA 2026
+    window.evaluarPresionArterial = function() {
+        const sistolica = parseInt(document.getElementById('bp-sistolica')?.value) || 0;
+        const diastolica = parseInt(document.getElementById('bp-diastolica')?.value) || 0;
+        const edad = document.getElementById('bp-edad')?.value || 'adulto';
+        
+        const resultadoDiv = document.getElementById('bp-resultado');
+        const significadoDiv = document.getElementById('bp-significado');
+        const recomendacionBaseDiv = document.getElementById('bp-recomendacion-base');
+        
+       if (sistolica === 0 || diastolica === 0) {
+            resultadoDiv.innerHTML = `
+                <div style="text-align: center; padding: 16px 0;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p style="color: #9CA3AF; margin-top: 8px;">Esperando valores...</p>
+                </div>
+            `;
+            significadoDiv.innerHTML = '';
+            if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
+            return;
+        }
+        
+        // Ocultar recomendación base cuando hay resultado
+        if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'none';
+        
+        let categoria = '';
+        let color = '';
+        let significado = '';
+        let iconoSvg = '';
+        
+        // Rangos ajustados por edad según AHA 2026
+        let rangoNormalSistolica = 120;
+        let rangoNormalDiastolica = 80;
+        let rangoElevadaSistolica = 129;
+        
+        if (edad === 'nino') {
+            rangoNormalSistolica = 100;
+            rangoNormalDiastolica = 70;
+            rangoElevadaSistolica = 110;
+        } else if (edad === 'joven') {
+            rangoNormalSistolica = 115;
+            rangoNormalDiastolica = 75;
+            rangoElevadaSistolica = 125;
+        } else if (edad === 'adulto-mayor') {
+            rangoNormalSistolica = 130;
+            rangoNormalDiastolica = 85;
+            rangoElevadaSistolica = 139;
+        }
+        
+        // Clasificación según AHA 2026 con rangos por edad
+        if (sistolica < rangoNormalSistolica && diastolica < rangoNormalDiastolica) {
+            categoria = 'Normal';
+            color = '#22C55E';
+            iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>`;
+            significado = `✅ PRESIÓN NORMAL (AHA 2026): Tus valores están dentro del rango óptimo para tu grupo de edad. Esto indica que tu sistema cardiovascular funciona correctamente y no hay evidencia de hipertensión. Continúa con hábitos saludables para mantener estos niveles.`;
+        } 
+        else if ((sistolica >= rangoNormalSistolica && sistolica <= rangoElevadaSistolica) && diastolica < rangoNormalDiastolica) {
+            categoria = 'Elevada';
+            color = '#F59E0B';
+            iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>`;
+            significado = `⚠️ PRESIÓN ELEVADA (AHA 2026): Tus valores están por encima de lo óptimo. Esto significa que estás en una etapa de alerta temprana. Aunque no se considera hipertensión, es una señal para tomar acción preventiva. La AHA recomienda cambios en el estilo de vida: reducción de sodio, ejercicio regular y manejo del estrés.`;
+        }
+        else if ((sistolica >= rangoElevadaSistolica + 1 && sistolica <= rangoElevadaSistolica + 10) || 
+                 (diastolica >= rangoNormalDiastolica && diastolica <= rangoNormalDiastolica + 9)) {
+            categoria = 'Hipertensión Etapa 1';
+            color = '#F97316';
+            iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>`;
+            significado = `🩺 HIPERTENSIÓN ETAPA 1 (AHA 2026): Significa que tu presión arterial está constantemente elevada. En esta etapa, el corazón comienza a trabajar más de lo normal. La AHA recomienda: cambios en el estilo de vida durante 3-6 meses. Si persiste, el médico podría indicar medicación. Es momento de consultar a tu médico de cabecera.`;
+        }
+        else if (sistolica >= rangoElevadaSistolica + 11 || diastolica >= rangoNormalDiastolica + 10) {
+            if (sistolica >= 180 || diastolica >= 120) {
+                categoria = 'Crisis Hipertensiva';
+                color = '#EF4444';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                <line x1="8" y1="8" x2="16" y2="16"/>
+                                <line x1="16" y1="8" x2="8" y2="16"/>
+                            </svg>`;
+                significado = `🚨 CRISIS HIPERTENSIVA (AHA 2026): ¡URGENTE! Esto significa que tu presión arterial alcanzó niveles peligrosamente altos. Existe riesgo de daño a órganos vitales como corazón, cerebro, riñones y ojos. La AHA 2026 indica: DEBES BUSCAR ATENCIÓN MÉDICA INMEDIATA. Si presentas dolor de pecho, dificultad para respirar, dolor de espalda severo, cambios en la visión o debilidad, llama a emergencias (911) AHORA MISMO.`;
+            } else {
+                categoria = 'Hipertensión Etapa 2';
+                color = '#DC2626';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                <line x1="12" y1="22" x2="12" y2="12"/>
+                            </svg>`;
+                significado = `💊 HIPERTENSIÓN ETAPA 2 (AHA 2026): Significa que tu presión arterial está significativamente elevada de manera sostenida. El corazón y las arterias están sometidos a un esfuerzo constante excesivo. La AHA 2026 recomienda: iniciar tratamiento farmacológico junto con cambios intensivos en el estilo de vida. Es prioritario que ACUDAS A TU CLÍNICA EN LOS PRÓXIMOS DÍAS para evaluación médica completa. No automediques.`;
+            }
+        }
+        
+        // Detectar hipotensión (presión baja)
+        if (sistolica < 90 || diastolica < 60) {
+            categoria = 'Hipotensión';
+            color = '#3B82F6';
+            iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                            <path d="M4 4L20 20M20 4L4 20"/>
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>`;
+            significado = `📉 HIPOTENSIÓN (Presión baja): Significa que tu presión arterial está por debajo de lo considerado normal para tu grupo de edad. Puede causar mareos, fatiga o desmayos. La AHA 2026 indica: si no tienes síntomas, puede ser normal para ti. Si presentas síntomas, consulta a tu médico. Mantente hidratado y evita cambios bruscos de posición.`;
+        }
+        
+        // Actualizar UI con resultado
+        resultadoDiv.innerHTML = `
+            <div style="text-align: center; padding: 8px 0;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: ${color}20; border-radius: 50%; margin-bottom: 12px;">
+                    ${iconoSvg}
+                </div>
+                <div style="font-size: 48px; font-weight: 800; color: ${color}; margin-bottom: 8px;">
+                    ${sistolica} / ${diastolica} mmHg
+                </div>
+                <div style="display: inline-block; background: ${color}20; padding: 8px 24px; border-radius: 40px; color: ${color}; font-weight: 700;">
+                    ${categoria}
+                </div>
+            </div>
+        `;
+        
+        significadoDiv.innerHTML = `
+            <div style="background: ${color}10; border-radius: 20px; padding: 20px; margin-top: 16px;">
+                <p style="color: ${color}; font-weight: 700; margin: 0 0 12px 0; font-size: 15px;">
+                    📋 Según la American Heart Association (AHA 2026):
+                </p>
+                <p style="color: #374151; margin: 0; font-size: 14px; line-height: 1.6;">
+                    ${significado}
+                </p>
+            </div>
+        `;
+        
+        // Animación de pulso
+        const resultadoCard = document.getElementById('bp-resultado-card');
+        if (resultadoCard) {
+            resultadoCard.style.animation = 'pulse 0.4s ease';
+            setTimeout(() => { if(resultadoCard) resultadoCard.style.animation = ''; }, 400);
+        }
+    };
+    
+    // Auto-evaluación al escribir
+    setTimeout(() => {
+        const sistolicaInput = document.getElementById('bp-sistolica');
+        const diastolicaInput = document.getElementById('bp-diastolica');
+        const edadSelect = document.getElementById('bp-edad');
+        
+        const checkAndEvaluate = () => {
+            if (sistolicaInput?.value && diastolicaInput?.value) {
+                window.evaluarPresionArterial();
+            } else {
+                const resultadoDiv = document.getElementById('bp-resultado');
+                const recomendacionBaseDiv = document.getElementById('bp-recomendacion-base');
+                if (resultadoDiv) {
+                    resultadoDiv.innerHTML = `
+                      
+                    `;
+                    document.getElementById('bp-significado').innerHTML = '';
+                    if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
+                }
+            }
+        };
+        
+        if (sistolicaInput) sistolicaInput.addEventListener('input', checkAndEvaluate);
+        if (diastolicaInput) diastolicaInput.addEventListener('input', checkAndEvaluate);
+        if (edadSelect) edadSelect.addEventListener('change', checkAndEvaluate);
+    }, 100);
+    
+    return `
+        <style>
+            @keyframes pulse {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.02); opacity: 0.95; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+            .bp-input-card {
+                transition: all 0.3s ease;
+            }
+            .bp-input-card:focus-within {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            }
+            input[type="number"]::-webkit-inner-spin-button, 
+            input[type="number"]::-webkit-outer-spin-button {
+                opacity: 0.5;
+            }
+            select {
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 16px center;
+                background-size: 20px;
+            }
+        </style>
+        
+        <div style="padding: 4px 0 20px 0;">
+
+
+            
+            <!-- Tarjeta de cabecera -->
+            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 24px; padding: 4px; margin-bottom: 24px; color: white;">
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <div>
+                        <h3 style="margin: 0 0 4px 0; font-size: clamp(20px, 5vw, 26px);">Presión Arterial</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: clamp(12px, 3vw, 14px);">Clasificación según AHA 2026</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selector de edad -->
+            <div style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    Selecciona tu grupo de edad:
+                </label>
+                <select id="bp-edad" style="width: 100%; padding: 14px 16px; border: 2px solid #E5E7EB; border-radius: 16px; font-size: 16px; font-weight: 500; background: white; cursor: pointer;">
+                    <option value="nino">👧 Niño (6-12 años)</option>
+                    <option value="joven">🧑 Joven (13-25 años)</option>
+                    <option value="adulto" selected>👨 Adulto (26-59 años)</option>
+                    <option value="adulto-mayor">👴 Adulto Mayor (60+ años)</option>
+                </select>
+            </div>
+
+
+            
+           
+
+
+            <!-- Inputs de presión arterial en 2 COLUMNAS -->
+<div class="bp-input-card" style="background: white; border-radius: 24px; padding: 28px 24px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+            <label style="display: block; font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2" style="display: inline; margin-right: 6px;">
+                    <path d="M2 12h20M12 2v20"/>
+                </svg>
+                SISTÓLICA
+            </label>
+            <input type="number" id="bp-sistolica" placeholder="Ej: 120" 
+                   style="width: 100%; padding: 18px 8px; border: 3px solid #D1D5DB; border-radius: 20px; font-size: 20px; font-weight: 700; text-align: center;">
+        </div>
+        <div>
+            <label style="display: block; font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2" style="display: inline; margin-right: 6px;">
+                    <path d="M20 12H4M12 4v16"/>
+                </svg>
+                DIASTÓLICA
+            </label>
+            <input type="number" id="bp-diastolica" placeholder="Ej: 80" 
+                   style="width: 100%; padding: 18px 8px; border: 3px solid #D1D5DB; border-radius: 20px; font-size: 20px; font-weight: 700; text-align: center;">
+        </div>
+    </div>
+</div>
+
+
+
+         <!-- Card de resultado -->
+            <div id="bp-resultado-card" style="background: white; border-radius: 24px; padding: 8px 24px 24px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                <div id="bp-resultado">
+                
+                </div>
+                <div id="bp-significado"></div>
+            </div>
+
+
+            
+            <!-- Recomendación base (SALUD) - visible antes de evaluar -->
+            <div id="bp-recomendacion-base" style="background: #EFF6FF; border-radius: 20px; padding: 20px; margin-top: 24px; border-left: 4px solid #0D9488;">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <div>
+                        <p style="color: #1E40AF; font-weight: 700; margin: 0 0 8px 0;">📌 Recomendación de la Secretaría de Salud:</p>
+                        <p style="color: #1E3A8A; margin: 0; font-size: 14px; line-height: 1.5;">
+                            Es fundamental no automedicarse y acudir a tu clínica para una evaluación. Para prevenir o controlar estos valores, 
+                            la Secretaría de Salud promueve cambios en el estilo de vida, como una dieta baja en sodio y actividad física regular.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+
+    // ==============================================
+// HERRAMIENTA DE GLUCOSA (DIABETES) - ADA 2026
+// ==============================================
+
+window.renderGlucosaTool = function() {
+    // Función para evaluar según tipo de diabetes y valores ADA 2026
+    window.evaluarGlucosa = function() {
+        const glucosa = parseInt(document.getElementById('glucosa-valor')?.value) || 0;
+        const momento = document.getElementById('glucosa-momento')?.value || 'ayunas';
+        const tipoDiabetes = document.getElementById('glucosa-tipo')?.value || 'tipo2';
+        
+        const resultadoDiv = document.getElementById('glucosa-resultado');
+        const significadoDiv = document.getElementById('glucosa-significado');
+        const recomendacionBaseDiv = document.getElementById('glucosa-recomendacion-base');
+        
+        if (glucosa === 0) {
+            resultadoDiv.innerHTML = `
+                <div style="text-align: center; padding: 16px 0;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p style="color: #9CA3AF; margin-top: 8px;">Esperando valor de glucosa...</p>
+                </div>
+            `;
+            significadoDiv.innerHTML = '';
+            if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
+            return;
+        }
+        
+        // Ocultar recomendación base cuando hay resultado
+        if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'none';
+        
+        let categoria = '';
+        let color = '';
+        let significado = '';
+        let iconoSvg = '';
+        let rango = '';
+        
+        // Rangos según American Diabetes Association (ADA) 2026
+        if (momento === 'ayunas') {
+            if (glucosa < 100) {
+                categoria = 'Normal';
+                color = '#22C55E';
+                rango = '< 100 mg/dL';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>`;
+                significado = `✅ GLUCOSA NORMAL EN AYUNAS (ADA 2026): Tu nivel de glucosa está dentro del rango óptimo (${glucosa} mg/dL). Esto indica un excelente control metabólico. Mantén tus hábitos saludables: alimentación balanceada, ejercicio regular y adherencia al tratamiento si lo tienes.`;
+            } 
+            else if (glucosa >= 100 && glucosa <= 125) {
+                categoria = 'Prediabetes';
+                color = '#F59E0B';
+                rango = '100-125 mg/dL';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>`;
+                significado = `⚠️ PREDIABETES (ADA 2026): Tu glucosa en ayunas (${glucosa} mg/dL) está por encima de lo normal pero no es diabetes. Es una señal de alerta temprana. La ADA recomienda: pérdida del 7% de peso corporal si tienes sobrepeso, actividad física moderada (150 min/semana) y seguimiento médico cada 6-12 meses. ¡Puedes revertirlo con cambios en el estilo de vida!`;
+            }
+            else if (glucosa >= 126) {
+                categoria = 'Diabetes';
+                color = '#EF4444';
+                rango = '≥ 126 mg/dL';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>`;
+                significado = `🩸 DIABETES (ADA 2026): Tu glucosa en ayunas (${glucosa} mg/dL) cumple criterios para diagnóstico de diabetes. ${tipoDiabetes === 'tipo1' ? 'Para diabetes tipo 1: requiere insulina desde el diagnóstico y monitoreo continuo.' : 'Para diabetes tipo 2: la ADA recomienda metformina como primer escalón, junto con cambios en alimentación y ejercicio.'} Consulta con tu endocrinólogo para ajustar tratamiento. El control glucémico reduce riesgo de complicaciones.`;
+            }
+        } 
+        else if (momento === 'postprandial') {
+            if (glucosa < 140) {
+                categoria = 'Normal';
+                color = '#22C55E';
+                rango = '< 140 mg/dL';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>`;
+                significado = `✅ GLUCOSA POSTPRANDIAL NORMAL (ADA 2026): ${glucosa} mg/dL es un excelente control post comida. La glucosa postprandial óptima se asocia con menor riesgo cardiovascular. Continúa con tus hábitos saludables.`;
+            }
+            else if (glucosa >= 140 && glucosa <= 199) {
+                categoria = 'Intolerancia a la Glucosa';
+                color = '#F59E0B';
+                rango = '140-199 mg/dL';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>`;
+                significado = `⚠️ INTOLERANCIA A LA GLUCOSA (ADA 2026): Tus niveles postprandiales (${glucosa} mg/dL) están elevados. Evalúa el contenido de carbohidratos de tus comidas y considera ejercicio post comida. La ADA sugiere monitoreo para prevenir progresión a diabetes.`;
+            }
+            else if (glucosa >= 200) {
+                categoria = 'Diabetes';
+                color = '#EF4444';
+                rango = '≥ 200 mg/dL';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>`;
+                significado = `🩸 DIABETES (ADA 2026): Glucosa postprandial de ${glucosa} mg/dL. Evalúa dosis de insulina o medicación preprandial. La ADA recomienda alcanzar metas postprandiales <180 mg/dL para reducir complicaciones microvasculares. Consulta ajuste terapéutico.`;
+            }
+        }
+        else { // HbA1c
+            if (glucosa < 5.7) {
+                categoria = 'Normal';
+                color = '#22C55E';
+                rango = '< 5.7%';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>`;
+                significado = `✅ HEMOGLOBINA A1c NORMAL (ADA 2026): ${glucosa}% es un nivel óptimo. Mantén tus hábitos actuales. La A1c refleja control glucémico de los últimos 3 meses.`;
+            }
+            else if (glucosa >= 5.7 && glucosa <= 6.4) {
+                categoria = 'Prediabetes';
+                color = '#F59E0B';
+                rango = '5.7-6.4%';
+                iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>`;
+                significado = `⚠️ ALTO RIESGO (PREDIABETES) - ADA 2026: A1c de ${glucosa}%. Programa de prevención: pérdida de peso, 150 min/semana de ejercicio. Repetir A1c en 6 meses.`;
+            }
+            else if (glucosa >= 6.5) {
+                if (glucosa < 7.0) {
+                    categoria = 'Diabetes Controlada';
+                    color = '#3B82F6';
+                    rango = '6.5-6.9%';
+                    iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                </svg>`;
+                    significado = `✅ DIABETES CONTROLADA (ADA 2026): A1c de ${glucosa}%. ¡Excelente! La ADA recomienda meta <7% para la mayoría de adultos con diabetes. Mantén tu plan de tratamiento actual.`;
+                }
+                else if (glucosa >= 7.0 && glucosa <= 8.0) {
+                    categoria = 'Diabetes Subóptima';
+                    color = '#F97316';
+                    rango = '7.0-8.0%';
+                    iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>`;
+                    significado = `⚠️ CONTROL SUBÓPTIMO (ADA 2026): A1c ${glucosa}%. La ADA recomienda reevaluar tratamiento: ajuste de dosis, educación en automanejo o añadir segunda línea terapéutica. Consulta en ≤3 meses.`;
+                }
+                else {
+                    categoria = 'Diabetes Mal Controlada';
+                    color = '#EF4444';
+                    rango = '> 8.0%';
+                    iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    <line x1="8" y1="8" x2="16" y2="16"/>
+                                    <line x1="16" y1="8" x2="8" y2="16"/>
+                                </svg>`;
+                    significado = `⚠️ CONTROL GLUCÉMICO INADECUADO (ADA 2026): A1c ${glucosa}%. Alto riesgo de complicaciones. La ADA recomienda: intensificar tratamiento (múltiples dosis de insulina o agregar agonista GLP-1 si aplica), educación en diabetes y seguimiento en <3 meses.`;
+                }
+            }
+        }
+        
+        // Actualizar UI con resultado
+        resultadoDiv.innerHTML = `
+            <div style="text-align: center; padding: 8px 0;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: ${color}20; border-radius: 50%; margin-bottom: 12px;">
+                    ${iconoSvg}
+                </div>
+                <div style="font-size: 48px; font-weight: 800; color: ${color}; margin-bottom: 8px;">
+                    ${glucosa} ${momento === 'hba1c' ? '%' : 'mg/dL'}
+                </div>
+                <div style="display: inline-block; background: ${color}20; padding: 8px 24px; border-radius: 40px; color: ${color}; font-weight: 700;">
+                    ${categoria}
+                </div>
+                <div style="margin-top: 8px; font-size: 14px; color: #6B7280;">
+                    Rango ADA: ${rango}
+                </div>
+            </div>
+        `;
+        
+        significadoDiv.innerHTML = `
+            <div style="background: ${color}10; border-radius: 20px; padding: 20px; margin-top: 16px;">
+                <p style="color: ${color}; font-weight: 700; margin: 0 0 12px 0; font-size: 15px;">
+                    📋 Según la American Diabetes Association (ADA 2026):
+                </p>
+                <p style="color: #374151; margin: 0; font-size: 14px; line-height: 1.6;">
+                    ${significado}
+                </p>
+            </div>
+        `;
+        
+        // Animación de pulso
+        const resultadoCard = document.getElementById('glucosa-resultado-card');
+        if (resultadoCard) {
+            resultadoCard.style.animation = 'pulse 0.4s ease';
+            setTimeout(() => { if(resultadoCard) resultadoCard.style.animation = ''; }, 400);
+        }
+    };
+    
+    // Auto-evaluación al escribir
+    setTimeout(() => {
+        const glucosaInput = document.getElementById('glucosa-valor');
+        const momentoSelect = document.getElementById('glucosa-momento');
+        const tipoSelect = document.getElementById('glucosa-tipo');
+        
+        const checkAndEvaluate = () => {
+            if (glucosaInput?.value) {
+                window.evaluarGlucosa();
+            } else {
+                const resultadoDiv = document.getElementById('glucosa-resultado');
+                const recomendacionBaseDiv = document.getElementById('glucosa-recomendacion-base');
+                if (resultadoDiv) {
+                    resultadoDiv.innerHTML = `<div style="text-align: center; padding: 16px 0; color: #9CA3AF;">Esperando valor...</div>`;
+                    document.getElementById('glucosa-significado').innerHTML = '';
+                    if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
+                }
+            }
+        };
+        
+        if (glucosaInput) glucosaInput.addEventListener('input', checkAndEvaluate);
+        if (momentoSelect) momentoSelect.addEventListener('change', checkAndEvaluate);
+        if (tipoSelect) tipoSelect.addEventListener('change', checkAndEvaluate);
+    }, 100);
+    
+    return `
+        <style>
+            @keyframes pulse {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.02); opacity: 0.95; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+            .glucosa-input-card {
+                transition: all 0.3s ease;
+            }
+            .glucosa-input-card:focus-within {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            }
+        </style>
+        
+        <div style="padding: 4px 0 20px 0;">
+            <!-- Tarjeta de cabecera -->
+            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 24px; padding: 4px; margin-bottom: 24px; color: white;">
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                        <path d="M8 12h8"/>
+                    </svg>
+                    <div>
+                        <h3 style="margin: 0 0 4px 0; font-size: clamp(20px, 5vw, 26px);">Glucosa (Diabetes)</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: clamp(12px, 3vw, 14px);">Clasificación según ADA 2026</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selector de tipo de medición -->
+            <div style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    Tipo de medición:
+                </label>
+                <select id="glucosa-momento" style="width: 100%; padding: 14px 16px; border: 2px solid #E5E7EB; border-radius: 16px; font-size: 16px; font-weight: 500; background: white; cursor: pointer;">
+                    <option value="ayunas" selected>🌅 Glucosa en ayunas (≥8 horas sin comer)</option>
+                    <option value="postprandial">🍽️ Glucosa postprandial (2 horas después de comer)</option>
+                    <option value="hba1c">🩸 Hemoglobina A1c (HbA1c - %)</option>
+                </select>
+            </div>
+            
+            <!-- Selector de tipo de diabetes -->
+            <div style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
+                        <path d="M20 12H4M12 4v16"/>
+                    </svg>
+                    Tipo de diabetes (para recomendaciones):
+                </label>
+                <select id="glucosa-tipo" style="width: 100%; padding: 14px 16px; border: 2px solid #E5E7EB; border-radius: 16px; font-size: 16px; font-weight: 500; background: white; cursor: pointer;">
+                    <option value="tipo1">🩸 Diabetes Tipo 1</option>
+                    <option value="tipo2" selected>🩺 Diabetes Tipo 2</option>
+                    <option value="gestacional">🤰 Diabetes Gestacional</option>
+                </select>
+            </div>
+            
+            <!-- Input del valor de glucosa -->
+            <div class="glucosa-input-card" style="background: white; border-radius: 24px; padding: 28px 24px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;">
+                <label style="display: block; font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 12px; text-align: center;">
+                    Ingresa tu valor:
+                </label>
+                <input type="number" id="glucosa-valor" placeholder="Ej: 95" 
+                       style="width: 100%; padding: 18px 8px; border: 3px solid #D1D5DB; border-radius: 20px; font-size: 20px; font-weight: 700; text-align: center;">
+                <p style="text-align: center; font-size: 12px; color: #6B7280; margin-top: 8px;">
+                    <span id="glucosa-unidad">mg/dL</span>
+                </p>
+            </div>
+            
+            <!-- Card de resultado -->
+            <div id="glucosa-resultado-card" style="background: white; border-radius: 24px; padding: 8px 24px 24px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                <div id="glucosa-resultado">
+                    <div style="text-align: center; padding: 16px 0; color: #9CA3AF;">Esperando valor...</div>
+                </div>
+                <div id="glucosa-significado"></div>
+            </div>
+            
+            <!-- Recomendación base - visible antes de evaluar -->
+            <div id="glucosa-recomendacion-base" style="background: #EFF6FF; border-radius: 20px; padding: 20px; margin-top: 24px; border-left: 4px solid #0D9488;">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <div>
+                        <p style="color: #1E40AF; font-weight: 700; margin: 0 0 8px 0;">📌 Recomendación de la American Diabetes Association (ADA 2026):</p>
+                        <p style="color: #1E3A8A; margin: 0; font-size: 14px; line-height: 1.5;">
+                            El automonitoreo regular de glucosa es fundamental. Metas generales: glucosa en ayunas 80-130 mg/dL, postprandial <180 mg/dL, A1c <7% (individualizable). 
+                            Ante valores persistentemente elevados o síntomas como sed excesiva, micción frecuente o visión borrosa, consulta a tu médico.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     `;
