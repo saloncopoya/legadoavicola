@@ -3734,8 +3734,8 @@ const herramientasVacias = [];
                         <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
                             ${configActual.iconos[sub] || ICONOS_SVG.icono_default}
                         </span>
-                        <span style="font-size: clamp(10px, 3vw, 12px); font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; color: ${subHerramientaMostrar === sub ? 'white' : '#4B5563'}; text-align: center; max-width: 70px; line-height: 1.3;">
-                            ${configActual.nombres[sub]}
+<span class="subtool-text" style="font-size: clamp(10px, 3vw, 12px); font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center; max-width: 70px; line-height: 1.3;">
+${configActual.nombres[sub]}
                         </span>
                     </button>
                 `).join('')}
