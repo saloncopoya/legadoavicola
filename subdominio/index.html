@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 09</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 10</p>
 
          
             </div>
@@ -3741,300 +3741,192 @@ const herramientasVacias = [];
 
               function generarContenidoDinamico(configActual, contenidoActual) {
     // ==============================================
-    // NUEVA FUNCION PARA PRESION ARTERIAL (IA PROFESIONAL)
+    // PRESION ARTERIAL
     // ==============================================
     if (contenidoActual.esPresionArterial) {
-        // Generar un ID único para este componente
-        const componentId = 'presion-arterial-' + Date.now();
-        
-        return `
-            <div id="${componentId}" style="padding: 4px 0 20px 0;">
-                <!-- Header informativo -->
-                <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                        <span style="font-size: 28px;">🩺</span>
-                        <h3 style="color: ${configActual.color}; margin: 0;">Monitor de Presión Arterial</h3>
-                    </div>
-                    <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
-                </div>
-                
-                <!-- Cuadro de entrada de valores -->
-                <div style="background: white; border-radius: 24px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <span style="font-size: 48px;">❤️</span>
-                        <div style="font-size: 14px; color: #6B7280; margin-top: 8px;">Presión Arterial (mmHg)</div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 120px;">
-                            <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">SISTÓLICA (máxima)</label>
-                            <input type="text" id="presion_sistolica" maxlength="3" placeholder="120" 
-                                   style="width: 100%; padding: 16px; font-size: 24px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; font-weight: 700;"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3); validarPresionCompleta();">
-                        </div>
-                        <div style="flex: 1; min-width: 120px;">
-                            <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">DIASTÓLICA (mínima)</label>
-                            <input type="text" id="presion_diastolica" maxlength="3" placeholder="80" 
-                                   style="width: 100%; padding: 16px; font-size: 24px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; font-weight: 700;"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3); validarPresionCompleta();">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Contenedor de resultados (se llena dinámicamente) -->
-                <div id="resultado_presion" style="background: #F3F4F6; border-radius: 20px; padding: 20px; text-align: center;">
-                    <div style="color: #9CA3AF;">
-                        <span style="font-size: 32px;">📊</span>
-                        <p style="margin-top: 12px;">Ingrese valores de 3 dígitos cada uno para obtener diagnóstico</p>
-                        <p style="font-size: 12px; margin-top: 8px;">Ejemplo: 120 / 80</p>
-                    </div>
-                </div>
-            </div>
-            
-            <script>
-                // Función global para validar y calcular presión arterial
-                window.validarPresionCompleta = function() {
-                    const sistolica = document.getElementById('presion_sistolica');
-                    const diastolica = document.getElementById('presion_diastolica');
-                    const resultadoDiv = document.getElementById('resultado_presion');
-                    
-                    if (!sistolica || !diastolica || !resultadoDiv) return;
-                    
-                    const valorSistolica = sistolica.value;
-                    const valorDiastolica = diastolica.value;
-                    
-                    // Verificar que ambos campos tengan EXACTAMENTE 3 dígitos
-                    if (valorSistolica.length === 3 && valorDiastolica.length === 3) {
-                        const sist = parseInt(valorSistolica);
-                        const diast = parseInt(valorDiastolica);
-                        
-                        // Validar que sean números válidos
-                        if (isNaN(sist) || isNaN(diast)) return;
-                        
-                        // ==============================================
-                        // DIAGNÓSTICO PROFESIONAL (Basado en guías clínicas)
-                        // ==============================================
-                        let estado = '';
-                        let color = '';
-                        let icono = '';
-                        let recomendaciones = [];
-                        let nivelRiesgo = '';
-                        
-                        // CRISIS HIPERTENSIVA (Emergencia)
-                        if (sist >= 180 || diast >= 120) {
-                            estado = 'CRISIS HIPERTENSIVA';
-                            color = '#DC2626';
-                            icono = '🚨';
-                            nivelRiesgo = '⚠️⚠️⚠️ PELIGRO - EMERGENCIA';
-                            recomendaciones = [
-                                '🔴 LLAME A EMERGENCIAS INMEDIATAMENTE (911)',
-                                '🔴 No espere - requiere atención médica URGENTE',
-                                '🔴 Si hay dolor de pecho, falta de aire o cambios neurológicos, acuda a sala de emergencias',
-                                '🔴 No tome medicamentos sin supervisión médica'
-                            ];
-                        }
-                        // HIPERTENSIÓN ETAPA 2 (Alta)
-                        else if (sist >= 140 || diast >= 90) {
-                            if (sist >= 160 || diast >= 100) {
-                                estado = 'HIPERTENSIÓN ETAPA 2';
-                                color = '#F97316';
-                                icono = '⚠️⚠️';
-                                nivelRiesgo = 'ALTO RIESGO';
-                                recomendaciones = [
-                                    '🏥 Consulte a su médico en los próximos días',
-                                    '💊 Puede requerir ajuste o inicio de medicación',
-                                    '🥗 Refuerce dieta baja en sodio (menos de 2g al día)',
-                                    '🚫 Suspenda alcohol y tabaco completamente',
-                                    '🏃 Actividad física moderada bajo supervisión'
-                                ];
-                            } else {
-                                estado = 'HIPERTENSIÓN ETAPA 1';
-                                color = '#F59E0B';
-                                icono = '⚠️';
-                                nivelRiesgo = 'RIESGO MODERADO';
-                                recomendaciones = [
-                                    '👨‍⚕️ Consulte a su médico en 2-4 semanas',
-                                    '🥗 Reduzca consumo de sal (menos de 2.3g/día)',
-                                    '🥦 Aumente consumo de frutas y verduras',
-                                    '🚶‍♂️ Realice 30 minutos de ejercicio diario',
-                                    '💧 Tome suficiente agua (2 litros al día)'
-                                ];
-                            }
-                        }
-                        // PREHIPERTENSIÓN / ELEVADA
-                        else if (sist >= 120 || diast >= 80) {
-                            estado = 'PRESIÓN ARTERIAL ELEVADA';
-                            color = '#FBBF24';
-                            icono = '📈';
-                            nivelRiesgo = 'RIESGO BAJO - PREVENCIÓN';
-                            recomendaciones = [
-                                '✅ Monitoree su presión semanalmente',
-                                '🥗 Adopte dieta DASH (rica en frutas, verduras, lácteos bajos en grasa)',
-                                '🏃 Aumente actividad física (150 min/semana)',
-                                '⚖️ Mantenga peso saludable (IMC < 25)',
-                                '😴 Duerma al menos 7-8 horas por noche'
-                            ];
-                        }
-                        // NORMAL / ÓPTIMA
-                        else if (sist < 120 && diast < 80 && sist >= 90 && diast >= 60) {
-                            estado = 'NORMAL / SALUDABLE';
-                            color = '#10B981';
-                            icono = '✅';
-                            nivelRiesgo = 'RIESGO MÍNIMO';
-                            recomendaciones = [
-                                '🎉 ¡Excelente! Sus valores están en rango normal',
-                                '🥗 Mantenga una dieta balanceada',
-                                '🏃 Continúe con ejercicio regular',
-                                '💧 Manténgase hidratado',
-                                '📆 Realice chequeo anual'
-                            ];
-                        }
-                        // HIPOTENSIÓN (Baja)
-                        else if (sist < 90 || diast < 60) {
-                            estado = 'HIPOTENSIÓN (BAJA)';
-                            color = '#6366F1';
-                            icono = '📉';
-                            nivelRiesgo = 'ATENCIÓN - POSIBLE HIPOTENSIÓN';
-                            recomendaciones = [
-                                '💧 Aumente su consumo de líquidos (agua, sueros)',
-                                '🧂 Consumo moderado de sal si no tiene contraindicación',
-                                '🛌 Levántese lentamente de la cama/silla',
-                                '🍎 Coma porciones más pequeñas y frecuentes',
-                                '👨‍⚕️ Consulte a su médico si presenta mareos frecuentes'
-                            ];
-                        } else {
-                            // Caso de valores anormales (ej: sistolica 50)
-                            estado = 'VALOR ANORMAL';
-                            color = '#6B7280';
-                            icono = '❓';
-                            nivelRiesgo = 'VERIFICAR MEDICIÓN';
-                            recomendaciones = [
-                                '⚠️ Los valores ingresados son atípicos',
-                                '🔄 Verifique que la medición sea correcta',
-                                '🔁 Tome la presión nuevamente siguiendo las instrucciones',
-                                '👨‍⚕️ Consulte a su médico para evaluación'
-                            ];
-                        }
-                        
-                        // Construir el HTML del resultado
-                        let htmlResultado = \`
-                            <div style="animation: fadeIn 0.3s ease;">
-                                <!-- Cabecera del diagnóstico -->
-                                <div style="background: \${color}; border-radius: 16px; padding: 20px; margin-bottom: 16px; text-align: center;">
-                                    <div style="font-size: 48px; margin-bottom: 8px;">\${icono}</div>
-                                    <div style="font-size: 28px; font-weight: 800; color: white;">\${estado}</div>
-                                    <div style="font-size: 14px; color: rgba(255,255,255,0.9); margin-top: 8px;">
-                                        \${sist} / \${diast} mmHg
-                                    </div>
-                                    <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 8px;">
-                                        \${nivelRiesgo}
-                                    </div>
-                                </div>
-                                
-                                <!-- Valoración adicional -->
-                                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 16px;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                                        <span style="font-weight: 600;">Presión de Pulso:</span>
-                                        <span>\${sist - diast} mmHg \${(sist - diast) > 60 ? '(Alta)' : (sist - diast) < 40 ? '(Baja)' : '(Normal)'}</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between;">
-                                        <span style="font-weight: 600;">Presión Media (PAM):</span>
-                                        <span>\${Math.round(diast + (sist - diast) / 3)} mmHg</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Recomendaciones personalizadas -->
-                                <div style="background: white; border-radius: 16px; padding: 16px;">
-                                    <div style="font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                        <span>📋</span> RECOMENDACIONES DEL SISTEMA
-                                    </div>
-                                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                                        \${recomendaciones.map(rec => \`<div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #374151;"><span style="font-size: 16px;">•</span>\${rec}</div>\`).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        \`;
-                        
-                        resultadoDiv.innerHTML = htmlResultado;
-                        resultadoDiv.style.background = '#F3F4F6';
-                                              
-                    } else {
-                        // No hay 3 dígitos en ambos campos
-                        resultadoDiv.innerHTML = \`
-                            <div style="color: #9CA3AF;">
-                                <span style="font-size: 32px;">⌨️</span>
-                                <p style="margin-top: 12px;">Ingrese 3 dígitos en cada campo</p>
-                                <p style="font-size: 12px; margin-top: 8px;">Ejemplo: 120 / 80</p>
-                            </div>
-                        \`;
-                        resultadoDiv.style.background = '#F3F4F6';
-                    }
-                };
-                
-                // Agregar estilos de animación si no existen
-                if (!document.getElementById('presion-estilos')) {
-                    const style = document.createElement('style');
-                    style.id = 'presion-estilos';
-                    style.textContent = \`
-                        @keyframes fadeIn {
-                            from { opacity: 0; transform: translateY(10px); }
-                            to { opacity: 1; transform: translateY(0); }
-                        }
-                    \`;
-                    document.head.appendChild(style);
-                }
-                
-                // Escuchar cambios en los inputs
-                setTimeout(() => {
-                    const sistolicaInput = document.getElementById('presion_sistolica');
-                    const diastolicaInput = document.getElementById('presion_diastolica');
-                    if (sistolicaInput && diastolicaInput) {
-                        sistolicaInput.addEventListener('input', window.validarPresionCompleta);
-                        diastolicaInput.addEventListener('input', window.validarPresionCompleta);
-                    }
-                }, 100);
-            </script>
-        `;
+        return '<div style="padding: 4px 0 20px 0;">' +
+            '<div style="background: ' + configActual.color + '10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ' + configActual.color + ';">' +
+                '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">' +
+                    '<span style="font-size: 28px;">🩺</span>' +
+                    '<h3 style="color: ' + configActual.color + '; margin: 0;">Monitor de Presión Arterial</h3>' +
+                '</div>' +
+                '<p style="color: #4B5563; font-size: 14px; line-height: 1.6;">' + contenidoActual.descripcion + '</p>' +
+            '</div>' +
+            '<div style="background: white; border-radius: 24px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">' +
+                '<div style="text-align: center; margin-bottom: 24px;">' +
+                    '<span style="font-size: 48px;">❤️</span>' +
+                    '<div style="font-size: 14px; color: #6B7280; margin-top: 8px;">Presión Arterial (mmHg)</div>' +
+                '</div>' +
+                '<div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">' +
+                    '<div style="flex: 1; min-width: 120px;">' +
+                        '<label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">SISTÓLICA (máxima)</label>' +
+                        '<input type="text" id="presion_sistolica" maxlength="3" placeholder="120" style="width: 100%; padding: 16px; font-size: 24px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; font-weight: 700;" oninput="this.value = this.value.replace(/[^0-9]/g, \"\").slice(0, 3); window.validarPresionCompleta();">' +
+                    '</div>' +
+                    '<div style="flex: 1; min-width: 120px;">' +
+                        '<label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">DIASTÓLICA (mínima)</label>' +
+                        '<input type="text" id="presion_diastolica" maxlength="3" placeholder="80" style="width: 100%; padding: 16px; font-size: 24px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; font-weight: 700;" oninput="this.value = this.value.replace(/[^0-9]/g, \"\").slice(0, 3); window.validarPresionCompleta();">' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div id="resultado_presion" style="background: #F3F4F6; border-radius: 20px; padding: 20px; text-align: center;">' +
+                '<div style="color: #9CA3AF;">' +
+                    '<span style="font-size: 32px;">📊</span>' +
+                    '<p style="margin-top: 12px;">Ingrese valores de 3 dígitos cada uno para obtener diagnóstico</p>' +
+                    '<p style="font-size: 12px; margin-top: 8px;">Ejemplo: 120 / 80</p>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+        '<script>' +
+            'window.validarPresionCompleta = function() {' +
+                'var sistolica = document.getElementById("presion_sistolica");' +
+                'var diastolica = document.getElementById("presion_diastolica");' +
+                'var resultadoDiv = document.getElementById("resultado_presion");' +
+                'if (!sistolica || !diastolica || !resultadoDiv) return;' +
+                'var valorSistolica = sistolica.value;' +
+                'var valorDiastolica = diastolica.value;' +
+                'if (valorSistolica.length === 3 && valorDiastolica.length === 3) {' +
+                    'var sist = parseInt(valorSistolica);' +
+                    'var diast = parseInt(valorDiastolica);' +
+                    'if (isNaN(sist) || isNaN(diast)) return;' +
+                    'var estado = "";' +
+                    'var color = "";' +
+                    'var icono = "";' +
+                    'var recomendaciones = [];' +
+                    'var nivelRiesgo = "";' +
+                    'if (sist >= 180 || diast >= 120) {' +
+                        'estado = "CRISIS HIPERTENSIVA";' +
+                        'color = "#DC2626";' +
+                        'icono = "🚨";' +
+                        'nivelRiesgo = "PELIGRO - EMERGENCIA";' +
+                        'recomendaciones = ["LLAME A EMERGENCIAS INMEDIATAMENTE (911)", "Requiere atención médica URGENTE", "No tome medicamentos sin supervisión"];' +
+                    '} else if (sist >= 140 || diast >= 90) {' +
+                        'if (sist >= 160 || diast >= 100) {' +
+                            'estado = "HIPERTENSIÓN ETAPA 2";' +
+                            'color = "#F97316";' +
+                            'icono = "⚠️⚠️";' +
+                            'nivelRiesgo = "ALTO RIESGO";' +
+                            'recomendaciones = ["Consulte a su médico en los próximos días", "Puede requerir ajuste de medicación", "Dieta baja en sodio", "Suspenda alcohol y tabaco"];' +
+                        '} else {' +
+                            'estado = "HIPERTENSIÓN ETAPA 1";' +
+                            'color = "#F59E0B";' +
+                            'icono = "⚠️";' +
+                            'nivelRiesgo = "RIESGO MODERADO";' +
+                            'recomendaciones = ["Consulte a su médico en 2-4 semanas", "Reduzca consumo de sal", "Aumente frutas y verduras", "Ejercicio 30 minutos diarios"];' +
+                        '}' +
+                    '} else if (sist >= 120 || diast >= 80) {' +
+                        'estado = "PRESIÓN ARTERIAL ELEVADA";' +
+                        'color = "#FBBF24";' +
+                        'icono = "📈";' +
+                        'nivelRiesgo = "RIESGO BAJO - PREVENCIÓN";' +
+                        'recomendaciones = ["Monitoree su presión semanalmente", "Adopte dieta saludable", "Aumente actividad física", "Mantenga peso saludable"];' +
+                    '} else if (sist < 120 && diast < 80 && sist >= 90 && diast >= 60) {' +
+                        'estado = "NORMAL / SALUDABLE";' +
+                        'color = "#10B981";' +
+                        'icono = "✅";' +
+                        'nivelRiesgo = "RIESGO MÍNIMO";' +
+                        'recomendaciones = ["Excelente! Valores en rango normal", "Mantenga dieta balanceada", "Continúe con ejercicio regular", "Manténgase hidratado"];' +
+                    '} else if (sist < 90 || diast < 60) {' +
+                        'estado = "HIPOTENSIÓN (BAJA)";' +
+                        'color = "#6366F1";' +
+                        'icono = "📉";' +
+                        'nivelRiesgo = "ATENCIÓN - POSIBLE HIPOTENSIÓN";' +
+                        'recomendaciones = ["Aumente consumo de líquidos", "Levántese lentamente", "Consulte a su médico si hay mareos"];' +
+                    '} else {' +
+                        'estado = "VALOR ANORMAL";' +
+                        'color = "#6B7280";' +
+                        'icono = "❓";' +
+                        'nivelRiesgo = "VERIFICAR MEDICIÓN";' +
+                        'recomendaciones = ["Verifique que la medición sea correcta", "Tome la presión nuevamente", "Consulte a su médico"];' +
+                    '}' +
+                    'var htmlResultado = "<div style=\"animation: fadeIn 0.3s ease;\">" +' +
+                        '"<div style=\"background: " + color + "; border-radius: 16px; padding: 20px; margin-bottom: 16px; text-align: center;\">" +' +
+                            '"<div style=\"font-size: 48px; margin-bottom: 8px;\">" + icono + "</div>" +' +
+                            '"<div style=\"font-size: 28px; font-weight: 800; color: white;\">" + estado + "</div>" +' +
+                            '"<div style=\"font-size: 14px; color: rgba(255,255,255,0.9); margin-top: 8px;\">" + sist + " / " + diast + " mmHg</div>" +' +
+                            '"<div style=\"font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 8px;\">" + nivelRiesgo + "</div>" +'
+                        '"</div>" +' +
+                        '"<div style=\"background: white; border-radius: 16px; padding: 16px; margin-bottom: 16px;\">" +' +
+                            '"<div style=\"display: flex; justify-content: space-between; margin-bottom: 12px;\">" +' +
+                                '"<span style=\"font-weight: 600;\">Presión de Pulso:</span>" +' +
+                                '"<span>" + (sist - diast) + " mmHg</span>" +' +
+                            '"</div>" +' +
+                            '"<div style=\"display: flex; justify-content: space-between;\">" +' +
+                                '"<span style=\"font-weight: 600;\">Presión Media (PAM):</span>" +' +
+                                '"<span>" + Math.round(diast + (sist - diast) / 3) + " mmHg</span>" +' +
+                            '"</div>" +' +
+                        '"</div>" +' +
+                        '"<div style=\"background: white; border-radius: 16px; padding: 16px;\">" +' +
+                            '"<div style=\"font-weight: 700; margin-bottom: 12px;\">📋 RECOMENDACIONES</div>" +' +
+                            '"<div style=\"display: flex; flex-direction: column; gap: 10px;\">" +';
+                    'for (var i = 0; i < recomendaciones.length; i++) {' +
+                        'htmlResultado += "<div style=\"display: flex; align-items: center; gap: 10px; font-size: 13px;\">• " + recomendaciones[i] + "</div>";' +
+                    '}' +
+                    'htmlResultado += "</div></div></div>";' +
+                    'resultadoDiv.innerHTML = htmlResultado;' +
+                    'resultadoDiv.style.background = "#F3F4F6";' +
+                '} else {' +
+                    'resultadoDiv.innerHTML = "<div style=\"color: #9CA3AF;\">" +' +
+                        '"<span style=\"font-size: 32px;\">⌨️</span>" +' +
+                        '"<p style=\"margin-top: 12px;\">Ingrese 3 dígitos en cada campo</p>" +' +
+                        '"<p style=\"font-size: 12px; margin-top: 8px;\">Ejemplo: 120 / 80</p>" +' +
+                    '"</div>";' +
+                    'resultadoDiv.style.background = "#F3F4F6";' +
+                '}' +
+            '};' +
+            'if (!document.getElementById("presion-estilos")) {' +
+                'var style = document.createElement("style");' +
+                'style.id = "presion-estilos";' +
+                'style.textContent = "@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }";' +
+                'document.head.appendChild(style);' +
+            '}' +
+            'setTimeout(function() {' +
+                'var sistolicaInput = document.getElementById("presion_sistolica");' +
+                'var diastolicaInput = document.getElementById("presion_diastolica");' +
+                'if (sistolicaInput && diastolicaInput) {' +
+                    'sistolicaInput.addEventListener("input", window.validarPresionCompleta);' +
+                    'diastolicaInput.addEventListener("input", window.validarPresionCompleta);' +
+                '}' +
+            '}, 100);' +
+        '<\/script>';
     }
     
     // ==============================================
-    // CÓDIGO ORIGINAL PARA LAS DEMÁS HERRAMIENTAS
+    // CODIGO ORIGINAL PARA LAS DEMAS HERRAMIENTAS
     // ==============================================
     if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
-        return `
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
-                <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
-                <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
-                <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
-                </div>
-            </div>
-        `;
+        return '<div style="text-align: center; padding: 60px 20px;">' +
+            '<div style="font-size: 64px; margin-bottom: 20px;">📋</div>' +
+            '<h3 style="color: #374151; margin-top: 20px; font-size: 20px;">' + contenidoActual.titulo + '</h3>' +
+            '<p style="color: #6B7280; margin-top: 8px;">' + contenidoActual.descripcion + '</p>' +
+            '<div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">' +
+                '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="' + configActual.color + '" stroke-width="1.5">' +
+                    '<circle cx="12" cy="12" r="10"/>' +
+                    '<line x1="12" y1="8" x2="12" y2="12"/>' +
+                    '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
+                '</svg>' +
+                '<p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>' +
+            '</div>' +
+        '</div>';
     }
-    return `
-        <div style="padding: 4px 0 20px 0;">
-            <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
-                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
-            </div>
-            ${contenidoActual.secciones.map(seccion => `
-                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('')}
-            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
-            </div>
-        </div>
-    `;
+    
+    return '<div style="padding: 4px 0 20px 0;">' +
+        '<div style="background: ' + configActual.color + '10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ' + configActual.color + ';">' +
+            '<p style="color: #4B5563; font-size: 14px; line-height: 1.6;">' + contenidoActual.descripcion + '</p>' +
+        '</div>' +
+        contenidoActual.secciones.map(function(seccion) {
+            return '<div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">' +
+                '<h4 style="color: ' + configActual.color + '; margin: 0 0 12px 0; font-size: 16px;">' + seccion.nombre + '</h4>' +
+                '<div style="display: flex; flex-wrap: wrap; gap: 8px;">' +
+                    seccion.valores.map(function(valor) {
+                        return '<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">' + valor + '</span>';
+                    }).join('') +
+                '</div>' +
+            '</div>';
+        }).join('') +
+        '<div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">' +
+            '<button onclick="AppState.addNotification(\'Función en desarrollo\', \'info\')" style="background: ' + configActual.color + '; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>' +
+        '</div>' +
+    '</div>';
 }
           
     const generarContenido = () => {
