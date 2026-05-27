@@ -2726,7 +2726,8 @@ limpiarPantallasInvalidas();
         // ==============================================
      if (isOffline) {
     console.log('📴 Modo offline - Usando datos guardados');
-    
+        const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+
     // Intentar recuperar usuario guardado de localStorage (solo datos básicos)
     const cachedUser = localStorage.getItem('offline_user');
     
@@ -2768,7 +2769,6 @@ limpiarPantallasInvalidas();
     
     // ✅ OFFLINE: NO cambiar la URL, usar solo localStorage
     const lastScreen = localStorage.getItem('lastScreen');
-    const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
     
     let pantallaFinal = SCREENS.PUBLIC;    
     if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
