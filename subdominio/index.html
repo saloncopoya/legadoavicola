@@ -3288,22 +3288,6 @@ window.renderRoosterScreen = async function() {
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
 <script>
       window.renderVentasScreen = async function() {
-
-    // Si hay tool seleccionado, ocultar la barra
-    const urlParams = new URLSearchParams(window.location.search);
-    const herramientaActual = urlParams.get('tool');
-    if (herramientaActual) {
-        const barra = document.querySelector('nav');
-        if (barra) barra.style.display = 'none';
-    } else {
-        const barra = document.querySelector('nav');
-        if (barra) barra.style.display = 'flex';
-    }
-
-
-          
-          
-    
     // ==============================================
     // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
@@ -3495,11 +3479,7 @@ window.renderRoosterScreen = async function() {
     }, 10);
 };
     
-    window.volverAlMenuPrincipal = function() {
-        const barra = document.querySelector('nav');
-    if (barra) barra.style.display = 'flex';
-
-        
+    window.volverAlMenuPrincipal = function() {  
         const nuevaUrl = new URL(window.location);
         nuevaUrl.searchParams.delete('tool');
         nuevaUrl.searchParams.delete('subtool');
