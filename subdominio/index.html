@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 05</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 06</p>
 
          
             </div>
@@ -2309,7 +2309,6 @@ async function handleLogout() {
 // NAVEGACIÓN
 // ==============================================
 window.navigateTo = function(section) {
-   
 
     const pantallasValidas = Object.values(SCREENS);
     if (section && !pantallasValidas.includes(section)) {
@@ -2331,14 +2330,23 @@ if (section && section !== SCREENS.LOGIN && section !== SCREENS.ACTIVATION_PENDI
     section = AppState.user.profile?.activated === false ? SCREENS.ACTIVATION_PENDING : SCREENS.PUBLIC;
 }
   // ✅ SOLO CAMBIAR LA URL SI HAY INTERNET
-    if (navigator.onLine) {
-        const shareId = new URLSearchParams(window.location.search).get('share');
-if (section === SCREENS.SHARE && shareId) {
-            window.history.pushState({}, '', `/?share=${shareId}`);
-        } else {
-            window.history.pushState({}, '', `/?section=${section}`);
-        }
+ if (navigator.onLine) {
+    const shareId = new URLSearchParams(window.location.search).get('share');
+    if (section === SCREENS.SHARE && shareId) {
+        window.history.pushState({}, '', `/?share=${shareId}`);
+    } else {
+        // ✅ Conservar tool y subtool si existen en la URL actual
+        const urlParams = new URLSearchParams(window.location.search);
+        const toolActual = urlParams.get('tool');
+        const subtoolActual = urlParams.get('subtool');
+        
+        let nuevaUrl = `/?section=${section}`;
+        if (toolActual) nuevaUrl += `&tool=${toolActual}`;
+        if (subtoolActual) nuevaUrl += `&subtool=${subtoolActual}`;
+        
+        window.history.pushState({}, '', nuevaUrl);
     }
+}
     
 const pantallasPublicasNavigate = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.SHARE, SCREENS.VENTAS, SCREENS.ROOSTER];
 if (!AppState.user.current && !pantallasPublicasNavigate.includes(section)) {
@@ -2813,18 +2821,29 @@ AppState.setScreen(SCREENS.PUBLIC);
             
             
             let pantallaADestino = SCREENS.PUBLIC;
-            const shareIdActual = new URLSearchParams(window.location.search).get('share');
-            
-            if (shareIdActual) {
-                pantallaADestino = SCREENS.SHARE;
-                sessionStorage.setItem('currentShareId', shareIdActual);
-            } else if (!profile?.activated) {
-                pantallaADestino = SCREENS.PUBLIC;
-            } else if (pantallaPendiente) {
-                pantallaADestino = pantallaPendiente;
-            }
-            
-            AppState.setScreen(pantallaADestino);
+const shareIdActual = new URLSearchParams(window.location.search).get('share');
+const urlParams = new URLSearchParams(window.location.search);
+const toolParam = urlParams.get('tool');
+const subtoolParam = urlParams.get('subtool');
+
+if (shareIdActual) {
+    pantallaADestino = SCREENS.SHARE;
+    sessionStorage.setItem('currentShareId', shareIdActual);
+} 
+// ✅ NUEVO: Si hay tool en la URL, mostrar VENTAS (Bienestar) directamente
+else if (toolParam) {
+    pantallaADestino = SCREENS.VENTAS;
+    // Mantener los parámetros tool y subtool en la URL
+    // No hacer nada, la URL ya los tiene
+}
+else if (!profile?.activated) {
+    pantallaADestino = SCREENS.PUBLIC;
+} 
+else if (pantallaPendiente) {
+    pantallaADestino = pantallaPendiente;
+}
+
+AppState.setScreen(pantallaADestino);
             AppState.setLoading(false);
             hideLoadingScreen();
             // Migrar token pendiente si existe
@@ -3418,6 +3437,14 @@ window.renderRoosterScreen = async function() {
     // FUNCIONES DE NAVEGACIÓN (CON SCROLL MANTENIDO)
     // ==============================================
     window.cambiarHerramienta = function(herramienta, subtool) {
+// OCULTAR BARRA SOLO SI ESTÁ VISIBLE
+const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+if (bottomBar && bottomBar.style.display !== 'none') {
+    bottomBar.style.display = 'none';
+}
+        
+
+        
         const nuevaUrl = new URL(window.location);
         if (herramienta) {
             nuevaUrl.searchParams.set('tool', herramienta);
@@ -3479,7 +3506,14 @@ window.renderRoosterScreen = async function() {
     }, 10);
 };
     
-    window.volverAlMenuPrincipal = function() {  
+    window.volverAlMenuPrincipal = function() { 
+// RESTAURAR BARRA DE NAVEGACIÓN SOLO SI ESTÁ OCULTA
+const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+if (bottomBar && bottomBar.style.display === 'none') {
+    bottomBar.style.display = 'flex';
+}
+        
+        
         const nuevaUrl = new URL(window.location);
         nuevaUrl.searchParams.delete('tool');
         nuevaUrl.searchParams.delete('subtool');
