@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 3</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 4</p>
 
          
             </div>
@@ -2951,13 +2951,9 @@ else if (toolParam) {
     
     // 1. Determinar a qué pantalla pertenece este tool
     // Si hay section en URL, usar esa. Si no, usar VENTAS como default
-    let pantallaDelTool = sectionParam && pantallasPublicas.includes(sectionParam) 
-        ? sectionParam 
-        : SCREENS.PUBLIC;
-    
-       
-    // 3. Validar si la pantalla es pública o privada
-    const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
+const pantallaIntentada = sectionParam || SCREENS.PUBLIC;
+const esPantallaPrivada = !pantallasPublicas.includes(pantallaIntentada);
+let pantallaDelTool = esPantallaPrivada ? SCREENS.PUBLIC : pantallaIntentada;
     
     if (esPantallaPublica) {
                 console.log('✅ [AUDITORIA] Acceso PERMITIDO - Mostrando pantalla:', pantallaDelTool);
