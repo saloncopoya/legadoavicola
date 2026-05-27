@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 6</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 7</p>
 
          
             </div>
@@ -2949,7 +2949,10 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
 // USUARIOS NO LOGUEADOS - VALIDAR TOOL Y SUBTOOL
 // ==============================================
 
-                // ========== CONSOLA PARA AUDITAR FLUJO ==========
+            
+            
+else if (toolParam) {
+        // ========== CONSOLA PARA AUDITAR FLUJO ==========
         console.log('🔍 [AUTH] ========== INICIO VERIFICACIÓN ==========');
         console.log('🔍 [AUTH] URL actual:', window.location.href);
         console.log('🔍 [AUTH] Parámetros URL:', {
@@ -2967,9 +2970,6 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
             tienePermisoJuez: profile?.isJudge === true,
             tienePermisoAdmin: profile?.gallo === true
         });
-            
-else if (toolParam) {
-    
     // 1. Determinar a qué pantalla pertenece este tool
     // Si hay section en URL, usar esa. Si no, usar VENTAS como default
 const pantallaIntentada = sectionParam || SCREENS.PUBLIC;
