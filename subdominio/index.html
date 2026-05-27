@@ -3376,38 +3376,21 @@ window.renderRoosterScreen = async function() {
         herramienta_glasgow: 'Escala de Glasgow',
         herramienta_norton: 'Escala de Norton',
         herramienta_braden: 'Escala de Braden',
-        herramienta_barthel: 'Índice de Barthel',
-        herramienta_eva: 'Escala EVA',
-        herramienta_ramos: 'Escala de Ramos',
-        herramienta_waterlow: 'Escala de Waterlow',
-        herramienta_apache: 'Escala APACHE II',
-        herramienta_sofa: 'Escala SOFA',
-        herramienta_news: 'Escala NEWS',
+        
         
         herramienta_antibioticos: 'Antibióticos',
         herramienta_analgesicos: 'Analgésicos',
         herramienta_cardiovasculares: 'Cardiovasculares',
-        herramienta_antihipertensivos: 'Antihipertensivos',
-        herramienta_antidiabeticos: 'Antidiabéticos',
-        herramienta_anticoagulantes: 'Anticoagulantes',
-        herramienta_antiepilepticos: 'Antiepilépticos',
-        herramienta_psicofarmacos: 'Psicofármacos',
+  
         
         herramienta_rcep: 'RCP Actualizado',
         herramienta_guias: 'Guías Clínicas',
         herramienta_protocolos: 'Protocolos Enfermería',
-        herramienta_actualizaciones: 'Actualizaciones',
-        herramienta_ecografia: 'Ecografía POCUS',
-        herramienta_ventilacion: 'Ventilación Mecánica',
-        herramienta_hemodinamia: 'Hemodinamia',
-        herramienta_heridas: 'Manejo de Heridas',
         
         desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
         desc_norton: 'Evaluar el riesgo de desarrollar úlceras por presión. Valora cinco parámetros: estado físico, estado mental, actividad, movilidad e incontinencia.',
         desc_braden: 'Predecir el riesgo de úlceras por presión. Valora percepción sensorial, exposición a humedad, actividad, movilidad, nutrición y fricción.',
-        desc_barthel: 'Evaluar la independencia en actividades de la vida diaria. 10 actividades puntuadas de 0 a 10 o 15.',
-        desc_eva: 'Evaluar la intensidad del dolor. Del 0 (sin dolor) al 10 (peor dolor imaginable).',
-        
+         
         apertura_ocular: 'Apertura Ocular',
         respuesta_verbal: 'Respuesta Verbal',
         respuesta_motora: 'Respuesta Motora',
@@ -3423,16 +3406,7 @@ window.renderRoosterScreen = async function() {
         nutricion: 'Nutrición',
         friccion: 'Fricción y Corte',
         
-        comer: 'Comer',
-        banarse: 'Bañarse',
-        vestirse: 'Vestirse',
-        arreglarse: 'Arreglarse',
-        deposiciones: 'Deposiciones',
-        miccion: 'Micción',
-        usar_retrete: 'Usar retrete',
-        trasladarse: 'Trasladarse',
-        deambular: 'Deambular',
-        escaleras: 'Subir escaleras'
+       
     };
     
     // ==============================================
@@ -3448,34 +3422,17 @@ window.renderRoosterScreen = async function() {
         icono_glasgow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
         icono_norton: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
         icono_braden: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 12H4M12 4v16"/><circle cx="12" cy="12" r="2"/></svg>`,
-        icono_barthel: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/></svg>`,
-        icono_eva: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="2"/></svg>`,
-        icono_ramos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7h6V5a3 3 0 0 0-3-3z"/><path d="M19 10h-2v4h2v-4z"/><path d="M5 10H3v4h2v-4z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`,
-        icono_waterlow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l2-5 3 9 3-7 2 3h4"/></svg>`,
-        icono_apache: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M9 10.5l3-1.5 3 1.5"/></svg>`,
-        icono_sofa: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></svg>`,
-        icono_news: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
-        
+          
         // Iconos para subtools - MEDICAMENTOS
         icono_antibioticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>`,
         icono_analgesicos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
         icono_cardiovasculares: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
-        icono_antihipertensivos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>`,
-        icono_antidiabeticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
-        icono_anticoagulantes: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2M12 6L8 8l4 4"/></svg>`,
-        icono_antiepilepticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-        icono_psicofarmacos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/><path d="M9 10l3 2 3-2"/></svg>`,
-        
+      
         // Iconos para subtools - CONOCIMIENTOS
         icono_rcep: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
         icono_guias: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>`,
         icono_protocolos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
-        icono_actualizaciones: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
-        icono_ecografia: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="15" y1="9" x2="19" y2="5"/><line x1="9" y1="15" x2="5" y2="19"/></svg>`,
-        icono_ventilacion: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/><path d="M8 12h8"/></svg>`,
-        icono_hemodinamia: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><line x1="12" y1="8" x2="12" y2="12"/></svg>`,
-        icono_heridas: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7h6V5a3 3 0 0 0-3-3z"/><path d="M19 10h-2v4h2v-4z"/><path d="M5 10H3v4h2v-4z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`,
-        
+         
         icono_default: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`
     };
     
@@ -3618,104 +3575,70 @@ if (bottomBar && bottomBar.style.display === 'none') {
                 { nombre: TEXTOS.friccion, valores: ['Sin problema (3)', 'Problema potencial (2)', 'Problema evidente (1)'] }
             ]
         },
-        barthel: {
-            titulo: TEXTOS.herramienta_barthel,
-            descripcion: TEXTOS.desc_barthel,
-            secciones: [
-                { nombre: TEXTOS.comer, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.banarse, valores: ['Independiente (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.vestirse, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.arreglarse, valores: ['Independiente (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.deposiciones, valores: ['Continente (10)', 'Accidente ocasional (5)', 'Incontinente (0)'] },
-                { nombre: TEXTOS.miccion, valores: ['Continente (10)', 'Accidente ocasional (5)', 'Incontinente (0)'] },
-                { nombre: TEXTOS.usar_retrete, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.trasladarse, valores: ['Independiente (15)', 'Mínima ayuda (10)', 'Gran ayuda (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.deambular, valores: ['Independiente (15)', 'Necesita ayuda (10)', 'Silla ruedas (5)', 'Dependiente (0)'] },
-                { nombre: TEXTOS.escaleras, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] }
-            ]
-        },
-        eva: {
-            titulo: TEXTOS.herramienta_eva,
-            descripcion: TEXTOS.desc_eva,
-            secciones: [
-                { nombre: 'Nivel de Dolor', valores: [
-                    '0: Sin dolor',
-                    '1-3: Dolor leve',
-                    '4-6: Dolor moderado',
-                    '7-9: Dolor intenso',
-                    '10: Peor dolor imaginable'
-                ]}
-            ]
-        },
+
         vacia: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
     };
     
     // Agregar todas las nuevas herramientas con pantalla vacía
-    const herramientasVacias = ['ramos', 'waterlow', 'apache', 'sofa', 'news', 'antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos', 'rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas'];
-    herramientasVacias.forEach(h => { if (!contenidos[h]) contenidos[h] = { ...contenidos.vacia, titulo: TEXTOS[`herramienta_${h}`] || h }; });
+const herramientasVacias = [];
+          herramientasVacias.forEach(h => { if (!contenidos[h]) contenidos[h] = { ...contenidos.vacia, titulo: TEXTOS[`herramienta_${h}`] || h }; });
     
     // ==============================================
     // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
     // ==============================================
     const herramientasConfig = {
-        'valores-normales': {
-            titulo: TEXTOS.btn_valores_normales,
-            descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
-            color: '#0D9488',
-            icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow', 'norton', 'braden', 'barthel', 'eva', 'ramos', 'waterlow', 'apache', 'sofa', 'news'],
-            nombres: {
-                glasgow: TEXTOS.herramienta_glasgow, norton: TEXTOS.herramienta_norton, braden: TEXTOS.herramienta_braden,
-                barthel: TEXTOS.herramienta_barthel, eva: TEXTOS.herramienta_eva, ramos: TEXTOS.herramienta_ramos,
-                waterlow: TEXTOS.herramienta_waterlow, apache: TEXTOS.herramienta_apache, sofa: TEXTOS.herramienta_sofa,
-                news: TEXTOS.herramienta_news
-            },
-            iconos: {
-                glasgow: ICONOS_SVG.icono_glasgow, norton: ICONOS_SVG.icono_norton, braden: ICONOS_SVG.icono_braden,
-                barthel: ICONOS_SVG.icono_barthel, eva: ICONOS_SVG.icono_eva, ramos: ICONOS_SVG.icono_ramos,
-                waterlow: ICONOS_SVG.icono_waterlow, apache: ICONOS_SVG.icono_apache, sofa: ICONOS_SVG.icono_sofa,
-                news: ICONOS_SVG.icono_news
-            }
+    'valores-normales': {
+        titulo: TEXTOS.btn_valores_normales,
+        descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
+        color: '#0D9488',
+        icono: ICONOS_SVG.icono_valores_normales,
+        subherramientas: ['glasgow', 'norton', 'braden'],
+        nombres: {
+            glasgow: TEXTOS.herramienta_glasgow,
+            norton: TEXTOS.herramienta_norton,
+            braden: TEXTOS.herramienta_braden
         },
-        'medicamentos': {
-            titulo: TEXTOS.btn_medicamentos,
-            descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
-            color: '#3B82F6',
-            icono: ICONOS_SVG.icono_medicamentos,
-            subherramientas: ['antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos'],
-            nombres: {
-                antibioticos: TEXTOS.herramienta_antibioticos, analgesicos: TEXTOS.herramienta_analgesicos,
-                cardiovasculares: TEXTOS.herramienta_cardiovasculares, antihipertensivos: TEXTOS.herramienta_antihipertensivos,
-                antidiabeticos: TEXTOS.herramienta_antidiabeticos, anticoagulantes: TEXTOS.herramienta_anticoagulantes,
-                antiepilepticos: TEXTOS.herramienta_antiepilepticos, psicofarmacos: TEXTOS.herramienta_psicofarmacos
-            },
-            iconos: {
-                antibioticos: ICONOS_SVG.icono_antibioticos, analgesicos: ICONOS_SVG.icono_analgesicos,
-                cardiovasculares: ICONOS_SVG.icono_cardiovasculares, antihipertensivos: ICONOS_SVG.icono_antihipertensivos,
-                antidiabeticos: ICONOS_SVG.icono_antidiabeticos, anticoagulantes: ICONOS_SVG.icono_anticoagulantes,
-                antiepilepticos: ICONOS_SVG.icono_antiepilepticos, psicofarmacos: ICONOS_SVG.icono_psicofarmacos
-            }
-        },
-        'conocimientos': {
-            titulo: TEXTOS.btn_conocimientos,
-            descripcion: 'Guías, protocolos, actualizaciones, RCP',
-            color: '#F59E0B',
-            icono: ICONOS_SVG.icono_conocimientos,
-            subherramientas: ['rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas'],
-            nombres: {
-                rcep: TEXTOS.herramienta_rcep, guias: TEXTOS.herramienta_guias, protocolos: TEXTOS.herramienta_protocolos,
-                actualizaciones: TEXTOS.herramienta_actualizaciones, ecografia: TEXTOS.herramienta_ecografia,
-                ventilacion: TEXTOS.herramienta_ventilacion, hemodinamia: TEXTOS.herramienta_hemodinamia,
-                heridas: TEXTOS.herramienta_heridas
-            },
-            iconos: {
-                rcep: ICONOS_SVG.icono_rcep, guias: ICONOS_SVG.icono_guias, protocolos: ICONOS_SVG.icono_protocolos,
-                actualizaciones: ICONOS_SVG.icono_actualizaciones, ecografia: ICONOS_SVG.icono_ecografia,
-                ventilacion: ICONOS_SVG.icono_ventilacion, hemodinamia: ICONOS_SVG.icono_hemodinamia,
-                heridas: ICONOS_SVG.icono_heridas
-            }
+        iconos: {
+            glasgow: ICONOS_SVG.icono_glasgow,
+            norton: ICONOS_SVG.icono_norton,
+            braden: ICONOS_SVG.icono_braden
         }
-    };
+    },
+    'medicamentos': {
+        titulo: TEXTOS.btn_medicamentos,
+        descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
+        color: '#3B82F6',
+        icono: ICONOS_SVG.icono_medicamentos,
+        subherramientas: ['antibioticos', 'analgesicos', 'cardiovasculares'],
+        nombres: {
+            antibioticos: TEXTOS.herramienta_antibioticos,
+            analgesicos: TEXTOS.herramienta_analgesicos,
+            cardiovasculares: TEXTOS.herramienta_cardiovasculares
+        },
+        iconos: {
+            antibioticos: ICONOS_SVG.icono_antibioticos,
+            analgesicos: ICONOS_SVG.icono_analgesicos,
+            cardiovasculares: ICONOS_SVG.icono_cardiovasculares
+        }
+    },
+    'conocimientos': {
+        titulo: TEXTOS.btn_conocimientos,
+        descripcion: 'Guías, protocolos, actualizaciones, RCP',
+        color: '#F59E0B',
+        icono: ICONOS_SVG.icono_conocimientos,
+        subherramientas: ['rcep', 'guias', 'protocolos'],
+        nombres: {
+            rcep: TEXTOS.herramienta_rcep,
+            guias: TEXTOS.herramienta_guias,
+            protocolos: TEXTOS.herramienta_protocolos
+        },
+        iconos: {
+            rcep: ICONOS_SVG.icono_rcep,
+            guias: ICONOS_SVG.icono_guias,
+            protocolos: ICONOS_SVG.icono_protocolos
+        }
+    }
+};
     
     // ==============================================
     // VISTA PRINCIPAL (TUS BOTONES ORIGINALES)
