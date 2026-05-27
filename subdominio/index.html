@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 0004</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 001</p>
 
          
             </div>
@@ -3388,11 +3388,10 @@ window.renderRoosterScreen = async function() {
         icono_valores_normales: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
         icono_medicamentos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`,
         icono_conocimientos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>`,
-               icono_glasgow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
-        icono_presion: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h3l3-9 3 18 3-9 3 9 3-9 3 9h3"/><line x1="3" y1="12" x2="21" y2="12"/></svg>`,
+        icono_glasgow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
         icono_antibioticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>`,
         icono_rcep: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
-        icono_default: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`
+        icono_default: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`
     };
     
     // ==============================================
@@ -3442,104 +3441,7 @@ window.renderRoosterScreen = async function() {
             </div>
         `;
     }
-
-
-               // FUNCIÓN PARA PRESIÓN ARTERIAL
-    function renderPresionArterial() {
-        window.analizarPresion = function() {
-            const sistolica = parseInt(document.getElementById('presion_sistolica')?.value);
-            const diastolica = parseInt(document.getElementById('presion_diastolica')?.value);
-            const resultadoDiv = document.getElementById('resultado-presion');
-            
-            if (isNaN(sistolica) || isNaN(diastolica) || sistolica < 50 || sistolica > 250 || diastolica < 30 || diastolica > 150) {
-                resultadoDiv.innerHTML = `<div style="background: #FEE2E2; color: #991B1B; padding: 20px; border-radius: 16px;"><strong>⚠️ Error:</strong> Ingresa valores válidos (Ej. 120/80)</div>`;
-                return;
-            }
-            
-            let categoria = '', color = '', emoji = '', riesgos = '', cuidados = '', posiblesMotivos = '', soluciones = '';
-            
-            if (sistolica < 120 && diastolica < 80) {
-                categoria = 'Normal'; color = '#10B981'; emoji = '✅';
-                riesgos = 'Riesgo cardiovascular bajo.';
-                cuidados = 'Mantén estilo de vida saludable. Revisión anual.';
-                posiblesMotivos = 'Valores dentro del rango óptimo.';
-                soluciones = 'Continúa así. ¡Felicidades!';
-            }
-            else if ((sistolica >= 120 && sistolica <= 129) && diastolica < 80) {
-                categoria = 'Elevada'; color = '#F59E0B'; emoji = '⚠️';
-                riesgos = 'Riesgo moderado de desarrollar hipertensión.';
-                cuidados = 'Monitoreo en casa. Reduce sal y haz ejercicio.';
-                posiblesMotivos = 'Estrés, consumo de sal, falta de actividad física.';
-                soluciones = 'Mejora dieta (DASH), camina 30 min/día, reduce cafeína.';
-            }
-            else if ((sistolica >= 130 && sistolica <= 139) || (diastolica >= 80 && diastolica <= 89)) {
-                categoria = 'Hipertensión Etapa 1'; color = '#F97316'; emoji = '🩺';
-                riesgos = 'Riesgo alto de enfermedad cardíaca y ACV.';
-                cuidados = 'Consulta a tu médico. Monitoreo semanal.';
-                posiblesMotivos = 'Genética, obesidad, alcohol, tabaquismo.';
-                soluciones = 'Medicación si es necesario. Dieta baja en sodio. Ejercicio regular.';
-            }
-            else if (sistolica >= 140 || diastolica >= 90) {
-                categoria = 'Hipertensión Etapa 2'; color = '#EF4444'; emoji = '🚨';
-                riesgos = 'Riesgo MUY ALTO de ataque cardíaco, derrame cerebral.';
-                cuidados = 'Seguimiento médico urgente. Monitoreo DIARIO.';
-                posiblesMotivos = 'Mala alimentación crónica, sedentarismo, herencia.';
-                soluciones = 'Tratamiento farmacológico inmediato. Cambio completo de hábitos.';
-            }
-            
-            if (sistolica >= 180 || diastolica >= 120) {
-                categoria = 'CRISIS HIPERTENSIVA'; color = '#DC2626'; emoji = '🆘';
-                riesgos = '¡RIESGO INMINENTE! Derrame cerebral, ataque cardíaco.';
-                cuidados = '🚨 ACUDE A URGENCIAS INMEDIATAMENTE.';
-                posiblesMotivos = 'Fallo en tratamiento, feocromocitoma, drogas.';
-                soluciones = 'LLAMA AL 911 O VE AL HOSPITAL AHORA.';
-            }
-            
-            resultadoDiv.innerHTML = `
-                <div style="background: ${color}10; border-radius: 20px; padding: 20px; margin-top: 20px; border: 1px solid ${color}30;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                        <span style="font-size: 48px;">${emoji}</span>
-                        <div><h3 style="color: ${color}; margin: 0;">${categoria}</h3><p style="margin: 5px 0 0;">${sistolica} / ${diastolica} mmHg</p></div>
-                    </div>
-                    <div style="background: white; border-radius: 16px; padding: 16px; margin-top: 16px;">
-                        <h4>⚠️ Riesgos & Cuidados</h4>
-                        <p><strong>🔴 Riesgos:</strong> ${riesgos}</p>
-                        <p><strong>🟢 Cuidados:</strong> ${cuidados}</p>
-                    </div>
-                    <div style="background: white; border-radius: 16px; padding: 16px; margin-top: 16px;">
-                        <h4>🔍 Diagnóstico IA</h4>
-                        <p><strong>📌 Posibles Motivos:</strong> ${posiblesMotivos}</p>
-                        <p><strong>💊 Soluciones:</strong> ${soluciones}</p>
-                    </div>
-                </div>
-            `;
-        };
-        
-        return `
-            <div style="padding: 4px 0 20px 0;">
-                <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-                    <p style="color: #4B5563;">La presión arterial es la fuerza que ejerce la sangre contra las paredes de las arterias. Mantenerla normal previene enfermedades cardiovasculares.</p>
-                </div>
-                <div style="background: white; border-radius: 16px; padding: 24px;">
-                    <h3 style="color: #0D9488; text-align: center;">📊 Ingresa tus valores</h3>
-                    <div style="display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0;">
-                        <div style="flex: 1;">
-                            <label>Presión Sistólica (Alta)</label>
-                            <input type="number" id="presion_sistolica" placeholder="Ej. 120" style="width:100%; padding:14px; border:2px solid #E5E7EB; border-radius:12px; text-align:center;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label>Presión Diastólica (Baja)</label>
-                            <input type="number" id="presion_diastolica" placeholder="Ej. 80" style="width:100%; padding:14px; border:2px solid #E5E7EB; border-radius:12px; text-align:center;">
-                        </div>
-                    </div>
-                    <button onclick="analizarPresion()" style="background: #0D9488; color:white; border:none; padding:14px; border-radius:30px; width:100%; font-weight:600; cursor:pointer;">🔍 ANALIZAR PRESIÓN</button>
-                    <div id="resultado-presion"></div>
-                </div>
-            </div>
-        `;
-    }
-
-           
+    
     // FUNCIÓN PARA ANTIBIÓTICOS
     function renderAntibioticos() {
         return `
@@ -3623,30 +3525,21 @@ window.renderRoosterScreen = async function() {
         window.history.pushState({}, '', nuevaUrl);
         
         // Actualizar clases activas
-                  document.querySelectorAll('.subtool-btn').forEach(btn => {
+        document.querySelectorAll('.subtool-btn').forEach(btn => {
             const btnSubtool = btn.getAttribute('data-subtool');
-            const iconSpan = btn.querySelector('.subtool-icon');
-            const textSpan = btn.querySelector('.subtool-text');
-            
             if (btnSubtool === subtool) {
-                btn.style.background = toolColor;
-                btn.style.borderColor = toolColor;
-                if (iconSpan) iconSpan.style.color = 'white';
-                if (textSpan) textSpan.style.color = 'white';
+                btn.style.background = herramientasConfig[herramientaActual].color;
+                btn.style.color = 'white';
             } else {
                 btn.style.background = 'white';
-                btn.style.borderColor = '#E5E7EB';
-                if (iconSpan) iconSpan.style.color = toolColor;
-                if (textSpan) textSpan.style.color = toolColor;
+                btn.style.color = herramientasConfig[herramientaActual].color;
             }
         });
-
         
         // Actualizar contenido llamando a la función correspondiente
         const mainContent = document.getElementById('subtool-main-content');
         if (mainContent) {
             if (subtool === 'glasgow') mainContent.innerHTML = renderGlasgow();
-                else if (subtool === 'presion_arterial') mainContent.innerHTML = renderPresionArterial();
             else if (subtool === 'antibioticos') mainContent.innerHTML = renderAntibioticos();
             else if (subtool === 'rcep') mainContent.innerHTML = renderRCP();
             else mainContent.innerHTML = '<div style="text-align:center;padding:60px;">Contenido en desarrollo</div>';
@@ -3675,9 +3568,8 @@ window.renderRoosterScreen = async function() {
     // ==============================================
     // CONTENIDO DE CADA SUB-HERRAMIENTA (CONFIG)
     // ==============================================
-     const contenidos = {
+    const contenidos = {
         glasgow: { titulo: TEXTOS.herramienta_glasgow, render: renderGlasgow },
-        presion_arterial: { titulo: 'Presión Arterial', render: renderPresionArterial },
         antibioticos: { titulo: TEXTOS.herramienta_antibioticos, render: renderAntibioticos },
         rcep: { titulo: TEXTOS.herramienta_rcep, render: renderRCP }
     };
@@ -3687,12 +3579,9 @@ window.renderRoosterScreen = async function() {
             titulo: TEXTOS.btn_valores_normales,
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow', 'presion_arterial'],
-            nombres: { glasgow: TEXTOS.herramienta_glasgow, presion_arterial: 'Presión Arterial' },
-            iconos: { 
-                glasgow: ICONOS_SVG.icono_glasgow,
-                presion_arterial: ICONOS_SVG.icono_presion
-            }
+            subherramientas: ['glasgow'],
+            nombres: { glasgow: TEXTOS.herramienta_glasgow },
+            iconos: { glasgow: ICONOS_SVG.icono_glasgow }
         },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
@@ -3783,9 +3672,10 @@ window.renderRoosterScreen = async function() {
                         border: 1px solid ${subHerramientaMostrar === sub ? configActual.color : '#E5E7EB'};
                         border-radius: 16px; cursor: pointer;
                     ">
-<span class="subtool-icon" style="display: inline-flex; width: 32px; height: 32px; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">${configActual.iconos[sub] || ICONOS_SVG.icono_default}</span>
-<span class="subtool-text" style="font-size: 11px; font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">${configActual.nombres[sub]}</span>
-`).join('')}
+                        <span style="display: inline-flex; width: 32px; height: 32px;">${configActual.iconos[sub] || ICONOS_SVG.icono_default}</span>
+                        <span style="font-size: 11px; font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center;">${configActual.nombres[sub]}</span>
+                    </button>
+                `).join('')}
             </div>
         `;
     };
