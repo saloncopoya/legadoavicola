@@ -3369,45 +3369,20 @@ window.renderRoosterScreen = async function() {
     // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
     const TEXTOS = {
-        btn_valores_normales: 'VALORES NORMALES',
-        btn_medicamentos: 'MEDICAMENTOS',
-        btn_conocimientos: 'CONOCIMIENTOS',
-        
-        herramienta_glasgow: 'Escala de Glasgow',
-        herramienta_norton: 'Escala de Norton',
-        herramienta_braden: 'Escala de Braden',
-        
-        
-        herramienta_antibioticos: 'Antibióticos',
-        herramienta_analgesicos: 'Analgésicos',
-        herramienta_cardiovasculares: 'Cardiovasculares',
-  
-        
-        herramienta_rcep: 'RCP Actualizado',
-        herramienta_guias: 'Guías Clínicas',
-        herramienta_protocolos: 'Protocolos Enfermería',
-        
-        desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
-        desc_norton: 'Evaluar el riesgo de desarrollar úlceras por presión. Valora cinco parámetros: estado físico, estado mental, actividad, movilidad e incontinencia.',
-        desc_braden: 'Predecir el riesgo de úlceras por presión. Valora percepción sensorial, exposición a humedad, actividad, movilidad, nutrición y fricción.',
-         
-        apertura_ocular: 'Apertura Ocular',
-        respuesta_verbal: 'Respuesta Verbal',
-        respuesta_motora: 'Respuesta Motora',
-        
-        estado_fisico: 'Estado Físico General',
-        estado_mental: 'Estado Mental',
-        actividad: 'Actividad',
-        movilidad: 'Movilidad',
-        incontinencia: 'Incontinencia',
-        
-        percepcion_sensorial: 'Percepción Sensorial',
-        humedad: 'Exposición a Humedad',
-        nutricion: 'Nutrición',
-        friccion: 'Fricción y Corte',
-        
-       
-    };
+    btn_valores_normales: 'VALORES NORMALES',
+    btn_medicamentos: 'MEDICAMENTOS',
+    btn_conocimientos: 'CONOCIMIENTOS',
+    
+    herramienta_glasgow: 'Escala de Glasgow',
+    herramienta_antibioticos: 'Antibióticos',
+    herramienta_rcep: 'RCP Actualizado',
+    
+    desc_glasgow: 'Evaluar el nivel de conciencia...',
+     
+    apertura_ocular: 'Apertura Ocular',
+    respuesta_verbal: 'Respuesta Verbal',
+    respuesta_motora: 'Respuesta Motora',
+};
     
     // ==============================================
     // TODOS LOS ICONOS SVG SON CONSTANTES
@@ -3420,19 +3395,13 @@ window.renderRoosterScreen = async function() {
         
         // Iconos para subtools - VALORES NORMALES
         icono_glasgow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
-        icono_norton: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-        icono_braden: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 12H4M12 4v16"/><circle cx="12" cy="12" r="2"/></svg>`,
-          
+           
         // Iconos para subtools - MEDICAMENTOS
         icono_antibioticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>`,
-        icono_analgesicos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
-        icono_cardiovasculares: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
-      
+       
         // Iconos para subtools - CONOCIMIENTOS
         icono_rcep: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
-        icono_guias: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>`,
-        icono_protocolos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
-         
+           
         icono_default: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`
     };
     
@@ -3543,100 +3512,46 @@ if (bottomBar && bottomBar.style.display === 'none') {
     // CONTENIDO DE CADA SUB-HERRAMIENTA
     // ==============================================
     const contenidos = {
-        glasgow: {
-            titulo: TEXTOS.herramienta_glasgow,
-            descripcion: TEXTOS.desc_glasgow,
-            secciones: [
-                { nombre: TEXTOS.apertura_ocular, valores: ['Espontánea (4)', 'A la voz (3)', 'Al dolor (2)', 'Ninguna (1)'] },
-                { nombre: TEXTOS.respuesta_verbal, valores: ['Orientado (5)', 'Confuso (4)', 'Palabras inapropiadas (3)', 'Sonidos incomprensibles (2)', 'Ninguna (1)'] },
-                { nombre: TEXTOS.respuesta_motora, valores: ['Obedece órdenes (6)', 'Localiza dolor (5)', 'Retirada al dolor (4)', 'Flexión anormal (3)', 'Extensión anormal (2)', 'Ninguna (1)'] }
-            ]
-        },
-        norton: {
-            titulo: TEXTOS.herramienta_norton,
-            descripcion: TEXTOS.desc_norton,
-            secciones: [
-                { nombre: TEXTOS.estado_fisico, valores: ['Bueno (4)', 'Regular (3)', 'Malo (2)', 'Muy malo (1)'] },
-                { nombre: TEXTOS.estado_mental, valores: ['Alerta (4)', 'Apático (3)', 'Confuso (2)', 'Estupor (1)'] },
-                { nombre: TEXTOS.actividad, valores: ['Ambulante (4)', 'Con ayuda (3)', 'Limitada (2)', 'Inmóvil (1)'] },
-                { nombre: TEXTOS.movilidad, valores: ['Total (4)', 'Ligeramente limitada (3)', 'Muy limitada (2)', 'Inmóvil (1)'] },
-                { nombre: TEXTOS.incontinencia, valores: ['Continente (4)', 'Ocasional (3)', 'Urinaria (2)', 'Doble (1)'] }
-            ]
-        },
-        braden: {
-            titulo: TEXTOS.herramienta_braden,
-            descripcion: TEXTOS.desc_braden,
-            secciones: [
-                { nombre: TEXTOS.percepcion_sensorial, valores: ['No comprometida (4)', 'Ligeramente comprometida (3)', 'Muy limitada (2)', 'Completamente limitada (1)'] },
-                { nombre: TEXTOS.humedad, valores: ['Rara vez (4)', 'Ocasional (3)', 'Frecuente (2)', 'Constantemente (1)'] },
-                { nombre: TEXTOS.actividad, valores: ['Deambula (4)', 'Camina ocasionalmente (3)', 'Silla de ruedas (2)', 'Encamado (1)'] },
-                { nombre: TEXTOS.movilidad, valores: ['Sin limitaciones (4)', 'Ligeramente limitada (3)', 'Muy limitada (2)', 'Completamente inmóvil (1)'] },
-                { nombre: TEXTOS.nutricion, valores: ['Excelente (4)', 'Adecuada (3)', 'Probablemente inadecuada (2)', 'Muy pobre (1)'] },
-                { nombre: TEXTOS.friccion, valores: ['Sin problema (3)', 'Problema potencial (2)', 'Problema evidente (1)'] }
-            ]
-        },
-
-        vacia: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
+    glasgow: {
+        titulo: TEXTOS.herramienta_glasgow,
+        descripcion: TEXTOS.desc_glasgow,
+        secciones: [
+            { nombre: TEXTOS.apertura_ocular, valores: ['Espontánea (4)', 'A la voz (3)', 'Al dolor (2)', 'Ninguna (1)'] },
+            { nombre: TEXTOS.respuesta_verbal, valores: ['Orientado (5)', 'Confuso (4)', 'Palabras inapropiadas (3)', 'Sonidos incomprensibles (2)', 'Ninguna (1)'] },
+            { nombre: TEXTOS.respuesta_motora, valores: ['Obedece órdenes (6)', 'Localiza dolor (5)', 'Retirada al dolor (4)', 'Flexión anormal (3)', 'Extensión anormal (2)', 'Ninguna (1)'] }
+        ]
+    },
+    antibioticos: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] },
+    rcep: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
     };
     
-    // Agregar todas las nuevas herramientas con pantalla vacía
-const herramientasVacias = [];
-          herramientasVacias.forEach(h => { if (!contenidos[h]) contenidos[h] = { ...contenidos.vacia, titulo: TEXTOS[`herramienta_${h}`] || h }; });
-    
-    // ==============================================
-    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
-    // ==============================================
-    const herramientasConfig = {
+   const herramientasConfig = {
     'valores-normales': {
         titulo: TEXTOS.btn_valores_normales,
         descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
         color: '#0D9488',
         icono: ICONOS_SVG.icono_valores_normales,
-        subherramientas: ['glasgow', 'norton', 'braden'],
-        nombres: {
-            glasgow: TEXTOS.herramienta_glasgow,
-            norton: TEXTOS.herramienta_norton,
-            braden: TEXTOS.herramienta_braden
-        },
-        iconos: {
-            glasgow: ICONOS_SVG.icono_glasgow,
-            norton: ICONOS_SVG.icono_norton,
-            braden: ICONOS_SVG.icono_braden
-        }
+        subherramientas: ['glasgow'],
+        nombres: { glasgow: TEXTOS.herramienta_glasgow },
+        iconos: { glasgow: ICONOS_SVG.icono_glasgow }
     },
     'medicamentos': {
         titulo: TEXTOS.btn_medicamentos,
         descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
         color: '#3B82F6',
         icono: ICONOS_SVG.icono_medicamentos,
-        subherramientas: ['antibioticos', 'analgesicos', 'cardiovasculares'],
-        nombres: {
-            antibioticos: TEXTOS.herramienta_antibioticos,
-            analgesicos: TEXTOS.herramienta_analgesicos,
-            cardiovasculares: TEXTOS.herramienta_cardiovasculares
-        },
-        iconos: {
-            antibioticos: ICONOS_SVG.icono_antibioticos,
-            analgesicos: ICONOS_SVG.icono_analgesicos,
-            cardiovasculares: ICONOS_SVG.icono_cardiovasculares
-        }
+        subherramientas: ['antibioticos'],
+        nombres: { antibioticos: TEXTOS.herramienta_antibioticos },
+        iconos: { antibioticos: ICONOS_SVG.icono_antibioticos }
     },
     'conocimientos': {
         titulo: TEXTOS.btn_conocimientos,
         descripcion: 'Guías, protocolos, actualizaciones, RCP',
         color: '#F59E0B',
         icono: ICONOS_SVG.icono_conocimientos,
-        subherramientas: ['rcep', 'guias', 'protocolos'],
-        nombres: {
-            rcep: TEXTOS.herramienta_rcep,
-            guias: TEXTOS.herramienta_guias,
-            protocolos: TEXTOS.herramienta_protocolos
-        },
-        iconos: {
-            rcep: ICONOS_SVG.icono_rcep,
-            guias: ICONOS_SVG.icono_guias,
-            protocolos: ICONOS_SVG.icono_protocolos
-        }
+        subherramientas: ['rcep'],
+        nombres: { rcep: TEXTOS.herramienta_rcep },
+        iconos: { rcep: ICONOS_SVG.icono_rcep }
     }
 };
     
@@ -3708,7 +3623,7 @@ const herramientasVacias = [];
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
     }
-    const contenidoActual = contenidos[subHerramientaMostrar] || contenidos.vacia;
+const contenidoActual = contenidos[subHerramientaMostrar] || { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] };
     
     const generarPestanas = () => {
         return `
@@ -3780,43 +3695,7 @@ const herramientasVacias = [];
     `;
 }
           
-    const generarContenido = () => {
-        if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
-            return `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
-                    <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
-                    <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
-                    <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
-                    </div>
-                </div>
-            `;
-        }
-        return `
-            <div style="padding: 4px 0 20px 0;">
-                <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
-                    <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
-                </div>
-                ${contenidoActual.secciones.map(seccion => `
-                    <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
-                        </div>
-                    </div>
-                `).join('')}
-                <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                    <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
-                </div>
-            </div>
-        `;
-    };
+    
     
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
@@ -3836,7 +3715,8 @@ const herramientasVacias = [];
                 ${generarPestanas()}
             </div>
             
-            <div id="subtool-main-content" style="padding: 16px;">${generarContenido()}</div>
+<div id="subtool-main-content" style="padding: 16px;">${generarContenidoDinamico(configActual, contenidoActual)}</div>
+
         </div>
     `;
 };          
