@@ -2943,6 +2943,12 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
 // USUARIOS NO LOGUEADOS - VALIDAR TOOL Y SUBTOOL
 // ==============================================
 else if (toolParam) {
+
+       console.log('🔍 [AUDITORIA] toolParam detectado:', toolParam);
+    console.log('🔍 [AUDITORIA] sectionParam:', sectionParam);
+    console.log('🔍 [AUDITORIA] Usuario logueado?:', AppState.user.current ? 'SÍ' : 'NO');
+    console.log('🔍 [AUDITORIA] pantallasPublicas disponibles:', pantallasPublicas);
+    
     // 1. Determinar a qué pantalla pertenece este tool
     // Si hay section en URL, usar esa. Si no, usar VENTAS como default
     let pantallaDelTool = sectionParam && pantallasPublicas.includes(sectionParam) 
@@ -2954,6 +2960,8 @@ else if (toolParam) {
     const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
     
     if (esPantallaPublica) {
+                console.log('✅ [AUDITORIA] Acceso PERMITIDO - Mostrando pantalla:', pantallaDelTool);
+
         // ==========================================
         // CASO 1: Pantalla PÚBLICA - Mostrar normal
         // ==========================================
@@ -2965,10 +2973,17 @@ else if (toolParam) {
             if (barra) barra.style.display = 'none';
         }, 100);
     } else {
+
+          console.log('❌ [AUDITORIA] Acceso DENEGADO - No está logueado y la pantalla requiere autenticación');
         // ==========================================
         // CASO 2: Pantalla PRIVADA - Solo redirigir a LOGIN
         // ==========================================
         // Redirigir a LOGIN (sin guardar destino)
+          const nuevaUrl = new URL(window.location);
+        nuevaUrl.searchParams.delete('tool');
+        nuevaUrl.searchParams.delete('subtool');
+        window.history.replaceState({}, '', nuevaUrl);
+        
         AppState.setScreen(SCREENS.LOGIN);
         
         // Mostrar mensaje al usuario
