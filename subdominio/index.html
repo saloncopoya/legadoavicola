@@ -3475,25 +3475,85 @@ window.renderVentasScreen = async function() {
     window.cambiarSubHerramienta = function(subtool, event) {
     if (event && event.preventDefault) event.preventDefault();
     
-    // Guardar la posición del scroll
+    // ✅ Guardar la posición ACTUAL del scroll ANTES de cambiar
     const scrollContainer = document.querySelector('.pestanas-scroll-container');
     const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+    
+    // ✅ Obtener el elemento activo actual (para animación suave)
+    const activeBtn = document.querySelector('.subtool-btn-active');
+    const newBtn = document.querySelector(`.subtool-btn[data-subtool="${subtool}"]`);
+    
+    // ✅ Si existe animación CSS, aplicarla
+    if (newBtn && !newBtn.classList.contains('subtool-btn-active')) {
+        newBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => { if(newBtn) newBtn.style.transform = ''; }, 150);
+    }
     
     // Actualizar URL
     const nuevaUrl = new URL(window.location);
     nuevaUrl.searchParams.set('subtool', subtool);
     window.history.pushState({}, '', nuevaUrl);
     
-    // Recargar la pantalla para que renderApp muestre la herramienta correcta
-    renderApp();
+    // ✅ ACTUALIZAR SOLO EL CONTENIDO PRINCIPAL (no toda la pantalla)
+    const mainContent = document.getElementById('subtool-main-content');
+    if (mainContent) {
+        // Generar solo el contenido nuevo
+        let nuevoContenido = '';
+        const herramientaActual = new URLSearchParams(window.location.search).get('tool');
+        
+        if (herramientaActual === 'valores-normales') {
+            if (subtool === 'glasgow') nuevoContenido = window.renderGlasgowTool();
+            else if (subtool === 'norton') nuevoContenido = window.renderNortonTool();
+            else if (subtool === 'braden') nuevoContenido = window.renderBradenTool();
+            else if (subtool === 'presion-arterial') nuevoContenido = window.renderBloodPressureTool();
+            else if (subtool === 'glucosa') nuevoContenido = window.renderGlucosaTool();
+            else nuevoContenido = '<div style="padding:20px; text-align:center;">Contenido en desarrollo</div>';
+        } else if (herramientaActual === 'medicamentos') {
+            if (subtool === 'antibioticos') nuevoContenido = window.renderAntibioticosTool();
+            else if (subtool === 'analgesicos') nuevoContenido = window.renderAnalgesicosTool();
+            else if (subtool === 'cardiovasculares') nuevoContenido = window.renderCardiovascularesTool();
+            else nuevoContenido = '<div style="padding:20px; text-align:center;">Contenido en desarrollo</div>';
+        } else if (herramientaActual === 'conocimientos') {
+            if (subtool === 'rcep') nuevoContenido = window.renderRceptTool();
+            else if (subtool === 'guias') nuevoContenido = window.renderGuiasTool();
+            else if (subtool === 'protocolos') nuevoContenido = window.renderProtocolosTool();
+            else nuevoContenido = '<div style="padding:20px; text-align:center;">Contenido en desarrollo</div>';
+        }
+        
+        // ✅ Animar el cambio de contenido (fade)
+        mainContent.style.opacity = '0.5';
+        setTimeout(() => {
+            mainContent.innerHTML = nuevoContenido;
+            mainContent.style.opacity = '1';
+        }, 100);
+    }
     
-    // Restaurar scroll después de renderizar
+    // ✅ Actualizar SOLO las clases de los botones (sin recargar toda la pantalla)
+    document.querySelectorAll('.subtool-btn').forEach(btn => {
+        const btnSubtool = btn.getAttribute('data-subtool');
+        btn.classList.remove('subtool-btn-active');
+        if (btnSubtool === subtool) {
+            btn.classList.add('subtool-btn-active');
+            // Cambiar estilos inline también
+            btn.style.background = window.configActual?.color || '#0D9488';
+            btn.style.color = 'white';
+            const textSpan = btn.querySelector('.subtool-text');
+            if (textSpan) textSpan.style.fontWeight = '700';
+        } else {
+            btn.style.background = 'white';
+            btn.style.color = window.configActual?.color || '#0D9488';
+            const textSpan = btn.querySelector('.subtool-text');
+            if (textSpan) textSpan.style.fontWeight = '500';
+        }
+    });
+    
+    // ✅ RESTAURAR el scroll después de renderizar
     setTimeout(() => {
         const newScrollContainer = document.querySelector('.pestanas-scroll-container');
         if (newScrollContainer) {
             newScrollContainer.scrollLeft = scrollPosition;
         }
-    }, 100);
+    }, 50);
 };
 
     
@@ -3662,6 +3722,7 @@ iconos: {
     // VISTA DE HERRAMIENTA SELECCIONADA
     // ==============================================
     const configActual = herramientasConfig[herramientaActual];
+    window.configActual = configActual;
     let subHerramientaMostrar = subHerramientaActual;
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
