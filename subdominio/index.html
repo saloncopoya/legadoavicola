@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 5</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 6</p>
 
          
             </div>
@@ -2852,6 +2852,9 @@ else if (toolParam) {
     const pantallasSinPermiso = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE, SCREENS.PERFIL, SCREENS.CONFIGURACIONES];
     
     // 3. Verificar permisos para pantallas que lo requieren
+        console.log(`🔍 [AUTH] Verificando acceso a pantalla: "${pantallaDestino}"`);
+    console.log(`🔍 [AUTH] - Es pantalla sin permiso? ${pantallasSinPermiso.includes(pantallaDestino)}`);
+    
     const profile = AppState.user.profile;
     let tienePermiso = true;
     
@@ -2868,6 +2871,9 @@ else if (toolParam) {
         tienePermiso = false;
         AppState.addNotification('⚠️ No tienes permiso para acceder a ADMIN', 'warning');
     }
+
+
+        console.log(`🔍 [AUTH] Resultado final: ${tienePermiso ? '✅ PERMITIDO' : '❌ DENEGADO'} acceso a "${pantallaDestino}"`);
     
     // 4. Si no tiene permiso, redirigir a PUBLIC
     if (!tienePermiso) {
@@ -2942,12 +2948,27 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
 // ==============================================
 // USUARIOS NO LOGUEADOS - VALIDAR TOOL Y SUBTOOL
 // ==============================================
-else if (toolParam) {
 
-       console.log('🔍 [AUDITORIA] toolParam detectado:', toolParam);
-    console.log('🔍 [AUDITORIA] sectionParam:', sectionParam);
-    console.log('🔍 [AUDITORIA] Usuario logueado?:', AppState.user.current ? 'SÍ' : 'NO');
-    console.log('🔍 [AUDITORIA] pantallasPublicas disponibles:', pantallasPublicas);
+                // ========== CONSOLA PARA AUDITAR FLUJO ==========
+        console.log('🔍 [AUTH] ========== INICIO VERIFICACIÓN ==========');
+        console.log('🔍 [AUTH] URL actual:', window.location.href);
+        console.log('🔍 [AUTH] Parámetros URL:', {
+            section: urlParams.get('section'),
+            tool: urlParams.get('tool'),
+            subtool: urlParams.get('subtool'),
+            share: urlParams.get('share')
+        });
+        console.log('🔍 [AUTH] Perfil usuario:', {
+            uid: user?.uid,
+            displayName: profile?.displayName,
+            activated: profile?.activated,
+            tienePermisoPublicaciones: profile?.publicaciones === true,
+            tienePermisoPedigri: profile?.pedigri === true,
+            tienePermisoJuez: profile?.isJudge === true,
+            tienePermisoAdmin: profile?.gallo === true
+        });
+            
+else if (toolParam) {
     
     // 1. Determinar a qué pantalla pertenece este tool
     // Si hay section en URL, usar esa. Si no, usar VENTAS como default
@@ -2955,10 +2976,12 @@ const pantallaIntentada = sectionParam || SCREENS.PUBLIC;
 const esPantallaPrivada = !pantallasPublicas.includes(pantallaIntentada);
 let pantallaDelTool = esPantallaPrivada ? SCREENS.PUBLIC : pantallaIntentada;
        const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
-
+    console.log(`🔍 [AUTH-NO-LOGIN] Pantalla intentada: "${pantallaDelTool}"`);
+    console.log(`🔍 [AUTH-NO-LOGIN] ¿Es pública? ${esPantallaPublica}`);
+    console.log(`🔍 [AUTH-NO-LOGIN] Resultado: ${esPantallaPublica ? '✅ PERMITIDO (pública)' : '❌ DENEGADO → redirigir a LOGIN'}`);
+    
     
     if (esPantallaPublica) {
-                console.log('✅ [AUDITORIA] Acceso PERMITIDO - Mostrando pantalla:', pantallaDelTool);
 
         // ==========================================
         // CASO 1: Pantalla PÚBLICA - Mostrar normal
@@ -2972,7 +2995,6 @@ let pantallaDelTool = esPantallaPrivada ? SCREENS.PUBLIC : pantallaIntentada;
         }, 100);
     } else {
 
-          console.log('❌ [AUDITORIA] Acceso DENEGADO - No está logueado y la pantalla requiere autenticación');
         // ==========================================
         // CASO 2: Pantalla PRIVADA - Solo redirigir a LOGIN
         // ==========================================
