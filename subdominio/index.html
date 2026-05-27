@@ -2824,14 +2824,22 @@ AppState.setScreen(SCREENS.PUBLIC);
 const shareIdActual = new URLSearchParams(window.location.search).get('share');
 const toolParam = urlParams.get('tool');
 const subtoolParam = urlParams.get('subtool');
-
+const sectionFromUrl = urlParams.get('section');
+            
 if (shareIdActual) {
     pantallaADestino = SCREENS.SHARE;
     sessionStorage.setItem('currentShareId', shareIdActual);
 } 
 // ✅ NUEVO: Si hay tool en la URL, mostrar VENTAS (Bienestar) directamente
 else if (toolParam) {
-    pantallaADestino = SCREENS.VENTAS;
+    // Si hay una sección en la URL, usar esa. Si no, mantener la pantalla pendiente o PUBLIC
+    if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
+        pantallaADestino = sectionFromUrl;
+    } else if (pantallaPendiente) {
+        pantallaADestino = pantallaPendiente;
+    } else {
+        pantallaADestino = SCREENS.PUBLIC;
+    }
     // FORZAR OCULTAR BARRA
     setTimeout(() => {
         const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
