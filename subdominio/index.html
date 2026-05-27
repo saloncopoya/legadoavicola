@@ -3283,17 +3283,28 @@ window.formatTime = formatTime;
 // MANEJAR BOTÓN "ATRÁS" DEL CELULAR
 // ==============================================
 window.addEventListener('popstate', function() {
-    // Recargar la pantalla según la URL actual
+    // ✅ LEER LA NUEVA URL Y ACTUALIZAR AppState
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get('section');
+    const toolParam = urlParams.get('tool');
+    
+    // ✅ Actualizar la pantalla actual en AppState
+    if (section && Object.values(SCREENS).includes(section)) {
+        AppState.ui.currentScreen = section;
+    } else if (toolParam) {
+        AppState.ui.currentScreen = SCREENS.VENTAS;
+    } else {
+        AppState.ui.currentScreen = SCREENS.PUBLIC;
+    }
+    
+    // Recargar la pantalla
     renderApp();
     
     // ✅ FORZAR AJUSTE DE BARRA DE NAVEGACIÓN SEGÚN LA NUEVA URL
     setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const toolActual = urlParams.get('tool');
         const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
-        
         if (barra) {
-            if (toolActual) {
+            if (toolParam) {
                 barra.style.display = 'none';
                 document.body.style.paddingBottom = '0';
             } else {
