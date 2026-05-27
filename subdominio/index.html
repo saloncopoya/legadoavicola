@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 02</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 03</p>
 
          
             </div>
@@ -3487,20 +3487,7 @@ window.renderVentasScreen = async function() {
         
     if (event && event.preventDefault) event.preventDefault();
 
-         const urlParamsActual = new URLSearchParams(window.location.search);
-    const subtoolActual = urlParamsActual.get('subtool');
-    
-    // ✅ NUEVO: Si es la MISMA herramienta, NO hacer nada (solo animación visual)
-    if (subtoolActual === subtool) {
-        // Solo animación de feedback visual sin recargar
-        const newBtn = document.querySelector(`.subtool-btn[data-subtool="${subtool}"]`);
-        if (newBtn) {
-            newBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => { if(newBtn) newBtn.style.transform = ''; }, 150);
-        }
-        return; // ✅ SALIR - No hacer nada más
-    }
-        
+  
     
     // ✅ Guardar la posición ACTUAL del scroll ANTES de cambiar
     const scrollContainer = document.querySelector('.pestanas-scroll-container');
