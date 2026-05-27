@@ -3449,6 +3449,32 @@ window.renderVentasScreen = async function() {
         window.history.pushState({}, '', nuevaUrl);
         renderApp();
     };
+
+
+    window.cambiarSubHerramienta = function(subtool, event) {
+    if (event && event.preventDefault) event.preventDefault();
+    
+    // Guardar la posición del scroll
+    const scrollContainer = document.querySelector('.pestanas-scroll-container');
+    const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+    
+    // Actualizar URL
+    const nuevaUrl = new URL(window.location);
+    nuevaUrl.searchParams.set('subtool', subtool);
+    window.history.pushState({}, '', nuevaUrl);
+    
+    // Recargar la pantalla para que renderApp muestre la herramienta correcta
+    renderApp();
+    
+    // Restaurar scroll después de renderizar
+    setTimeout(() => {
+        const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+        if (newScrollContainer) {
+            newScrollContainer.scrollLeft = scrollPosition;
+        }
+    }, 100);
+};
+
     
     window.volverAlMenuPrincipal = function() { 
         const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
