@@ -3432,23 +3432,53 @@ window.renderRoosterScreen = async function() {
     };
     
     window.cambiarSubHerramienta = function(subtool, event) {
-        if (event && event.preventDefault) event.preventDefault();
-        
-        const scrollContainer = document.querySelector('.pestanas-scroll-container');
-        const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
-        
-        const nuevaUrl = new URL(window.location);
-        nuevaUrl.searchParams.set('subtool', subtool);
-        window.history.pushState({}, '', nuevaUrl);
-        renderApp();
-        
-        setTimeout(() => {
-            const newScrollContainer = document.querySelector('.pestanas-scroll-container');
-            if (newScrollContainer) {
-                newScrollContainer.scrollLeft = scrollPosition;
-            }
-        }, 50);
-    };
+    if (event && event.preventDefault) event.preventDefault();
+    
+    // Guardar la posición del scroll
+    const scrollContainer = document.querySelector('.pestanas-scroll-container');
+    const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+    
+    // Actualizar URL sin recargar la página completa
+    const nuevaUrl = new URL(window.location);
+    nuevaUrl.searchParams.set('subtool', subtool);
+    window.history.pushState({}, '', nuevaUrl);
+    
+    // Actualizar SOLO la parte visual sin renderizar todo de nuevo
+    const configActual = herramientasConfig[herramientaActual];
+    const contenidoActual = contenidos[subtool] || contenidos.vacia;
+    
+    // Actualizar clases activas en los botones
+    document.querySelectorAll('.subtool-btn').forEach(btn => {
+        const btnSubtool = btn.getAttribute('data-subtool');
+        if (btnSubtool === subtool) {
+            btn.style.background = configActual.color;
+            btn.style.color = 'white';
+            btn.style.borderColor = configActual.color;
+            const spanText = btn.querySelector('.subtool-text');
+            if (spanText) spanText.style.color = 'white';
+        } else {
+            btn.style.background = 'white';
+            btn.style.color = configActual.color;
+            btn.style.borderColor = '#E5E7EB';
+            const spanText = btn.querySelector('.subtool-text');
+            if (spanText) spanText.style.color = '#4B5563';
+        }
+    });
+    
+    // Actualizar SOLO el contenido principal
+    const mainContent = document.getElementById('subtool-main-content');
+    if (mainContent) {
+        mainContent.innerHTML = generarContenidoDinamico(configActual, contenidoActual);
+    }
+    
+    // Restaurar scroll
+    setTimeout(() => {
+        const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+        if (newScrollContainer) {
+            newScrollContainer.scrollLeft = scrollPosition;
+        }
+    }, 10);
+};
     
     window.volverAlMenuPrincipal = function() {
         const nuevaUrl = new URL(window.location);
@@ -3667,7 +3697,7 @@ window.renderRoosterScreen = async function() {
         return `
             <div class="pestanas-scroll-container" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
                 ${configActual.subherramientas.map(sub => `
-                    <button onclick="window.cambiarSubHerramienta('${sub}', event)" style="
+                    <button class="subtool-btn" data-subtool="${sub}" onclick="window.cambiarSubHerramienta('${sub}', event)" style="
                         display: flex;
                         flex-direction: column;
                         align-items: center;
@@ -3692,7 +3722,47 @@ window.renderRoosterScreen = async function() {
             </div>
         `;
     };
-    
+
+
+
+          function generarContenidoDinamico(configActual, contenidoActual) {
+    if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
+        return `
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
+                <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
+                <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
+                <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
+                </div>
+            </div>
+        `;
+    }
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
+            </div>
+            ${contenidoActual.secciones.map(seccion => `
+                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('')}
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+}
+          
     const generarContenido = () => {
         if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
             return `
@@ -3749,7 +3819,7 @@ window.renderRoosterScreen = async function() {
                 ${generarPestanas()}
             </div>
             
-            <div style="padding: 16px;">${generarContenido()}</div>
+            <div id="subtool-main-content" style="padding: 16px;">${generarContenido()}</div>
         </div>
     `;
 };          
