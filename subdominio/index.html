@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 0002</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 0003</p>
 
          
             </div>
@@ -3623,14 +3623,21 @@ window.renderRoosterScreen = async function() {
         window.history.pushState({}, '', nuevaUrl);
         
         // Actualizar clases activas
-        document.querySelectorAll('.subtool-btn').forEach(btn => {
+              document.querySelectorAll('.subtool-btn').forEach(btn => {
             const btnSubtool = btn.getAttribute('data-subtool');
             if (btnSubtool === subtool) {
-                btn.style.background = herramientasConfig[herramientaActual].color;
+                btn.style.background = toolColor;
+                btn.style.borderColor = toolColor;
+                const spans = btn.querySelectorAll('span');
+                spans.forEach(span => span.style.color = 'white');
             } else {
                 btn.style.background = 'white';
+                btn.style.borderColor = '#E5E7EB';
+                const spans = btn.querySelectorAll('span');
+                spans.forEach(span => span.style.color = toolColor);
             }
         });
+
         
         // Actualizar contenido llamando a la función correspondiente
         const mainContent = document.getElementById('subtool-main-content');
