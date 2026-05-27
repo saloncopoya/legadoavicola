@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 001</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 08</p>
 
          
             </div>
@@ -3353,8 +3353,8 @@ window.renderRoosterScreen = async function() {
 
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
 <script>
-       window.renderVentasScreen = async function() {
-    // ==============================================
+      window.renderVentasScreen = async function() {
+              // ==============================================
     // OCULTAR BARRA SI ENTRAMOS CON tool EN URL
     // ==============================================
     const ocultarTool = new URLSearchParams(window.location.search).get('tool');
@@ -3369,116 +3369,41 @@ window.renderRoosterScreen = async function() {
     // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
     const TEXTOS = {
-        btn_valores_normales: 'VALORES NORMALES',
-        btn_medicamentos: 'MEDICAMENTOS',
-        btn_conocimientos: 'CONOCIMIENTOS',
-        herramienta_glasgow: 'Escala de Glasgow',
-        herramienta_antibioticos: 'Antibióticos',
-        herramienta_rcep: 'RCP Actualizado',
-        desc_glasgow: 'Evaluar el nivel de conciencia...',
-        apertura_ocular: 'Apertura Ocular',
-        respuesta_verbal: 'Respuesta Verbal',
-        respuesta_motora: 'Respuesta Motora',
-    };
+    btn_valores_normales: 'VALORES NORMALES',
+    btn_medicamentos: 'MEDICAMENTOS',
+    btn_conocimientos: 'CONOCIMIENTOS',
+    
+    herramienta_glasgow: 'Escala de Glasgow',
+    herramienta_antibioticos: 'Antibióticos',
+    herramienta_rcep: 'RCP Actualizado',
+    
+    desc_glasgow: 'Evaluar el nivel de conciencia...',
+     
+    apertura_ocular: 'Apertura Ocular',
+    respuesta_verbal: 'Respuesta Verbal',
+    respuesta_motora: 'Respuesta Motora',
+};
     
     // ==============================================
     // TODOS LOS ICONOS SVG SON CONSTANTES
     // ==============================================
     const ICONOS_SVG = {
+        // Iconos para botones principales
         icono_valores_normales: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
         icono_medicamentos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`,
         icono_conocimientos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>`,
+        
+        // Iconos para subtools - VALORES NORMALES
         icono_glasgow: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
+           
+        // Iconos para subtools - MEDICAMENTOS
         icono_antibioticos: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>`,
+       
+        // Iconos para subtools - CONOCIMIENTOS
         icono_rcep: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
+           
         icono_default: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>`
     };
-    
-    // ==============================================
-    // FUNCIONES SEPARADAS PARA CADA HERRAMIENTA
-    // ==============================================
-    
-    // FUNCIÓN PARA GLASGOW (Escala de Glasgow)
-    function renderGlasgow() {
-        return `
-            <div style="padding: 4px 0 20px 0;">
-                <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-                    <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el nivel de conciencia...</p>
-                </div>
-                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;">
-                    <h4 style="color: #0D9488; margin: 0 0 12px 0;">Apertura Ocular</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Espontánea (4)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">A la voz (3)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Al dolor (2)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Ninguna (1)</span>
-                    </div>
-                </div>
-                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;">
-                    <h4 style="color: #0D9488; margin: 0 0 12px 0;">Respuesta Verbal</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Orientado (5)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Confuso (4)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Palabras inapropiadas (3)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Sonidos incomprensibles (2)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Ninguna (1)</span>
-                    </div>
-                </div>
-                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;">
-                    <h4 style="color: #0D9488; margin: 0 0 12px 0;">Respuesta Motora</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Obedece órdenes (6)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Localiza dolor (5)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Retirada al dolor (4)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Flexión anormal (3)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Extensión anormal (2)</span>
-                        <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px;">Ninguna (1)</span>
-                    </div>
-                </div>
-                <div style="background: white; border-radius: 16px; padding: 20px; text-align: center;">
-                    <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
-                </div>
-            </div>
-        `;
-    }
-    
-    // FUNCIÓN PARA ANTIBIÓTICOS
-    function renderAntibioticos() {
-        return `
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">💊</div>
-                <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">Antibióticos</h3>
-                <p style="color: #6B7280; margin-top: 8px;">Guía de antibióticos, dosis y recomendaciones</p>
-                <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
-                </div>
-            </div>
-        `;
-    }
-    
-    // FUNCIÓN PARA RCP
-    function renderRCP() {
-        return `
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🫀</div>
-                <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">RCP Actualizado</h3>
-                <p style="color: #6B7280; margin-top: 8px;">Protocolos actualizados de reanimación cardiopulmonar</p>
-                <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
-                </div>
-            </div>
-        `;
-    }
     
     // ==============================================
     // OBTENER HERRAMIENTA ACTUAL DESDE URL
@@ -3493,14 +3418,18 @@ window.renderRoosterScreen = async function() {
     }
     
     // ==============================================
-    // FUNCIONES DE NAVEGACIÓN
+    // FUNCIONES DE NAVEGACIÓN (CON SCROLL MANTENIDO)
     // ==============================================
     window.cambiarHerramienta = function(herramienta, subtool) {
-        const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
-        if (bottomBar && bottomBar.style.display !== 'none') {
-            bottomBar.style.display = 'none';
-            document.body.style.paddingBottom = '0';
-        }
+// OCULTAR BARRA SOLO SI ESTÁ VISIBLE
+const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+if (bottomBar && bottomBar.style.display !== 'none') {
+    bottomBar.style.display = 'none';
+        document.body.style.paddingBottom = '0';
+
+}
+        
+
         
         const nuevaUrl = new URL(window.location);
         if (herramienta) {
@@ -3515,48 +3444,62 @@ window.renderRoosterScreen = async function() {
     };
     
     window.cambiarSubHerramienta = function(subtool, event) {
-        if (event && event.preventDefault) event.preventDefault();
+    if (event && event.preventDefault) event.preventDefault();
+    
+    // Guardar la posición del scroll
+    const scrollContainer = document.querySelector('.pestanas-scroll-container');
+    const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+    
+    // Actualizar URL sin recargar la página completa
+    const nuevaUrl = new URL(window.location);
+    nuevaUrl.searchParams.set('subtool', subtool);
+    window.history.pushState({}, '', nuevaUrl);
+    
+    // Actualizar SOLO la parte visual sin renderizar todo de nuevo
+    const configActual = herramientasConfig[herramientaActual];
+const contenidoActual = contenidos[subtool] || { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] };
         
-        const scrollContainer = document.querySelector('.pestanas-scroll-container');
-        const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
-        
-        const nuevaUrl = new URL(window.location);
-        nuevaUrl.searchParams.set('subtool', subtool);
-        window.history.pushState({}, '', nuevaUrl);
-        
-        // Actualizar clases activas
-        document.querySelectorAll('.subtool-btn').forEach(btn => {
-            const btnSubtool = btn.getAttribute('data-subtool');
-            if (btnSubtool === subtool) {
-                btn.style.background = herramientasConfig[herramientaActual].color;
-                btn.style.color = 'white';
-            } else {
-                btn.style.background = 'white';
-                btn.style.color = herramientasConfig[herramientaActual].color;
-            }
-        });
-        
-        // Actualizar contenido llamando a la función correspondiente
-        const mainContent = document.getElementById('subtool-main-content');
-        if (mainContent) {
-            if (subtool === 'glasgow') mainContent.innerHTML = renderGlasgow();
-            else if (subtool === 'antibioticos') mainContent.innerHTML = renderAntibioticos();
-            else if (subtool === 'rcep') mainContent.innerHTML = renderRCP();
-            else mainContent.innerHTML = '<div style="text-align:center;padding:60px;">Contenido en desarrollo</div>';
+    // Actualizar clases activas en los botones
+    document.querySelectorAll('.subtool-btn').forEach(btn => {
+        const btnSubtool = btn.getAttribute('data-subtool');
+        if (btnSubtool === subtool) {
+            btn.style.background = configActual.color;
+            btn.style.color = 'white';
+            btn.style.borderColor = configActual.color;
+            const spanText = btn.querySelector('.subtool-text');
+            if (spanText) spanText.style.color = 'white';
+        } else {
+            btn.style.background = 'white';
+            btn.style.color = configActual.color;
+            btn.style.borderColor = '#E5E7EB';
+            const spanText = btn.querySelector('.subtool-text');
+            if (spanText) spanText.style.color = '#4B5563';
         }
-        
-        setTimeout(() => {
-            const newScrollContainer = document.querySelector('.pestanas-scroll-container');
-            if (newScrollContainer) newScrollContainer.scrollLeft = scrollPosition;
-        }, 10);
-    };
+    });
+    
+    // Actualizar SOLO el contenido principal
+    const mainContent = document.getElementById('subtool-main-content');
+    if (mainContent) {
+        mainContent.innerHTML = generarContenidoDinamico(configActual, contenidoActual);
+    }
+    
+    // Restaurar scroll
+    setTimeout(() => {
+        const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+        if (newScrollContainer) {
+            newScrollContainer.scrollLeft = scrollPosition;
+        }
+    }, 10);
+};
     
     window.volverAlMenuPrincipal = function() { 
-        const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
-        if (bottomBar && bottomBar.style.display === 'none') {
-            bottomBar.style.display = 'flex';
-            document.body.style.paddingBottom = '65px';
-        }
+// RESTAURAR BARRA DE NAVEGACIÓN SOLO SI ESTÁ OCULTA
+const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+if (bottomBar && bottomBar.style.display === 'none') {
+    bottomBar.style.display = 'flex';
+     document.body.style.paddingBottom = '65px';
+}
+        
         
         const nuevaUrl = new URL(window.location);
         nuevaUrl.searchParams.delete('tool');
@@ -3566,43 +3509,54 @@ window.renderRoosterScreen = async function() {
     };
     
     // ==============================================
-    // CONTENIDO DE CADA SUB-HERRAMIENTA (CONFIG)
+    // CONTENIDO DE CADA SUB-HERRAMIENTA
     // ==============================================
     const contenidos = {
-        glasgow: { titulo: TEXTOS.herramienta_glasgow, render: renderGlasgow },
-        antibioticos: { titulo: TEXTOS.herramienta_antibioticos, render: renderAntibioticos },
-        rcep: { titulo: TEXTOS.herramienta_rcep, render: renderRCP }
+    glasgow: {
+        titulo: TEXTOS.herramienta_glasgow,
+        descripcion: TEXTOS.desc_glasgow,
+        secciones: [
+            { nombre: TEXTOS.apertura_ocular, valores: ['Espontánea (4)', 'A la voz (3)', 'Al dolor (2)', 'Ninguna (1)'] },
+            { nombre: TEXTOS.respuesta_verbal, valores: ['Orientado (5)', 'Confuso (4)', 'Palabras inapropiadas (3)', 'Sonidos incomprensibles (2)', 'Ninguna (1)'] },
+            { nombre: TEXTOS.respuesta_motora, valores: ['Obedece órdenes (6)', 'Localiza dolor (5)', 'Retirada al dolor (4)', 'Flexión anormal (3)', 'Extensión anormal (2)', 'Ninguna (1)'] }
+        ]
+    },
+    antibioticos: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] },
+    rcep: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
     };
     
-    const herramientasConfig = {
-        'valores-normales': {
-            titulo: TEXTOS.btn_valores_normales,
-            color: '#0D9488',
-            icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow'],
-            nombres: { glasgow: TEXTOS.herramienta_glasgow },
-            iconos: { glasgow: ICONOS_SVG.icono_glasgow }
-        },
-        'medicamentos': {
-            titulo: TEXTOS.btn_medicamentos,
-            color: '#3B82F6',
-            icono: ICONOS_SVG.icono_medicamentos,
-            subherramientas: ['antibioticos'],
-            nombres: { antibioticos: TEXTOS.herramienta_antibioticos },
-            iconos: { antibioticos: ICONOS_SVG.icono_antibioticos }
-        },
-        'conocimientos': {
-            titulo: TEXTOS.btn_conocimientos,
-            color: '#F59E0B',
-            icono: ICONOS_SVG.icono_conocimientos,
-            subherramientas: ['rcep'],
-            nombres: { rcep: TEXTOS.herramienta_rcep },
-            iconos: { rcep: ICONOS_SVG.icono_rcep }
-        }
-    };
+   const herramientasConfig = {
+    'valores-normales': {
+        titulo: TEXTOS.btn_valores_normales,
+        descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
+        color: '#0D9488',
+        icono: ICONOS_SVG.icono_valores_normales,
+        subherramientas: ['glasgow'],
+        nombres: { glasgow: TEXTOS.herramienta_glasgow },
+        iconos: { glasgow: ICONOS_SVG.icono_glasgow }
+    },
+    'medicamentos': {
+        titulo: TEXTOS.btn_medicamentos,
+        descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
+        color: '#3B82F6',
+        icono: ICONOS_SVG.icono_medicamentos,
+        subherramientas: ['antibioticos'],
+        nombres: { antibioticos: TEXTOS.herramienta_antibioticos },
+        iconos: { antibioticos: ICONOS_SVG.icono_antibioticos }
+    },
+    'conocimientos': {
+        titulo: TEXTOS.btn_conocimientos,
+        descripcion: 'Guías, protocolos, actualizaciones, RCP',
+        color: '#F59E0B',
+        icono: ICONOS_SVG.icono_conocimientos,
+        subherramientas: ['rcep'],
+        nombres: { rcep: TEXTOS.herramienta_rcep },
+        iconos: { rcep: ICONOS_SVG.icono_rcep }
+    }
+};
     
     // ==============================================
-    // VISTA PRINCIPAL (BOTONES)
+    // VISTA PRINCIPAL (TUS BOTONES ORIGINALES)
     // ==============================================
     if (!herramientaActual) {
         return `
@@ -3615,31 +3569,41 @@ window.renderRoosterScreen = async function() {
                     </svg>
                     <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
                 </div>
+                
                 <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
                 </div>
+                
                 <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
                     <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_valores_normales}</div>
+                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                ${ICONOS_SVG.icono_valores_normales}
+                            </div>
                             <div>
                                 <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3>
                                 <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Constantes vitales, laboratorio, parámetros</p>
                             </div>
                         </div>
                     </button>
+                    
                     <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_medicamentos}</div>
+                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                ${ICONOS_SVG.icono_medicamentos}
+                            </div>
                             <div>
                                 <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3>
                                 <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Dosis, indicaciones, contraindicaciones</p>
                             </div>
                         </div>
                     </button>
+                    
                     <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_conocimientos}</div>
+                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">
+                                ${ICONOS_SVG.icono_conocimientos}
+                            </div>
                             <div>
                                 <h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3>
                                 <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Guías, protocolos, actualizaciones</p>
@@ -3659,47 +3623,103 @@ window.renderRoosterScreen = async function() {
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
     }
-    const contenidoActual = contenidos[subHerramientaMostrar];
+const contenidoActual = contenidos[subHerramientaMostrar] || { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] };
     
     const generarPestanas = () => {
         return `
-            <div class="pestanas-scroll-container" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px;">
+            <div class="pestanas-scroll-container" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
                 ${configActual.subherramientas.map(sub => `
                     <button class="subtool-btn" data-subtool="${sub}" onclick="window.cambiarSubHerramienta('${sub}', event)" style="
-                        display: flex; flex-direction: column; align-items: center; gap: 6px;
-                        min-width: 70px; padding: 10px 8px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 6px;
+                        min-width: 70px;
+                        padding: 10px 8px;
                         background: ${subHerramientaMostrar === sub ? configActual.color : 'white'};
                         border: 1px solid ${subHerramientaMostrar === sub ? configActual.color : '#E5E7EB'};
-                        border-radius: 16px; cursor: pointer;
+                        border-radius: 16px;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};
                     ">
-                        <span style="display: inline-flex; width: 32px; height: 32px;">${configActual.iconos[sub] || ICONOS_SVG.icono_default}</span>
-                        <span style="font-size: 11px; font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center;">${configActual.nombres[sub]}</span>
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                            ${configActual.iconos[sub] || ICONOS_SVG.icono_default}
+                        </span>
+                        <span style="font-size: clamp(10px, 3vw, 12px); font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; color: ${subHerramientaMostrar === sub ? 'white' : '#4B5563'}; text-align: center; max-width: 70px; line-height: 1.3;">
+                            ${configActual.nombres[sub]}
+                        </span>
                     </button>
                 `).join('')}
             </div>
         `;
     };
+
+
+
+          function generarContenidoDinamico(configActual, contenidoActual) {
+    if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
+        return `
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
+                <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
+                <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
+                <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
+                </div>
+            </div>
+        `;
+    }
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
+            </div>
+            ${contenidoActual.secciones.map(seccion => `
+                <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('')}
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+}
+          
+    
     
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
-            <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px;">
-                <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 30px; cursor: pointer;">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
-                <div style="flex:1;">
+                <div style="flex: 1;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="width: 32px; height: 32px;">${configActual.icono}</span>
-                        <h2 style="color: white; margin: 0; font-size: 18px;">${configActual.titulo}</h2>
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">${configActual.icono}</span>
+                        <h2 style="color: white; margin: 0; font-size: 18px; font-weight: 600;">${configActual.titulo}</h2>
                     </div>
                 </div>
             </div>
-            <div style="background: white; padding: 12px 16px; border-bottom: 1px solid #E5E7EB;">
+            
+            <div style="position: relative; background: white; padding: 12px 16px; border-bottom: 1px solid #E5E7EB;">
                 ${generarPestanas()}
             </div>
-            <div id="subtool-main-content" style="padding: 16px;">${contenidoActual.render()}</div>
+            
+<div id="subtool-main-content" style="padding: 16px;">${generarContenidoDinamico(configActual, contenidoActual)}</div>
+
         </div>
     `;
-};      
+};          
 </script>
 
 
