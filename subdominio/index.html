@@ -3154,7 +3154,7 @@ window.addEventListener('load', async () => {
     // Si estamos OFFLINE, mostrar la última pantalla sin intentar Firebase
     if (isOffline) {
         console.log('📴 Modo offline - Mostrando última pantalla guardada');
-        
+
         // Ocultar loading inmediatamente
         hideLoadingScreen();
 
@@ -3198,18 +3198,29 @@ window.addEventListener('load', async () => {
         }
         
         // Obtener la última pantalla guardada
-        const lastScreen = localStorage.getItem('lastScreen');
-        
-        // Pantallas que pueden verse offline
-        const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
-        let pantallaMostrar = SCREENS.PUBLIC;
-        
-        if (lastScreen && pantallasOffline.includes(lastScreen)) {
-            pantallaMostrar = lastScreen;
-        }
-        
-        // Mostrar la pantalla
-        AppState.setScreen(pantallaMostrar);
+      // ✅ LEER URL OFFLINE - tool y subtool para CUALQUIER pantalla
+const urlParamsOffline = new URLSearchParams(window.location.search);
+const toolFromUrl = urlParamsOffline.get('tool');
+const subtoolFromUrl = urlParamsOffline.get('subtool');
+const sectionFromUrl = urlParamsOffline.get('section');
+
+let pantallaMostrar = SCREENS.PUBLIC;
+
+
+// ✅ Si hay section en URL, usar esa pantalla
+if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
+    pantallaMostrar = sectionFromUrl;
+}
+// ✅ Si no, usar la última pantalla guardada
+else {
+    const lastScreen = localStorage.getItem('lastScreen');
+    const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+    if (lastScreen && pantallasOffline.includes(lastScreen)) {
+        pantallaMostrar = lastScreen;
+    }
+}
+
+AppState.setScreen(pantallaMostrar);
         AppState.setLoading(false);
         renderApp();
         
