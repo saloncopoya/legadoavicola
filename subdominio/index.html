@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 06</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 07</p>
 
          
             </div>
@@ -3279,7 +3279,30 @@ window.formatTime = formatTime;
 
 
 
-
+// ==============================================
+// MANEJAR BOTÓN "ATRÁS" DEL CELULAR
+// ==============================================
+window.addEventListener('popstate', function() {
+    // Recargar la pantalla según la URL actual
+    renderApp();
+    
+    // ✅ FORZAR AJUSTE DE BARRA DE NAVEGACIÓN SEGÚN LA NUEVA URL
+    setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const toolActual = urlParams.get('tool');
+        const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+        
+        if (barra) {
+            if (toolActual) {
+                barra.style.display = 'none';
+                document.body.style.paddingBottom = '0';
+            } else {
+                barra.style.display = 'flex';
+                document.body.style.paddingBottom = '65px';
+            }
+        }
+    }, 50);
+});
 
 
 </script>
@@ -3465,6 +3488,8 @@ window.renderRoosterScreen = async function() {
 const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
 if (bottomBar && bottomBar.style.display !== 'none') {
     bottomBar.style.display = 'none';
+        document.body.style.paddingBottom = '0';
+
 }
         
 
@@ -3535,6 +3560,7 @@ if (bottomBar && bottomBar.style.display !== 'none') {
 const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
 if (bottomBar && bottomBar.style.display === 'none') {
     bottomBar.style.display = 'flex';
+     document.body.style.paddingBottom = '65px';
 }
         
         
@@ -4127,7 +4153,7 @@ window.renderAdminScreen = async function() {
 
     
 <!-- FOOTER -->
-<footer style="background:var(--bg-dark); color:#e0e0e0; padding:30px 15px 25px; margin-bottom: clamp(55px, 14vw, 65px); border-top:2px solid var(--color-secondary);">
+<footer style="background:var(--bg-dark); color:#e0e0e0; padding:30px 15px 25px;  border-top:2px solid var(--color-secondary);">
     <div style="max-width:100%; margin:0 auto; text-align:center;">
         
         <div style="margin-bottom:20px;">
