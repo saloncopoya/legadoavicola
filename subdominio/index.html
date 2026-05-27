@@ -3948,28 +3948,21 @@ window.renderBloodPressureTool = function() {
         const significadoDiv = document.getElementById('bp-significado');
         const recomendacionBaseDiv = document.getElementById('bp-recomendacion-base');
         
-         const sistolicaDigitos = sistolicaInput?.toString().replace(/[^0-9]/g, '').length || 0;
-    const diastolicaDigitos = diastolicaInput?.toString().replace(/[^0-9]/g, '').length || 0;
-    
-    const tieneDigitosValidos = (sistolicaDigitos === 2 || sistolicaDigitos === 3) && 
-                                 (diastolicaDigitos === 2 || diastolicaDigitos === 3);
-    
-    // Validar que no estén vacíos, que sean números válidos y tengan 2-3 dígitos
-    if (sistolica === 0 || diastolica === 0 || !tieneDigitosValidos) {
-        resultadoDiv.innerHTML = `
-            <div style="text-align: center; padding: 16px 0;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <p style="color: #9CA3AF; margin-top: 8px;">Ingresa valores válidos (2 o 3 dígitos cada uno)</p>
-            </div>
-        `;
-        significadoDiv.innerHTML = '';
-        if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
-        return;
-    }
+       if (sistolica === 0 || diastolica === 0) {
+            resultadoDiv.innerHTML = `
+                <div style="text-align: center; padding: 16px 0;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p style="color: #9CA3AF; margin-top: 8px;">Esperando valores...</p>
+                </div>
+            `;
+            significadoDiv.innerHTML = '';
+            if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
+            return;
+        }
         
         // Ocultar recomendación base cuando hay resultado
         if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'none';
