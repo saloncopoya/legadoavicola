@@ -3627,10 +3627,8 @@ window.renderRoosterScreen = async function() {
             const btnSubtool = btn.getAttribute('data-subtool');
             if (btnSubtool === subtool) {
                 btn.style.background = herramientasConfig[herramientaActual].color;
-                btn.style.color = 'white';
             } else {
                 btn.style.background = 'white';
-                btn.style.color = herramientasConfig[herramientaActual].color;
             }
         });
         
