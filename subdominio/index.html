@@ -3491,23 +3491,25 @@ if (bottomBar && bottomBar.style.display !== 'none') {
     const contenidoActual = contenidos[subtool] || contenidos.vacia;
     
     // Actualizar clases activas en los botones
-    document.querySelectorAll('.subtool-btn').forEach(btn => {
+            document.querySelectorAll('.subtool-btn').forEach(btn => {
         const btnSubtool = btn.getAttribute('data-subtool');
         if (btnSubtool === subtool) {
             btn.style.background = configActual.color;
-         
+            btn.style.color = 'white';
             btn.style.borderColor = configActual.color;
-           
+            const spanText = btn.querySelector('.subtool-text');
             if (spanText) spanText.style.color = 'white';
         } else {
             btn.style.background = 'white';
+            btn.style.color = configActual.color;
             btn.style.borderColor = '#E5E7EB';
+            const spanText = btn.querySelector('.subtool-text');
             if (spanText) {
-                spanText.style.color = configActual.color;  
-                spanText.style.fontWeight = '500';
-            }
+                spanText.style.color = configActual.color;}
         }
     });
+
+        
     
     // Actualizar SOLO el contenido principal
     const mainContent = document.getElementById('subtool-main-content');
