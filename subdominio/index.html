@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 02</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 03</p>
 
          
             </div>
@@ -2832,7 +2832,7 @@ if (shareIdActual) {
 // ✅ NUEVO: Si hay tool en la URL, mostrar VENTAS (Bienestar) directamente
 else if (toolParam) {
     // Si hay una sección en la URL, usar esa. Si no, mantener la pantalla pendiente o PUBLIC
-    if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
+if (sectionFromUrl && pantallasOffline.includes(sectionFromUrl)) {
         pantallaADestino = sectionFromUrl;
     } else if (pantallaPendiente) {
         pantallaADestino = pantallaPendiente;
@@ -3208,7 +3208,7 @@ let pantallaMostrar = SCREENS.PUBLIC;
 
 
 // ✅ Si hay section en URL, usar esa pantalla
-if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
+if (sectionFromUrl && pantallasOffline.includes(sectionFromUrl)) {
     pantallaMostrar = sectionFromUrl;
 }
 // ✅ Si no, usar la última pantalla guardada
