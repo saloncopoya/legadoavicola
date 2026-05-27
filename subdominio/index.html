@@ -3457,8 +3457,8 @@ if (bottomBar && bottomBar.style.display !== 'none') {
     
     // Actualizar SOLO la parte visual sin renderizar todo de nuevo
     const configActual = herramientasConfig[herramientaActual];
-    const contenidoActual = contenidos[subtool] || contenidos.vacia;
-    
+const contenidoActual = contenidos[subtool] || { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] };
+        
     // Actualizar clases activas en los botones
     document.querySelectorAll('.subtool-btn').forEach(btn => {
         const btnSubtool = btn.getAttribute('data-subtool');
