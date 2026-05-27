@@ -3287,23 +3287,20 @@ window.renderRoosterScreen = async function() {
 
 <!-- PANTALLA 2: VENTAS (SUBASTAS) -->
 <script>
-window.renderVentasScreen = async function() {
+
+    window.renderVentasScreen = async function() {
     
     // ==============================================
-    // TEXTOS COMPLETOS CON MÁS OPCIONES
+    // TODAS LAS CONSTANTES DENTRO DE LA PANTALLA
     // ==============================================
     const TEXTOS = {
-        // BOTONES PRINCIPALES (AGREGÉ MÁS)
         btn_valores_normales: 'VALORES NORMALES',
         btn_medicamentos: 'MEDICAMENTOS',
         btn_conocimientos: 'CONOCIMIENTOS',
         btn_signos_vitales: 'SIGNOS VITALES',
         btn_laboratorio: 'LABORATORIO',
         btn_emergencias: 'EMERGENCIAS',
-        btn_pediatrico: 'PEDIÁTRICO',
-        btn_geriatrico: 'GERIÁTRICO',
         
-        // HERRAMIENTAS DE VALORES NORMALES (AGREGÉ MÁS)
         herramienta_glasgow: 'Escala de Glasgow',
         herramienta_norton: 'Escala de Norton',
         herramienta_braden: 'Escala de Braden',
@@ -3315,7 +3312,6 @@ window.renderVentasScreen = async function() {
         herramienta_sofa: 'Escala SOFA',
         herramienta_news: 'Escala NEWS',
         
-        // HERRAMIENTAS DE MEDICAMENTOS (AGREGÉ MÁS)
         herramienta_antibioticos: 'Antibióticos',
         herramienta_analgesicos: 'Analgésicos',
         herramienta_cardiovasculares: 'Cardiovasculares',
@@ -3325,7 +3321,6 @@ window.renderVentasScreen = async function() {
         herramienta_antiepilepticos: 'Antiepilépticos',
         herramienta_psicofarmacos: 'Psicofármacos',
         
-        // HERRAMIENTAS DE CONOCIMIENTOS (AGREGÉ MÁS)
         herramienta_rcep: 'RCP Actualizado',
         herramienta_guias: 'Guías Clínicas',
         herramienta_protocolos: 'Protocolos Enfermería',
@@ -3335,50 +3330,55 @@ window.renderVentasScreen = async function() {
         herramienta_hemodinamia: 'Hemodinamia',
         herramienta_heridas: 'Manejo de Heridas',
         
-        // SIGNOS VITALES (NUEVA SECCIÓN)
         herramienta_tension: 'Tensión Arterial',
         herramienta_frecuencia: 'Frecuencia Cardíaca',
         herramienta_respiracion: 'Frecuencia Respiratoria',
         herramienta_temperatura: 'Temperatura',
         herramienta_saturacion: 'Saturación O2',
         
-        // LABORATORIO (NUEVA SECCIÓN)
         herramienta_hemograma: 'Hemograma',
         herramienta_quimica: 'Química Sanguínea',
         herramienta_biometria: 'Biometría Hemática',
         herramienta_orina: 'Examen de Orina',
         herramienta_coagulacion: 'Tiempos de Coagulación',
         
-        // EMERGENCIAS (NUEVA SECCIÓN)
         herramienta_acv: 'ACV - Código Ictus',
         herramienta_iam: 'IAM - Código Infarto',
         herramienta_tauma: 'Trauma - ABCDE',
         herramienta_quemaduras: 'Quemaduras - Regla de 9',
         herramienta_intoxicacion: 'Intoxicaciones',
         
-        // DESCRIPCIONES
-        desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral.',
-        desc_norton: 'Evaluar el riesgo de desarrollar úlceras por presión.',
-        desc_braden: 'Predecir el riesgo de úlceras por presión.',
-        desc_barthel: 'Evaluar la independencia en actividades de la vida diaria.',
-        desc_eva: 'Evaluar la intensidad del dolor.',
-        desc_ramos: 'Escala para valoración neurológica en pacientes pediátricos.',
-        desc_waterlow: 'Valoración de riesgo de úlceras por presión.',
-        desc_apache: 'Sistema de puntuación de gravedad en UCI.',
-        desc_sofa: 'Evaluación de fallo orgánico secuencial.',
-        desc_news: 'Sistema de alerta temprana para deterioro clínico.',
+        desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
+        desc_norton: 'Evaluar el riesgo de desarrollar úlceras por presión. Valora cinco parámetros: estado físico, estado mental, actividad, movilidad e incontinencia.',
+        desc_braden: 'Predecir el riesgo de úlceras por presión. Valora percepción sensorial, exposición a humedad, actividad, movilidad, nutrición y fricción.',
+        desc_barthel: 'Evaluar la independencia en actividades de la vida diaria. 10 actividades puntuadas de 0 a 10 o 15.',
+        desc_eva: 'Evaluar la intensidad del dolor. Del 0 (sin dolor) al 10 (peor dolor imaginable).',
         
-        // Valores para Glasgow
         apertura_ocular: 'Apertura Ocular',
         respuesta_verbal: 'Respuesta Verbal',
         respuesta_motora: 'Respuesta Motora',
         
-        // Valores para Norton
         estado_fisico: 'Estado Físico General',
         estado_mental: 'Estado Mental',
         actividad: 'Actividad',
         movilidad: 'Movilidad',
         incontinencia: 'Incontinencia',
+        
+        percepcion_sensorial: 'Percepción Sensorial',
+        humedad: 'Exposición a Humedad',
+        nutricion: 'Nutrición',
+        friccion: 'Fricción y Corte',
+        
+        comer: 'Comer',
+        banarse: 'Bañarse',
+        vestirse: 'Vestirse',
+        arreglarse: 'Arreglarse',
+        deposiciones: 'Deposiciones',
+        miccion: 'Micción',
+        usar_retrete: 'Usar retrete',
+        trasladarse: 'Trasladarse',
+        deambular: 'Deambular',
+        escaleras: 'Subir escaleras'
     };
     
     // ==============================================
@@ -3388,7 +3388,7 @@ window.renderVentasScreen = async function() {
     let herramientaActual = urlParams.get('tool');
     let subHerramientaActual = urlParams.get('subtool');
     
-    // Validar herramientas válidas (AGREGÉ MÁS)
+    // Validar herramientas válidas (MÁS BOTONES)
     const herramientasValidas = ['valores-normales', 'medicamentos', 'conocimientos', 'signos-vitales', 'laboratorio', 'emergencias'];
     if (!herramientasValidas.includes(herramientaActual)) {
         herramientaActual = null;
@@ -3453,21 +3453,52 @@ window.renderVentasScreen = async function() {
             titulo: TEXTOS.herramienta_braden,
             descripcion: TEXTOS.desc_braden,
             secciones: [
-                { nombre: 'Percepción Sensorial', valores: ['No comprometida (4)', 'Ligeramente comprometida (3)', 'Muy limitada (2)', 'Completamente limitada (1)'] },
-                { nombre: 'Exposición a Humedad', valores: ['Rara vez (4)', 'Ocasional (3)', 'Frecuente (2)', 'Constantemente (1)'] },
-                { nombre: 'Actividad', valores: ['Deambula (4)', 'Camina ocasionalmente (3)', 'Silla de ruedas (2)', 'Encamado (1)'] }
+                { nombre: TEXTOS.percepcion_sensorial, valores: ['No comprometida (4)', 'Ligeramente comprometida (3)', 'Muy limitada (2)', 'Completamente limitada (1)'] },
+                { nombre: TEXTOS.humedad, valores: ['Rara vez (4)', 'Ocasional (3)', 'Frecuente (2)', 'Constantemente (1)'] },
+                { nombre: TEXTOS.actividad, valores: ['Deambula (4)', 'Camina ocasionalmente (3)', 'Silla de ruedas (2)', 'Encamado (1)'] },
+                { nombre: TEXTOS.movilidad, valores: ['Sin limitaciones (4)', 'Ligeramente limitada (3)', 'Muy limitada (2)', 'Completamente inmóvil (1)'] },
+                { nombre: TEXTOS.nutricion, valores: ['Excelente (4)', 'Adecuada (3)', 'Probablemente inadecuada (2)', 'Muy pobre (1)'] },
+                { nombre: TEXTOS.friccion, valores: ['Sin problema (3)', 'Problema potencial (2)', 'Problema evidente (1)'] }
             ]
         },
-        // Pantalla VACÍA para las nuevas herramientas (pero EXISTE)
-        vacia: {
-            titulo: 'Próximamente',
-            descripcion: 'Contenido en desarrollo',
-            secciones: []
-        }
+        barthel: {
+            titulo: TEXTOS.herramienta_barthel,
+            descripcion: TEXTOS.desc_barthel,
+            secciones: [
+                { nombre: TEXTOS.comer, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.banarse, valores: ['Independiente (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.vestirse, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.arreglarse, valores: ['Independiente (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.deposiciones, valores: ['Continente (10)', 'Accidente ocasional (5)', 'Incontinente (0)'] },
+                { nombre: TEXTOS.miccion, valores: ['Continente (10)', 'Accidente ocasional (5)', 'Incontinente (0)'] },
+                { nombre: TEXTOS.usar_retrete, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.trasladarse, valores: ['Independiente (15)', 'Mínima ayuda (10)', 'Gran ayuda (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.deambular, valores: ['Independiente (15)', 'Necesita ayuda (10)', 'Silla ruedas (5)', 'Dependiente (0)'] },
+                { nombre: TEXTOS.escaleras, valores: ['Independiente (10)', 'Necesita ayuda (5)', 'Dependiente (0)'] }
+            ]
+        },
+        eva: {
+            titulo: TEXTOS.herramienta_eva,
+            descripcion: TEXTOS.desc_eva,
+            secciones: [
+                { nombre: 'Nivel de Dolor', valores: [
+                    '0: Sin dolor',
+                    '1-3: Dolor leve',
+                    '4-6: Dolor moderado',
+                    '7-9: Dolor intenso',
+                    '10: Peor dolor imaginable'
+                ]}
+            ]
+        },
+        vacia: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
     };
     
+    // Para que todas las herramientas tengan contenido vacío pero existan
+    const herramientasVacias = ['ramos', 'waterlow', 'apache', 'sofa', 'news', 'antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos', 'rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas', 'tension', 'frecuencia', 'respiracion', 'temperatura', 'saturacion', 'hemograma', 'quimica', 'biometria', 'orina', 'coagulacion', 'acv', 'iam', 'tauma', 'quemaduras', 'intoxicacion'];
+    herramientasVacias.forEach(h => { if (!contenidos[h]) contenidos[h] = { ...contenidos.vacia, titulo: 'Próximamente' }; });
+    
     // ==============================================
-    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL (CON MÁS BOTONES)
+    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL (MÁS BOTONES)
     // ==============================================
     const herramientasConfig = {
         'valores-normales': {
@@ -3477,15 +3508,9 @@ window.renderVentasScreen = async function() {
             icono: '📊',
             subherramientas: ['glasgow', 'norton', 'braden', 'barthel', 'eva', 'ramos', 'waterlow', 'apache', 'sofa', 'news'],
             nombres: {
-                glasgow: TEXTOS.herramienta_glasgow,
-                norton: TEXTOS.herramienta_norton,
-                braden: TEXTOS.herramienta_braden,
-                barthel: TEXTOS.herramienta_barthel,
-                eva: TEXTOS.herramienta_eva,
-                ramos: TEXTOS.herramienta_ramos,
-                waterlow: TEXTOS.herramienta_waterlow,
-                apache: TEXTOS.herramienta_apache,
-                sofa: TEXTOS.herramienta_sofa,
+                glasgow: TEXTOS.herramienta_glasgow, norton: TEXTOS.herramienta_norton, braden: TEXTOS.herramienta_braden,
+                barthel: TEXTOS.herramienta_barthel, eva: TEXTOS.herramienta_eva, ramos: TEXTOS.herramienta_ramos,
+                waterlow: TEXTOS.herramienta_waterlow, apache: TEXTOS.herramienta_apache, sofa: TEXTOS.herramienta_sofa,
                 news: TEXTOS.herramienta_news
             }
         },
@@ -3496,14 +3521,10 @@ window.renderVentasScreen = async function() {
             icono: '💊',
             subherramientas: ['antibioticos', 'analgesicos', 'cardiovasculares', 'antihipertensivos', 'antidiabeticos', 'anticoagulantes', 'antiepilepticos', 'psicofarmacos'],
             nombres: {
-                antibioticos: TEXTOS.herramienta_antibioticos,
-                analgesicos: TEXTOS.herramienta_analgesicos,
-                cardiovasculares: TEXTOS.herramienta_cardiovasculares,
-                antihipertensivos: TEXTOS.herramienta_antihipertensivos,
-                antidiabeticos: TEXTOS.herramienta_antidiabeticos,
-                anticoagulantes: TEXTOS.herramienta_anticoagulantes,
-                antiepilepticos: TEXTOS.herramienta_antiepilepticos,
-                psicofarmacos: TEXTOS.herramienta_psicofarmacos
+                antibioticos: TEXTOS.herramienta_antibioticos, analgesicos: TEXTOS.herramienta_analgesicos,
+                cardiovasculares: TEXTOS.herramienta_cardiovasculares, antihipertensivos: TEXTOS.herramienta_antihipertensivos,
+                antidiabeticos: TEXTOS.herramienta_antidiabeticos, anticoagulantes: TEXTOS.herramienta_anticoagulantes,
+                antiepilepticos: TEXTOS.herramienta_antiepilepticos, psicofarmacos: TEXTOS.herramienta_psicofarmacos
             }
         },
         'conocimientos': {
@@ -3513,67 +3534,45 @@ window.renderVentasScreen = async function() {
             icono: '📚',
             subherramientas: ['rcep', 'guias', 'protocolos', 'actualizaciones', 'ecografia', 'ventilacion', 'hemodinamia', 'heridas'],
             nombres: {
-                rcep: TEXTOS.herramienta_rcep,
-                guias: TEXTOS.herramienta_guias,
-                protocolos: TEXTOS.herramienta_protocolos,
-                actualizaciones: TEXTOS.herramienta_actualizaciones,
-                ecografia: TEXTOS.herramienta_ecografia,
-                ventilacion: TEXTOS.herramienta_ventilacion,
-                hemodinamia: TEXTOS.herramienta_hemodinamia,
+                rcep: TEXTOS.herramienta_rcep, guias: TEXTOS.herramienta_guias, protocolos: TEXTOS.herramienta_protocolos,
+                actualizaciones: TEXTOS.herramienta_actualizaciones, ecografia: TEXTOS.herramienta_ecografia,
+                ventilacion: TEXTOS.herramienta_ventilacion, hemodinamia: TEXTOS.herramienta_hemodinamia,
                 heridas: TEXTOS.herramienta_heridas
             }
         },
         'signos-vitales': {
-            titulo: 'SIGNOS VITALES',
+            titulo: TEXTOS.btn_signos_vitales,
             descripcion: 'Parámetros normales, rangos, alertas',
             color: '#8B5CF6',
             icono: '❤️',
             subherramientas: ['tension', 'frecuencia', 'respiracion', 'temperatura', 'saturacion'],
-            nombres: {
-                tension: TEXTOS.herramienta_tension,
-                frecuencia: TEXTOS.herramienta_frecuencia,
-                respiracion: TEXTOS.herramienta_respiracion,
-                temperatura: TEXTOS.herramienta_temperatura,
-                saturacion: TEXTOS.herramienta_saturacion
-            }
+            nombres: { tension: TEXTOS.herramienta_tension, frecuencia: TEXTOS.herramienta_frecuencia, respiracion: TEXTOS.herramienta_respiracion, temperatura: TEXTOS.herramienta_temperatura, saturacion: TEXTOS.herramienta_saturacion }
         },
         'laboratorio': {
-            titulo: 'LABORATORIO',
+            titulo: TEXTOS.btn_laboratorio,
             descripcion: 'Valores de referencia, interpretación',
             color: '#EC4899',
             icono: '🔬',
             subherramientas: ['hemograma', 'quimica', 'biometria', 'orina', 'coagulacion'],
-            nombres: {
-                hemograma: TEXTOS.herramienta_hemograma,
-                quimica: TEXTOS.herramienta_quimica,
-                biometria: TEXTOS.herramienta_biometria,
-                orina: TEXTOS.herramienta_orina,
-                coagulacion: TEXTOS.herramienta_coagulacion
-            }
+            nombres: { hemograma: TEXTOS.herramienta_hemograma, quimica: TEXTOS.herramienta_quimica, biometria: TEXTOS.herramienta_biometria, orina: TEXTOS.herramienta_orina, coagulacion: TEXTOS.herramienta_coagulacion }
         },
         'emergencias': {
-            titulo: 'EMERGENCIAS',
+            titulo: TEXTOS.btn_emergencias,
             descripcion: 'Protocolos, códigos, manejo inicial',
             color: '#EF4444',
             icono: '🚨',
             subherramientas: ['acv', 'iam', 'tauma', 'quemaduras', 'intoxicacion'],
-            nombres: {
-                acv: TEXTOS.herramienta_acv,
-                iam: TEXTOS.herramienta_iam,
-                tauma: TEXTOS.herramienta_tauma,
-                quemaduras: TEXTOS.herramienta_quemaduras,
-                intoxicacion: TEXTOS.herramienta_intoxicacion
-            }
+            nombres: { acv: TEXTOS.herramienta_acv, iam: TEXTOS.herramienta_iam, tauma: TEXTOS.herramienta_tauma, quemaduras: TEXTOS.herramienta_quemaduras, intoxicacion: TEXTOS.herramienta_intoxicacion }
         }
     };
     
     // ==============================================
-    // VISTA PRINCIPAL (MENÚ DE 6 BOTONES AHORA)
+    // VISTA PRINCIPAL (MENÚ DE 6 BOTONES CON DIFERENTES COLORES)
     // ==============================================
     if (!herramientaActual) {
         return `
             <div style="min-height: 100vh; background: #F9FAFB;">
-                <!-- ENCABEZADO - NO FLOTANTE -->
+                <!-- ENCABEZADO BIENESTAR - NO FLOTANTE -->
                 <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -3583,48 +3582,48 @@ window.renderVentasScreen = async function() {
                     <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
                 </div>
                 
-                <!-- BOTONES GRANDES (6 BOTONES AHORA) -->
+                <!-- DESCRIPCIÓN FLOTANTE (sticky) -->
+                <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
+                </div>
+                
+                <!-- BOTONES GRANDES (6 BOTONES CON DIFERENTES COLORES) -->
                 <div style="padding: 24px 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;">
-                        <div style="background: #0D9488; width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                            <span style="font-size: 24px;">📊</span>
+                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: #0D9488; border: none; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
-                        <h3 style="margin: 0; color: #1F2937; font-size: 14px;">${TEXTOS.btn_valores_normales}</h3>
+                        <h3 style="margin: 0; color: white; font-size: 14px;">${TEXTOS.btn_valores_normales}</h3>
                     </button>
-                    
-                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;">
-                        <div style="background: #3B82F6; width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                            <span style="font-size: 24px;">💊</span>
+                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: #3B82F6; border: none; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>
                         </div>
-                        <h3 style="margin: 0; color: #1F2937; font-size: 14px;">${TEXTOS.btn_medicamentos}</h3>
+                        <h3 style="margin: 0; color: white; font-size: 14px;">${TEXTOS.btn_medicamentos}</h3>
                     </button>
-                    
-                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;">
-                        <div style="background: #F59E0B; width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                            <span style="font-size: 24px;">📚</span>
+                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: #F59E0B; border: none; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
                         </div>
-                        <h3 style="margin: 0; color: #1F2937; font-size: 14px;">${TEXTOS.btn_conocimientos}</h3>
+                        <h3 style="margin: 0; color: white; font-size: 14px;">${TEXTOS.btn_conocimientos}</h3>
                     </button>
-                    
-                    <button onclick="window.cambiarHerramienta('signos-vitales', 'tension')" style="background: white; border: none; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;">
-                        <div style="background: #8B5CF6; width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                            <span style="font-size: 24px;">❤️</span>
+                    <button onclick="window.cambiarHerramienta('signos-vitales', 'tension')" style="background: #8B5CF6; border: none; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                         </div>
-                        <h3 style="margin: 0; color: #1F2937; font-size: 14px;">SIGNOS VITALES</h3>
+                        <h3 style="margin: 0; color: white; font-size: 14px;">${TEXTOS.btn_signos_vitales}</h3>
                     </button>
-                    
-                    <button onclick="window.cambiarHerramienta('laboratorio', 'hemograma')" style="background: white; border: none; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;">
-                        <div style="background: #EC4899; width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                            <span style="font-size: 24px;">🔬</span>
+                    <button onclick="window.cambiarHerramienta('laboratorio', 'hemograma')" style="background: #EC4899; border: none; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
-                        <h3 style="margin: 0; color: #1F2937; font-size: 14px;">LABORATORIO</h3>
+                        <h3 style="margin: 0; color: white; font-size: 14px;">${TEXTOS.btn_laboratorio}</h3>
                     </button>
-                    
-                    <button onclick="window.cambiarHerramienta('emergencias', 'acv')" style="background: white; border: none; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;">
-                        <div style="background: #EF4444; width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                            <span style="font-size: 24px;">🚨</span>
+                    <button onclick="window.cambiarHerramienta('emergencias', 'acv')" style="background: #EF4444; border: none; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <div style="background: rgba(255,255,255,0.2); width: 48px; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
                         </div>
-                        <h3 style="margin: 0; color: #1F2937; font-size: 14px;">EMERGENCIAS</h3>
+                        <h3 style="margin: 0; color: white; font-size: 14px;">${TEXTOS.btn_emergencias}</h3>
                     </button>
                 </div>
             </div>
@@ -3641,31 +3640,44 @@ window.renderVentasScreen = async function() {
     }
     const contenidoActual = contenidos[subHerramientaMostrar] || contenidos.vacia;
     
-    // Generar pestañas scrolleables
+    // Generar pestañas con ICONOS SVG y título pequeño con clamp
     const generarPestanas = () => {
+        const iconosPorSubtool = {
+            glasgow:'🧠', norton:'🛌', braden:'🩹', barthel:'🚶', eva:'😖', ramos:'👶', waterlow:'⚠️', apache:'📈', sofa:'🫀', news:'📊',
+            antibioticos:'💊', analgesicos:'💉', cardiovasculares:'❤️', antihipertensivos:'🩸', antidiabeticos:'🍬', anticoagulantes:'🩸', antiepilepticos:'⚡', psicofarmacos:'🧠',
+            rcep:'🫀', guias:'📖', protocolos:'📋', actualizaciones:'🔄', ecografia:'📷', ventilacion:'🌬️', hemodinamia:'💓', heridas:'🩺',
+            tension:'❤️', frecuencia:'💓', respiracion:'🌬️', temperatura:'🌡️', saturacion:'🫁',
+            hemograma:'🩸', quimica:'🧪', biometria:'🔬', orina:'🚽', coagulacion:'⏱️',
+            acv:'🧠', iam:'❤️', tauma:'🦴', quemaduras:'🔥', intoxicacion:'☠️'
+        };
         return `
-            <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
+            <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
                 ${configActual.subherramientas.map(sub => `
                     <button onclick="window.cambiarSubHerramienta('${sub}')" style="
-                        padding: 10px 16px;
-                        background: ${subHerramientaMostrar === sub ? configActual.color : '#F3F4F6'};
-                        color: ${subHerramientaMostrar === sub ? 'white' : '#4B5563'};
-                        border: none;
-                        border-radius: 30px;
-                        font-size: 13px;
-                        font-weight: ${subHerramientaMostrar === sub ? '700' : '500'};
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 6px;
+                        min-width: 70px;
+                        padding: 10px 8px;
+                        background: ${subHerramientaMostrar === sub ? configActual.color : 'white'};
+                        border: 1px solid ${subHerramientaMostrar === sub ? configActual.color : '#E5E7EB'};
+                        border-radius: 16px;
                         cursor: pointer;
-                        white-space: nowrap;
                         transition: all 0.2s;
+                        box-shadow: ${subHerramientaMostrar === sub ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'};
                     ">
-                        ${configActual.nombres[sub]}
+                        <span style="font-size: 28px;">${iconosPorSubtool[sub] || '📌'}</span>
+                        <span style="font-size: clamp(10px, 3vw, 12px); font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; color: ${subHerramientaMostrar === sub ? 'white' : '#4B5563'}; text-align: center; max-width: 70px; line-height: 1.3;">
+                            ${configActual.nombres[sub]}
+                        </span>
                     </button>
                 `).join('')}
             </div>
         `;
     };
     
-    // Generar contenido (puede estar vacío pero la pantalla EXISTE)
+    // Generar contenido
     const generarContenido = () => {
         if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
             return `
@@ -3684,65 +3696,52 @@ window.renderVentasScreen = async function() {
                 </div>
             `;
         }
-        
         return `
             <div style="padding: 4px 0 20px 0;">
                 <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
                     <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
                 </div>
-                
                 ${contenidoActual.secciones.map(seccion => `
                     <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                         <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
                         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            ${seccion.valores.map(valor => `
-                                <span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">
-                                    ${valor}
-                                </span>
-                            `).join('')}
+                            ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
                         </div>
                     </div>
                 `).join('')}
+                <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                    <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+                </div>
             </div>
         `;
     };
     
-    // HTML FINAL CON BARRA SUPERIOR STICKY (NO FLOTANTE) + PESTAÑAS FLOTANTES
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
-            
-            <!-- BARRA SUPERIOR STICKY (NO FLOTANTE - se pega pero es parte del flujo) -->
+            <!-- BARRA SUPERIOR - NO FLOTANTE (sticky pero sin comportamiento flotante extra) -->
             <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                
-                <!-- BOTÓN DE REGRESAR -->
                 <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"/>
-                    </svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
-                
-                <!-- TÍTULO Y DESCRIPCIÓN (LA DESCRIPCIÓN SÍ FLOTA PORQUE ESTÁ DENTRO DE STICKY) -->
                 <div style="flex: 1;">
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="font-size: 20px;">${configActual.icono}</span>
                         <h2 style="color: white; margin: 0; font-size: 18px; font-weight: 600;">${configActual.titulo}</h2>
                     </div>
-                    <p style="color: rgba(255,255,255,0.85); margin: 2px 0 0; font-size: 11px;">${configActual.descripcion}</p>
                 </div>
             </div>
             
-            <!-- PESTAÑAS (STICKY + SCROLLABLE - ESTAS SÍ FLOTAN) -->
-            <div style="position: sticky; top: 74px; z-index: 99; background: white; padding: 12px 16px 0 16px; border-bottom: 1px solid #E5E7EB;">
+            <!-- PESTAÑAS SCROLLABLE - FLOTANTES (sticky) -->
+            <div style="position: sticky; top: 64px; z-index: 99; background: white; padding: 12px 16px; border-bottom: 1px solid #E5E7EB;">
                 ${generarPestanas()}
             </div>
             
-            <!-- CONTENIDO PRINCIPAL -->
-            <div style="padding: 16px;">
-                ${generarContenido()}
-            </div>
+            <!-- CONTENIDO -->
+            <div style="padding: 16px;">${generarContenido()}</div>
         </div>
     `;
 };
+                      
 </script>
 
 <!-- PANTALLA 3: SHARE (COMPARTIR) - CON OFFLINE -->
