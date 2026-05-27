@@ -3638,6 +3638,7 @@ window.renderRoosterScreen = async function() {
         const mainContent = document.getElementById('subtool-main-content');
         if (mainContent) {
             if (subtool === 'glasgow') mainContent.innerHTML = renderGlasgow();
+                else if (subtool === 'presion_arterial') mainContent.innerHTML = renderPresionArterial();
             else if (subtool === 'antibioticos') mainContent.innerHTML = renderAntibioticos();
             else if (subtool === 'rcep') mainContent.innerHTML = renderRCP();
             else mainContent.innerHTML = '<div style="text-align:center;padding:60px;">Contenido en desarrollo</div>';
