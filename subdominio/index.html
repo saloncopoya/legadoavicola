@@ -3473,7 +3473,23 @@ window.renderVentasScreen = async function() {
 
 
     window.cambiarSubHerramienta = function(subtool, event) {
+        
     if (event && event.preventDefault) event.preventDefault();
+
+         const urlParamsActual = new URLSearchParams(window.location.search);
+    const subtoolActual = urlParamsActual.get('subtool');
+    
+    // ✅ NUEVO: Si es la MISMA herramienta, NO hacer nada (solo animación visual)
+    if (subtoolActual === subtool) {
+        // Solo animación de feedback visual sin recargar
+        const newBtn = document.querySelector(`.subtool-btn[data-subtool="${subtool}"]`);
+        if (newBtn) {
+            newBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => { if(newBtn) newBtn.style.transform = ''; }, 150);
+        }
+        return; // ✅ SALIR - No hacer nada más
+    }
+        
     
     // ✅ Guardar la posición ACTUAL del scroll ANTES de cambiar
     const scrollContainer = document.querySelector('.pestanas-scroll-container');
