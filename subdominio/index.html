@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 03</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 02</p>
 
          
             </div>
@@ -2829,11 +2829,12 @@ if (shareIdActual) {
     pantallaADestino = SCREENS.SHARE;
     sessionStorage.setItem('currentShareId', shareIdActual);
 } 
+// ✅ NUEVO: Si hay tool en la URL, mostrar VENTAS (Bienestar) directamente
 else if (toolParam) {
-    // Si hay una sección en la URL y ES PÚBLICA, usarla
-    if (sectionFromUrl && pantallasPublicas.includes(sectionFromUrl)) {
+    // Si hay una sección en la URL, usar esa. Si no, mantener la pantalla pendiente o PUBLIC
+    if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
         pantallaADestino = sectionFromUrl;
-    } else if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
+    } else if (pantallaPendiente) {
         pantallaADestino = pantallaPendiente;
     } else {
         pantallaADestino = SCREENS.PUBLIC;
@@ -2898,20 +2899,11 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
     } 
         //  Si hay tool en la URL, mostrar VENTAS (Bienestar) aunque no esté logueado
 else if (toolParam) {
-    // ✅ Si hay section en URL y ESA pantalla está permitida OFFLINE, usarla
-if (sectionFromUrl && pantallasOffline.includes(sectionFromUrl)) {
-    pantallaMostrar = sectionFromUrl;
-}
-// ✅ Si no, usar la última pantalla guardada (que es pública)
-else {
-    const lastScreen = localStorage.getItem('lastScreen');
-    const pantallasOffline = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
-    if (lastScreen && pantallasOffline.includes(lastScreen)) {
-        pantallaMostrar = lastScreen;
+    if (sectionParam && Object.values(SCREENS).includes(sectionParam)) {
+        AppState.setScreen(sectionParam);
     } else {
-        pantallaMostrar = SCREENS.PUBLIC; // ✅ FORZAR PÚBLICA
+        AppState.setScreen(SCREENS.PUBLIC);
     }
-}
     setTimeout(() => {
         const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
         if (barra) barra.style.display = 'none';
@@ -3216,7 +3208,7 @@ let pantallaMostrar = SCREENS.PUBLIC;
 
 
 // ✅ Si hay section en URL, usar esa pantalla
-if (sectionFromUrl && pantallasOffline.includes(sectionFromUrl)) {
+if (sectionFromUrl && Object.values(SCREENS).includes(sectionFromUrl)) {
     pantallaMostrar = sectionFromUrl;
 }
 // ✅ Si no, usar la última pantalla guardada
