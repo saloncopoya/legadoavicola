@@ -4339,18 +4339,16 @@ window.renderBloodPressureTool = function() {
 // HERRAMIENTA DE GLUCOSA (DIABETES) - ADA 2026
 // ==============================================
 
-// ==============================================
-// HERRAMIENTA DE GLUCOSA (DIABETES) - ADA 2026
-// ==============================================
 
 window.renderGlucosaTool = function() {
-    // Función para evaluar según valores ADA 2026
+    // Función para evaluar según valores ADA 2026 (SIN tipo de diabetes)
     window.evaluarGlucosa = function() {
-        const glucosa = parseFloat(document.getElementById('glucosa-valor')?.value) || 0;
+        const glucosa = parseInt(document.getElementById('glucosa-valor')?.value) || 0;
         const momento = document.getElementById('glucosa-momento')?.value || 'ayunas';
         
         const resultadoDiv = document.getElementById('glucosa-resultado');
         const significadoDiv = document.getElementById('glucosa-significado');
+        const valoresReferenciaDiv = document.getElementById('glucosa-valores-referencia');
         const recomendacionBaseDiv = document.getElementById('glucosa-recomendacion-base');
         
         if (glucosa === 0) {
@@ -4361,25 +4359,39 @@ window.renderGlucosaTool = function() {
                         <line x1="12" y1="8" x2="12" y2="12"/>
                         <line x1="12" y1="16" x2="12.01" y2="16"/>
                     </svg>
-                    <p style="color: #9CA3AF; margin-top: 8px;">Esperando valor de glucosa...</p>
+                    <p style="color: #9CA3AF; margin-top: 8px;">Ingresa un valor de glucosa para ver el análisis</p>
                 </div>
             `;
             significadoDiv.innerHTML = '';
+            if (valoresReferenciaDiv) valoresReferenciaDiv.style.display = 'block';
             if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
             return;
         }
         
         // Ocultar recomendación base cuando hay resultado
         if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'none';
+        if (valoresReferenciaDiv) valoresReferenciaDiv.style.display = 'none';
         
         let categoria = '';
         let color = '';
         let significado = '';
         let iconoSvg = '';
         let rango = '';
+        let valoresReferenciaHTML = '';
         
         // Rangos según American Diabetes Association (ADA) 2026
         if (momento === 'ayunas') {
+            valoresReferenciaHTML = `
+                <div style="background: #F3F4F6; border-radius: 16px; padding: 12px 16px; margin-bottom: 16px;">
+                    <p style="font-weight: 600; margin: 0 0 8px 0; color: #374151;">📊 VALORES DE REFERENCIA (ADA 2026) - Ayunas:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+                        <span style="background: #22C55E20; padding: 6px 12px; border-radius: 20px; color: #22C55E; font-weight: 500;">✓ Normal: &lt; 100 mg/dL</span>
+                        <span style="background: #F59E0B20; padding: 6px 12px; border-radius: 20px; color: #F59E0B; font-weight: 500;">⚠️ Prediabetes: 100-125 mg/dL</span>
+                        <span style="background: #EF444420; padding: 6px 12px; border-radius: 20px; color: #EF4444; font-weight: 500;">🩸 Diabetes: ≥ 126 mg/dL</span>
+                    </div>
+                </div>
+            `;
+            
             if (glucosa < 100) {
                 categoria = 'Normal';
                 color = '#22C55E';
@@ -4388,7 +4400,7 @@ window.renderGlucosaTool = function() {
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>`;
-                significado = `✅ GLUCOSA NORMAL EN AYUNAS (ADA 2026): Tu nivel de glucosa (${glucosa} mg/dL) se encuentra dentro del rango óptimo. Esto indica un excelente control metabólico y un bajo riesgo de desarrollar diabetes. Mantén tus hábitos saludables: alimentación balanceada y ejercicio regular.`;
+                significado = `✅ GLUCOSA NORMAL EN AYUNAS (ADA 2026): Tu nivel de glucosa (${glucosa} mg/dL) está dentro del rango óptimo. Esto indica un excelente control metabólico. Mantén tus hábitos saludables: alimentación balanceada, ejercicio regular y buena hidratación.`;
             } 
             else if (glucosa >= 100 && glucosa <= 125) {
                 categoria = 'Prediabetes';
@@ -4399,7 +4411,7 @@ window.renderGlucosaTool = function() {
                                 <path d="M2 17l10 5 10-5"/>
                                 <path d="M2 12l10 5 10-5"/>
                             </svg>`;
-                significado = `⚠️ PREDIABETES (ADA 2026): Tu glucosa en ayunas (${glucosa} mg/dL) está por encima de lo normal, pero aún no es diabetes. Esta es una señal de alerta temprana. La ADA recomienda: pérdida del 7% de peso corporal si tienes sobrepeso, actividad física moderada (150 min/semana) y seguimiento médico cada 6-12 meses. ¡Con cambios en el estilo de vida puedes revertirlo!`;
+                significado = `⚠️ PREDIABETES (ADA 2026): Tu glucosa en ayunas (${glucosa} mg/dL) está por encima de lo normal pero no es diabetes. Es una señal de alerta temprana. La ADA recomienda: pérdida del 7% de peso corporal si tienes sobrepeso, actividad física moderada (150 min/semana) y seguimiento médico cada 6-12 meses. ¡Puedes revertirlo con cambios en el estilo de vida!`;
             }
             else if (glucosa >= 126) {
                 categoria = 'Diabetes';
@@ -4410,10 +4422,21 @@ window.renderGlucosaTool = function() {
                                 <line x1="12" y1="8" x2="12" y2="12"/>
                                 <line x1="12" y1="16" x2="12.01" y2="16"/>
                             </svg>`;
-                significado = `🩸 DIABETES (ADA 2026): Tu glucosa en ayunas (${glucosa} mg/dL) cumple con los criterios para el diagnóstico de diabetes. Es fundamental que consultes con un médico endocrinólogo para confirmar el diagnóstico e iniciar un plan de tratamiento personalizado. El control glucémico adecuado reduce significativamente el riesgo de complicaciones a largo plazo.`;
+                significado = `🩸 DIABETES (ADA 2026): Tu glucosa en ayunas (${glucosa} mg/dL) cumple criterios para diagnóstico de diabetes. Es fundamental que consultes con tu médico para confirmar el diagnóstico con una segunda prueba y establecer un plan de tratamiento adecuado. El control glucémico reduce el riesgo de complicaciones.`;
             }
         } 
         else if (momento === 'postprandial') {
+            valoresReferenciaHTML = `
+                <div style="background: #F3F4F6; border-radius: 16px; padding: 12px 16px; margin-bottom: 16px;">
+                    <p style="font-weight: 600; margin: 0 0 8px 0; color: #374151;">📊 VALORES DE REFERENCIA (ADA 2026) - Postprandial (2h después de comer):</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+                        <span style="background: #22C55E20; padding: 6px 12px; border-radius: 20px; color: #22C55E; font-weight: 500;">✓ Normal: &lt; 140 mg/dL</span>
+                        <span style="background: #F59E0B20; padding: 6px 12px; border-radius: 20px; color: #F59E0B; font-weight: 500;">⚠️ Intolerancia: 140-199 mg/dL</span>
+                        <span style="background: #EF444420; padding: 6px 12px; border-radius: 20px; color: #EF4444; font-weight: 500;">🩸 Diabetes: ≥ 200 mg/dL</span>
+                    </div>
+                </div>
+            `;
+            
             if (glucosa < 140) {
                 categoria = 'Normal';
                 color = '#22C55E';
@@ -4422,7 +4445,7 @@ window.renderGlucosaTool = function() {
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>`;
-                significado = `✅ GLUCOSA POSTPRANDIAL NORMAL (ADA 2026): ${glucosa} mg/dL es un excelente control después de las comidas. Mantener la glucosa postprandial en rangos óptimos se asocia con un menor riesgo de enfermedades cardiovasculares. Continúa con tus hábitos saludables.`;
+                significado = `✅ GLUCOSA POSTPRANDIAL NORMAL (ADA 2026): ${glucosa} mg/dL es un excelente control después de las comidas. La glucosa postprandial óptima se asocia con menor riesgo cardiovascular. Continúa con tus hábitos saludables.`;
             }
             else if (glucosa >= 140 && glucosa <= 199) {
                 categoria = 'Intolerancia a la Glucosa';
@@ -4433,7 +4456,7 @@ window.renderGlucosaTool = function() {
                                 <path d="M2 17l10 5 10-5"/>
                                 <path d="M2 12l10 5 10-5"/>
                             </svg>`;
-                significado = `⚠️ INTOLERANCIA A LA GLUCOSA (ADA 2026): Tus niveles postprandiales (${glucosa} mg/dL) están elevados. Esto sugiere que tu cuerpo no está procesando los carbohidratos de manera eficiente. Evalúa el contenido de carbohidratos de tus comidas y considera realizar ejercicio después de comer. La ADA sugiere monitoreo para prevenir la progresión a diabetes.`;
+                significado = `⚠️ INTOLERANCIA A LA GLUCOSA (ADA 2026): Tus niveles postprandiales (${glucosa} mg/dL) están elevados. Evalúa el contenido de carbohidratos de tus comidas y considera realizar ejercicio después de comer. La ADA sugiere monitoreo para prevenir progresión a diabetes.`;
             }
             else if (glucosa >= 200) {
                 categoria = 'Diabetes';
@@ -4444,10 +4467,22 @@ window.renderGlucosaTool = function() {
                                 <line x1="12" y1="8" x2="12" y2="12"/>
                                 <line x1="12" y1="16" x2="12.01" y2="16"/>
                             </svg>`;
-                significado = `🩸 DIABETES (ADA 2026): Tu glucosa postprandial de ${glucosa} mg/dL es diagnóstica de diabetes. Es importante que consultes a tu médico para una evaluación completa. Es posible que necesites ajustar tu tratamiento o dieta para alcanzar las metas postprandiales recomendadas (<180 mg/dL) y así reducir el riesgo de complicaciones.`;
+                significado = `🩸 DIABETES (ADA 2026): Glucosa postprandial de ${glucosa} mg/dL. Esto sugiere que el control de carbohidratos en tus comidas necesita evaluación. Consulta con tu médico para ajustar el plan de alimentación o tratamiento si ya tienes diagnóstico de diabetes.`;
             }
         }
         else { // HbA1c
+            valoresReferenciaHTML = `
+                <div style="background: #F3F4F6; border-radius: 16px; padding: 12px 16px; margin-bottom: 16px;">
+                    <p style="font-weight: 600; margin: 0 0 8px 0; color: #374151;">📊 VALORES DE REFERENCIA (ADA 2026) - Hemoglobina A1c:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+                        <span style="background: #22C55E20; padding: 6px 12px; border-radius: 20px; color: #22C55E; font-weight: 500;">✓ Normal: &lt; 5.7%</span>
+                        <span style="background: #F59E0B20; padding: 6px 12px; border-radius: 20px; color: #F59E0B; font-weight: 500;">⚠️ Prediabetes: 5.7-6.4%</span>
+                        <span style="background: #EF444420; padding: 6px 12px; border-radius: 20px; color: #EF4444; font-weight: 500;">🩸 Diabetes: ≥ 6.5%</span>
+                    </div>
+                    <p style="font-size: 12px; color: #6B7280; margin-top: 8px; text-align: center;">Meta para diabetes: &lt; 7.0% (individualizable)</p>
+                </div>
+            `;
+            
             if (glucosa < 5.7) {
                 categoria = 'Normal';
                 color = '#22C55E';
@@ -4456,7 +4491,7 @@ window.renderGlucosaTool = function() {
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>`;
-                significado = `✅ HEMOGLOBINA A1c NORMAL (ADA 2026): ${glucosa}% es un nivel óptimo. La HbA1c refleja tu control glucémico promedio de los últimos 3 meses. Mantén tus hábitos actuales, ya que estás dentro del rango recomendado para la población general.`;
+                significado = `✅ HEMOGLOBINA A1c NORMAL (ADA 2026): ${glucosa}% es un nivel óptimo que refleja un excelente control glucémico en los últimos 3 meses. Mantén tus hábitos actuales de alimentación y actividad física.`;
             }
             else if (glucosa >= 5.7 && glucosa <= 6.4) {
                 categoria = 'Prediabetes';
@@ -4467,7 +4502,7 @@ window.renderGlucosaTool = function() {
                                 <path d="M2 17l10 5 10-5"/>
                                 <path d="M2 12l10 5 10-5"/>
                             </svg>`;
-                significado = `⚠️ ALTO RIESGO (PREDIABETES) - ADA 2026: Tu A1c de ${glucosa}% indica un alto riesgo de desarrollar diabetes en el futuro. Es el momento ideal para implementar un programa de prevención: pérdida de peso (si es necesario) y al menos 150 minutos de ejercicio a la semana. Repite la A1c en 6 meses para evaluar tu progreso.`;
+                significado = `⚠️ ALTO RIESGO (PREDIABETES) - ADA 2026: A1c de ${glucosa}%. Esto indica que tus niveles de glucosa han estado elevados en los últimos meses. Programa de prevención: pérdida de peso si es necesario, 150 min/semana de ejercicio moderado. Repetir A1c en 6 meses.`;
             }
             else if (glucosa >= 6.5) {
                 if (glucosa < 7.0) {
@@ -4477,10 +4512,10 @@ window.renderGlucosaTool = function() {
                     iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
                                     <path d="M20 6L9 17l-5-5"/>
                                 </svg>`;
-                    significado = `✅ DIABETES CONTROLADA (ADA 2026): Con una A1c de ${glucosa}%, has alcanzado la meta terapéutica recomendada por la ADA (generalmente <7% para la mayoría de los adultos con diabetes). ¡Excelente trabajo! Mantén tu plan de tratamiento actual y continúa con tus controles periódicos.`;
+                    significado = `✅ DIABETES CONTROLADA (ADA 2026): A1c de ${glucosa}%. ¡Excelente control! La ADA recomienda meta &lt;7% para la mayoría de adultos con diabetes. Mantén tu plan de tratamiento actual y sigue con tus controles periódicos.`;
                 }
                 else if (glucosa >= 7.0 && glucosa <= 8.0) {
-                    categoria = 'Control Subóptimo';
+                    categoria = 'Diabetes Subóptima';
                     color = '#F97316';
                     rango = '7.0-8.0%';
                     iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
@@ -4488,10 +4523,10 @@ window.renderGlucosaTool = function() {
                                     <line x1="12" y1="8" x2="12" y2="12"/>
                                     <line x1="12" y1="16" x2="12.01" y2="16"/>
                                 </svg>`;
-                    significado = `⚠️ CONTROL GLUCÉMICO SUBÓPTIMO (ADA 2026): Con una A1c de ${glucosa}%, tu control está por encima de la meta ideal. La ADA recomienda reevaluar tu plan de tratamiento. Es posible que necesites un ajuste en la dosis de tu medicación, educación adicional en automanejo o añadir una segunda línea terapéutica. Consulta con tu médico en los próximos 3 meses.`;
+                    significado = `⚠️ CONTROL SUBÓPTIMO (ADA 2026): A1c ${glucosa}%. La ADA recomienda reevaluar el tratamiento: ajuste de dosis, educación en automanejo o añadir segunda línea terapéutica si es necesario. Consulta con tu médico en los próximos 3 meses.`;
                 }
                 else {
-                    categoria = 'Control Inadecuado';
+                    categoria = 'Diabetes Mal Controlada';
                     color = '#EF4444';
                     rango = '> 8.0%';
                     iconoSvg = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
@@ -4501,7 +4536,7 @@ window.renderGlucosaTool = function() {
                                     <line x1="8" y1="8" x2="16" y2="16"/>
                                     <line x1="16" y1="8" x2="8" y2="16"/>
                                 </svg>`;
-                    significado = `⚠️ CONTROL GLUCÉMICO INADECUADO (ADA 2026): Tu A1c de ${glucosa}% está significativamente por encima de la meta. Esto representa un alto riesgo de desarrollar complicaciones microvasculares (retinopatía, neuropatía, nefropatía). La ADA recomienda: intensificar el tratamiento (considerar múltiples dosis de insulina o agregar un agonista GLP-1 si es clínicamente apropiado), educación intensiva en diabetes y un seguimiento en menos de 3 meses.`;
+                    significado = `⚠️ CONTROL GLUCÉMICO INADECUADO (ADA 2026): A1c ${glucosa}%. Alto riesgo de complicaciones microvasculares y macrovasculares. La ADA recomienda: intensificar tratamiento, educación en diabetes y seguimiento en menos de 3 meses. ¡Consulta a tu médico lo antes posible!`;
                 }
             }
         }
@@ -4519,6 +4554,7 @@ window.renderGlucosaTool = function() {
                     ${categoria}
                 </div>
                 <div style="margin-top: 8px; font-size: 14px; color: #6B7280;">
+                    Rango ADA: ${rango}
                 </div>
             </div>
         `;
@@ -4526,12 +4562,13 @@ window.renderGlucosaTool = function() {
         significadoDiv.innerHTML = `
             <div style="background: ${color}10; border-radius: 20px; padding: 20px; margin-top: 16px;">
                 <p style="color: ${color}; font-weight: 700; margin: 0 0 12px 0; font-size: 15px;">
-                    📋 Evaluación Clínica Basada en ADA 2026:
+                    📋 Según la American Diabetes Association (ADA 2026):
                 </p>
                 <p style="color: #374151; margin: 0; font-size: 14px; line-height: 1.6;">
                     ${significado}
                 </p>
             </div>
+            ${valoresReferenciaHTML}
         `;
         
         // Animación de pulso
@@ -4552,10 +4589,12 @@ window.renderGlucosaTool = function() {
                 window.evaluarGlucosa();
             } else {
                 const resultadoDiv = document.getElementById('glucosa-resultado');
+                const valoresReferenciaDiv = document.getElementById('glucosa-valores-referencia');
                 const recomendacionBaseDiv = document.getElementById('glucosa-recomendacion-base');
                 if (resultadoDiv) {
-                    resultadoDiv.innerHTML = `<div style="text-align: center; padding: 16px 0; color: #9CA3AF;">Esperando valor...</div>`;
+                    resultadoDiv.innerHTML = `<div style="text-align: center; padding: 16px 0; color: #9CA3AF;">Ingresa un valor de glucosa para ver el análisis</div>`;
                     document.getElementById('glucosa-significado').innerHTML = '';
+                    if (valoresReferenciaDiv) valoresReferenciaDiv.style.display = 'block';
                     if (recomendacionBaseDiv) recomendacionBaseDiv.style.display = 'block';
                 }
             }
@@ -4583,14 +4622,18 @@ window.renderGlucosaTool = function() {
         
         <div style="padding: 4px 0 20px 0;">
             <!-- Tarjeta de cabecera -->
-            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 24px; padding: 24px; margin-bottom: 24px; color: white; text-align: center;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 12px;">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6l4 2"/>
-                    <path d="M8 12h8"/>
-                </svg>
-                <h2 style="margin: 0 0 8px 0; font-size: clamp(24px, 6vw, 28px); font-weight: 700;">Monitor de Glucosa</h2>
-                <p style="margin: 0; opacity: 0.9; font-size: clamp(12px, 3vw, 14px);">Clasificación según guías de la Asociación Americana de Diabetes (ADA) 2026</p>
+            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 24px; padding: 4px; margin-bottom: 24px; color: white;">
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                        <path d="M8 12h8"/>
+                    </svg>
+                    <div>
+                        <h3 style="margin: 0 0 4px 0; font-size: clamp(20px, 5vw, 26px);">Glucosa</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: clamp(12px, 3vw, 14px);">Clasificación según ADA 2026</p>
+                    </div>
+                </div>
             </div>
             
             <!-- Selector de tipo de medición -->
@@ -4612,25 +4655,36 @@ window.renderGlucosaTool = function() {
             <!-- Input del valor de glucosa -->
             <div class="glucosa-input-card" style="background: white; border-radius: 24px; padding: 28px 24px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border: 1px solid #E5E7EB;">
                 <label style="display: block; font-size: 15px; font-weight: 600; color: #374151; margin-bottom: 12px; text-align: center;">
-                    Ingresa tu valor de glucosa:
+                    Ingresa tu valor:
                 </label>
                 <input type="number" id="glucosa-valor" placeholder="Ej: 95" 
                        style="width: 100%; padding: 18px 8px; border: 3px solid #D1D5DB; border-radius: 20px; font-size: 20px; font-weight: 700; text-align: center;">
                 <p style="text-align: center; font-size: 12px; color: #6B7280; margin-top: 8px;">
-                    <span id="glucosa-unidad">mg/dL</span>
+                    <span id="glucosa-unidad">mg/dL (para A1c usa %)</span>
                 </p>
             </div>
             
             <!-- Card de resultado -->
             <div id="glucosa-resultado-card" style="background: white; border-radius: 24px; padding: 8px 24px 24px 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
                 <div id="glucosa-resultado">
-                    <div style="text-align: center; padding: 16px 0; color: #9CA3AF;">Ingresa un valor para evaluar</div>
+                    <div style="text-align: center; padding: 16px 0; color: #9CA3AF;">Ingresa un valor de glucosa para ver el análisis</div>
                 </div>
                 <div id="glucosa-significado"></div>
             </div>
             
+            <!-- Contenedor de valores de referencia (visible antes de evaluar) -->
+            <div id="glucosa-valores-referencia" style="background: #F3F4F6; border-radius: 20px; padding: 16px; margin-top: 20px;">
+                <p style="font-weight: 600; margin: 0 0 8px 0; color: #374151; text-align: center;">📊 VALORES DE REFERENCIA (ADA 2026):</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+                    <span style="background: #22C55E20; padding: 6px 12px; border-radius: 20px; color: #22C55E; font-weight: 500;">✓ Ayunas: &lt; 100 mg/dL</span>
+                    <span style="background: #22C55E20; padding: 6px 12px; border-radius: 20px; color: #22C55E; font-weight: 500;">✓ Postprandial: &lt; 140 mg/dL</span>
+                    <span style="background: #22C55E20; padding: 6px 12px; border-radius: 20px; color: #22C55E; font-weight: 500;">✓ HbA1c: &lt; 5.7%</span>
+                </div>
+                <p style="font-size: 12px; color: #6B7280; text-align: center; margin-top: 12px;">Meta para diabetes: HbA1c &lt; 7.0%</p>
+            </div>
+            
             <!-- Recomendación base - visible antes de evaluar -->
-            <div id="glucosa-recomendacion-base" style="background: #EFF6FF; border-radius: 20px; padding: 20px; margin-top: 24px; border-left: 4px solid #0D9488;">
+            <div id="glucosa-recomendacion-base" style="background: #EFF6FF; border-radius: 20px; padding: 20px; margin-top: 20px; border-left: 4px solid #0D9488;">
                 <div style="display: flex; gap: 12px; align-items: flex-start;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -4638,11 +4692,10 @@ window.renderGlucosaTool = function() {
                         <path d="M2 12l10 5 10-5"/>
                     </svg>
                     <div>
-                        <p style="color: #1E40AF; font-weight: 700; margin: 0 0 8px 0;">📌 Recomendación de la Asociación Americana de Diabetes (ADA 2026):</p>
+                        <p style="color: #1E40AF; font-weight: 700; margin: 0 0 8px 0;">📌 Recomendación de la American Diabetes Association (ADA 2026):</p>
                         <p style="color: #1E3A8A; margin: 0; font-size: 14px; line-height: 1.5;">
-                            El automonitoreo regular de glucosa es fundamental para el manejo de la diabetes. Las metas generales son: glucosa en ayunas de 80-130 mg/dL y glucosa postprandial de <180 mg/dL. 
-                            La HbA1c debe mantenerse generalmente por debajo del 7% para la mayoría de los adultos no gestantes, aunque este objetivo debe individualizarse.
-                            Ante valores persistentemente elevados o síntomas como sed excesiva, micción frecuente o visión borrosa, consulta a tu médico de cabecera o endocrinólogo.
+                            El automonitoreo regular de glucosa es fundamental. Metas generales: glucosa en ayunas 80-130 mg/dL, postprandial &lt;180 mg/dL, A1c &lt;7% (individualizable). 
+                            Ante valores persistentemente elevados o síntomas como sed excesiva, micción frecuente o visión borrosa, consulta a tu médico.
                         </p>
                     </div>
                 </div>
