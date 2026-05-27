@@ -3564,17 +3564,19 @@ window.renderVentasScreen = async function() {
             descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow', 'norton', 'braden'],
-            nombres: {
-                glasgow: TEXTOS.herramienta_glasgow,
-                norton: TEXTOS.herramienta_norton,
-                braden: TEXTOS.herramienta_braden
-            },
-            iconos: {
-                glasgow: ICONOS_SVG.icono_glasgow,
-                norton: ICONOS_SVG.icono_norton,
-                braden: ICONOS_SVG.icono_braden
-            }
+            subherramientas: ['presion-arterial', 'glasgow', 'norton', 'braden'],
+nombres: {
+    'presion-arterial': 'Presión Arterial',
+    glasgow: TEXTOS.herramienta_glasgow,
+    norton: TEXTOS.herramienta_norton,
+    braden: TEXTOS.herramienta_braden
+},
+iconos: {
+    'presion-arterial': '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><path d="M12 8v4M12 16h.01"/></svg>',
+    glasgow: ICONOS_SVG.icono_glasgow,
+    norton: ICONOS_SVG.icono_norton,
+    braden: ICONOS_SVG.icono_braden
+}
         },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
@@ -3682,6 +3684,7 @@ window.renderVentasScreen = async function() {
             if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
             if (subHerramientaMostrar === 'norton') return window.renderNortonTool();
             if (subHerramientaMostrar === 'braden') return window.renderBradenTool();
+            if (subHerramientaMostrar === 'presion-arterial') return window.renderBloodPressureTool();
         }
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
@@ -3925,6 +3928,206 @@ window.renderBradenTool = function() {
             </div>
             <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
                 <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+};
+
+
+    // ==============================================
+// HERRAMIENTA DE PRESIÓN ARTERIAL (AHA)
+// ==============================================
+
+window.renderBloodPressureTool = function() {
+    // Función para evaluar la presión arterial según guías AHA
+    window.evaluarPresionArterial = function() {
+        const sistolica = parseInt(document.getElementById('bp-sistolica')?.value) || 0;
+        const diastolica = parseInt(document.getElementById('bp-diastolica')?.value) || 0;
+        const resultadoDiv = document.getElementById('bp-resultado');
+        const categoriaDiv = document.getElementById('bp-categoria');
+        const recomendacionDiv = document.getElementById('bp-recomendacion');
+        
+        if (sistolica === 0 || diastolica === 0) {
+            resultadoDiv.innerHTML = '<span style="color: #9CA3AF;">⏳ Esperando valores...</span>';
+            categoriaDiv.innerHTML = '';
+            recomendacionDiv.innerHTML = '';
+            return;
+        }
+        
+        let categoria = '';
+        let color = '';
+        let recomendacion = '';
+        let icono = '';
+        
+        // Clasificación según AHA (American Heart Association)
+        if (sistolica < 120 && diastolica < 80) {
+            categoria = 'Normal';
+            color = '#22C55E';
+            recomendacion = '✅ Excelente! Mantén un estilo de vida saludable con ejercicio regular y dieta balanceada.';
+            icono = '🎯';
+        } 
+        else if ((sistolica >= 120 && sistolica <= 129) && diastolica < 80) {
+            categoria = 'Elevada';
+            color = '#F59E0B';
+            recomendacion = '⚠️ Tu presión es elevada. Adopta hábitos saludables: reduce el sodio, haz ejercicio y controla el estrés.';
+            icono = '📈';
+        }
+        else if ((sistolica >= 130 && sistolica <= 139) || (diastolica >= 80 && diastolica <= 89)) {
+            categoria = 'Hipertensión Etapa 1';
+            color = '#F97316';
+            recomendacion = '🩺 Consulta a tu médico. Podría recomendar cambios en el estilo de vida y posiblemente medicación.';
+            icono = '⚠️';
+        }
+        else if (sistolica >= 140 || diastolica >= 90) {
+            if (sistolica >= 180 || diastolica >= 120) {
+                categoria = 'Crisis Hipertensiva';
+                color = '#EF4444';
+                recomendacion = '🚨 ¡URGENTE! Busca atención médica inmediata. Si hay dolor de pecho, dificultad respiratoria o dolor de espalda, llama a emergencias.';
+                icono = '🆘';
+            } else {
+                categoria = 'Hipertensión Etapa 2';
+                color = '#DC2626';
+                recomendacion = '🏥 Requieres atención médica. Programa una cita con tu médico para evaluar tratamiento farmacológico.';
+                icono = '💊';
+            }
+        }
+        
+        // Actualizar UI con animación
+        resultadoDiv.innerHTML = `
+            <div style="text-align: center; padding: 8px 0;">
+                <div style="font-size: 48px; font-weight: 800; color: ${color}; margin-bottom: 8px;">
+                    ${sistolica} / ${diastolica} mmHg
+                </div>
+                <div style="display: inline-block; background: ${color}20; padding: 8px 20px; border-radius: 40px; color: ${color}; font-weight: 700;">
+                    ${icono} ${categoria}
+                </div>
+            </div>
+        `;
+        categoriaDiv.innerHTML = `
+            <div style="background: ${color}10; border-radius: 16px; padding: 16px; margin-top: 16px;">
+                <p style="color: ${color}; font-weight: 600; margin: 0 0 8px 0;">Recomendación:</p>
+                <p style="color: #4B5563; margin: 0; font-size: 14px; line-height: 1.5;">${recomendacion}</p>
+            </div>
+        `;
+        
+        // Animación de pulso en el resultado
+        const resultadoCard = document.getElementById('bp-resultado-card');
+        if (resultadoCard) {
+            resultadoCard.style.animation = 'pulse 0.5s ease';
+            setTimeout(() => { if(resultadoCard) resultadoCard.style.animation = ''; }, 500);
+        }
+    };
+    
+    // Auto-evaluación al escribir
+    setTimeout(() => {
+        const sistolicaInput = document.getElementById('bp-sistolica');
+        const diastolicaInput = document.getElementById('bp-diastolica');
+        if (sistolicaInput && diastolicaInput) {
+            const checkAndEvaluate = () => {
+                if (sistolicaInput.value && diastolicaInput.value) {
+                    window.evaluarPresionArterial();
+                } else {
+                    document.getElementById('bp-resultado').innerHTML = '<span style="color: #9CA3AF;">⏳ Esperando valores...</span>';
+                }
+            };
+            sistolicaInput.addEventListener('input', checkAndEvaluate);
+            diastolicaInput.addEventListener('input', checkAndEvaluate);
+        }
+    }, 100);
+    
+    return `
+        <style>
+            @keyframes pulse {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.02); opacity: 0.9; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+            .bp-input-card {
+                transition: all 0.3s ease;
+            }
+            .bp-input-card:focus-within {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            }
+        </style>
+        <div style="padding: 4px 0 20px 0;">
+            <!-- Tarjeta de bienvenida -->
+            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 24px; padding: 24px; margin-bottom: 24px; color: white;">
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        <path d="M12 8v4M12 16h.01"/>
+                    </svg>
+                    <div>
+                        <h3 style="margin: 0 0 4px 0; font-size: clamp(18px, 5vw, 24px);">Presión Arterial</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: clamp(12px, 3vw, 14px);">Clasificación según guías AHA 2024</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card de entrada de valores -->
+            <div class="bp-input-card" style="background: white; border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="display: block; font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500;">📊 SISTÓLICA (máxima)</label>
+                        <input type="number" id="bp-sistolica" placeholder="Ej: 120" 
+                               style="width: 100%; padding: 16px; border: 2px solid #E5E7EB; border-radius: 16px; font-size: 18px; font-weight: 600; text-align: center; transition: all 0.2s;"
+                               onfocus="this.style.borderColor='#0D9488'"
+                               onblur="this.style.borderColor='#E5E7EB'">
+                    </div>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="display: block; font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500;">💓 DIASTÓLICA (mínima)</label>
+                        <input type="number" id="bp-diastolica" placeholder="Ej: 80" 
+                               style="width: 100%; padding: 16px; border: 2px solid #E5E7EB; border-radius: 16px; font-size: 18px; font-weight: 600; text-align: center; transition: all 0.2s;"
+                               onfocus="this.style.borderColor='#0D9488'"
+                               onblur="this.style.borderColor='#E5E7EB'">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card de resultado con animación -->
+            <div id="bp-resultado-card" style="background: white; border-radius: 24px; padding: 8px 24px 24px 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <div id="bp-resultado" style="text-align: center; padding: 16px 0;">
+                    <span style="color: #9CA3AF;">⏳ Esperando valores...</span>
+                </div>
+                <div id="bp-categoria"></div>
+            </div>
+            
+            <!-- Tabla de referencia AHA -->
+            <div style="background: white; border-radius: 24px; padding: 20px; margin-top: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h4 style="color: #0D9488; margin: 0 0 16px 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Clasificación AHA (American Heart Association)
+                </h4>
+                <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #F0FDF4; border-radius: 12px;">
+                        <span style="font-weight: 600;">🟢 Normal</span>
+                        <span style="color: #22C55E; font-weight: 500;">&lt;120 / &lt;80</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #FEFCE8; border-radius: 12px;">
+                        <span style="font-weight: 600;">🟡 Elevada</span>
+                        <span style="color: #F59E0B; font-weight: 500;">120-129 / &lt;80</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #FFF7ED; border-radius: 12px;">
+                        <span style="font-weight: 600;">🟠 Hipertensión Etapa 1</span>
+                        <span style="color: #F97316; font-weight: 500;">130-139 / 80-89</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #FEF2F2; border-radius: 12px;">
+                        <span style="font-weight: 600;">🔴 Hipertensión Etapa 2</span>
+                        <span style="color: #DC2626; font-weight: 500;">≥140 / ≥90</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #FEE2E2; border-radius: 12px;">
+                        <span style="font-weight: 600;">🆘 Crisis Hipertensiva</span>
+                        <span style="color: #EF4444; font-weight: 500;">≥180 / ≥120</span>
+                    </div>
+                </div>
+                <p style="font-size: 11px; color: #9CA3AF; margin-top: 16px; text-align: center;">
+                    * Basado en las guías de la American Heart Association (AHA)
+                </p>
             </div>
         </div>
     `;
