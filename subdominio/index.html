@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 08</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 09</p>
 
          
             </div>
@@ -3495,16 +3495,17 @@ if (bottomBar && bottomBar.style.display !== 'none') {
         const btnSubtool = btn.getAttribute('data-subtool');
         if (btnSubtool === subtool) {
             btn.style.background = configActual.color;
-            btn.style.color = 'white';
+         
             btn.style.borderColor = configActual.color;
-            const spanText = btn.querySelector('.subtool-text');
+           
             if (spanText) spanText.style.color = 'white';
         } else {
             btn.style.background = 'white';
-            btn.style.color = configActual.color;
             btn.style.borderColor = '#E5E7EB';
-            const spanText = btn.querySelector('.subtool-text');
-            if (spanText) spanText.style.color = '#4B5563';
+            if (spanText) {
+                spanText.style.color = configActual.color;  
+                spanText.style.fontWeight = '500';
+            }
         }
     });
     
