@@ -3036,8 +3036,19 @@ app.innerHTML = `${topBarHtml}<div id="main-content" style="padding-top: 0; marg
         
         if (screenFunctions[currentScreen]) {
             let topBarHtml = '';
-            if (currentUser) topBarHtml = renderMobileNavBar();
-            else topBarHtml = renderPublicTopBar();
+
+
+             // NO MUESTRA BARRA INFERIOR EN TOOL Y SUBTOOL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tieneTool = urlParams.get('tool') || urlParams.get('subtool');
+    
+    if (tieneTool) {
+        topBarHtml = '';
+    } else {
+        if (currentUser) topBarHtml = renderMobileNavBar();
+        else topBarHtml = renderPublicTopBar();
+    }
+
             
                 const screenContent = await screenFunctions[currentScreen](); 
             
