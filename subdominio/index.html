@@ -2952,24 +2952,7 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
             
             
 else if (toolParam) {
-        // ========== CONSOLA PARA AUDITAR FLUJO ==========
-        console.log('🔍 [AUTH] ========== INICIO VERIFICACIÓN ==========');
-        console.log('🔍 [AUTH] URL actual:', window.location.href);
-        console.log('🔍 [AUTH] Parámetros URL:', {
-            section: urlParams.get('section'),
-            tool: urlParams.get('tool'),
-            subtool: urlParams.get('subtool'),
-            share: urlParams.get('share')
-        });
-        console.log('🔍 [AUTH] Perfil usuario:', {
-            uid: user?.uid,
-            displayName: profile?.displayName,
-            activated: profile?.activated,
-            tienePermisoPublicaciones: profile?.publicaciones === true,
-            tienePermisoPedigri: profile?.pedigri === true,
-            tienePermisoJuez: profile?.isJudge === true,
-            tienePermisoAdmin: profile?.gallo === true
-        });
+
     // 1. Determinar a qué pantalla pertenece este tool
     // Si hay section en URL, usar esa. Si no, usar VENTAS como default
 const pantallaIntentada = sectionParam || SCREENS.PUBLIC;
