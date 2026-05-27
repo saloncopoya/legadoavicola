@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 8</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 3</p>
 
          
             </div>
@@ -2726,8 +2726,7 @@ limpiarPantallasInvalidas();
         // ==============================================
      if (isOffline) {
     console.log('📴 Modo offline - Usando datos guardados');
-        const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
-
+    
     // Intentar recuperar usuario guardado de localStorage (solo datos básicos)
     const cachedUser = localStorage.getItem('offline_user');
     
@@ -2769,6 +2768,7 @@ limpiarPantallasInvalidas();
     
     // ✅ OFFLINE: NO cambiar la URL, usar solo localStorage
     const lastScreen = localStorage.getItem('lastScreen');
+    const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
     
     let pantallaFinal = SCREENS.PUBLIC;    
     if (pantallaPendiente && pantallasPublicas.includes(pantallaPendiente)) {
@@ -2834,6 +2834,11 @@ if (shareIdActual) {
 // USUARIOS LOGUEADOS - VALIDAR TOOL Y SUBTOOL
 // ==============================================
 else if (toolParam) {
+        console.log('👤 USUARIO LOGUEADO - Tool detectado en URL:', toolParam);
+    console.log('🔍 Subtool detectado:', subtoolParam);
+    console.log('🔗 URL completa:', window.location.href);
+    console.log('📱 Usuario:', AppState.user.current?.uid);
+    
     // 1. Determinar la pantalla destino
     let pantallaDestino;
     
@@ -2852,9 +2857,6 @@ else if (toolParam) {
     const pantallasSinPermiso = [SCREENS.PUBLIC, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE, SCREENS.PERFIL, SCREENS.CONFIGURACIONES];
     
     // 3. Verificar permisos para pantallas que lo requieren
-        console.log(`🔍 [AUTH] Verificando acceso a pantalla: "${pantallaDestino}"`);
-    console.log(`🔍 [AUTH] - Es pantalla sin permiso? ${pantallasSinPermiso.includes(pantallaDestino)}`);
-    
     const profile = AppState.user.profile;
     let tienePermiso = true;
     
@@ -2871,14 +2873,14 @@ else if (toolParam) {
         tienePermiso = false;
         AppState.addNotification('⚠️ No tienes permiso para acceder a ADMIN', 'warning');
     }
-
-
-        console.log(`🔍 [AUTH] Resultado final: ${tienePermiso ? '✅ PERMITIDO' : '❌ DENEGADO'} acceso a "${pantallaDestino}"`);
     
     // 4. Si no tiene permiso, redirigir a PUBLIC
     if (!tienePermiso) {
         pantallaDestino = SCREENS.PUBLIC;
     }
+        console.log('🎬 DECISIÓN FINAL - Pantalla destino:', pantallaDestino);
+    console.log('✅ Tiene permiso:', tienePermiso);
+    console.log('🚫 Ocultando barra de navegación por tool en URL');
     
     // 5. Establecer la pantalla
     AppState.setScreen(pantallaDestino);
@@ -2948,83 +2950,69 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
 // ==============================================
 // USUARIOS NO LOGUEADOS - VALIDAR TOOL Y SUBTOOL
 // ==============================================
-
-            
-            
 else if (toolParam) {
 
+        console.log('👤 USUARIO NO LOGUEADO - Tool detectado en URL:', toolParam);
+    console.log('🔍 Subtool detectado:', subtoolParam);
+    console.log('🔗 URL completa:', window.location.href);
+    console.log('🚫 Usuario NO autenticado - Mostrando pantalla pública');
     // 1. Determinar a qué pantalla pertenece este tool
     // Si hay section en URL, usar esa. Si no, usar VENTAS como default
-const pantallaIntentada = sectionParam || SCREENS.PUBLIC;
-const esPantallaPrivada = !pantallasPublicas.includes(pantallaIntentada);
-let pantallaDelTool = esPantallaPrivada ? SCREENS.PUBLIC : pantallaIntentada;
-       const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
-   console.log(`🔍 [AUTH-NO-LOGIN] Pantalla intentada: "${pantallaDelTool}"`);
-    console.log(`🔍 [AUTH-NO-LOGIN] ¿Es pública? ${esPantallaPublica}`);
-    console.log(`🔍 [AUTH-NO-LOGIN] Resultado: ${esPantallaPublica ? '✅ PERMITIDO (pública)' : '❌ DENEGADO → redirigir a LOGIN'}`);
+    let pantallaDelTool = sectionParam && pantallasPublicas.includes(sectionParam) 
+        ? sectionParam 
+        : SCREENS.PUBLIC;
+    
+    // 2. Lista de pantallas PÚBLICAS (se pueden ver sin login)
+    const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PENDING, SCREENS.VENTAS, SCREENS.ROOSTER, SCREENS.SHARE];
+    
+    // 3. Validar si la pantalla es pública o privada
+    const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
     
     if (esPantallaPublica) {
-    // ==========================================
-    // CASO 1: Pantalla PÚBLICA - Mostrar normal
-    // ==========================================
-    console.log('═══════════════════════════════════════');
-    console.log('🔓 [ACCESO PÚBLICO] Pantalla pública detectada');
-    console.log(`📱 Pantalla: "${pantallaDelTool}"`);
-    console.log(`🛠️ toolParam: ${toolParam}`);
-    console.log(`🔧 subtoolParam: ${subtoolParam}`);
-    console.log('✅ Permitiendo acceso sin restricciones');
-    console.log('═══════════════════════════════════════');
-    
-    AppState.setScreen(pantallaDelTool);
-    
-    // FORZAR OCULTAR BARRA (como estaba originalmente)
-    setTimeout(() => {
-        const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
-        if (barra) {
-            console.log('🙈 Ocultando barra de navegación inferior (pantalla tool pública)');
-            barra.style.display = 'none';
-        } else {
-            console.log('⚠️ No se encontró barra de navegación para ocultar');
-        }
-    }, 100);
-    
-} else {
-    // ==========================================
-    // CASO 2: Pantalla PRIVADA - Solo redirigir a LOGIN
-    // ==========================================
-    console.log('═══════════════════════════════════════');
-    console.log('🔒 [ACCESO DENEGADO] Pantalla PRIVADA sin login');
-    console.log(`📱 Pantalla intentada: "${pantallaIntentada}"`);
-    console.log(`🛠️ toolParam: ${toolParam}`);
-    console.log(`🔧 subtoolParam: ${subtoolParam}`);
-    console.log(`👤 Usuario logueado: ${AppState.user.current ? 'SÍ' : 'NO'}`);
-    console.log(`🚫 Redirigiendo a pantalla de LOGIN`);
-    console.log('═══════════════════════════════════════');
-    
-    // Redirigir a LOGIN (sin guardar destino)
-    const nuevaUrl = new URL(window.location);
-    const toolEliminado = nuevaUrl.searchParams.get('tool');
-    const subtoolEliminado = nuevaUrl.searchParams.get('subtool');
-    
-    console.log(`🗑️ Eliminando parámetros de URL - tool: ${toolEliminado}, subtool: ${subtoolEliminado}`);
-    
-    nuevaUrl.searchParams.delete('tool');
-    nuevaUrl.searchParams.delete('subtool');
-    window.history.replaceState({}, '', nuevaUrl);
-    
-    console.log(`🔄 Nueva URL después de limpiar: ${window.location.href}`);
-    
-    AppState.setScreen(SCREENS.LOGIN);
-    
-    // Mostrar mensaje al usuario
-    AppState.addNotification(`🔐 Inicia sesión para acceder a esta sección`, 'warning');
-    console.log('💬 Mostrando notificación al usuario: "Inicia sesión para acceder a esta sección"');
-    
-    // NOTA: NO ocultamos la barra, NO guardamos destino
-    console.log('ℹ️ La barra de navegación NO se oculta (se mantiene visible para login)');
-    console.log('═══════════════════════════════════════');
-}
-    
+        // ==========================================
+        // CASO 1: Pantalla PÚBLICA - Mostrar normal
+        // ==========================================
+                console.log('✅ PANTALLA PÚBLICA - Acceso permitido sin login');
+        console.log('🎯 Pantalla destino:', pantallaDelTool);
+        console.log('🔧 Tool en URL:', toolParam);
+        console.log('🛠️ Subtool en URL:', subtoolParam);
+        
+        AppState.setScreen(pantallaDelTool);
+        
+        // FORZAR OCULTAR BARRA (como estaba originalmente)
+        setTimeout(() => {
+            const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+            if (barra) barra.style.display = 'none';
+        }, 100);
+    } else {
+        // ==========================================
+        // CASO 2: Pantalla PRIVADA - Solo redirigir a LOGIN
+        // ==========================================
+                console.log('🔒 PANTALLA PRIVADA - Acceso DENEGADO sin login');
+        console.log('🎯 Pantalla requerida:', pantallaDelTool);
+        console.log('🚫 Redirigiendo a LOGIN');
+        console.log('🔧 Tool ignorado:', toolParam);
+
+          // ✅ LIMPIAR URL - Eliminar tool y subtool ANTES de redirigir
+        const urlSinParams = new URL(window.location);
+        urlSinParams.searchParams.delete('tool');
+        urlSinParams.searchParams.delete('subtool');
+        urlSinParams.searchParams.set('section', SCREENS.LOGIN);
+        
+        console.log('🧹 LIMPIANDO URL - Eliminando tool y subtool');
+        console.log('🔗 URL nueva (solo login):', urlSinParams.toString());
+        
+        // Reemplazar la URL sin recargar la página
+        window.history.replaceState({}, '', urlSinParams);
+        
+        // Redirigir a LOGIN (sin guardar destino)
+        AppState.setScreen(SCREENS.LOGIN);
+        
+        // Mostrar mensaje al usuario
+        AppState.addNotification(`🔐 Inicia sesión para acceder a esta sección`, 'warning');
+        
+        // NOTA: NO ocultamos la barra, NO guardamos destino
+    }
 }
 
 
@@ -3347,6 +3335,13 @@ window.addEventListener('load', async () => {
     // TODO LO DEMÁS SIGUE IGUAL, NO SE ELIMINA NADA
     const urlParams = new URLSearchParams(window.location.search);
     const shareId = urlParams.get('share');
+
+        const toolInicial = urlParams.get('tool');
+    const subtoolInicial = urlParams.get('subtool');
+    console.log('🚀 INICIO DE APP - URL detectada:', window.location.href);
+    console.log('🔧 Tool inicial:', toolInicial);
+    console.log('🛠️ Subtool inicial:', subtoolInicial);
+    console.log('👤 Usuario logueado:', !!AppState.user.current);
     
     if (shareId !== null) {
         sessionStorage.setItem('currentShareId', shareId);
