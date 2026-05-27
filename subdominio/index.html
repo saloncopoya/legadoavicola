@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 01</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 02</p>
 
          
             </div>
@@ -2899,8 +2899,11 @@ const pantallasPublicas = [SCREENS.PUBLIC, SCREENS.LOGIN, SCREENS.ACTIVATION_PEN
     } 
         //  Si hay tool en la URL, mostrar VENTAS (Bienestar) aunque no esté logueado
 else if (toolParam) {
-    AppState.setScreen(SCREENS.VENTAS);
-    // FORZAR OCULTAR BARRA
+    if (sectionParam && Object.values(SCREENS).includes(sectionParam)) {
+        AppState.setScreen(sectionParam);
+    } else {
+        AppState.setScreen(SCREENS.PUBLIC);
+    }
     setTimeout(() => {
         const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
         if (barra) barra.style.display = 'none';
