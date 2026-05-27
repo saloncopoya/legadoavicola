@@ -3414,11 +3414,80 @@ window.renderRoosterScreen = async function() {
     if (!herramientasValidas.includes(herramientaActual)) {
         herramientaActual = null;
     }
+
+
+
+          
+              // ==============================================
+    // HISTORIAL Y BOTÓN REGRESAR DEL TELÉFONO
+    // ==============================================
+    const historialNavegacion = [];
     
+    function agregarAlHistorial(tipo, tool, subtool) {
+        historialNavegacion.push({ tipo, tool, subtool, timestamp: Date.now() });
+        if (historialNavegacion.length > 30) historialNavegacion.shift();
+    }
+    
+    function irAtras() {
+        if (historialNavegacion.length <= 1) return;
+        historialNavegacion.pop();
+        const anterior = historialNavegacion[historialNavegacion.length - 1];
+        
+        if (anterior.tipo === 'bienestar') {
+            const nuevaUrl = new URL(window.location);
+            nuevaUrl.searchParams.delete('tool');
+            nuevaUrl.searchParams.delete('subtool');
+            window.history.pushState({}, '', nuevaUrl);
+            renderApp();
+            const menu = document.querySelector('nav[style*="bottom: 0"]');
+            if (menu) menu.style.display = 'flex';
+        } else if (anterior.tipo === 'tool') {
+            const nuevaUrl = new URL(window.location);
+            nuevaUrl.searchParams.set('tool', anterior.tool);
+            nuevaUrl.searchParams.delete('subtool');
+            window.history.pushState({}, '', nuevaUrl);
+            renderApp();
+        } else if (anterior.tipo === 'subtool') {
+            const nuevaUrl = new URL(window.location);
+            nuevaUrl.searchParams.set('tool', anterior.tool);
+            nuevaUrl.searchParams.set('subtool', anterior.subtool);
+            window.history.pushState({}, '', nuevaUrl);
+            renderApp();
+        }
+    }
+    
+    // Guardar estado inicial
+    const urlParamsInicial = new URLSearchParams(window.location.search);
+    if (urlParamsInicial.get('tool')) {
+        agregarAlHistorial('tool', urlParamsInicial.get('tool'), null);
+    } else {
+        agregarAlHistorial('bienestar', null, null);
+    }
+    
+    // Capturar botón regresar del teléfono
+    window.addEventListener('popstate', function(event) {
+        event.preventDefault();
+        const urlParams = new URLSearchParams(window.location.search);
+        const tool = urlParams.get('tool');
+        const subtool = urlParams.get('subtool');
+        if (tool && subtool) agregarAlHistorial('subtool', tool, subtool);
+        else if (tool) agregarAlHistorial('tool', tool, null);
+        else agregarAlHistorial('bienestar', null, null);
+        irAtras();
+    });
+          
     // ==============================================
     // FUNCIONES DE NAVEGACIÓN (CON SCROLL MANTENIDO)
     // ==============================================
     window.cambiarHerramienta = function(herramienta, subtool) {
+
+        // Ocultar el menú inferior de navegación
+        const menuInferior = document.querySelector('nav[style*="bottom: 0"], nav[style*="position: fixed; bottom"]');
+        if (menuInferior) {
+            menuInferior.style.display = 'none';
+        }
+
+        
         const nuevaUrl = new URL(window.location);
         if (herramienta) {
             nuevaUrl.searchParams.set('tool', herramienta);
@@ -3431,56 +3500,59 @@ window.renderRoosterScreen = async function() {
         renderApp();
     };
     
-    window.cambiarSubHerramienta = function(subtool, event) {
-    if (event && event.preventDefault) event.preventDefault();
-    
-    // Guardar la posición del scroll
-    const scrollContainer = document.querySelector('.pestanas-scroll-container');
-    const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
-    
-    // Actualizar URL sin recargar la página completa
-    const nuevaUrl = new URL(window.location);
-    nuevaUrl.searchParams.set('subtool', subtool);
-    window.history.pushState({}, '', nuevaUrl);
-    
-    // Actualizar SOLO la parte visual sin renderizar todo de nuevo
-    const configActual = herramientasConfig[herramientaActual];
-    const contenidoActual = contenidos[subtool] || contenidos.vacia;
-    
-    // Actualizar clases activas en los botones
-    document.querySelectorAll('.subtool-btn').forEach(btn => {
-        const btnSubtool = btn.getAttribute('data-subtool');
-        if (btnSubtool === subtool) {
-            btn.style.background = configActual.color;
-            btn.style.color = 'white';
-            btn.style.borderColor = configActual.color;
-            const spanText = btn.querySelector('.subtool-text');
-            if (spanText) spanText.style.color = 'white';
-        } else {
-            btn.style.background = 'white';
-            btn.style.color = configActual.color;
-            btn.style.borderColor = '#E5E7EB';
-            const spanText = btn.querySelector('.subtool-text');
-            if (spanText) spanText.style.color = '#4B5563';
+
+        window.cambiarSubHerramienta = function(subtool, event) {
+        if (event && event.preventDefault) event.preventDefault();
+        
+        const scrollContainer = document.querySelector('.pestanas-scroll-container');
+        const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const toolActual = urlParams.get('tool');
+        
+        agregarAlHistorial('subtool', toolActual, subtool);
+        
+        const nuevaUrl = new URL(window.location);
+        nuevaUrl.searchParams.set('subtool', subtool);
+        window.history.pushState({}, '', nuevaUrl);
+        
+        const configActual = herramientasConfig[herramientaActual];
+        const contenidoActual = contenidos[subtool] || contenidos.vacia;
+        
+        document.querySelectorAll('.subtool-btn').forEach(btn => {
+            const btnSubtool = btn.getAttribute('data-subtool');
+            if (btnSubtool === subtool) {
+                btn.style.background = configActual.color;
+                btn.style.color = 'white';
+                btn.style.borderColor = configActual.color;
+            } else {
+                btn.style.background = 'white';
+                btn.style.color = configActual.color;
+                btn.style.borderColor = '#E5E7EB';
+            }
+        });
+        
+        const mainContent = document.getElementById('subtool-main-content');
+        if (mainContent) {
+            mainContent.innerHTML = generarContenidoDinamico(configActual, contenidoActual);
         }
-    });
-    
-    // Actualizar SOLO el contenido principal
-    const mainContent = document.getElementById('subtool-main-content');
-    if (mainContent) {
-        mainContent.innerHTML = generarContenidoDinamico(configActual, contenidoActual);
-    }
-    
-    // Restaurar scroll
-    setTimeout(() => {
-        const newScrollContainer = document.querySelector('.pestanas-scroll-container');
-        if (newScrollContainer) {
-            newScrollContainer.scrollLeft = scrollPosition;
-        }
-    }, 10);
-};
-    
+        
+        setTimeout(() => {
+            const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+            if (newScrollContainer) newScrollContainer.scrollLeft = scrollPosition;
+        }, 10);
+    };
     window.volverAlMenuPrincipal = function() {
+
+          // Restaurar el menú inferior según si el usuario está logueado o no
+        const menuInferior = document.querySelector('nav[style*="bottom: 0"], nav[style*="position: fixed; bottom"]');
+        if (menuInferior) {
+            menuInferior.style.display = 'flex';
+        }
+
+                agregarAlHistorial('bienestar', null, null);
+
+        
         const nuevaUrl = new URL(window.location);
         nuevaUrl.searchParams.delete('tool');
         nuevaUrl.searchParams.delete('subtool');
@@ -3622,7 +3694,10 @@ window.renderRoosterScreen = async function() {
             }
         }
     };
-    
+
+
+
+          
     // ==============================================
     // VISTA PRINCIPAL (TUS BOTONES ORIGINALES)
     // ==============================================
