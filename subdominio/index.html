@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 7</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 8</p>
 
          
             </div>
@@ -2959,41 +2959,72 @@ const pantallaIntentada = sectionParam || SCREENS.PUBLIC;
 const esPantallaPrivada = !pantallasPublicas.includes(pantallaIntentada);
 let pantallaDelTool = esPantallaPrivada ? SCREENS.PUBLIC : pantallaIntentada;
        const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
-    console.log(`🔍 [AUTH-NO-LOGIN] Pantalla intentada: "${pantallaDelTool}"`);
+   console.log(`🔍 [AUTH-NO-LOGIN] Pantalla intentada: "${pantallaDelTool}"`);
     console.log(`🔍 [AUTH-NO-LOGIN] ¿Es pública? ${esPantallaPublica}`);
     console.log(`🔍 [AUTH-NO-LOGIN] Resultado: ${esPantallaPublica ? '✅ PERMITIDO (pública)' : '❌ DENEGADO → redirigir a LOGIN'}`);
     
-    
     if (esPantallaPublica) {
-
-        // ==========================================
-        // CASO 1: Pantalla PÚBLICA - Mostrar normal
-        // ==========================================
-        AppState.setScreen(pantallaDelTool);
-        
-        // FORZAR OCULTAR BARRA (como estaba originalmente)
-        setTimeout(() => {
-            const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
-            if (barra) barra.style.display = 'none';
-        }, 100);
-    } else {
-
-        // ==========================================
-        // CASO 2: Pantalla PRIVADA - Solo redirigir a LOGIN
-        // ==========================================
-        // Redirigir a LOGIN (sin guardar destino)
-          const nuevaUrl = new URL(window.location);
-        nuevaUrl.searchParams.delete('tool');
-        nuevaUrl.searchParams.delete('subtool');
-        window.history.replaceState({}, '', nuevaUrl);
-        
-        AppState.setScreen(SCREENS.LOGIN);
-        
-        // Mostrar mensaje al usuario
-        AppState.addNotification(`🔐 Inicia sesión para acceder a esta sección`, 'warning');
-        
-        // NOTA: NO ocultamos la barra, NO guardamos destino
-    }
+    // ==========================================
+    // CASO 1: Pantalla PÚBLICA - Mostrar normal
+    // ==========================================
+    console.log('═══════════════════════════════════════');
+    console.log('🔓 [ACCESO PÚBLICO] Pantalla pública detectada');
+    console.log(`📱 Pantalla: "${pantallaDelTool}"`);
+    console.log(`🛠️ toolParam: ${toolParam}`);
+    console.log(`🔧 subtoolParam: ${subtoolParam}`);
+    console.log('✅ Permitiendo acceso sin restricciones');
+    console.log('═══════════════════════════════════════');
+    
+    AppState.setScreen(pantallaDelTool);
+    
+    // FORZAR OCULTAR BARRA (como estaba originalmente)
+    setTimeout(() => {
+        const barra = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
+        if (barra) {
+            console.log('🙈 Ocultando barra de navegación inferior (pantalla tool pública)');
+            barra.style.display = 'none';
+        } else {
+            console.log('⚠️ No se encontró barra de navegación para ocultar');
+        }
+    }, 100);
+    
+} else {
+    // ==========================================
+    // CASO 2: Pantalla PRIVADA - Solo redirigir a LOGIN
+    // ==========================================
+    console.log('═══════════════════════════════════════');
+    console.log('🔒 [ACCESO DENEGADO] Pantalla PRIVADA sin login');
+    console.log(`📱 Pantalla intentada: "${pantallaIntentada}"`);
+    console.log(`🛠️ toolParam: ${toolParam}`);
+    console.log(`🔧 subtoolParam: ${subtoolParam}`);
+    console.log(`👤 Usuario logueado: ${AppState.user.current ? 'SÍ' : 'NO'}`);
+    console.log(`🚫 Redirigiendo a pantalla de LOGIN`);
+    console.log('═══════════════════════════════════════');
+    
+    // Redirigir a LOGIN (sin guardar destino)
+    const nuevaUrl = new URL(window.location);
+    const toolEliminado = nuevaUrl.searchParams.get('tool');
+    const subtoolEliminado = nuevaUrl.searchParams.get('subtool');
+    
+    console.log(`🗑️ Eliminando parámetros de URL - tool: ${toolEliminado}, subtool: ${subtoolEliminado}`);
+    
+    nuevaUrl.searchParams.delete('tool');
+    nuevaUrl.searchParams.delete('subtool');
+    window.history.replaceState({}, '', nuevaUrl);
+    
+    console.log(`🔄 Nueva URL después de limpiar: ${window.location.href}`);
+    
+    AppState.setScreen(SCREENS.LOGIN);
+    
+    // Mostrar mensaje al usuario
+    AppState.addNotification(`🔐 Inicia sesión para acceder a esta sección`, 'warning');
+    console.log('💬 Mostrando notificación al usuario: "Inicia sesión para acceder a esta sección"');
+    
+    // NOTA: NO ocultamos la barra, NO guardamos destino
+    console.log('ℹ️ La barra de navegación NO se oculta (se mantiene visible para login)');
+    console.log('═══════════════════════════════════════');
+}
+    
 }
 
 
