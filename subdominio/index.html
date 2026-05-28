@@ -4103,7 +4103,7 @@ window.renderPresionArterialTool = function() {
                  // Reproducir sonido de alerta si es CRISIS HIPERTENSIVA (rojoBrillante)
                  if (categoria === 'rojoBrillante') {
                     try {
-                        const audio = new Audio('/notificacion.mp3');
+                        const audio = new Audio('/notificacion.wav');
                         audio.play().catch(e => console.log('Error:', e));
                     } catch(e) {}
                     // Vibración de emergencia (más fuerte)
