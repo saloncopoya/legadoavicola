@@ -3908,7 +3908,7 @@ function actualizarSelectorTiposPAM() {
 }
 
 // Calcular y mostrar PAM para el tipo seleccionado
-function calcularYPAM() {
+window.calcularYPAM = function() {
     const selector = document.getElementById('tipoSelectorPAM');
     const tipoSeleccionado = selector.value;
     const resultadoDiv = document.getElementById('resultadoPAM');
@@ -3976,7 +3976,7 @@ function calcularYPAM() {
 }
 
 // Ver detalles individuales de cada registro del tipo seleccionado
-function verDetallesPAM(tipo) {
+window.verDetallesPAM = function(tipo) {
     const historial = cargarHistorial();
     const registrosTipo = historial.filter(r => r.tipo === tipo);
     
