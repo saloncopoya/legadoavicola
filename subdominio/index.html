@@ -4289,8 +4289,7 @@ window.verDetallesPAM = function(tipo) {
 
                 document.getElementById("presionSistolica").value = '';
     document.getElementById("presionDiastolica").value = '';
-    // Resetear combobox a su estado inicial (placeholder vacío)
-    tipoSelect.value = "";
+    
                 
                 const categoria = clasificarPresionAHA(sistolica, diastolica, tipo);
                 const colorHex = getColorHex(categoria);
