@@ -3885,17 +3885,154 @@ window.renderPresionArterialTool = function() {
         AppState.addNotification('✅ Registro eliminado', 'success');
     };
 
+
+// ==============================================
+// NUEVA SECCIÓN: CÁLCULO DE PAM (PRESIÓN ARTERIAL MEDIA)
+// ==============================================
+
+// Actualizar el selector de tipos según el historial disponible
+function actualizarSelectorTiposPAM() {
+    const selector = document.getElementById('tipoSelectorPAM');
+    if (!selector) return;
+    
+    const historial = cargarHistorial();
+    const tiposUnicos = [...new Set(historial.map(r => r.tipo))];
+    
+    if (tiposUnicos.length === 0) {
+        selector.innerHTML = '<option value="">No hay tipos disponibles</option>';
+        return;
+    }
+    
+    selector.innerHTML = '<option value="" disabled selected>🔽 Seleccionar tipo de persona</option>' +
+        tiposUnicos.map(tipo => `<option value="${tipo}">${tipo}</option>`).join('');
+}
+
+// Calcular y mostrar PAM para el tipo seleccionado
+function calcularYPAM() {
+    const selector = document.getElementById('tipoSelectorPAM');
+    const tipoSeleccionado = selector.value;
+    const resultadoDiv = document.getElementById('resultadoPAM');
+    
+    if (!tipoSeleccionado) {
+        resultadoDiv.innerHTML = '<div style="color: #9CA3AF;">⚠️ Seleccione un tipo de persona para calcular su PAM</div>';
+        return;
+    }
+    
+    const historial = cargarHistorial();
+    const registrosTipo = historial.filter(r => r.tipo === tipoSeleccionado);
+    
+    if (registrosTipo.length === 0) {
+        resultadoDiv.innerHTML = '<div style="color: #9CA3AF;">⚠️ No hay registros para este tipo de persona</div>';
+        return;
+    }
+    
+    // Calcular PAM para cada registro: PAM = Diastólica + (Sistólica - Diastólica)/3
+    const pamValues = registrosTipo.map(reg => {
+        return reg.diastolica + (reg.sistolica - reg.diastolica) / 3;
+    });
+    
+    // Calcular promedio de PAM
+    const pamPromedio = pamValues.reduce((a, b) => a + b, 0) / pamValues.length;
+    
+    // Determinar estado de la PAM según valores de referencia
+    let estado = '';
+    let color = '';
+    let recomendacion = '';
+    
+    if (pamPromedio < 70) {
+        estado = '⚠️ BAJA';
+        color = '#F59E0B';
+        recomendacion = 'PAM por debajo de lo normal (referencia 70-100 mmHg). Puede indicar hipoperfusión. Consulte a su médico.';
+    } else if (pamPromedio >= 70 && pamPromedio <= 100) {
+        estado = '✅ NORMAL';
+        color = '#10B981';
+        recomendacion = 'Su PAM está en rango óptimo. Significa que sus órganos vitales reciben buena perfusión sanguínea.';
+    } else if (pamPromedio > 100 && pamPromedio <= 120) {
+        estado = '🔵 ELEVADA';
+        color = '#3B82F6';
+        recomendacion = 'PAM ligeramente elevada. Monitoree su presión regularmente.';
+    } else {
+        estado = '🔴 MUY ELEVADA';
+        color = '#EF4444';
+        recomendacion = 'PAM significativamente elevada. Riesgo cardiovascular aumentado. Consulte a su médico.';
+    }
+    
+    resultadoDiv.innerHTML = `
+        <div style="background: ${color}15; border-radius: 16px; padding: 20px; text-align: center;">
+            <div style="font-size: 14px; color: #6B7280; margin-bottom: 8px;">PRESIÓN ARTERIAL MEDIA (PAM) PROMEDIO</div>
+            <div style="font-size: 48px; font-weight: 800; color: ${color};">${Math.round(pamPromedio)}</div>
+            <div style="font-size: 14px; margin-top: 4px; color: #6B7280;">mmHg</div>
+            <div style="display: inline-block; background: ${color}; color: white; padding: 4px 16px; border-radius: 30px; margin-top: 12px; font-weight: 600;">${estado}</div>
+            <div style="margin-top: 16px; font-size: 13px; color: #4B5563; text-align: left; padding: 12px; background: white; border-radius: 12px;">
+                <strong>📊 Basado en ${registrosTipo.length} registro(s):</strong><br>
+                ${recomendacion}<br><br>
+                <small style="color: #9CA3AF;">💡 La PAM representa la presión promedio en las arterias durante un ciclo cardíaco. Valores entre 70-100 mmHg son ideales.</small>
+            </div>
+            <button onclick="verDetallesPAM('${tipoSeleccionado}')" style="margin-top: 16px; background: ${color}; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 600;">
+                📋 Ver detalles de este tipo
+            </button>
+        </div>
+    `;
+}
+
+// Ver detalles individuales de cada registro del tipo seleccionado
+function verDetallesPAM(tipo) {
+    const historial = cargarHistorial();
+    const registrosTipo = historial.filter(r => r.tipo === tipo);
+    
+    let detallesHtml = `<div style="max-height: 400px; overflow-y: auto;">`;
+    detallesHtml += `<h4 style="margin: 0 0 16px 0; color: #1F2937;">📋 Detalles de ${tipo} (${registrosTipo.length} registros)</h4>`;
+    
+    registrosTipo.forEach((reg, idx) => {
+        const pam = reg.diastolica + (reg.sistolica - reg.diastolica) / 3;
+        detallesHtml += `
+            <div style="border-bottom: 1px solid #E5E7EB; padding: 12px 0;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>${reg.fecha} ${reg.hora}</strong></span>
+                    <span>${reg.sistolica}/${reg.diastolica} mmHg</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+                    <span>PAM calculada:</span>
+                    <span style="font-weight: 700;">${Math.round(pam)} mmHg</span>
+                </div>
+                <div style="margin-top: 4px; font-size: 12px; color: #6B7280;">${reg.nombreCat}</div>
+            </div>
+        `;
+    });
+    
+    detallesHtml += `</div>`;
+    
+    // Mostrar en un modal simple
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 20px; width: 90%; max-width: 400px; padding: 20px;">
+            ${detallesHtml}
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 20px; width: 100%; padding: 12px; background: #0D9488; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">Cerrar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Cerrar al hacer clic fuera
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+}
+    
+    
     // Renderizar tabla de historial
     function renderizarHistorial() {
-        const contenedor = document.getElementById('historialPresionContainer');
+        const contenedor = document.getElementById('historialPresionContainer')
+        const seccionHistorial = document.getElementById('seccionHistorialCompleta');
         if (!contenedor) return;
         
         const historial = cargarHistorial();
         
-        if (historial.length === 0) {
-            contenedor.innerHTML = '<div style="text-align:center; padding:20px; color:#9CA3AF;">📋 No hay registros aún. Calcule una presión para comenzar.</div>';
-            return;
-        }
+        // ✅ OCULTAR o MOSTRAR la sección completa según haya registros
+    if (historial.length === 0) {
+        if (seccionHistorial) seccionHistorial.style.display = 'none';
+        return;
+    } else {
+        if (seccionHistorial) seccionHistorial.style.display = 'block';
+    }
         
         const getColorHistorial = (categoria) => {
             const colores = {
@@ -3935,6 +4072,8 @@ window.renderPresionArterialTool = function() {
                 </table>
             </div>
         `;
+            actualizarSelectorTiposPAM();
+
     }
 
     // Función de clasificación AHA 2026 ampliada
@@ -4131,6 +4270,18 @@ window.renderPresionArterialTool = function() {
             };
         }
         renderizarHistorial();
+
+         // ✅ NUEVO: Inicializar selector de PAM
+    actualizarSelectorTiposPAM();
+    
+    // ✅ Ocultar sección de historial si no hay registros
+    const historial = cargarHistorial();
+    const seccionHistorial = document.getElementById('seccionHistorialCompleta');
+    if (seccionHistorial) {
+        seccionHistorial.style.display = historial.length === 0 ? 'none' : 'block';
+    }
+
+        
     }, 100);
 
     return `
@@ -4194,17 +4345,44 @@ window.renderPresionArterialTool = function() {
 
 
 <!-- HISTORIAL DE REGISTROS -->
-            <div style="background: white; border-radius: 20px; padding: 1px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; padding-bottom: 12px;">
-                    <span style="font-size: 22px;">📋</span>
-                    <h3 style="margin: 0; color: #1F2937;">Historial clínico</h3>
-                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 25 registros</span>
-                </div>
-                <div id="historialPresionContainer">
-                    <!-- Aquí se renderiza el historial dinámicamente -->
-                    <div style="text-align:center; padding:20px; color:#9CA3AF;">📋 No hay registros aún. Calcule una presión para comenzar.</div>
-                </div>
-            </div>
+<div id="seccionHistorialCompleta" style="background: white; border-radius: 20px; padding: 1px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; padding-bottom: 12px;">
+        <span style="font-size: 22px;">📋</span>
+        <h3 style="margin: 0; color: #1F2937;">Historial clínico</h3>
+        <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 25 registros</span>
+    </div>
+    <div id="historialPresionContainer">
+        <div style="text-align:center; padding:20px; color:#9CA3AF;">📋 No hay registros aún. Calcule una presión para comenzar.</div>
+    </div>
+</div>
+
+<!-- NUEVA SECCIÓN: CÁLCULO DE PAM (PRESIÓN ARTERIAL MEDIA) -->
+<div id="seccionPAM" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span style="font-size: 28px;">❤️</span>
+        <h3 style="margin: 0; color: white;">Presión Arterial Media (PAM)</h3>
+    </div>
+    <p style="color: rgba(255,255,255,0.9); font-size: 13px; margin-bottom: 16px;">
+        La PAM representa la presión promedio en sus arterias. Valores normales: 70-100 mmHg.
+    </p>
+    
+    <div style="margin-bottom: 16px;">
+        <label style="display: block; color: white; font-weight: 600; margin-bottom: 8px;">👤 Seleccionar tipo de persona</label>
+        <select id="tipoSelectorPAM" style="width:100%; padding: 12px; border-radius: 12px; border: none; font-size: 14px;" onchange="calcularYPAM()">
+            <option value="" disabled selected>🔽 Seleccionar tipo según historial</option>
+        </select>
+    </div>
+    
+    <div id="resultadoPAM" style="background: white; border-radius: 16px; padding: 16px; margin-top: 8px;">
+        <div style="color: #9CA3AF; text-align: center;">
+            Seleccione un tipo de persona para calcular su PAM promedio
+        </div>
+    </div>
+    
+    <div style="margin-top: 12px; font-size: 11px; color: rgba(255,255,255,0.7); text-align: center;">
+        📊 El cálculo se basa en todos los registros del tipo seleccionado
+    </div>
+</div>
             
             
         </div>
