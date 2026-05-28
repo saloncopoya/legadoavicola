@@ -3653,25 +3653,29 @@ window.renderVentasScreen = async function() {
     // ==============================================
     const herramientasConfig = {
         'valores-normales': {
-            titulo: TEXTOS.btn_valores_normales,
-            descripcion: 'Cuidados de enfermeria a domicilio, guardias en hospitales',
-            color: '#0D9488',
-            icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow', 'presion-arterial', 'glucosa'],
-            nombres: {
-                glasgow: TEXTOS.herramienta_glasgow,
-                    'presion-arterial': 'Presión Arterial AHA 2026',
-                'glucosa': '🩸 Glucosa (Diabetes) ADA 2024'
-
-            },
-            iconos: {
-                glasgow: ICONOS_SVG.icono_glasgow,
-                    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
-                'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`
-
-        
-            }
-        },
+    titulo: TEXTOS.btn_valores_normales,
+    descripcion: 'Cuidados de enfermeria a domicilio, guardias en hospitales',
+    color: '#0D9488',
+    icono: ICONOS_SVG.icono_valores_normales,
+    subherramientas: ['glasgow', 'presion-arterial', 'glucosa', 'colesterol', 'trigliceridos', 'imc'],
+    nombres: {
+        glasgow: TEXTOS.herramienta_glasgow,
+        'presion-arterial': 'Presión Arterial AHA 2026',
+        'glucosa': '🩸 Glucosa (Diabetes) ADA 2024',
+        'colesterol': '🫀 Colesterol Total (NCEP-ATP III)',
+        'trigliceridos': '⚡ Triglicéridos (NCEP-ATP III)',
+        'imc': '🧍 IMC (Índice de Masa Corporal)'
+    },
+    iconos: {
+        glasgow: ICONOS_SVG.icono_glasgow,
+        'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
+        'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
+        // NUEVOS ICONOS PARA LAS 3 HERRAMIENTAS (Agrégalos aquí)
+        'colesterol': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L15 8H9L12 2Z M12 22L9 16H15L12 22Z M4 12L10 9V15L4 12Z M20 12L14 9V15L20 12Z"/><circle cx="12" cy="12" r="2"/></svg>`,
+        'trigliceridos': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 4 L19 20 M19 4 L5 20" stroke-linecap="round"/><path d="M16 6 L21 5 L20 10" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 18 L3 19 L4 14" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2"/></svg>`,
+        'imc': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="15"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="15" y2="12"/></svg>`
+    }
+},
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
             descripcion: 'cuiracion de heridas, dialisis',
@@ -3767,10 +3771,14 @@ window.renderVentasScreen = async function() {
     // FUNCIÓN QUE LLAMA A LAS HERRAMIENTAS SEPARADAS
     const generarContenidoPrincipal = () => {
         if (herramientaActual === 'valores-normales') {
-            if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
-            if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
-            if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
-               }
+    if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
+    if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
+    if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
+    // NUEVAS HERRAMIENTAS: Colesterol, Triglicéridos e IMC
+    if (subHerramientaMostrar === 'colesterol') return window.renderColesterolTool();
+    if (subHerramientaMostrar === 'trigliceridos') return window.renderTrigliceridosTool();
+    if (subHerramientaMostrar === 'imc') return window.renderIMCTool();
+}
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
                   }
@@ -3836,6 +3844,501 @@ window.renderVentasScreen = async function() {
         </div>
     `;
 };
+
+
+
+
+
+
+
+
+
+
+    // ==============================================
+// HERRAMIENTA DE COLESTEROL TOTAL (NCEP-ATP III)
+// ==============================================
+window.renderColesterolTool = function() {
+    const HISTORIAL_KEY = 'colesterol_historial';
+    const TIPO_GUARDADO_KEY = 'colesterol_tipo_seleccionado';
+
+    function guardarTipoSeleccionado(tipo) {
+        if (tipo && tipo !== "") localStorage.setItem(TIPO_GUARDADO_KEY, tipo);
+    }
+    function cargarTipoSeleccionado() { return localStorage.getItem(TIPO_GUARDADO_KEY) || ""; }
+    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
+    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
+
+    function agregarRegistro(valor, tipo, categoria, nombreCat) {
+        const h = cargarHistorial();
+        const now = new Date();
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, tipo, categoria, nombreCat, timestamp: now.getTime() });
+        if (h.length > 25) h.pop();
+        guardarHistorial(h);
+        renderizarHistorial();
+    }
+    window.eliminarRegistroColesterol = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+
+    function renderizarHistorial() {
+        const cont = document.getElementById('historialColesterolContainer');
+        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
+        if (!cont) return;
+        const historial = cargarHistorial();
+        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
+        if(secHist) secHist.style.display = 'block';
+
+        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th style="padding:12px 8px; text-align:left;">Fecha/Hora</th><th style="padding:12px 8px; text-align:left;">Colesterol (mg/dL)</th><th style="padding:12px 8px; text-align:left;">Resultado</th><th style="padding:12px 8px; text-align:center;">Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:10px 8px;">${reg.fecha}<br><small style="color:#6B7280;">${reg.hora}</small></td><td style="padding:10px 8px; font-weight:600;">${reg.valor} mg/dL</td><td style="padding:10px 8px;"><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">${reg.nombreCat}</span></td><td style="padding:10px 8px; text-align:center;"><button onclick="eliminarRegistroColesterol(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function clasificarColesterol(valor) {
+        if (valor < 200) return { categoria: 'verde', nombreCat: 'ÓPTIMO (Deseable)' };
+        if (valor >= 200 && valor <= 239) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
+        return { categoria: 'rojo', nombreCat: 'ALTO (Riesgo)' };
+    }
+    function getMensaje(valor, categoria) {
+        if (categoria === 'verde') return `<strong>✅ COLESTEROL ÓPTIMO</strong><br>Su nivel es deseable. Mantenga una dieta saludable y ejercicio regular.`;
+        if (categoria === 'amarillo') return `<strong>⚠️ COLESTEROL LÍMITE ALTO</strong><br>Revise su alimentación (reduzca grasas saturadas) y aumente actividad física. Consulte a su médico.`;
+        return `<strong>🔴 COLESTEROL ALTO</strong><br>Riesgo cardiovascular aumentado. Requiere cambios en el estilo de vida y probable tratamiento farmacológico. Consulte a su médico.`;
+    }
+
+    setTimeout(() => {
+        const btn = document.getElementById("calcularColesterolBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const valor = parseInt(document.getElementById("colesterolValor")?.value);
+                const resDiv = document.getElementById("resultadoColesterol"), colorDiv = document.getElementById("resultadoColesterolColor"), recDiv = document.getElementById("resultadoColesterolRecomendacion");
+                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
+                if (valor < 50 || valor > 500) { AppState.addNotification("⚠️ Rango clínico: 50-500 mg/dL", "warning"); return; }
+                document.getElementById("colesterolValor").value = '';
+                const { categoria, nombreCat } = clasificarColesterol(valor);
+                const colorHex = { verde: '#10B981', amarillo: '#FBBF24', rojo: '#EF4444' }[categoria];
+                const mensaje = getMensaje(valor, categoria);
+                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
+                colorDiv.style.backgroundColor = colorHex; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                recDiv.innerHTML = mensaje; resDiv.style.display = "block";
+                agregarRegistro(valor, "General", categoria, nombreCat);
+                resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            };
+        }
+        renderizarHistorial();
+        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
+        if(secHist && cargarHistorial().length === 0) secHist.style.display = 'none';
+    }, 100);
+
+    return `<div style="padding: 4px 0 20px 0;">
+        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+            <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluación del colesterol total según guías NCEP-ATP III. Valores deseables: &lt;200 mg/dL.</p>
+        </div>
+        <div style="margin-bottom: 24px;">
+            <input type="number" id="colesterolValor" placeholder="Ej: 180" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center; font-weight:700; background:#F8FAFC;">
+        </div>
+        <button id="calcularColesterolBtn" style="background: #2563EB; color: white; padding: 16px; border-radius: 60px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer;">🔍 CALCULAR COLESTEROL TOTAL</button>
+        <div id="resultadoColesterol" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div id="resultadoColesterolColor" style="border-radius: 16px; padding: 24px; text-align: center; font-weight: bold;"></div>
+            <div id="resultadoColesterolRecomendacion" style="margin-top: 20px; font-size: 14px; line-height: 1.6;"></div>
+            <div style="margin-top: 20px; font-size: 11px; background: #F3F4F6; padding: 12px; border-radius: 12px; text-align: center;">⚠️ Guía clínica. No reemplaza evaluación médica.</div>
+        </div>
+        <div id="seccionHistorialColesterolCompleta" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+            <h3 style="margin:0 0 16px 0;">📋 Historial clínico</h3>
+            <div id="historialColesterolContainer">Sin registros</div>
+        </div>
+    </div>`;
+};
+
+// ==============================================
+// HERRAMIENTA DE TRIGLICÉRIDOS (NCEP-ATP III)
+// ==============================================
+window.renderTrigliceridosTool = function() {
+    const HISTORIAL_KEY = 'trigliceridos_historial';
+    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
+    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
+    function agregarRegistro(valor, categoria, nombreCat) {
+        const h = cargarHistorial();
+        const now = new Date();
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, categoria, nombreCat, timestamp: now.getTime() });
+        if (h.length > 25) h.pop();
+        guardarHistorial(h);
+        renderizarHistorial();
+    }
+    window.eliminarRegistroTrigliceridos = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+    function renderizarHistorial() {
+        const cont = document.getElementById('historialTrigliceridosContainer');
+        const secHist = document.getElementById('seccionHistorialTrigliceridosCompleta');
+        if (!cont) return;
+        const historial = cargarHistorial();
+        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
+        if(secHist) secHist.style.display = 'block';
+        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>Triglicéridos (mg/dL)</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.valor}</td><td><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroTrigliceridos(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function clasificar(valor) {
+        if (valor < 150) return { categoria: 'verde', nombreCat: 'NORMAL' };
+        if (valor >= 150 && valor <= 199) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
+        if (valor >= 200 && valor <= 499) return { categoria: 'naranja', nombreCat: 'ALTO' };
+        return { categoria: 'rojo', nombreCat: 'MUY ALTO' };
+    }
+    setTimeout(() => {
+        const btn = document.getElementById("calcularTrigliceridosBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const valor = parseInt(document.getElementById("trigliceridosValor")?.value);
+                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
+                if (valor < 20 || valor > 1000) { AppState.addNotification("⚠️ Rango clínico: 20-1000 mg/dL", "warning"); return; }
+                document.getElementById("trigliceridosValor").value = '';
+                const { categoria, nombreCat } = clasificar(valor);
+                const colorDiv = document.getElementById("resultadoTrigliceridosColor"), recDiv = document.getElementById("resultadoTrigliceridosRecomendacion"), resDiv = document.getElementById("resultadoTrigliceridos");
+                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' };
+                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
+                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                let msg = (categoria === 'verde') ? 'Óptimo. Sigue así.' : (categoria === 'amarillo' ? 'Límite alto. Mejora hábitos.' : (categoria === 'naranja' ? 'Alto. Riesgo cardiovascular.' : 'Muy alto. Consulta al médico URGENTE.'));
+                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Referencia NCEP-ATP III: Normal &lt;150 mg/dL.</small>`;
+                resDiv.style.display = "block";
+                agregarRegistro(valor, categoria, nombreCat);
+                resDiv.scrollIntoView({ behavior: "smooth" });
+            };
+        }
+        renderizarHistorial();
+        if(document.getElementById('seccionHistorialTrigliceridosCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialTrigliceridosCompleta').style.display = 'none';
+    }, 100);
+    return `<div style="padding: 4px 0 20px 0;">
+        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+            <p style="color: #4B5563;">Evaluación de triglicéridos según guías NCEP-ATP III. Valores normales: &lt;150 mg/dL.</p>
+        </div>
+        <input type="number" id="trigliceridosValor" placeholder="Ej: 120" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center;">
+        <button id="calcularTrigliceridosBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; margin-top:16px; cursor:pointer;">🔍 CALCULAR TRIGLICÉRIDOS</button>
+        <div id="resultadoTrigliceridos" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
+            <div id="resultadoTrigliceridosColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
+            <div id="resultadoTrigliceridosRecomendacion" style="margin-top:20px; font-size:14px;"></div>
+        </div>
+        <div id="seccionHistorialTrigliceridosCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialTrigliceridosContainer">Sin registros</div></div>
+    </div>`;
+};
+
+// ==============================================
+// HERRAMIENTA DE IMC (ÍNDICE DE MASA CORPORAL)
+// ==============================================
+window.renderIMCTool = function() {
+    const HISTORIAL_KEY = 'imc_historial';
+    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
+    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
+    function agregarRegistro(imc, peso, altura, categoria, nombreCat) {
+        const h = cargarHistorial();
+        const now = new Date();
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), imc, peso, altura, categoria, nombreCat });
+        if (h.length > 25) h.pop();
+        guardarHistorial(h);
+        renderizarHistorial();
+    }
+    window.eliminarRegistroIMC = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+    function renderizarHistorial() {
+        const cont = document.getElementById('historialIMCContainer');
+        const secHist = document.getElementById('seccionHistorialIMCCompleta');
+        if (!cont) return;
+        const historial = cargarHistorial();
+        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
+        if(secHist) secHist.style.display = 'block';
+        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' }[cat] || '#6B7280');
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>IMC (kg/m²)</th><th>Peso/Altura</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.imc}</td><td>${reg.peso}kg / ${reg.altura}m</td><td><span style="background:${getColor(reg.categoria)}; color:white; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroIMC(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function clasificarIMC(imc) {
+        if (imc < 18.5) return { categoria: 'amarillo', nombreCat: 'BAJO PESO' };
+        if (imc >= 18.5 && imc <= 24.9) return { categoria: 'verde', nombreCat: 'NORMAL' };
+        if (imc >= 25 && imc <= 29.9) return { categoria: 'naranja', nombreCat: 'SOBREPESO' };
+        if (imc >= 30 && imc <= 34.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD I' };
+        if (imc >= 35 && imc <= 39.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD II' };
+        return { categoria: 'rojoBrillante', nombreCat: 'OBESIDAD III (MÓRBIDA)' };
+    }
+    setTimeout(() => {
+        const btn = document.getElementById("calcularIMCBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const peso = parseFloat(document.getElementById("imcPeso")?.value);
+                const altura = parseFloat(document.getElementById("imcAltura")?.value);
+                if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) { AppState.addNotification("❌ Ingrese peso y altura válidos", "error"); return; }
+                const imc = peso / (altura * altura);
+                const { categoria, nombreCat } = clasificarIMC(imc);
+                const resDiv = document.getElementById("resultadoIMC"), colorDiv = document.getElementById("resultadoIMCColor"), recDiv = document.getElementById("resultadoIMCRecomendacion");
+                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' };
+                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${imc.toFixed(1)}</div><div>kg/m²</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
+                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                let msg = (categoria === 'verde') ? 'Peso saludable. Mantén hábitos.' : (categoria === 'amarillo' ? 'Bajo peso. Aumenta ingesta calórica.' : (categoria === 'naranja' ? 'Sobrepeso. Dieta y ejercicio.' : (categoria === 'rojo' ? 'Obesidad. Consulta a un nutriólogo.' : 'Obesidad mórbida. Requiere evaluación médica URGENTE.')));
+                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Rango normal IMC: 18.5 - 24.9 kg/m² (OMS).</small>`;
+                resDiv.style.display = "block";
+                document.getElementById("imcPeso").value = '';
+                document.getElementById("imcAltura").value = '';
+                agregarRegistro(imc.toFixed(1), peso, altura, categoria, nombreCat);
+                resDiv.scrollIntoView({ behavior: "smooth" });
+            };
+        }
+        renderizarHistorial();
+        if(document.getElementById('seccionHistorialIMCCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialIMCCompleta').style.display = 'none';
+    }, 100);
+    return `<div style="padding: 4px 0 20px 0;">
+        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+            <p style="color: #4B5563;">Cálculo del Índice de Masa Corporal (IMC) según OMS. Clasificación del estado nutricional.</p>
+        </div>
+        <div style="display:flex; gap:16px; margin-bottom:20px;">
+            <input type="number" id="imcPeso" placeholder="Peso (kg)" step="0.1" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
+            <input type="number" id="imcAltura" placeholder="Altura (m)" step="0.01" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
+        </div>
+        <button id="calcularIMCBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; cursor:pointer;">🔍 CALCULAR IMC</button>
+        <div id="resultadoIMC" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
+            <div id="resultadoIMCColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
+            <div id="resultadoIMCRecomendacion" style="margin-top:20px; font-size:14px;"></div>
+        </div>
+        <div id="seccionHistorialIMCCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialIMCContainer">Sin registros</div></div>
+    </div>`;
+};
+
+
+
+    
+
+// ==============================================
+// HERRAMIENTA DE COLESTEROL TOTAL (NCEP-ATP III)
+// ==============================================
+window.renderColesterolTool = function() {
+    const HISTORIAL_KEY = 'colesterol_historial';
+    const TIPO_GUARDADO_KEY = 'colesterol_tipo_seleccionado';
+
+    function guardarTipoSeleccionado(tipo) {
+        if (tipo && tipo !== "") localStorage.setItem(TIPO_GUARDADO_KEY, tipo);
+    }
+    function cargarTipoSeleccionado() { return localStorage.getItem(TIPO_GUARDADO_KEY) || ""; }
+    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
+    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
+
+    function agregarRegistro(valor, tipo, categoria, nombreCat) {
+        const h = cargarHistorial();
+        const now = new Date();
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, tipo, categoria, nombreCat, timestamp: now.getTime() });
+        if (h.length > 25) h.pop();
+        guardarHistorial(h);
+        renderizarHistorial();
+    }
+    window.eliminarRegistroColesterol = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+
+    function renderizarHistorial() {
+        const cont = document.getElementById('historialColesterolContainer');
+        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
+        if (!cont) return;
+        const historial = cargarHistorial();
+        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
+        if(secHist) secHist.style.display = 'block';
+
+        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th style="padding:12px 8px; text-align:left;">Fecha/Hora</th><th style="padding:12px 8px; text-align:left;">Colesterol (mg/dL)</th><th style="padding:12px 8px; text-align:left;">Resultado</th><th style="padding:12px 8px; text-align:center;">Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:10px 8px;">${reg.fecha}<br><small style="color:#6B7280;">${reg.hora}</small></td><td style="padding:10px 8px; font-weight:600;">${reg.valor} mg/dL</td><td style="padding:10px 8px;"><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">${reg.nombreCat}</span></td><td style="padding:10px 8px; text-align:center;"><button onclick="eliminarRegistroColesterol(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function clasificarColesterol(valor) {
+        if (valor < 200) return { categoria: 'verde', nombreCat: 'ÓPTIMO (Deseable)' };
+        if (valor >= 200 && valor <= 239) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
+        return { categoria: 'rojo', nombreCat: 'ALTO (Riesgo)' };
+    }
+    function getMensaje(valor, categoria) {
+        if (categoria === 'verde') return `<strong>✅ COLESTEROL ÓPTIMO</strong><br>Su nivel es deseable. Mantenga una dieta saludable y ejercicio regular.`;
+        if (categoria === 'amarillo') return `<strong>⚠️ COLESTEROL LÍMITE ALTO</strong><br>Revise su alimentación (reduzca grasas saturadas) y aumente actividad física. Consulte a su médico.`;
+        return `<strong>🔴 COLESTEROL ALTO</strong><br>Riesgo cardiovascular aumentado. Requiere cambios en el estilo de vida y probable tratamiento farmacológico. Consulte a su médico.`;
+    }
+
+    setTimeout(() => {
+        const btn = document.getElementById("calcularColesterolBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const valor = parseInt(document.getElementById("colesterolValor")?.value);
+                const resDiv = document.getElementById("resultadoColesterol"), colorDiv = document.getElementById("resultadoColesterolColor"), recDiv = document.getElementById("resultadoColesterolRecomendacion");
+                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
+                if (valor < 50 || valor > 500) { AppState.addNotification("⚠️ Rango clínico: 50-500 mg/dL", "warning"); return; }
+                document.getElementById("colesterolValor").value = '';
+                const { categoria, nombreCat } = clasificarColesterol(valor);
+                const colorHex = { verde: '#10B981', amarillo: '#FBBF24', rojo: '#EF4444' }[categoria];
+                const mensaje = getMensaje(valor, categoria);
+                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
+                colorDiv.style.backgroundColor = colorHex; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                recDiv.innerHTML = mensaje; resDiv.style.display = "block";
+                agregarRegistro(valor, "General", categoria, nombreCat);
+                resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            };
+        }
+        renderizarHistorial();
+        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
+        if(secHist && cargarHistorial().length === 0) secHist.style.display = 'none';
+    }, 100);
+
+    return `<div style="padding: 4px 0 20px 0;">
+        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+            <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluación del colesterol total según guías NCEP-ATP III. Valores deseables: &lt;200 mg/dL.</p>
+        </div>
+        <div style="margin-bottom: 24px;">
+            <input type="number" id="colesterolValor" placeholder="Ej: 180" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center; font-weight:700; background:#F8FAFC;">
+        </div>
+        <button id="calcularColesterolBtn" style="background: #2563EB; color: white; padding: 16px; border-radius: 60px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer;">🔍 CALCULAR COLESTEROL TOTAL</button>
+        <div id="resultadoColesterol" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div id="resultadoColesterolColor" style="border-radius: 16px; padding: 24px; text-align: center; font-weight: bold;"></div>
+            <div id="resultadoColesterolRecomendacion" style="margin-top: 20px; font-size: 14px; line-height: 1.6;"></div>
+            <div style="margin-top: 20px; font-size: 11px; background: #F3F4F6; padding: 12px; border-radius: 12px; text-align: center;">⚠️ Guía clínica. No reemplaza evaluación médica.</div>
+        </div>
+        <div id="seccionHistorialColesterolCompleta" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+            <h3 style="margin:0 0 16px 0;">📋 Historial clínico</h3>
+            <div id="historialColesterolContainer">Sin registros</div>
+        </div>
+    </div>`;
+};
+
+// ==============================================
+// HERRAMIENTA DE TRIGLICÉRIDOS (NCEP-ATP III)
+// ==============================================
+window.renderTrigliceridosTool = function() {
+    const HISTORIAL_KEY = 'trigliceridos_historial';
+    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
+    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
+    function agregarRegistro(valor, categoria, nombreCat) {
+        const h = cargarHistorial();
+        const now = new Date();
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, categoria, nombreCat, timestamp: now.getTime() });
+        if (h.length > 25) h.pop();
+        guardarHistorial(h);
+        renderizarHistorial();
+    }
+    window.eliminarRegistroTrigliceridos = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+    function renderizarHistorial() {
+        const cont = document.getElementById('historialTrigliceridosContainer');
+        const secHist = document.getElementById('seccionHistorialTrigliceridosCompleta');
+        if (!cont) return;
+        const historial = cargarHistorial();
+        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
+        if(secHist) secHist.style.display = 'block';
+        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>Triglicéridos (mg/dL)</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.valor}</td><td><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroTrigliceridos(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function clasificar(valor) {
+        if (valor < 150) return { categoria: 'verde', nombreCat: 'NORMAL' };
+        if (valor >= 150 && valor <= 199) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
+        if (valor >= 200 && valor <= 499) return { categoria: 'naranja', nombreCat: 'ALTO' };
+        return { categoria: 'rojo', nombreCat: 'MUY ALTO' };
+    }
+    setTimeout(() => {
+        const btn = document.getElementById("calcularTrigliceridosBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const valor = parseInt(document.getElementById("trigliceridosValor")?.value);
+                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
+                if (valor < 20 || valor > 1000) { AppState.addNotification("⚠️ Rango clínico: 20-1000 mg/dL", "warning"); return; }
+                document.getElementById("trigliceridosValor").value = '';
+                const { categoria, nombreCat } = clasificar(valor);
+                const colorDiv = document.getElementById("resultadoTrigliceridosColor"), recDiv = document.getElementById("resultadoTrigliceridosRecomendacion"), resDiv = document.getElementById("resultadoTrigliceridos");
+                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' };
+                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
+                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                let msg = (categoria === 'verde') ? 'Óptimo. Sigue así.' : (categoria === 'amarillo' ? 'Límite alto. Mejora hábitos.' : (categoria === 'naranja' ? 'Alto. Riesgo cardiovascular.' : 'Muy alto. Consulta al médico URGENTE.'));
+                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Referencia NCEP-ATP III: Normal &lt;150 mg/dL.</small>`;
+                resDiv.style.display = "block";
+                agregarRegistro(valor, categoria, nombreCat);
+                resDiv.scrollIntoView({ behavior: "smooth" });
+            };
+        }
+        renderizarHistorial();
+        if(document.getElementById('seccionHistorialTrigliceridosCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialTrigliceridosCompleta').style.display = 'none';
+    }, 100);
+    return `<div style="padding: 4px 0 20px 0;">
+        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+            <p style="color: #4B5563;">Evaluación de triglicéridos según guías NCEP-ATP III. Valores normales: &lt;150 mg/dL.</p>
+        </div>
+        <input type="number" id="trigliceridosValor" placeholder="Ej: 120" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center;">
+        <button id="calcularTrigliceridosBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; margin-top:16px; cursor:pointer;">🔍 CALCULAR TRIGLICÉRIDOS</button>
+        <div id="resultadoTrigliceridos" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
+            <div id="resultadoTrigliceridosColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
+            <div id="resultadoTrigliceridosRecomendacion" style="margin-top:20px; font-size:14px;"></div>
+        </div>
+        <div id="seccionHistorialTrigliceridosCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialTrigliceridosContainer">Sin registros</div></div>
+    </div>`;
+};
+
+// ==============================================
+// HERRAMIENTA DE IMC (ÍNDICE DE MASA CORPORAL)
+// ==============================================
+window.renderIMCTool = function() {
+    const HISTORIAL_KEY = 'imc_historial';
+    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
+    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
+    function agregarRegistro(imc, peso, altura, categoria, nombreCat) {
+        const h = cargarHistorial();
+        const now = new Date();
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), imc, peso, altura, categoria, nombreCat });
+        if (h.length > 25) h.pop();
+        guardarHistorial(h);
+        renderizarHistorial();
+    }
+    window.eliminarRegistroIMC = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+    function renderizarHistorial() {
+        const cont = document.getElementById('historialIMCContainer');
+        const secHist = document.getElementById('seccionHistorialIMCCompleta');
+        if (!cont) return;
+        const historial = cargarHistorial();
+        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
+        if(secHist) secHist.style.display = 'block';
+        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' }[cat] || '#6B7280');
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>IMC (kg/m²)</th><th>Peso/Altura</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.imc}</td><td>${reg.peso}kg / ${reg.altura}m</td><td><span style="background:${getColor(reg.categoria)}; color:white; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroIMC(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function clasificarIMC(imc) {
+        if (imc < 18.5) return { categoria: 'amarillo', nombreCat: 'BAJO PESO' };
+        if (imc >= 18.5 && imc <= 24.9) return { categoria: 'verde', nombreCat: 'NORMAL' };
+        if (imc >= 25 && imc <= 29.9) return { categoria: 'naranja', nombreCat: 'SOBREPESO' };
+        if (imc >= 30 && imc <= 34.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD I' };
+        if (imc >= 35 && imc <= 39.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD II' };
+        return { categoria: 'rojoBrillante', nombreCat: 'OBESIDAD III (MÓRBIDA)' };
+    }
+    setTimeout(() => {
+        const btn = document.getElementById("calcularIMCBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const peso = parseFloat(document.getElementById("imcPeso")?.value);
+                const altura = parseFloat(document.getElementById("imcAltura")?.value);
+                if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) { AppState.addNotification("❌ Ingrese peso y altura válidos", "error"); return; }
+                const imc = peso / (altura * altura);
+                const { categoria, nombreCat } = clasificarIMC(imc);
+                const resDiv = document.getElementById("resultadoIMC"), colorDiv = document.getElementById("resultadoIMCColor"), recDiv = document.getElementById("resultadoIMCRecomendacion");
+                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' };
+                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${imc.toFixed(1)}</div><div>kg/m²</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
+                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                let msg = (categoria === 'verde') ? 'Peso saludable. Mantén hábitos.' : (categoria === 'amarillo' ? 'Bajo peso. Aumenta ingesta calórica.' : (categoria === 'naranja' ? 'Sobrepeso. Dieta y ejercicio.' : (categoria === 'rojo' ? 'Obesidad. Consulta a un nutriólogo.' : 'Obesidad mórbida. Requiere evaluación médica URGENTE.')));
+                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Rango normal IMC: 18.5 - 24.9 kg/m² (OMS).</small>`;
+                resDiv.style.display = "block";
+                document.getElementById("imcPeso").value = '';
+                document.getElementById("imcAltura").value = '';
+                agregarRegistro(imc.toFixed(1), peso, altura, categoria, nombreCat);
+                resDiv.scrollIntoView({ behavior: "smooth" });
+            };
+        }
+        renderizarHistorial();
+        if(document.getElementById('seccionHistorialIMCCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialIMCCompleta').style.display = 'none';
+    }, 100);
+    return `<div style="padding: 4px 0 20px 0;">
+        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+            <p style="color: #4B5563;">Cálculo del Índice de Masa Corporal (IMC) según OMS. Clasificación del estado nutricional.</p>
+        </div>
+        <div style="display:flex; gap:16px; margin-bottom:20px;">
+            <input type="number" id="imcPeso" placeholder="Peso (kg)" step="0.1" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
+            <input type="number" id="imcAltura" placeholder="Altura (m)" step="0.01" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
+        </div>
+        <button id="calcularIMCBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; cursor:pointer;">🔍 CALCULAR IMC</button>
+        <div id="resultadoIMC" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
+            <div id="resultadoIMCColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
+            <div id="resultadoIMCRecomendacion" style="margin-top:20px; font-size:14px;"></div>
+        </div>
+        <div id="seccionHistorialIMCCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialIMCContainer">Sin registros</div></div>
+    </div>`;
+};
+
+
+    
+    
 
 // ==============================================
 // HERRAMIENTA DE GLUCOSA (DIABETES) - PROFESIONAL
