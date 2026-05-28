@@ -4022,17 +4022,34 @@ function verDetallesPAM(tipo) {
     function renderizarHistorial() {
         const contenedor = document.getElementById('historialPresionContainer')
         const seccionHistorial = document.getElementById('seccionHistorialCompleta');
+            const seccionPAM = document.getElementById('seccionPAM');  
         if (!contenedor) return;
         
         const historial = cargarHistorial();
         
-        // ✅ OCULTAR o MOSTRAR la sección completa según haya registros
+        // OCULTAR o MOSTRAR la sección completa según haya registros
     if (historial.length === 0) {
         if (seccionHistorial) seccionHistorial.style.display = 'none';
         return;
     } else {
         if (seccionHistorial) seccionHistorial.style.display = 'block';
     }
+
+         //  OCULTAR o MOSTRAR la sección PAM (menos de 5 registros = oculto)
+        if (seccionPAM) {
+            if (historial.length >= 5) {
+                seccionPAM.style.display = 'block';
+            } else {
+                seccionPAM.style.display = 'none';
+            }
+        }
+
+        if (historial.length === 0) {
+        return;  
+    }
+
+        
+
         
         const getColorHistorial = (categoria) => {
             const colores = {
