@@ -1909,7 +1909,7 @@ function renderPublicScreen() {
         <div style="width: 100%; min-height: 100vh; background: var(--bg-body); padding: 0; margin: 0;">
             <div style="padding-top: 10px; max-width: 800px; margin: 0 auto; padding: 80px 20px 40px; text-align: center;">
           
-                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 4</p>
+                <p style="color: #666; margin-bottom: 30px;">INICIO PANTALLA 5</p>
 
          
             </div>
@@ -2954,7 +2954,6 @@ else if (toolParam) {
 
         console.log('👤 USUARIO NO LOGUEADO - Tool detectado en URL:', toolParam);
     console.log('🔗 URL completa:', window.location.href);
-    console.log('🚫 Usuario NO autenticado - Mostrando pantalla pública');
 
 
 
@@ -2970,8 +2969,7 @@ else if (toolParam) {
     
      
     // 3. Validar si la pantalla es pública o privada
-    const esPantallaPublica = pantallasPublicas.includes(pantallaDelTool);
-    
+ const esPantallaPublica = (sectionParam && pantallasPublicas.includes(sectionParam)) ? true : false;    
     if (esPantallaPublica) {
         // ==========================================
         // CASO 1: Pantalla PÚBLICA - Mostrar normal
