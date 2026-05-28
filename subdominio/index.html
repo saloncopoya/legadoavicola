@@ -4065,6 +4065,11 @@ window.renderPresionArterialTool = function() {
                 const tipoSelect = document.getElementById("tipoPersona");
                 const tipo = tipoSelect?.value;
                 const tipoTexto = tipoSelect?.options[tipoSelect.selectedIndex]?.text || tipo;
+              if (!tipo || tipo === "") {
+    AppState.addNotification("⚠️ Por favor, seleccione una condición (Niño, Adulto, Embarazada, etc.)", "warning");
+    return;
+}
+                
                 const resDiv = document.getElementById("resultadoPresion");
                 const colorDiv = document.getElementById("resultadoColor");
                 const recDiv = document.getElementById("resultadoRecomendacion");
@@ -4111,24 +4116,29 @@ window.renderPresionArterialTool = function() {
             </div>
 
             <!-- Formulario principal -->
-            <div style="background: white; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;">
-                <!-- Dos textboxes en la misma fila -->
-                <div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">📈 Sistólica (mmHg)</label>
-                        <input type="number" id="presionSistolica" placeholder="Ej: 120" style="width:100%; padding:5px; border-radius:14px; border:50px solid #E5E7EB; font-size:30px; text-align:center; font-weight:600;">
-                    </div>
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">📉 Diastólica (mmHg)</label>
-                        <input type="number" id="presionDiastolica" placeholder="Ej: 80" style="width:100%; padding:5px; border-radius:14px; border:50px solid #E5E7EB; font-size:30px; text-align:center; font-weight:600;">
-                    </div>
-                </div>
+           <!-- Versión profesional con sombra y efecto hover -->
+<div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 120px;">
+        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">📈 Sistólica (mmHg)</label>
+        <input type="number" id="presionSistolica" placeholder="120" 
+               style="width:100%; padding:16px; border-radius:16px; border:2px solid #E5E7EB; font-size:32px; text-align:center; font-weight:700; background:#F8FAFC; transition:all 0.2s; box-sizing:border-box;"
+               onfocus="this.style.borderColor='#0D9488'; this.style.background='white'"
+               onblur="this.style.borderColor='#E5E7EB'; this.style.background='#F8FAFC'">
+    </div>
+    <div style="flex: 1; min-width: 120px;">
+        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">📉 Diastólica (mmHg)</label>
+        <input type="number" id="presionDiastolica" placeholder="80" 
+               style="width:100%; padding:16px; border-radius:16px; border:2px solid #E5E7EB; font-size:32px; text-align:center; font-weight:700; background:#F8FAFC; transition:all 0.2s; box-sizing:border-box;"
+               onfocus="this.style.borderColor='#0D9488'; this.style.background='white'"
+               onblur="this.style.borderColor='#E5E7EB'; this.style.background='#F8FAFC'">
+    </div>
+</div>
 
                 <!-- Combobox de tipo de persona -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">👤 Seleccione su condición</label>
                     <select id="tipoPersona" style="width:100%; padding:14px; border-radius:14px; border:2px solid #E5E7EB; font-size:14px; background:white;">
-                           <option value="" selected disabled>🔽 Seleccionar...</option>
+                           <option value="" disabled>🔽 Seleccionar...</option>
                         <option value="nino">👶 Niño (percentiles AHA)</option>
                         <option value="joven">🧑 Joven (18-35 años)</option>
                         <option value="adulto">👨 Adulto (36-65 años)</option>
