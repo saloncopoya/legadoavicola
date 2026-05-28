@@ -3843,7 +3843,33 @@ window.renderVentasScreen = async function() {
 window.renderPresionArterialTool = function() {
     // Clave para guardar historial en localStorage
     const HISTORIAL_KEY = 'presion_arterial_historial';
+const TIPO_GUARDADO_KEY = 'presion_arterial_tipo_seleccionado';  // ✅ NUEVO
+    const TIPO_PAM_GUARDADO_KEY = 'presion_arterial_tipo_pam_seleccionado';  // ✅ NUEVO
 
+    // ✅ NUEVA FUNCIÓN: Guardar tipo de persona seleccionado
+    function guardarTipoSeleccionado(tipo) {
+        if (tipo && tipo !== "") {
+            localStorage.setItem(TIPO_GUARDADO_KEY, tipo);
+        }
+    }
+
+    // ✅ NUEVA FUNCIÓN: Cargar tipo de persona guardado
+    function cargarTipoSeleccionado() {
+        return localStorage.getItem(TIPO_GUARDADO_KEY) || "";
+    }
+
+    // ✅ NUEVA FUNCIÓN: Guardar tipo de PAM seleccionado
+    function guardarTipoPAMSeleccionado(tipo) {
+        if (tipo && tipo !== "") {
+            localStorage.setItem(TIPO_PAM_GUARDADO_KEY, tipo);
+        }
+    }
+
+    // ✅ NUEVA FUNCIÓN: Cargar tipo de PAM guardado
+    function cargarTipoPAMSeleccionado() {
+        return localStorage.getItem(TIPO_PAM_GUARDADO_KEY) || "";
+    }
+    
     // Cargar historial guardado
     function cargarHistorial() {
         const guardado = localStorage.getItem(HISTORIAL_KEY);
@@ -3897,6 +3923,7 @@ function actualizarSelectorTiposPAM() {
     
     const historial = cargarHistorial();
     const tiposUnicos = [...new Set(historial.map(r => r.tipo))];
+    const tipoGuardado = cargarTipoPAMSeleccionado();
     
     if (tiposUnicos.length === 0) {
         selector.innerHTML = '<option value="">No hay tipos disponibles</option>';
@@ -3905,6 +3932,10 @@ function actualizarSelectorTiposPAM() {
     
     selector.innerHTML = '<option value="" disabled selected>🔽 Seleccionar tipo de persona</option>' +
         tiposUnicos.map(tipo => `<option value="${tipo}">${tipo}</option>`).join('');
+    //  Si hay un tipo guardado, calcular automáticamente
+    if (tipoGuardado && tiposUnicos.includes(tipoGuardado)) {
+        window.calcularYPAM();
+    }
 }
 
 // Calcular y mostrar PAM para el tipo seleccionado
@@ -3912,6 +3943,12 @@ window.calcularYPAM = function() {
     const selector = document.getElementById('tipoSelectorPAM');
     const tipoSeleccionado = selector.value;
     const resultadoDiv = document.getElementById('resultadoPAM');
+
+    //  Guardar el tipo de PAM seleccionado
+    if (tipoSeleccionado && tipoSeleccionado !== "") {
+        guardarTipoPAMSeleccionado(tipoSeleccionado);
+    }
+    
     
     if (!tipoSeleccionado) {
         resultadoDiv.innerHTML = '<div style="color: #9CA3AF;">⚠️ Seleccione un tipo de persona para calcular su PAM</div>';
@@ -4219,7 +4256,12 @@ window.verDetallesPAM = function(tipo) {
                 const tipoSelect = document.getElementById("tipoPersona");
                 const tipo = tipoSelect?.value;
                 const tipoTexto = tipoSelect?.options[tipoSelect.selectedIndex]?.text || tipo;
-         
+
+                //  Guardar el tipo seleccionado automáticamente
+    if (tipo && tipo !== "") {
+        guardarTipoSeleccionado(tipo);
+    }
+                
                 
                 const resDiv = document.getElementById("resultadoPresion");
                 const colorDiv = document.getElementById("resultadoColor");
@@ -4286,6 +4328,39 @@ window.verDetallesPAM = function(tipo) {
         }
         renderizarHistorial();
 
+         // ✅ NUEVO: Cargar tipo de persona guardado al iniciar
+const tipoPersonaGuardado = cargarTipoSeleccionado();
+const tipoSelectElem = document.getElementById("tipoPersona");
+if (tipoPersonaGuardado && tipoSelectElem) {  
+    let existe = false;
+    for (let i = 0; i < tipoSelectElem.options.length; i++) {
+        if (tipoSelectElem.options[i].value === tipoPersonaGuardado) {
+            tipoSelectElem.selectedIndex = i;
+            existe = true;
+            break;
+        }
+    }
+    if (!existe) {
+        tipoSelectElem.selectedIndex = 0;
+    }
+}
+
+    // ✅ NUEVO: Cargar tipo de PAM guardado después de actualizar el selector
+    setTimeout(() => {
+        const tipoPAMGuardado = cargarTipoPAMSeleccionado();
+        const tipoSelectorPAM = document.getElementById("tipoSelectorPAM");
+        if (tipoPAMGuardado && tipoSelectorPAM && tipoSelectorPAM.options.length > 0) {
+            for (let i = 0; i < tipoSelectorPAM.options.length; i++) {
+                if (tipoSelectorPAM.options[i].value === tipoPAMGuardado) {
+                    tipoSelectorPAM.selectedIndex = i;
+                    window.calcularYPAM(); // Ejecutar cálculo automático
+                    break;
+                }
+            }
+        }
+    }, 150);
+
+        
          // ✅ NUEVO: Inicializar selector de PAM
     actualizarSelectorTiposPAM();
     
