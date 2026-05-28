@@ -4065,20 +4065,25 @@ window.renderPresionArterialTool = function() {
                 const tipoSelect = document.getElementById("tipoPersona");
                 const tipo = tipoSelect?.value;
                 const tipoTexto = tipoSelect?.options[tipoSelect.selectedIndex]?.text || tipo;
-              if (!tipo || tipo === "") {
-    AppState.addNotification("⚠️ Por favor, seleccione una condición (Niño, Adulto, Embarazada, etc.)", "warning");
-    return;
-}
+         
                 
                 const resDiv = document.getElementById("resultadoPresion");
                 const colorDiv = document.getElementById("resultadoColor");
                 const recDiv = document.getElementById("resultadoRecomendacion");
 
+                     if (!tipo || tipo === "") {
+                  if (navigator.vibrate) navigator.vibrate([300, 100, 200]);
+    AppState.addNotification("⚠️ Seleccione su edad (Niño, Adulto, Embarazada, etc.)", "warning");
+    return;
+}
+                
                 if (isNaN(sistolica) || isNaN(diastolica)) {
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 200]);
                     AppState.addNotification("❌ Ingrese valores válidos de presión arterial", "error");
                     return;
                 }
                 if (sistolica < 40 || sistolica > 250 || diastolica < 20 || diastolica > 150) {
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 200]);
                     AppState.addNotification("⚠️ Valores fuera de rango clínico (40-250 / 20-150)", "warning");
                     return;
                 }
@@ -4094,6 +4099,21 @@ window.renderPresionArterialTool = function() {
                 const mensajeProfesional = obtenerMensajeProfesional(categoria, tipo, sistolica, diastolica);
                 const nombreCat = getNombreCategoria(categoria);
 
+                
+                 // Reproducir sonido de alerta si es CRISIS HIPERTENSIVA (rojoBrillante)
+                 if (categoria === 'rojoBrillante') {
+                    try {
+                        const audio = new Audio('/notificacion.mp3');
+                        audio.play().catch(e => console.log('Error:', e));
+                    } catch(e) {}
+                    // Vibración de emergencia (más fuerte)
+                    if (navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+                    // Notificación visual destacada
+                    AppState.addNotification('🚨 ¡ALERTA! CRISIS HIPERTENSIVA - ACUDA AL MEDICO INMEDIATAMENTE', 'error', 10000);
+                }
+
+                
+                
                 colorDiv.innerHTML = `
                     <div style="font-size:28px; font-weight:800;">${sistolica} / ${diastolica}</div>
                     <div style="font-size:14px; margin-top:8px;">mmHg</div>
