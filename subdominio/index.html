@@ -3836,22 +3836,130 @@ window.renderVentasScreen = async function() {
 // HERRAMIENTA DE PRESIÓN ARTERIAL AHA 2026 (COMPLETA)
 // ==============================================
 
+// ==============================================
+// HERRAMIENTA DE PRESIÓN ARTERIAL AHA 2026 - PROFESIONAL
+// ==============================================
+
 window.renderPresionArterialTool = function() {
-    // Función de clasificación
+    // Clave para guardar historial en localStorage
+    const HISTORIAL_KEY = 'presion_arterial_historial';
+
+    // Cargar historial guardado
+    function cargarHistorial() {
+        const guardado = localStorage.getItem(HISTORIAL_KEY);
+        return guardado ? JSON.parse(guardado) : [];
+    }
+
+    // Guardar historial
+    function guardarHistorial(historial) {
+        localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
+    }
+
+    // Agregar nuevo registro
+    function agregarRegistro(sistolica, diastolica, tipo, categoria, nombreCat) {
+        const historial = cargarHistorial();
+        const now = new Date();
+        const registro = {
+            id: Date.now(),
+            fecha: now.toLocaleDateString('es-MX'),
+            hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+            sistolica: sistolica,
+            diastolica: diastolica,
+            tipo: tipo,
+            categoria: categoria,
+            nombreCat: nombreCat,
+            timestamp: now.getTime()
+        };
+        historial.unshift(registro); // Los más nuevos primero
+        if (historial.length > 20) historial.pop(); // Máximo 20 registros
+        guardarHistorial(historial);
+        renderizarHistorial();
+    }
+
+    // Eliminar registro
+    window.eliminarRegistroPresion = function(id) {
+        let historial = cargarHistorial();
+        historial = historial.filter(r => r.id !== id);
+        guardarHistorial(historial);
+        renderizarHistorial();
+        AppState.addNotification('✅ Registro eliminado', 'success');
+    };
+
+    // Renderizar tabla de historial
+    function renderizarHistorial() {
+        const contenedor = document.getElementById('historialPresionContainer');
+        if (!contenedor) return;
+        
+        const historial = cargarHistorial();
+        
+        if (historial.length === 0) {
+            contenedor.innerHTML = '<div style="text-align:center; padding:20px; color:#9CA3AF;">📋 No hay registros aún. Calcule una presión para comenzar.</div>';
+            return;
+        }
+        
+        const getColorHistorial = (categoria) => {
+            const colores = {
+                verde: '#10B981', amarillo: '#FBBF24', azul: '#3B82F6',
+                rojo: '#EF4444', rojoBrillante: '#B91C1C'
+            };
+            return colores[categoria] || '#6B7280';
+        };
+        
+        contenedor.innerHTML = `
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background: #F3F4F6; border-radius: 12px;">
+                            <th style="padding:12px 8px; text-align:left;">Fecha/Hora</th>
+                            <th style="padding:12px 8px; text-align:left;">Presión</th>
+                            <th style="padding:12px 8px; text-align:left;">Tipo</th>
+                            <th style="padding:12px 8px; text-align:left;">Resultado</th>
+                            <th style="padding:12px 8px; text-align:center;">Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${historial.map(reg => `
+                            <tr style="border-bottom:1px solid #E5E7EB;">
+                                <td style="padding:10px 8px;">${reg.fecha}<br><small style="color:#6B7280;">${reg.hora}</small></td>
+                                <td style="padding:10px 8px; font-weight:600;">${reg.sistolica}/${reg.diastolica}</td>
+                                <td style="padding:10px 8px; font-size:12px;">${reg.tipo}</td>
+                                <td style="padding:10px 8px;">
+                                    <span style="background:${getColorHistorial(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">${reg.nombreCat}</span>
+                                </td>
+                                <td style="padding:10px 8px; text-align:center;">
+                                    <button onclick="eliminarRegistroPresion(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer; font-weight:bold;">✕</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // Función de clasificación AHA 2026 ampliada
     function clasificarPresionAHA(sistolica, diastolica, tipo) {
+        // Mapeo de tipos a rangos específicos
         const rangos = {
-            adulto: {
+            nino: { // Percentiles AHA para niños
+                verde: { minSys: 0, maxSys: 109, minDia: 0, maxDia: 69 },
+                amarillo: { minSys: 110, maxSys: 119, minDia: 70, maxDia: 74 },
+                azul: { minSys: 120, maxSys: 129, minDia: 75, maxDia: 79 },
+                rojo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
+                rojoBrillante: { minSys: 140, maxSys: 999, minDia: 90, maxDia: 999 }
+            },
+            joven: { // 18-35 años
                 verde: { minSys: 0, maxSys: 119, minDia: 0, maxDia: 79 },
                 amarillo: { minSys: 120, maxSys: 129, minDia: 0, maxDia: 79 },
                 azul: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
                 rojo: { minSys: 140, maxSys: 179, minDia: 90, maxDia: 119 },
                 rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
             },
-            adultoMayor: {
-                verde: { minSys: 0, maxSys: 129, minDia: 0, maxDia: 79 },
-                amarillo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
-                azul: { minSys: 140, maxSys: 149, minDia: 90, maxDia: 99 },
-                rojo: { minSys: 150, maxSys: 179, minDia: 100, maxDia: 119 },
+            adulto: {
+                verde: { minSys: 0, maxSys: 119, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 120, maxSys: 129, minDia: 0, maxDia: 79 },
+                azul: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
+                rojo: { minSys: 140, maxSys: 179, minDia: 90, maxDia: 119 },
                 rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
             },
             embarazada: {
@@ -3861,14 +3969,36 @@ window.renderPresionArterialTool = function() {
                 rojo: { minSys: 140, maxSys: 159, minDia: 90, maxDia: 109 },
                 rojoBrillante: { minSys: 160, maxSys: 999, minDia: 110, maxDia: 999 }
             },
-            nino: {
-                verde: { minSys: 0, maxSys: 109, minDia: 0, maxDia: 69 },
-                amarillo: { minSys: 110, maxSys: 119, minDia: 70, maxDia: 74 },
-                azul: { minSys: 120, maxSys: 129, minDia: 75, maxDia: 79 },
-                rojo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
-                rojoBrillante: { minSys: 140, maxSys: 999, minDia: 90, maxDia: 999 }
+            adultoMayor: {
+                verde: { minSys: 0, maxSys: 129, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
+                azul: { minSys: 140, maxSys: 149, minDia: 90, maxDia: 99 },
+                rojo: { minSys: 150, maxSys: 179, minDia: 100, maxDia: 119 },
+                rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
+            },
+            hipertenso: { // Ya diagnosticado con HTA - rangos más estrictos
+                verde: { minSys: 0, maxSys: 129, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 84 },
+                azul: { minSys: 140, maxSys: 149, minDia: 85, maxDia: 89 },
+                rojo: { minSys: 150, maxSys: 179, minDia: 90, maxDia: 119 },
+                rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
+            },
+            hipotenso: { // Presión baja
+                verde: { minSys: 90, maxSys: 119, minDia: 60, maxDia: 79 },
+                amarillo: { minSys: 70, maxSys: 89, minDia: 50, maxDia: 59 },
+                azul: { minSys: 50, maxSys: 69, minDia: 40, maxDia: 49 },
+                rojo: { minSys: 0, maxSys: 49, minDia: 0, maxDia: 39 },
+                rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
+            },
+            diabetico: { // Diabéticos - control más estricto
+                verde: { minSys: 0, maxSys: 129, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 84 },
+                azul: { minSys: 140, maxSys: 149, minDia: 85, maxDia: 89 },
+                rojo: { minSys: 150, maxSys: 179, minDia: 90, maxDia: 119 },
+                rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
             }
         };
+        
         const rangoTipo = rangos[tipo] || rangos.adulto;
         for (let [color, limites] of Object.entries(rangoTipo)) {
             if (sistolica >= limites.minSys && sistolica <= limites.maxSys &&
@@ -3879,27 +4009,52 @@ window.renderPresionArterialTool = function() {
         return (sistolica >= 180 || diastolica >= 120) ? "rojoBrillante" : "rojo";
     }
 
-    function obtenerMensaje(categoria, tipo) {
-        const msg = {
-            verde: "✅ Normal. Mantenga hábitos saludables.",
-            amarillo: "⚠️ Presión elevada. Reduzca sal y haga ejercicio.",
-            azul: "🔵 HTA etapa 1. Consulte a su médico.",
-            rojo: "🔴 HTA etapa 2. Requiere atención médica pronto.",
-            rojoBrillante: "🔥 CRISIS HIPERTENSIVA. ¡ACUDA A URGENCIAS AHORA!"
+    function obtenerMensajeProfesional(categoria, tipo, sistolica, diastolica) {
+        const diagnosticos = {
+            verde: { estado: "✅ ÓPTIMO", descripcion: "Su presión arterial se encuentra en rangos normales. Continúe con hábitos saludables." },
+            amarillo: { estado: "⚠️ ELEVADA", descripcion: "Su presión está por encima de lo normal. Requiere modificar estilo de vida: reduzca sal, haga ejercicio, evite estrés." },
+            azul: { estado: "🔵 HIPERTENSIÓN ETAPA 1", descripcion: "Diagnóstico de hipertensión. Consulte a su médico en las próximas semanas para evaluar tratamiento." },
+            rojo: { estado: "🔴 HIPERTENSIÓN ETAPA 2", descripcion: "Hipertensión significativa. Requiere atención médica en los próximos días y probable tratamiento farmacológico." },
+            rojoBrillante: { estado: "🔥 CRISIS HIPERTENSIVA", descripcion: "¡EMERGENCIA! Riesgo de daño a órganos vitales. ACUDA A URGENCIAS INMEDIATAMENTE." }
         };
-        let texto = msg[categoria] || msg.azul;
-        if (tipo === "embarazada" && categoria !== "verde") {
-            texto += " 🚨 Riesgo de preeclampsia. Consulte a su obstetra.";
+        
+        let resultado = diagnosticos[categoria] || diagnosticos.azul;
+        let texto = `<strong style="font-size:18px;">${resultado.estado}</strong><br>${resultado.descripcion}`;
+        
+        if (categoria === "amarillo") {
+            texto += `<br><br>📊 <strong>Recomendación:</strong> Reducir sodio (<2g/día), actividad física 30-45 min/día, control en 3-6 meses.`;
+        } else if (categoria === "azul") {
+            texto += `<br><br>📊 <strong>Recomendación:</strong> Evaluación cardiovascular completa. Considerar tratamiento si hay diabetes, enfermedad renal o riesgo alto.`;
+        } else if (categoria === "rojo") {
+            texto += `<br><br>📊 <strong>Recomendación:</strong> Iniciar tratamiento farmacológico. Control en 2-4 semanas.`;
+        } else if (categoria === "rojoBrillante") {
+            texto += `<br><br>🚨 <strong>ACCIÓN INMEDIATA:</strong> Llame al 911 o acuda a urgencias. No conduzca usted mismo.`;
         }
+        
+        if (tipo === "embarazada" && categoria !== "verde") {
+            texto += `<br><br>🤰 <strong>EMBARAZO:</strong> Riesgo de preeclampsia. Consulte a su obstetra URGENTE.`;
+        }
+        if (tipo === "diabetico" && (categoria === "azul" || categoria === "rojo")) {
+            texto += `<br><br>🩸 <strong>DIABETES:</strong> El control estricto de presión es prioritario para prevenir daño renal y cardiovascular.`;
+        }
+        if (tipo === "hipotenso" && (categoria === "azul" || categoria === "rojo")) {
+            texto += `<br><br>📉 <strong>HIPOTENSIÓN:</strong> Aumente ingesta de líquidos y sal moderada. Evalúe posible causa (medicamentos, deshidratación).`;
+        }
+        
         return texto;
     }
 
-    function getColor(categoria) {
+    function getColorHex(categoria) {
         const colores = { verde: "#10B981", amarillo: "#FBBF24", azul: "#3B82F6", rojo: "#EF4444", rojoBrillante: "#B91C1C" };
         return colores[categoria] || "#6B7280";
     }
 
-    // HTML de la herramienta
+    function getNombreCategoria(categoria) {
+        const nombres = { verde: "ÓPTIMO", amarillo: "ELEVADO", azul: "HTA ETAPA 1", rojo: "HTA ETAPA 2", rojoBrillante: "CRISIS HIPERTENSIVA" };
+        return nombres[categoria] || "NO CLASIFICADO";
+    }
+
+    // HTML de la herramienta profesional
     setTimeout(() => {
         const btn = document.getElementById("calcularPresionBtn");
         if (btn && !btn.hasListener) {
@@ -3907,56 +4062,113 @@ window.renderPresionArterialTool = function() {
             btn.onclick = function() {
                 const sistolica = parseInt(document.getElementById("presionSistolica")?.value);
                 const diastolica = parseInt(document.getElementById("presionDiastolica")?.value);
-                const tipo = document.getElementById("tipoPersona")?.value;
+                const tipoSelect = document.getElementById("tipoPersona");
+                const tipo = tipoSelect?.value;
+                const tipoTexto = tipoSelect?.options[tipoSelect.selectedIndex]?.text || tipo;
                 const resDiv = document.getElementById("resultadoPresion");
                 const colorDiv = document.getElementById("resultadoColor");
                 const recDiv = document.getElementById("resultadoRecomendacion");
 
                 if (isNaN(sistolica) || isNaN(diastolica)) {
-                    AppState.addNotification("❌ Ingrese valores válidos", "error");
+                    AppState.addNotification("❌ Ingrese valores válidos de presión arterial", "error");
+                    return;
+                }
+                if (sistolica < 40 || sistolica > 250 || diastolica < 20 || diastolica > 150) {
+                    AppState.addNotification("⚠️ Valores fuera de rango clínico (40-250 / 20-150)", "warning");
                     return;
                 }
 
                 const categoria = clasificarPresionAHA(sistolica, diastolica, tipo);
-                const colorHex = getColor(categoria);
-                const mensaje = obtenerMensaje(categoria, tipo);
-                let nombreCat = { verde:"Normal", amarillo:"Elevado", azul:"HTA Etapa 1", rojo:"HTA Etapa 2", rojoBrillante:"CRISIS HIPERTENSIVA" }[categoria];
+                const colorHex = getColorHex(categoria);
+                const mensajeProfesional = obtenerMensajeProfesional(categoria, tipo, sistolica, diastolica);
+                const nombreCat = getNombreCategoria(categoria);
 
-                colorDiv.innerHTML = `${sistolica} / ${diastolica} mmHg<br><span style="font-size:14px;">${nombreCat}</span>`;
+                colorDiv.innerHTML = `
+                    <div style="font-size:28px; font-weight:800;">${sistolica} / ${diastolica}</div>
+                    <div style="font-size:14px; margin-top:8px;">mmHg</div>
+                    <div style="font-size:16px; font-weight:600; margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>
+                `;
                 colorDiv.style.backgroundColor = colorHex;
                 colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                recDiv.innerHTML = `<strong>📋 Recomendación AHA 2026:</strong><br>${mensaje}`;
+                recDiv.innerHTML = mensajeProfesional;
                 resDiv.style.display = "block";
+                
+                // Guardar en historial
+                agregarRegistro(sistolica, diastolica, tipoTexto, categoria, nombreCat);
+                
                 resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
             };
         }
-    }, 50);
+        renderizarHistorial();
+    }, 100);
 
     return `
         <div style="padding: 4px 0 20px 0;">
-            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-                <p style="color: #4B5563;">Ingrese valores de presión arterial y seleccione el tipo de persona (AHA 2026).</p>
+            <!-- Encabezado profesional -->
+            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 20px; padding: 24px; margin-bottom: 20px; color: white; text-align: center;">
+                <h2 style="margin: 0 0 8px 0; font-size: 24px;">🩺 Monitor de Presión Arterial</h2>
+                <p style="margin: 0; opacity: 0.9; font-size: 13px;">Basado en guías AHA 2026</p>
             </div>
-            <div style="background: white; border-radius: 16px; padding: 20px;">
-                <input type="number" id="presionSistolica" placeholder="Presión Sistólica (ej: 120)" style="width:100%; padding:12px; margin-bottom:16px; border-radius:12px; border:1px solid #ccc;">
-                <input type="number" id="presionDiastolica" placeholder="Presión Diastólica (ej: 80)" style="width:100%; padding:12px; margin-bottom:16px; border-radius:12px; border:1px solid #ccc;">
-                <select id="tipoPersona" style="width:100%; padding:12px; margin-bottom:24px; border-radius:12px; border:1px solid #ccc;">
-                    <option value="nino">👶 Niño</option>
-                    <option value="adulto">🧑 Adulto</option>
-                    <option value="embarazada">🤰 Embarazada</option>
-                    <option value="adultoMayor">👴 Adulto mayor</option>
-                </select>
-                <button id="calcularPresionBtn" style="background:#0D9488; color:white; padding:14px; border:none; border-radius:40px; font-weight:bold; width:100%; cursor:pointer;">🔍 CALCULAR (AHA 2026)</button>
+
+            <!-- Formulario principal -->
+            <div style="background: white; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px;">
+                <!-- Dos textboxes en la misma fila -->
+                <div style="display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">📈 Sistólica (mmHg)</label>
+                        <input type="number" id="presionSistolica" placeholder="Ej: 120" style="width:100%; padding:14px; border-radius:14px; border:2px solid #E5E7EB; font-size:16px; text-align:center; font-weight:600;">
+                    </div>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">📉 Diastólica (mmHg)</label>
+                        <input type="number" id="presionDiastolica" placeholder="Ej: 80" style="width:100%; padding:14px; border-radius:14px; border:2px solid #E5E7EB; font-size:16px; text-align:center; font-weight:600;">
+                    </div>
+                </div>
+
+                <!-- Combobox de tipo de persona -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">👤 Seleccione su condición</label>
+                    <select id="tipoPersona" style="width:100%; padding:14px; border-radius:14px; border:2px solid #E5E7EB; font-size:14px; background:white;">
+                        <option value="nino">👶 Niño (percentiles AHA)</option>
+                        <option value="joven">🧑 Joven (18-35 años)</option>
+                        <option value="adulto">👨 Adulto (36-65 años)</option>
+                        <option value="embarazada">🤰 Embarazada</option>
+                        <option value="adultoMayor">👴 Adulto mayor (>65 años)</option>
+                        <option value="hipertenso">💊 Hipertenso (diagnosticado)</option>
+                        <option value="hipotenso">📉 Hipotenso (presión baja)</option>
+                        <option value="diabetico">🩸 Diabético</option>
+                    </select>
+                </div>
+
+                <!-- Botón CALCULAR con estilo profesional -->
+                <button id="calcularPresionBtn" style="background: #2563EB; color: white; padding: 16px 20px; border: 2px solid #1D4ED8; border-radius: 60px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,0.3); transition: transform 0.1s, box-shadow 0.1s;">
+                    🔍 CALCULAR PRESIÓN ARTERIAL (AHA 2026)
+                </button>
             </div>
-            <div id="resultadoPresion" style="background:white; border-radius:16px; padding:20px; margin-top:16px; display:none;">
-                <div id="resultadoColor" style="border-radius:12px; padding:20px; text-align:center; font-weight:bold; font-size:18px;"></div>
-                <div id="resultadoRecomendacion" style="margin-top:16px; font-size:14px;"></div>
-                <div style="margin-top:16px; font-size:12px; background:#F3F4F6; padding:12px; border-radius:12px; text-align:center;">⚠️ Consulte siempre a su médico.</div>
+
+            <!-- HISTORIAL DE REGISTROS -->
+            <div style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; padding-bottom: 12px;">
+                    <span style="font-size: 22px;">📋</span>
+                    <h3 style="margin: 0; color: #1F2937;">Historial clínico</h3>
+                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 20 registros</span>
+                </div>
+                <div id="historialPresionContainer">
+                    <!-- Aquí se renderiza el historial dinámicamente -->
+                    <div style="text-align:center; padding:20px; color:#9CA3AF;">📋 No hay registros aún. Calcule una presión para comenzar.</div>
+                </div>
+            </div>
+
+            <!-- Resultado actual -->
+            <div id="resultadoPresion" style="background: white; border-radius: 20px; padding: 20px; margin-top: 8px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-left: 6px solid #0D9488;">
+                <div id="resultadoColor" style="border-radius: 16px; padding: 24px; text-align: center; font-weight: bold; transition: all 0.3s ease;"></div>
+                <div id="resultadoRecomendacion" style="margin-top: 20px; font-size: 14px; line-height: 1.6; color: #1F2937; padding: 8px;"></div>
+                <div style="margin-top: 20px; font-size: 11px; background: #F3F4F6; padding: 12px; border-radius: 12px; text-align: center; color: #6B7280;">
+                    ⚠️ Esta herramienta es una guía clínica. No reemplaza la evaluación médica presencial.
+                </div>
             </div>
         </div>
     `;
 };
-
 
     // ==============================================
 // FUNCIONES SEPARADAS - VALORES NORMALES 1
