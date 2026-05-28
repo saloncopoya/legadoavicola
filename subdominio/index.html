@@ -3651,12 +3651,17 @@ window.renderVentasScreen = async function() {
             descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow'],
+            subherramientas: ['glasgow', 'presion-arterial'],
             nombres: {
-                glasgow: TEXTOS.herramienta_glasgow
+                glasgow: TEXTOS.herramienta_glasgow,
+                    'presion-arterial': 'Presión Arterial AHA 2026'
+
             },
             iconos: {
-                glasgow: ICONOS_SVG.icono_glasgow
+                glasgow: ICONOS_SVG.icono_glasgow,
+                    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`
+
+        
             }
         },
         'medicamentos': {
@@ -3755,6 +3760,8 @@ window.renderVentasScreen = async function() {
     const generarContenidoPrincipal = () => {
         if (herramientaActual === 'valores-normales') {
             if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
+            if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
+
                }
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
@@ -3825,11 +3832,134 @@ window.renderVentasScreen = async function() {
 
 
 
+// ==============================================
+// HERRAMIENTA DE PRESIÓN ARTERIAL AHA 2026 (COMPLETA)
+// ==============================================
 
+window.renderPresionArterialTool = function() {
+    // Función de clasificación
+    function clasificarPresionAHA(sistolica, diastolica, tipo) {
+        const rangos = {
+            adulto: {
+                verde: { minSys: 0, maxSys: 119, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 120, maxSys: 129, minDia: 0, maxDia: 79 },
+                azul: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
+                rojo: { minSys: 140, maxSys: 179, minDia: 90, maxDia: 119 },
+                rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
+            },
+            adultoMayor: {
+                verde: { minSys: 0, maxSys: 129, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
+                azul: { minSys: 140, maxSys: 149, minDia: 90, maxDia: 99 },
+                rojo: { minSys: 150, maxSys: 179, minDia: 100, maxDia: 119 },
+                rojoBrillante: { minSys: 180, maxSys: 999, minDia: 120, maxDia: 999 }
+            },
+            embarazada: {
+                verde: { minSys: 0, maxSys: 119, minDia: 0, maxDia: 79 },
+                amarillo: { minSys: 120, maxSys: 129, minDia: 80, maxDia: 84 },
+                azul: { minSys: 130, maxSys: 139, minDia: 85, maxDia: 89 },
+                rojo: { minSys: 140, maxSys: 159, minDia: 90, maxDia: 109 },
+                rojoBrillante: { minSys: 160, maxSys: 999, minDia: 110, maxDia: 999 }
+            },
+            nino: {
+                verde: { minSys: 0, maxSys: 109, minDia: 0, maxDia: 69 },
+                amarillo: { minSys: 110, maxSys: 119, minDia: 70, maxDia: 74 },
+                azul: { minSys: 120, maxSys: 129, minDia: 75, maxDia: 79 },
+                rojo: { minSys: 130, maxSys: 139, minDia: 80, maxDia: 89 },
+                rojoBrillante: { minSys: 140, maxSys: 999, minDia: 90, maxDia: 999 }
+            }
+        };
+        const rangoTipo = rangos[tipo] || rangos.adulto;
+        for (let [color, limites] of Object.entries(rangoTipo)) {
+            if (sistolica >= limites.minSys && sistolica <= limites.maxSys &&
+                diastolica >= limites.minDia && diastolica <= limites.maxDia) {
+                return color;
+            }
+        }
+        return (sistolica >= 180 || diastolica >= 120) ? "rojoBrillante" : "rojo";
+    }
+
+    function obtenerMensaje(categoria, tipo) {
+        const msg = {
+            verde: "✅ Normal. Mantenga hábitos saludables.",
+            amarillo: "⚠️ Presión elevada. Reduzca sal y haga ejercicio.",
+            azul: "🔵 HTA etapa 1. Consulte a su médico.",
+            rojo: "🔴 HTA etapa 2. Requiere atención médica pronto.",
+            rojoBrillante: "🔥 CRISIS HIPERTENSIVA. ¡ACUDA A URGENCIAS AHORA!"
+        };
+        let texto = msg[categoria] || msg.azul;
+        if (tipo === "embarazada" && categoria !== "verde") {
+            texto += " 🚨 Riesgo de preeclampsia. Consulte a su obstetra.";
+        }
+        return texto;
+    }
+
+    function getColor(categoria) {
+        const colores = { verde: "#10B981", amarillo: "#FBBF24", azul: "#3B82F6", rojo: "#EF4444", rojoBrillante: "#B91C1C" };
+        return colores[categoria] || "#6B7280";
+    }
+
+    // HTML de la herramienta
+    setTimeout(() => {
+        const btn = document.getElementById("calcularPresionBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const sistolica = parseInt(document.getElementById("presionSistolica")?.value);
+                const diastolica = parseInt(document.getElementById("presionDiastolica")?.value);
+                const tipo = document.getElementById("tipoPersona")?.value;
+                const resDiv = document.getElementById("resultadoPresion");
+                const colorDiv = document.getElementById("resultadoColor");
+                const recDiv = document.getElementById("resultadoRecomendacion");
+
+                if (isNaN(sistolica) || isNaN(diastolica)) {
+                    AppState.addNotification("❌ Ingrese valores válidos", "error");
+                    return;
+                }
+
+                const categoria = clasificarPresionAHA(sistolica, diastolica, tipo);
+                const colorHex = getColor(categoria);
+                const mensaje = obtenerMensaje(categoria, tipo);
+                let nombreCat = { verde:"Normal", amarillo:"Elevado", azul:"HTA Etapa 1", rojo:"HTA Etapa 2", rojoBrillante:"CRISIS HIPERTENSIVA" }[categoria];
+
+                colorDiv.innerHTML = `${sistolica} / ${diastolica} mmHg<br><span style="font-size:14px;">${nombreCat}</span>`;
+                colorDiv.style.backgroundColor = colorHex;
+                colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                recDiv.innerHTML = `<strong>📋 Recomendación AHA 2026:</strong><br>${mensaje}`;
+                resDiv.style.display = "block";
+                resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            };
+        }
+    }, 50);
+
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+                <p style="color: #4B5563;">Ingrese valores de presión arterial y seleccione el tipo de persona (AHA 2026).</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px;">
+                <input type="number" id="presionSistolica" placeholder="Presión Sistólica (ej: 120)" style="width:100%; padding:12px; margin-bottom:16px; border-radius:12px; border:1px solid #ccc;">
+                <input type="number" id="presionDiastolica" placeholder="Presión Diastólica (ej: 80)" style="width:100%; padding:12px; margin-bottom:16px; border-radius:12px; border:1px solid #ccc;">
+                <select id="tipoPersona" style="width:100%; padding:12px; margin-bottom:24px; border-radius:12px; border:1px solid #ccc;">
+                    <option value="nino">👶 Niño</option>
+                    <option value="adulto">🧑 Adulto</option>
+                    <option value="embarazada">🤰 Embarazada</option>
+                    <option value="adultoMayor">👴 Adulto mayor</option>
+                </select>
+                <button id="calcularPresionBtn" style="background:#0D9488; color:white; padding:14px; border:none; border-radius:40px; font-weight:bold; width:100%; cursor:pointer;">🔍 CALCULAR (AHA 2026)</button>
+            </div>
+            <div id="resultadoPresion" style="background:white; border-radius:16px; padding:20px; margin-top:16px; display:none;">
+                <div id="resultadoColor" style="border-radius:12px; padding:20px; text-align:center; font-weight:bold; font-size:18px;"></div>
+                <div id="resultadoRecomendacion" style="margin-top:16px; font-size:14px;"></div>
+                <div style="margin-top:16px; font-size:12px; background:#F3F4F6; padding:12px; border-radius:12px; text-align:center;">⚠️ Consulte siempre a su médico.</div>
+            </div>
+        </div>
+    `;
+};
 
 
     // ==============================================
-// FUNCIONES SEPARADAS - VALORES NORMALES
+// FUNCIONES SEPARADAS - VALORES NORMALES 1
 // ==============================================
 
 window.renderGlasgowTool = function() {
