@@ -4254,7 +4254,7 @@ function verDetallesPAM(tipo) {
                 
                 
                 colorDiv.innerHTML = `
-                    <div style="font-size:28px; font-weight:800;">${sistolica} / ${diastolica}</div>
+                    <div style="font-size:clamp(28px, 8vw, 36px); font-weight:800;">${sistolica} / ${diastolica}</div>
                     <div style="font-size:14px; margin-top:8px;">mmHg</div>
                     <div style="font-size:16px; font-weight:600; margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>
                 `;
@@ -4288,7 +4288,7 @@ function verDetallesPAM(tipo) {
         <div style="padding: 4px 0 20px 0;">
             <!-- Encabezado profesional -->
             <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 20px; padding: 10px; margin-bottom: 20px; color: white; text-align: center;">
-                <h2 style="margin: 0 0 8px 0; font-size: 24px;">🩺 Monitor de Presión Arterial</h2>
+                <h2 style="margin: 0 0 8px 0; font-size: clamp(13px, 4vw, 28px);">🩺 Monitor de Presión Arterial</h2>
                 <p style="margin: 0; opacity: 0.9; font-size: 13px;">Basado en guías AHA 2026</p>
             </div>
 
@@ -4328,8 +4328,7 @@ function verDetallesPAM(tipo) {
                 </div>
 
                 <!-- Botón CALCULAR con estilo profesional -->
-                <button id="calcularPresionBtn" style="background: #2563EB; color: white; padding: 16px 20px; border: 2px solid #1D4ED8; border-radius: 60px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,0.3); transition: transform 0.1s, box-shadow 0.1s;">
-                    🔍 CALCULAR PRESIÓN ARTERIAL (AHA 2026)
+<button id="calcularPresionBtn" style="background: #2563EB; color: white; padding: clamp(12px, 4vw, 16px) clamp(16px, 5vw, 20px); border: 2px solid #1D4ED8; border-radius: 60px; font-weight: 800; font-size: clamp(14px, 4vw, 28px); width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,0.3); transition: transform 0.1s, box-shadow 0.1s;">                    🔍 CALCULAR PRESIÓN ARTERIAL (AHA 2026)
                 </button>
             </div>
 
