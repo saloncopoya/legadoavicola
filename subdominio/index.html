@@ -4060,28 +4060,36 @@ window.verDetallesPAM = function(tipo) {
         const contenedor = document.getElementById('historialPresionContainer')
         const seccionHistorial = document.getElementById('seccionHistorialCompleta');
             const seccionPAM = document.getElementById('seccionPAM');  
+
+          console.log("🔍 DEPURACIÓN:");
+    console.log("  - seccionPAM encontrado:", seccionPAM);
+        
         if (!contenedor) return;
         
         const historial = cargarHistorial();
         
         // OCULTAR o MOSTRAR la sección completa según haya registros
     if (historial.length === 0) {
+        console.log("  - CASO: 0 registros - Ocultando todo");
         if (seccionHistorial) seccionHistorial.style.display = 'none';
-                    if (seccionPAM) seccionPAM.style.display = 'none';
-
+        if (seccionPAM) seccionPAM.style.display = 'none';
         return;
     } else {
+        console.log("  - CASO: Hay registros - Mostrando historial");
         if (seccionHistorial) seccionHistorial.style.display = 'block';
     }
 
-         //  OCULTAR o MOSTRAR la sección PAM (menos de 5 registros = oculto)
-        if (seccionPAM) {
-            if (historial.length >= 8) {
-                seccionPAM.style.display = 'block';
-            } else {
-                seccionPAM.style.display = 'none';
-            }
+    // OCULTAR o MOSTRAR la sección PAM
+    if (seccionPAM) {
+        console.log("  - Evaluando PAM con", historial.length, "registros");
+        if (historial.length >= 8) {
+            console.log("  - ✅ Mostrando PAM (>=8 registros)");
+            seccionPAM.style.display = 'block';
+        } else {
+            console.log("  - ❌ Ocultando PAM (<8 registros)");
+            seccionPAM.style.display = 'none';
         }
+    }
 
       
 
@@ -4367,6 +4375,9 @@ if (tipoPersonaGuardado && tipoSelectElem) {
     
     // ✅ Ocultar sección de historial si no hay registros
     const historial = cargarHistorial();
+        console.log("📊 TOTAL DE REGISTROS EN LOCALSTORAGE:", historial.length);
+console.log("📊 REGISTROS:", historial);
+        
     const seccionHistorial = document.getElementById('seccionHistorialCompleta');
     if (seccionHistorial) {
         seccionHistorial.style.display = historial.length === 0 ? 'none' : 'block';
