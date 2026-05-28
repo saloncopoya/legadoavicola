@@ -3513,10 +3513,10 @@ window.renderVentasScreen = async function() {
     // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
     const TEXTOS = {
-        btn_valores_normales: 'VALORES NORMALES',
-        btn_medicamentos: 'MEDICAMENTOS',
-        btn_conocimientos: 'CONOCIMIENTOS',
-        herramienta_glasgow: 'Escala de Glasgow',
+        btn_valores_normales: 'AGENCIA DE ENFERMERIA',
+        btn_medicamentos: 'SOLICITAR PROCEDIMIENTOS',
+        btn_conocimientos: 'COMPRAR PROPIEDADES',
+        herramienta_glasgow: 'RENTA DE CASAS',
        
         herramienta_antibioticos: 'Antibióticos',
       
@@ -3654,7 +3654,7 @@ window.renderVentasScreen = async function() {
     const herramientasConfig = {
         'valores-normales': {
             titulo: TEXTOS.btn_valores_normales,
-            descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
+            descripcion: 'Cuidados de enfermeria a domicilio, guardias en hospitales',
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
             subherramientas: ['glasgow', 'presion-arterial', 'glucosa'],
@@ -3674,7 +3674,7 @@ window.renderVentasScreen = async function() {
         },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
-            descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
+            descripcion: 'cuiracion de heridas, dialisis',
             color: '#3B82F6',
             icono: ICONOS_SVG.icono_medicamentos,
             subherramientas: ['antibioticos'],
@@ -3687,7 +3687,7 @@ window.renderVentasScreen = async function() {
         },
         'conocimientos': {
             titulo: TEXTOS.btn_conocimientos,
-            descripcion: 'Guías, protocolos, actualizaciones, RCP',
+            descripcion: 'renta de propiedades ',
             color: '#F59E0B',
             icono: ICONOS_SVG.icono_conocimientos,
             subherramientas: ['rcep'],
@@ -3712,10 +3712,10 @@ window.renderVentasScreen = async function() {
                         <polyline points="22 4 12 14.01 9 11.01"/>
                         <path d="M12 16v-4M12 8h.01"/>
                     </svg>
-                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
+                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BUSCADOR</h1>
                 </div>
                 <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
+                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Encuentra lo que necesites en tu ubicacion mas cercana</p>
                 </div>
                 <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
                     <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
