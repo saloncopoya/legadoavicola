@@ -3651,15 +3651,17 @@ window.renderVentasScreen = async function() {
             descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow', 'presion-arterial'],
+            subherramientas: ['glasgow', 'presion-arterial', 'glucosa'],
             nombres: {
                 glasgow: TEXTOS.herramienta_glasgow,
-                    'presion-arterial': 'Presión Arterial AHA 2026'
+                    'presion-arterial': 'Presión Arterial AHA 2026',
+                'glucosa': '🩸 Glucosa (Diabetes) ADA 2024'
 
             },
             iconos: {
                 glasgow: ICONOS_SVG.icono_glasgow,
-                    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`
+                    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
+                'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`
 
         
             }
@@ -3761,7 +3763,7 @@ window.renderVentasScreen = async function() {
         if (herramientaActual === 'valores-normales') {
             if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
             if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
-
+            if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
                }
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
@@ -3829,13 +3831,627 @@ window.renderVentasScreen = async function() {
     `;
 };
 
-
-
-
-
 // ==============================================
-// HERRAMIENTA DE PRESIÓN ARTERIAL AHA 2026 (COMPLETA)
+// HERRAMIENTA DE GLUCOSA (DIABETES) - PROFESIONAL
 // ==============================================
+
+window.renderGlucosaTool = function() {
+    // Clave para guardar historial en localStorage
+    const HISTORIAL_KEY = 'glucosa_historial';
+    const TIPO_GUARDADO_KEY = 'glucosa_tipo_condicion_seleccionado';
+
+    // Función para guardar el tipo de condición (pre/post) seleccionado
+    function guardarTipoSeleccionado(tipo) {
+        if (tipo && tipo !== "") {
+            localStorage.setItem(TIPO_GUARDADO_KEY, tipo);
+        }
+    }
+
+    // Función para cargar el tipo de condición guardado
+    function cargarTipoSeleccionado() {
+        return localStorage.getItem(TIPO_GUARDADO_KEY) || "";
+    }
+
+    // Cargar historial guardado
+    function cargarHistorial() {
+        const guardado = localStorage.getItem(HISTORIAL_KEY);
+        return guardado ? JSON.parse(guardado) : [];
+    }
+
+    // Guardar historial
+    function guardarHistorial(historial) {
+        localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
+    }
+
+    // Agregar nuevo registro
+    function agregarRegistro(valor, condicion, tipo, categoria, nombreCat) {
+        const historial = cargarHistorial();
+        const now = new Date();
+        const registro = {
+            id: Date.now(),
+            fecha: now.toLocaleDateString('es-MX'),
+            hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+            valor: valor,
+            condicion: condicion,
+            tipo: tipo,
+            categoria: categoria,
+            nombreCat: nombreCat,
+            timestamp: now.getTime()
+        };
+        historial.unshift(registro); // Los más nuevos primero
+        if (historial.length > 25) historial.pop(); // Máximo 25 registros
+        guardarHistorial(historial);
+        renderizarHistorial();
+        actualizarSelectorAnalisisIA(); // <-- Actualizar selector de IA cuando hay nuevos datos
+    }
+
+    // Eliminar registro
+    window.eliminarRegistroGlucosa = function(id) {
+        let historial = cargarHistorial();
+        historial = historial.filter(r => r.id !== id);
+        guardarHistorial(historial);
+        renderizarHistorial();
+        actualizarSelectorAnalisisIA(); // <-- Actualizar selector de IA al eliminar
+        AppState.addNotification('✅ Registro eliminado', 'success');
+    };
+
+    // Renderizar tabla de historial
+    function renderizarHistorial() {
+        const contenedor = document.getElementById('historialGlucosaContainer');
+        const seccionHistorial = document.getElementById('seccionHistorialGlucosaCompleta');
+        const seccionIA = document.getElementById('seccionAnalisisIA');
+
+        if (!contenedor) return;
+
+        const historial = cargarHistorial();
+
+        // OCULTAR o MOSTRAR la sección completa según haya registros
+        if (historial.length === 0) {
+            if (seccionHistorial) seccionHistorial.style.display = 'none';
+            if (seccionIA) seccionIA.style.display = 'none';
+            return;
+        } else {
+            if (seccionHistorial) seccionHistorial.style.display = 'block';
+        }
+
+        // MOSTRAR la sección de IA si hay 8 o más registros
+        if (seccionIA) {
+            if (historial.length >= 8) {
+                seccionIA.style.display = 'block';
+                // Renderizar el análisis la primera vez que se muestra
+                if (window.analizarGlucosaIA) window.analizarGlucosaIA();
+            } else {
+                seccionIA.style.display = 'none';
+            }
+        }
+
+        const getColorHistorial = (categoria) => {
+            const colores = {
+                'verde': '#10B981',
+                'amarillo': '#FBBF24',
+                'naranja': '#F97316',
+                'rojo': '#EF4444',
+                'rojoBrillante': '#B91C1C'
+            };
+            return colores[categoria] || '#6B7280';
+        };
+
+        const getNombreCondicion = (condicion) => {
+            return condicion === 'preprandial' ? 'Preprandial (Ayunas)' : 'Postprandial (Después de comer)';
+        };
+
+        contenedor.innerHTML = `
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background: #F3F4F6; border-radius: 12px;">
+                            <th style="padding:12px 8px; text-align:left;">Fecha/Hora</th>
+                            <th style="padding:12px 8px; text-align:left;">Glucosa (mg/dL)</th>
+                            <th style="padding:12px 8px; text-align:left;">Condición</th>
+                            <th style="padding:12px 8px; text-align:left;">Resultado</th>
+                            <th style="padding:12px 8px; text-align:center;">Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${historial.map(reg => `
+                            <tr style="border-bottom:1px solid #E5E7EB;">
+                                <td style="padding:10px 8px;">${reg.fecha}<br><small style="color:#6B7280;">${reg.hora}</small></td>
+                                <td style="padding:10px 8px; font-weight:600;">${reg.valor} mg/dL</td>
+                                <td style="padding:10px 8px; font-size:12px;">${getNombreCondicion(reg.condicion)}</td>
+                                <td style="padding:10px 8px;">
+                                    <span style="background:${getColorHistorial(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">${reg.nombreCat}</span>
+                                </td>
+                                <td style="padding:10px 8px; text-align:center;">
+                                    <button onclick="eliminarRegistroGlucosa(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer; font-weight:bold;">✕</button>
+                                </td>
+                             </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // Función de clasificación de Glucosa según ADA
+    function clasificarGlucosa(valor, tipoCondicion) {
+        let categoria = '';
+        let nombreCat = '';
+        
+        if (tipoCondicion === 'preprandial') {
+            // Rangos Preprandial (en ayunas)
+            if (valor < 70) {
+                categoria = 'rojoBrillante';
+                nombreCat = 'HIPOGLUCEMIA SEVERA';
+            } else if (valor >= 70 && valor < 80) {
+                categoria = 'rojo';
+                nombreCat = 'HIPOGLUCEMIA LEVE';
+            } else if (valor >= 80 && valor <= 130) {
+                categoria = 'verde';
+                nombreCat = 'ÓPTIMO (RANGO NORMAL)';
+            } else if (valor > 130 && valor <= 180) {
+                categoria = 'amarillo';
+                nombreCat = 'ELEVADA (PRE-DIABETES)';
+            } else if (valor > 180 && valor <= 250) {
+                categoria = 'naranja';
+                nombreCat = 'HIPERGLUCEMIA MODERADA';
+            } else {
+                categoria = 'rojo';
+                nombreCat = 'HIPERGLUCEMIA SEVERA';
+            }
+        } else { // Postprandial (después de comer)
+            if (valor < 70) {
+                categoria = 'rojoBrillante';
+                nombreCat = 'HIPOGLUCEMIA SEVERA';
+            } else if (valor >= 70 && valor < 80) {
+                categoria = 'rojo';
+                nombreCat = 'HIPOGLUCEMIA LEVE';
+            } else if (valor >= 80 && valor <= 180) {
+                categoria = 'verde';
+                nombreCat = 'ÓPTIMO (RANGO NORMAL)';
+            } else if (valor > 180 && valor <= 250) {
+                categoria = 'amarillo';
+                nombreCat = 'HIPERGLUCEMIA MODERADA';
+            } else if (valor > 250 && valor <= 300) {
+                categoria = 'naranja';
+                nombreCat = 'HIPERGLUCEMIA SEVERA';
+            } else {
+                categoria = 'rojo';
+                nombreCat = 'HIPERGLUCEMIA CRÍTICA';
+            }
+        }
+        return { categoria, nombreCat };
+    }
+
+    function obtenerMensajeProfesional(categoria, tipoCondicion, valor) {
+        const nombreCondicion = tipoCondicion === 'preprandial' ? 'en ayunas (Preprandial)' : 'después de comer (Postprandial)';
+        let mensaje = '';
+        
+        switch(categoria) {
+            case 'verde':
+                mensaje = `<strong style="font-size:18px;">✅ GLUCOSA EN RANGO NORMAL</strong><br>Excelente control. Sigue con tu plan de alimentación y medicación.`;
+                break;
+            case 'amarillo':
+                mensaje = `<strong style="font-size:18px;">⚠️ GLUCOSA ELEVADA</strong><br>Revisa tu dieta y actividad física. Si es recurrente, consulta a tu médico para ajustar tratamiento.`;
+                break;
+            case 'naranja':
+                mensaje = `<strong style="font-size:18px;">🔴 GLUCOSA MUY ELEVADA</strong><br>Requiere atención. Verifica tu medicación y considera contactar a tu médico en las próximas horas.`;
+                break;
+            case 'rojo':
+                mensaje = `<strong style="font-size:18px;">🔴 ¡ALERTA! GLUCOSA CRÍTICAMENTE ALTA</strong><br>Riesgo de complicaciones agudas. ACUDE A URGENCIAS si presentas síntomas como sed intensa, micción frecuente o confusión.`;
+                break;
+            case 'rojoBrillante':
+                mensaje = `<strong style="font-size:18px;">🚨 ¡EMERGENCIA! HIPOGLUCEMIA SEVERA</strong><br>¡ACCIÓN INMEDIATA! Consume una fuente de azúcar de rápida absorción (jugo, refresco, 3 cucharadas de azúcar). Si no mejora en 15 minutos o está inconsciente, LLAME AL 911.`;
+                break;
+            default:
+                mensaje = `Valor: ${valor} mg/dL ${nombreCondicion}. Consulta a tu médico.`;
+        }
+        
+        if (tipoCondicion === 'preprandial') {
+            mensaje += `<br><br>📌 <strong>Referencia ADA 2024:</strong> Preprandial (ayunas) óptimo: 80-130 mg/dL.`;
+        } else {
+            mensaje += `<br><br>📌 <strong>Referencia ADA 2024:</strong> Postprandial óptimo: <180 mg/dL.`;
+        }
+        
+        mensaje += `<br><br>⚠️ <small>Esta herramienta es una guía. No sustituye la evaluación médica profesional.</small>`;
+        return mensaje;
+    }
+
+    function getColorHex(categoria) {
+        const colores = {
+            'verde': '#10B981',
+            'amarillo': '#FBBF24',
+            'naranja': '#F97316',
+            'rojo': '#EF4444',
+            'rojoBrillante': '#B91C1C'
+        };
+        return colores[categoria] || '#6B7280';
+    }
+
+    // ==============================================
+    // SECCIÓN DE ANALISIS MEDICO IA
+    // ==============================================
+    
+    // Función para actualizar el selector de análisis basado en el historial
+    function actualizarSelectorAnalisisIA() {
+        const selector = document.getElementById('tipoSelectorAnalisisIA');
+        if (!selector) return;
+        
+        const historial = cargarHistorial();
+        const tiposUnicos = [...new Set(historial.map(r => r.condicion))];
+        const tipoGuardado = cargarTipoSeleccionado();
+        
+        if (tiposUnicos.length === 0) {
+            selector.innerHTML = '<option value="">No hay tipos disponibles</option>';
+            return;
+        }
+        
+        selector.innerHTML = '<option value="" disabled selected>🔽 Seleccionar condición (Pre/Post)</option>' +
+            tiposUnicos.map(tipo => {
+                let nombre = tipo === 'preprandial' ? '🍏 Preprandial (Ayunas)' : '🍽️ Postprandial (Después de comer)';
+                return `<option value="${tipo}">${nombre}</option>`;
+            }).join('');
+            
+        // Seleccionar automáticamente el tipo guardado si existe
+        if (tipoGuardado && tiposUnicos.includes(tipoGuardado)) {
+            selector.value = tipoGuardado;
+            // Disparar el análisis automáticamente después de un pequeño retraso para que el DOM esté listo
+            setTimeout(() => window.analizarGlucosaIA(), 100);
+        }
+    }
+
+    // Función principal de análisis IA
+    window.analizarGlucosaIA = function() {
+        const selector = document.getElementById('tipoSelectorAnalisisIA');
+        const tipoCondicion = selector?.value;
+        const resultadoDiv = document.getElementById('resultadoAnalisisIA');
+        
+        if (!tipoCondicion) {
+            resultadoDiv.innerHTML = '<div style="color: #9CA3AF; text-align:center;">Seleccione una condición (Preprandial/Postprandial) para generar el análisis clínico.</div>';
+            return;
+        }
+        
+        // Guardar el tipo seleccionado
+        guardarTipoSeleccionado(tipoCondicion);
+        
+        const historial = cargarHistorial();
+        const registrosFiltrados = historial.filter(r => r.condicion === tipoCondicion);
+        
+        if (registrosFiltrados.length < 8) {
+            resultadoDiv.innerHTML = `<div style="background: #FEF3C7; color: #92400E; padding: 16px; border-radius: 12px; text-align:center;">
+                <strong>⚠️ Se requieren al menos 8 registros</strong><br>
+                Actualmente tienes ${registrosFiltrados.length} registro(s) para "${tipoCondicion === 'preprandial' ? 'Preprandial' : 'Postprandial'}".
+                Toma más mediciones para habilitar el análisis clínico con IA.
+            </div>`;
+            return;
+        }
+        
+        // Calcular métricas
+        const valores = registrosFiltrados.map(r => r.valor);
+        const promedio = valores.reduce((a, b) => a + b, 0) / valores.length;
+        const max = Math.max(...valores);
+        const min = Math.min(...valores);
+        const sorted = [...valores].sort((a, b) => a - b);
+        const mediana = sorted[Math.floor(sorted.length / 2)];
+        
+        // Calcular desviación estándar (aproximada)
+        const media = promedio;
+        const sumaCuadrados = valores.reduce((sum, val) => sum + Math.pow(val - media, 2), 0);
+        const desviacionEstandar = Math.sqrt(sumaCuadrados / valores.length);
+        
+        // Porcentaje de valores en diferentes rangos
+        let rangoOptimo = 0, rangoElevado = 0, rangoCritico = 0, rangoBajo = 0;
+        const limiteOptimoSuperior = tipoCondicion === 'preprandial' ? 130 : 180;
+        
+        valores.forEach(val => {
+            if (val >= 80 && val <= limiteOptimoSuperior) rangoOptimo++;
+            else if (val > limiteOptimoSuperior && val <= 250) rangoElevado++;
+            else if (val > 250) rangoCritico++;
+            else if (val < 70) rangoBajo++;
+        });
+        
+        const porcentajeOptimo = (rangoOptimo / valores.length) * 100;
+        const porcentajeElevado = (rangoElevado / valores.length) * 100;
+        const porcentajeCritico = (rangoCritico / valores.length) * 100;
+        const porcentajeBajo = (rangoBajo / valores.length) * 100;
+        
+        // Diagnóstico y recomendaciones IA
+        let diagnostico = '';
+        let colorDiagnostico = '';
+        let recomendacionPersonalizada = '';
+        let emoji = '';
+        
+        if (promedio > (tipoCondicion === 'preprandial' ? 150 : 200)) {
+            diagnostico = 'Control Metabólico NO ÓPTIMO';
+            colorDiagnostico = '#EF4444';
+            emoji = '🔴';
+            recomendacionPersonalizada = `⚠️ <strong>ALERTA CRÍTICA:</strong> Tu glucosa ${tipoCondicion === 'preprandial' ? 'en ayunas' : 'postprandial'} promedio es MUY ELEVADA (${promedio.toFixed(0)} mg/dL). 
+            <br><br>🔍 <strong>Análisis Clínico IA:</strong> 
+            <br>• El ${porcentajeCritico.toFixed(0)}% de tus mediciones superan los 250 mg/dL, indicando hiperglucemias severas recurrentes.
+            <br>• Solo el ${porcentajeOptimo.toFixed(0)}% de tus valores están en rango óptimo.
+            <br><br>💊 <strong>Recomendación:</strong> 
+            <br>1. ACUDE A TU MÉDICO EN LOS PRÓXIMOS DÍAS para ajuste de medicación.
+            <br>2. Considera aumentar la frecuencia de monitoreo (mínimo 3-4 veces al día).
+            <br>3. Revisa tu adherencia a la medicación y dieta.`;
+        } else if (promedio > (tipoCondicion === 'preprandial' ? 130 : 180)) {
+            diagnostico = 'Control Metabólico MEJORABLE';
+            colorDiagnostico = '#F97316';
+            emoji = '🟠';
+            recomendacionPersonalizada = `⚠️ <strong>GLUCOSA ELEVADA:</strong> Tu promedio (${promedio.toFixed(0)} mg/dL) está por encima del objetivo.
+            <br><br>🔍 <strong>Análisis Clínico IA:</strong>
+            <br>• El ${porcentajeElevado.toFixed(0)}% de tus mediciones están en rango elevado.
+            <br>• Tu glucosa máxima alcanzó ${max} mg/dL, requiriendo atención.
+            <br><br>💡 <strong>Recomendación:</strong>
+            <br>1. Agenda cita con tu endocrinólogo para revisar plan de tratamiento.
+            <br>2. Fortalece hábitos: reduce carbohidratos simples, aumenta actividad física.
+            <br>3. Monitorea especialmente después de las comidas.`;
+        } else if (promedio < 70 && tipoCondicion === 'preprandial') {
+            diagnostico = 'RIESGO DE HIPOGLUCEMIA';
+            colorDiagnostico = '#B91C1C';
+            emoji = '🚨';
+            recomendacionPersonalizada = `<strong>¡ALERTA!</strong> Tu glucosa en ayunas promedio es BAJA (${promedio.toFixed(0)} mg/dL).
+            <br><br>🔍 <strong>Análisis Clínico IA:</strong>
+            <br>• El ${porcentajeBajo.toFixed(0)}% de tus mediciones están por debajo de 70 mg/dL.
+            <br>• Tu valor mínimo fue de ${min} mg/dL.
+            <br><br>🆘 <strong>ACCIÓN INMEDIATA:</strong>
+            <br>1. Consume carbohidratos de absorción rápida antes de acostarte.
+            <br>2. Consulta a tu médico para reducir dosis de insulina/medicación.
+            <br>3. Mantén siempre una fuente de azúcar contigo.`;
+        } else {
+            diagnostico = 'Control Metabólico EN RANGO ÓPTIMO';
+            colorDiagnostico = '#10B981';
+            emoji = '✅';
+            recomendacionPersonalizada = `👍 <strong>EXCELENTE CONTROL:</strong> Tu glucosa ${tipoCondicion === 'preprandial' ? 'en ayunas' : 'postprandial'} promedio (${promedio.toFixed(0)} mg/dL) está dentro del objetivo.
+            <br><br>🔍 <strong>Análisis Clínico IA:</strong>
+            <br>• El ${porcentajeOptimo.toFixed(0)}% de tus mediciones están en rango óptimo.
+            <br>• Presentas buena estabilidad (desviación estándar: ${desviacionEstandar.toFixed(1)} mg/dL).
+            <br><br>🎯 <strong>Recomendación:</strong>
+            <br>1. Mantén tus hábitos actuales de alimentación y ejercicio.
+            <br>2. Continúa con el monitoreo regular.
+            <br>3. Acude a tus controles médicos de rutina.`;
+        }
+        
+        // Agregar métricas clave al reporte
+        const reporteHtml = `
+            <div style="background: ${colorDiagnostico}10; border-radius: 20px; padding: 20px; border: 2px solid ${colorDiagnostico}30;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px;">${emoji}</div>
+                    <div style="font-size: 22px; font-weight: 800; color: ${colorDiagnostico};">${diagnostico}</div>
+                    <div style="font-size: 13px; color: #6B7280; margin-top: 8px;">Basado en ${valores.length} registros de ${tipoCondicion === 'preprandial' ? 'Preprandial (ayunas)' : 'Postprandial (después de comer)'}</div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: white; border-radius: 12px; padding: 12px; text-align: center;">
+                        <div style="font-size: 11px; color: #6B7280;">PROMEDIO</div>
+                        <div style="font-size: 24px; font-weight: 800;">${promedio.toFixed(0)}</div>
+                        <div style="font-size: 10px;">mg/dL</div>
+                    </div>
+                    <div style="background: white; border-radius: 12px; padding: 12px; text-align: center;">
+                        <div style="font-size: 11px; color: #6B7280;">MEDIANA</div>
+                        <div style="font-size: 24px; font-weight: 800;">${mediana.toFixed(0)}</div>
+                        <div style="font-size: 10px;">mg/dL</div>
+                    </div>
+                    <div style="background: white; border-radius: 12px; padding: 12px; text-align: center;">
+                        <div style="font-size: 11px; color: #6B7280;">MÁX / MÍN</div>
+                        <div style="font-size: 20px; font-weight: 800;">${max} / ${min}</div>
+                        <div style="font-size: 10px;">mg/dL</div>
+                    </div>
+                    <div style="background: white; border-radius: 12px; padding: 12px; text-align: center;">
+                        <div style="font-size: 11px; color: #6B7280;">ESTABILIDAD</div>
+                        <div style="font-size: 20px; font-weight: 800;">${desviacionEstandar.toFixed(1)}</div>
+                        <div style="font-size: 10px;">DE mg/dL</div>
+                    </div>
+                </div>
+                
+                <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                    <div style="font-weight: 700; margin-bottom: 12px;">📊 Distribución de rangos:</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                        <span style="background: #10B981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Óptimo: ${porcentajeOptimo.toFixed(0)}%</span>
+                        <span style="background: #FBBF24; color: #1F2937; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Elevado: ${porcentajeElevado.toFixed(0)}%</span>
+                        <span style="background: #EF4444; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Crítico: ${porcentajeCritico.toFixed(0)}%</span>
+                        <span style="background: #B91C1C; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Hipo: ${porcentajeBajo.toFixed(0)}%</span>
+                    </div>
+                </div>
+                
+                <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; line-height: 1.6; font-size: 14px;">
+                    ${recomendacionPersonalizada}
+                </div>
+                
+                <div style="margin-top: 16px; font-size: 11px; color: #9CA3AF; text-align: center; border-top: 1px solid #E5E7EB; padding-top: 12px;">
+                    🤖 Análisis generado por IA con fines educativos. No reemplaza consulta médica.
+                </div>
+            </div>
+        `;
+        
+        resultadoDiv.innerHTML = reporteHtml;
+    };
+    
+    // HTML de la herramienta profesional
+    setTimeout(() => {
+        const btn = document.getElementById("calcularGlucosaBtn");
+        if (btn && !btn.hasListener) {
+            btn.hasListener = true;
+            btn.onclick = function() {
+                const valor = parseFloat(document.getElementById("glucosaValor")?.value);
+                const condicionSelect = document.getElementById("tipoCondicion");
+                const condicion = condicionSelect?.value;
+                const condicionTexto = condicionSelect?.options[condicionSelect.selectedIndex]?.text || condicion;
+
+                // Guardar la condición seleccionada automáticamente
+                if (condicion && condicion !== "") {
+                    guardarTipoSeleccionado(condicion);
+                }
+
+                const resDiv = document.getElementById("resultadoGlucosa");
+                const colorDiv = document.getElementById("resultadoGlucosaColor");
+                const recDiv = document.getElementById("resultadoGlucosaRecomendacion");
+
+                if (!condicion || condicion === "") {
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 200]);
+                    AppState.addNotification("⚠️ Seleccione si es Preprandial (antes de comer) o Postprandial (después de comer)", "warning");
+                    return;
+                }
+
+                if (isNaN(valor) || valor <= 0) {
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 200]);
+                    AppState.addNotification("❌ Ingrese un valor válido de glucosa (mg/dL)", "error");
+                    return;
+                }
+                
+                if (valor < 20 || valor > 600) {
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 200]);
+                    AppState.addNotification("⚠️ Valores fuera de rango clínico (20-600 mg/dL)", "warning");
+                    return;
+                }
+
+                // Limpiar campos después de calcular
+                document.getElementById("glucosaValor").value = '';
+
+                const { categoria, nombreCat } = clasificarGlucosa(valor, condicion);
+                const colorHex = getColorHex(categoria);
+                const mensajeProfesional = obtenerMensajeProfesional(categoria, condicion, valor);
+                
+                // Reproducir sonido de alerta si es HIPOGLUCEMIA o HIPERGLUCEMIA CRÍTICA
+                if (categoria === 'rojoBrillante' || categoria === 'rojo' || categoria === 'naranja') {
+                    try {
+                        const audio = new Audio('/notificacion.wav');
+                        audio.play().catch(e => console.log('Error al reproducir sonido:', e));
+                    } catch(e) {}
+                    if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+                    
+                    if (categoria === 'rojoBrillante') {
+                        AppState.addNotification('🚨 ¡ALERTA! HIPOGLUCEMIA SEVERA - Consuma azúcar INMEDIATAMENTE', 'error', 10000);
+                    } else if (categoria === 'rojo') {
+                        AppState.addNotification('🔴 ¡ALERTA! HIPERGLUCEMIA CRÍTICA - Requiere atención médica', 'error', 8000);
+                    } else if (categoria === 'naranja') {
+                        AppState.addNotification('⚠️ GLUCOSA MUY ELEVADA - Monitoree y consulte a su médico', 'warning', 6000);
+                    }
+                }
+
+                colorDiv.innerHTML = `
+                    <div style="font-size:clamp(28px, 8vw, 36px); font-weight:800;">${valor}</div>
+                    <div style="font-size:14px; margin-top:8px;">mg/dL</div>
+                    <div style="font-size:16px; font-weight:600; margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>
+                `;
+                colorDiv.style.backgroundColor = colorHex;
+                colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
+                recDiv.innerHTML = mensajeProfesional;
+                resDiv.style.display = "block";
+                
+                // Guardar en historial
+                agregarRegistro(valor, condicion, condicionTexto, categoria, nombreCat);
+                
+                resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            };
+        }
+        
+        renderizarHistorial();
+        
+        // Inicializar selector de IA después de renderizar el historial
+        setTimeout(() => {
+            actualizarSelectorAnalisisIA();
+        }, 100);
+        
+        // Ocultar secciones si no hay registros al inicio
+        const historialInicial = cargarHistorial();
+        const seccionHistorial = document.getElementById('seccionHistorialGlucosaCompleta');
+        const seccionIA = document.getElementById('seccionAnalisisIA');
+        if (seccionHistorial && historialInicial.length === 0) {
+            seccionHistorial.style.display = 'none';
+        }
+        if (seccionIA && historialInicial.length < 8) {
+            seccionIA.style.display = 'none';
+        }
+        
+    }, 100);
+
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <!-- Encabezado profesional -->
+            <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); border-radius: 20px; padding: 10px; margin-bottom: 20px; color: white; text-align: center;">
+                <h2 style="margin: 0 0 8px 0; font-size: clamp(13px, 4vw, 28px);">🩸 Monitor de Glucosa (Diabetes)</h2>
+                <p style="margin: 0; opacity: 0.9; font-size: 13px;">Basado en guías ADA 2024</p>
+            </div>
+
+            <!-- Formulario principal -->
+            <div style="margin-bottom: 24px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">🩸 Valor de Glucosa (mg/dL)</label>
+                    <input type="number" id="glucosaValor" placeholder="Ej: 110" 
+                           style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center; font-weight:700; background:#F8FAFC; transition:all 0.2s; box-sizing:border-box;"
+                           onfocus="this.style.borderColor='#0D9488'; this.style.background='white'"
+                           onblur="this.style.borderColor='#E5E7EB'; this.style.background='#F8FAFC'">
+                </div>
+
+                <!-- Combobox de condición (Preprandial / Postprandial) -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #1F2937;">🍽️ Condición de la medición</label>
+                    <select id="tipoCondicion" style="width:100%; padding:14px; border-radius:14px; border:2px solid #E5E7EB; font-size:14px; background:white;">
+                        <option value="" disabled selected>🔽 Seleccionar condición</option>
+                        <option value="preprandial">🍏 Preprandial (En ayunas - antes de comer)</option>
+                        <option value="postprandial">🍽️ Postprandial (Después de comer - 2 horas)</option>
+                    </select>
+                </div>
+
+                <!-- Botón CALCULAR -->
+                <button id="calcularGlucosaBtn" style="background: #2563EB; color: white; padding: clamp(12px, 4vw, 16px) clamp(16px, 5vw, 20px); border: 2px solid #1D4ED8; border-radius: 60px; font-weight: 800; font-size: clamp(14px, 4vw, 28px); width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(37,99,235,0.3); transition: transform 0.1s, box-shadow 0.1s;">
+                    🔍 CALCULAR GLUCOSA (ADA 2024)
+                </button>
+            </div>
+
+            <!-- Resultado actual -->
+            <div id="resultadoGlucosa" style="background: white; border-radius: 20px; padding: 20px; margin-top: 8px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-left: 6px solid #0D9488;">
+                <div id="resultadoGlucosaColor" style="border-radius: 16px; padding: 24px; text-align: center; font-weight: bold; transition: all 0.3s ease;"></div>
+                <div id="resultadoGlucosaRecomendacion" style="margin-top: 20px; font-size: 14px; line-height: 1.6; color: #1F2937; padding: 8px;"></div>
+                <div style="margin-top: 20px; font-size: 11px; background: #F3F4F6; padding: 12px; border-radius: 12px; text-align: center; color: #6B7280;">
+                    ⚠️ Esta herramienta es una guía clínica. No reemplaza la evaluación médica presencial.
+                </div>
+            </div>
+
+            <!-- HISTORIAL DE REGISTROS -->
+            <div id="seccionHistorialGlucosaCompleta" style="background: white; border-radius: 20px; padding: 1px; margin-bottom: 20px; margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; padding-bottom: 12px;">
+                    <span style="font-size: 22px;">📋</span>
+                    <h3 style="margin: 0; color: #1F2937;">Historial clínico de Glucosa</h3>
+                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 25 registros</span>
+                </div>
+                <div id="historialGlucosaContainer">
+                    <div style="text-align:center; padding:20px; color:#9CA3AF;">📋 No hay registros aún. Calcule un valor de glucosa para comenzar.</div>
+                </div>
+            </div>
+
+            <!-- NUEVA SECCIÓN: ANÁLISIS MÉDICO IA (se muestra con 8+ registros) -->
+            <div id="seccionAnalisisIA" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                    <span style="font-size: 28px;">🤖</span>
+                    <h3 style="margin: 0; color: white;">Análisis Clínico IA</h3>
+                    <span style="margin-left: auto; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 11px; color: white;">Beta</span>
+                </div>
+                <p style="color: rgba(255,255,255,0.9); font-size: 13px; margin-bottom: 16px;">
+                    Seleccione una condición (Preprandial/Postprandial) y el sistema analizará sus últimos 8+ registros generando un reporte médico automático.
+                </p>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; color: white; font-weight: 600; margin-bottom: 8px;">👤 Tipo de condición a analizar</label>
+                    <select id="tipoSelectorAnalisisIA" style="width:100%; padding: 12px; border-radius: 12px; border: none; font-size: 14px;" onchange="analizarGlucosaIA()">
+                        <option value="" disabled selected>🔽 Seleccionar condición según historial</option>
+                    </select>
+                </div>
+                
+                <div id="resultadoAnalisisIA" style="background: white; border-radius: 16px; padding: 16px; margin-top: 8px;">
+                    <div style="color: #9CA3AF; text-align: center;">
+                        Seleccione una condición para generar el análisis clínico detallado.
+                    </div>
+                </div>
+                
+                <div style="margin-top: 12px; font-size: 11px; color: rgba(255,255,255,0.7); text-align: center;">
+                    📊 Se requieren al menos 8 registros del mismo tipo para generar un análisis estadístico significativo.
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+
 
 // ==============================================
 // HERRAMIENTA DE PRESIÓN ARTERIAL AHA 2026 - PROFESIONAL
