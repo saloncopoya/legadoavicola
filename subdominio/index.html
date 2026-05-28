@@ -4016,22 +4016,75 @@ window.renderTrigliceridosTool = function() {
     </div>`;
 };
 
-// ==============================================
-// HERRAMIENTA DE IMC (ÍNDICE DE MASA CORPORAL)
+
+
+
+    // ==============================================
+// HERRAMIENTA DE IMC (OMS 2026)
+// Con interpretación de riesgo y rangos específicos
 // ==============================================
 window.renderIMCTool = function() {
-    const HISTORIAL_KEY = 'imc_historial';
+    const HISTORIAL_KEY = 'imc_historial_v2';
+    
     function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
     function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-    function agregarRegistro(imc, peso, altura, categoria, nombreCat) {
+    
+    function agregarRegistro(imc, peso, altura, categoria, nombreCat, riesgo) {
         const h = cargarHistorial();
         const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), imc, peso, altura, categoria, nombreCat });
+        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), imc, peso, altura, categoria, nombreCat, riesgo });
         if (h.length > 25) h.pop();
         guardarHistorial(h);
         renderizarHistorial();
     }
-    window.eliminarRegistroIMC = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
+    
+    window.eliminarRegistroIMC = function(id) { 
+        let h = cargarHistorial(); 
+        h = h.filter(r => r.id !== id); 
+        guardarHistorial(h); 
+        renderizarHistorial(); 
+        AppState.addNotification('✅ Registro eliminado', 'success'); 
+    };
+    
+    function clasificarIMC(imc) {
+        // Clasificación OMS 2026
+        if (imc < 16.0) return { categoria: 'rojoBrillante', nombreCat: 'DELGADEZ SEVERA', riesgo: 'Muy alto riesgo de complicaciones' };
+        if (imc >= 16.0 && imc < 17.0) return { categoria: 'rojo', nombreCat: 'DELGADEZ MODERADA', riesgo: 'Alto riesgo' };
+        if (imc >= 17.0 && imc < 18.5) return { categoria: 'naranja', nombreCat: 'DELGADEZ ACEPTABLE', riesgo: 'Riesgo moderado' };
+        if (imc >= 18.5 && imc < 25.0) return { categoria: 'verde', nombreCat: 'NORMOPESO', riesgo: 'Riesgo bajo (saludable)' };
+        if (imc >= 25.0 && imc < 27.0) return { categoria: 'amarillo', nombreCat: 'SOBREPESO GRADO I', riesgo: 'Riesgo leve aumentado' };
+        if (imc >= 27.0 && imc < 30.0) return { categoria: 'amarillo', nombreCat: 'SOBREPESO GRADO II', riesgo: 'Riesgo moderado' };
+        if (imc >= 30.0 && imc < 35.0) return { categoria: 'naranja', nombreCat: 'OBESIDAD TIPO I', riesgo: 'Alto riesgo cardiovascular' };
+        if (imc >= 35.0 && imc < 40.0) return { categoria: 'rojo', nombreCat: 'OBESIDAD TIPO II', riesgo: 'Muy alto riesgo' };
+        return { categoria: 'rojoBrillante', nombreCat: 'OBESIDAD TIPO III (MÓRBIDA)', riesgo: 'Riesgo extremadamente alto' };
+    }
+    
+    function getMensajeProfesional(imc, peso, altura, categoria, nombreCat, riesgo) {
+        const pesoIdealMin = (18.5 * altura * altura).toFixed(1);
+        const pesoIdealMax = (24.9 * altura * altura).toFixed(1);
+        
+        return `
+            <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <div style="font-size: 32px; font-weight: 800; text-align: center;">${imc} <span style="font-size: 16px;">kg/m²</span></div>
+                <div style="text-align: center; margin-top: 8px;"><strong>Clasificación:</strong> ${nombreCat}</div>
+                <div style="text-align: center; margin-top: 4px;">Peso: ${peso} kg | Altura: ${altura} m</div>
+            </div>
+            <div style="background: ${categoria === 'verde' ? '#D1FAE5' : categoria === 'amarillo' ? '#FEF3C7' : '#FEE2E2'}; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <strong>⚠️ Riesgo asociado: ${riesgo}</strong>
+            </div>
+            <div style="padding: 12px;">
+                ${categoria === 'verde' ? '<strong>✅ PESO SALUDABLE</strong><br>Mantenga sus hábitos actuales. Realice actividad física regular (150 min/semana) y alimentación balanceada.' : 
+                  categoria.includes('DELGADEZ') ? '<strong>⚠️ BAJO PESO</strong><br>Consulte a un nutricionista. Aumente ingesta calórica con alimentos nutritivos. Evalúe causas subyacentes.' :
+                  categoria.includes('SOBREPESO') ? '<strong>⚠️ SOBREPESO</strong><br>Riesgo cardiovascular aumentado. Modifique hábitos: reduzca 500 kcal/día, aumente actividad física a 300 min/semana.' :
+                  '<strong>🔴 OBESIDAD</strong><br>Alto riesgo de enfermedades cardiovasculares, diabetes tipo 2 y complicaciones metabólicas. Requiere intervención médica multidisciplinaria.'}
+            </div>
+            <div style="font-size: 12px; color: #6B7280; padding: 8px; background: #F3F4F6; border-radius: 8px; margin-top: 12px;">
+                📌 <strong>Referencia OMS 2026:</strong> Rango saludable 18.5 - 24.9 kg/m²<br>
+                🎯 Su peso ideal para su altura: ${pesoIdealMin} - ${pesoIdealMax} kg
+            </div>
+        `;
+    }
+    
     function renderizarHistorial() {
         const cont = document.getElementById('historialIMCContainer');
         const secHist = document.getElementById('seccionHistorialIMCCompleta');
@@ -4039,17 +4092,11 @@ window.renderIMCTool = function() {
         const historial = cargarHistorial();
         if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
         if(secHist) secHist.style.display = 'block';
+        
         const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>IMC (kg/m²)</th><th>Peso/Altura</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.imc}</td><td>${reg.peso}kg / ${reg.altura}m</td><td><span style="background:${getColor(reg.categoria)}; color:white; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroIMC(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
+        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>IMC</th><th>Peso/Altura</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.imc} kg/m²</td><td>${reg.peso}kg / ${reg.altura}m</td><td><span style="background:${getColor(reg.categoria)}; color:white; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroIMC(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
     }
-    function clasificarIMC(imc) {
-        if (imc < 18.5) return { categoria: 'amarillo', nombreCat: 'BAJO PESO' };
-        if (imc >= 18.5 && imc <= 24.9) return { categoria: 'verde', nombreCat: 'NORMAL' };
-        if (imc >= 25 && imc <= 29.9) return { categoria: 'naranja', nombreCat: 'SOBREPESO' };
-        if (imc >= 30 && imc <= 34.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD I' };
-        if (imc >= 35 && imc <= 39.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD II' };
-        return { categoria: 'rojoBrillante', nombreCat: 'OBESIDAD III (MÓRBIDA)' };
-    }
+    
     setTimeout(() => {
         const btn = document.getElementById("calcularIMCBtn");
         if (btn && !btn.hasListener) {
@@ -4057,39 +4104,50 @@ window.renderIMCTool = function() {
             btn.onclick = function() {
                 const peso = parseFloat(document.getElementById("imcPeso")?.value);
                 const altura = parseFloat(document.getElementById("imcAltura")?.value);
-                if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) { AppState.addNotification("❌ Ingrese peso y altura válidos", "error"); return; }
+                if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) { 
+                    AppState.addNotification("❌ Ingrese peso y altura válidos", "error"); 
+                    return; 
+                }
+                if (peso < 20 || peso > 300) { AppState.addNotification("⚠️ Rango de peso: 20-300 kg", "warning"); return; }
+                if (altura < 0.5 || altura > 2.5) { AppState.addNotification("⚠️ Rango de altura: 0.5-2.5 m", "warning"); return; }
+                
                 const imc = peso / (altura * altura);
-                const { categoria, nombreCat } = clasificarIMC(imc);
+                const { categoria, nombreCat, riesgo } = clasificarIMC(imc);
                 const resDiv = document.getElementById("resultadoIMC"), colorDiv = document.getElementById("resultadoIMCColor"), recDiv = document.getElementById("resultadoIMCRecomendacion");
                 const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' };
+                
                 colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${imc.toFixed(1)}</div><div>kg/m²</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                let msg = (categoria === 'verde') ? 'Peso saludable. Mantén hábitos.' : (categoria === 'amarillo' ? 'Bajo peso. Aumenta ingesta calórica.' : (categoria === 'naranja' ? 'Sobrepeso. Dieta y ejercicio.' : (categoria === 'rojo' ? 'Obesidad. Consulta a un nutriólogo.' : 'Obesidad mórbida. Requiere evaluación médica URGENTE.')));
-                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Rango normal IMC: 18.5 - 24.9 kg/m² (OMS).</small>`;
+                colorDiv.style.backgroundColor = colores[categoria];
+                colorDiv.style.color = "white";
+                recDiv.innerHTML = getMensajeProfesional(imc.toFixed(1), peso, altura, categoria, nombreCat, riesgo);
                 resDiv.style.display = "block";
-                document.getElementById("imcPeso").value = '';
-                document.getElementById("imcAltura").value = '';
-                agregarRegistro(imc.toFixed(1), peso, altura, categoria, nombreCat);
+                
+                agregarRegistro(imc.toFixed(1), peso, altura, categoria, nombreCat, riesgo);
                 resDiv.scrollIntoView({ behavior: "smooth" });
             };
         }
         renderizarHistorial();
-        if(document.getElementById('seccionHistorialIMCCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialIMCCompleta').style.display = 'none';
     }, 100);
+    
     return `<div style="padding: 4px 0 20px 0;">
         <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563;">Cálculo del Índice de Masa Corporal (IMC) según OMS. Clasificación del estado nutricional.</p>
+            <p style="color: #4B5563;"><strong>📊 Índice de Masa Corporal (IMC) - OMS 2026</strong><br>Evaluación del estado nutricional con clasificación detallada y cálculo de peso ideal.</p>
         </div>
         <div style="display:flex; gap:16px; margin-bottom:20px;">
-            <input type="number" id="imcPeso" placeholder="Peso (kg)" step="0.1" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
-            <input type="number" id="imcAltura" placeholder="Altura (m)" step="0.01" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
+            <div style="flex:1;"><label>Peso (kg)</label>
+            <input type="number" id="imcPeso" placeholder="Ej: 70" step="0.1" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;"></div>
+            <div style="flex:1;"><label>Altura (m)</label>
+            <input type="number" id="imcAltura" placeholder="Ej: 1.70" step="0.01" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;"></div>
         </div>
         <button id="calcularIMCBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; cursor:pointer;">🔍 CALCULAR IMC</button>
         <div id="resultadoIMC" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
             <div id="resultadoIMCColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
-            <div id="resultadoIMCRecomendacion" style="margin-top:20px; font-size:14px;"></div>
+            <div id="resultadoIMCRecomendacion" style="margin-top:16px;"></div>
         </div>
-        <div id="seccionHistorialIMCCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialIMCContainer">Sin registros</div></div>
+        <div id="seccionHistorialIMCCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;">
+            <h3>📋 Historial de IMC</h3>
+            <div id="historialIMCContainer">Sin registros</div>
+        </div>
     </div>`;
 };
 
