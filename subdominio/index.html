@@ -3421,6 +3421,12 @@ window.formatTime = formatTime;
 // MANEJAR BOTÓN "ATRÁS" DEL CELULAR
 // ==============================================
 window.addEventListener('popstate', function() {
+
+    //  Si está OFFLINE NO RETROCEDER
+    if (!navigator.onLine) {
+        return;
+    }
+    
     // ✅ LEER LA NUEVA URL Y ACTUALIZAR AppState
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
