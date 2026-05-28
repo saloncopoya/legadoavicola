@@ -3871,7 +3871,7 @@ window.renderPresionArterialTool = function() {
             timestamp: now.getTime()
         };
         historial.unshift(registro); // Los más nuevos primero
-        if (historial.length > 5) historial.pop(); // Máximo 5 registros
+        if (historial.length > 25) historial.pop(); // Máximo 25 registros
         guardarHistorial(historial);
         renderizarHistorial();
     }
@@ -4083,6 +4083,12 @@ window.renderPresionArterialTool = function() {
                     return;
                 }
 
+
+                document.getElementById("presionSistolica").value = '';
+    document.getElementById("presionDiastolica").value = '';
+    // Resetear combobox a su estado inicial (placeholder vacío)
+    tipoSelect.value = "";
+                
                 const categoria = clasificarPresionAHA(sistolica, diastolica, tipo);
                 const colorHex = getColorHex(categoria);
                 const mensajeProfesional = obtenerMensajeProfesional(categoria, tipo, sistolica, diastolica);
@@ -4172,7 +4178,7 @@ window.renderPresionArterialTool = function() {
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; padding-bottom: 12px;">
                     <span style="font-size: 22px;">📋</span>
                     <h3 style="margin: 0; color: #1F2937;">Historial clínico</h3>
-                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 5 registros</span>
+                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 25 registros</span>
                 </div>
                 <div id="historialPresionContainer">
                     <!-- Aquí se renderiza el historial dinámicamente -->
