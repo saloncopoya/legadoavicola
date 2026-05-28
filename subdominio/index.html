@@ -4067,6 +4067,8 @@ window.verDetallesPAM = function(tipo) {
         // OCULTAR o MOSTRAR la sección completa según haya registros
     if (historial.length === 0) {
         if (seccionHistorial) seccionHistorial.style.display = 'none';
+                    if (seccionPAM) seccionPAM.style.display = 'none';
+
         return;
     } else {
         if (seccionHistorial) seccionHistorial.style.display = 'block';
