@@ -3810,9 +3810,10 @@ window.renderVentasScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
             <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
+               <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px); border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
+    <svg width="clamp(18px, 4vw, 22px)" height="clamp(18px, 4vw, 22px)" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <span style="color: white; font-size: clamp(9px, 3vw, 23px); font-weight: 500;">SALIR</span>
+</button>
                 <div style="flex: 1;">
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">${configActual.icono}</span>
