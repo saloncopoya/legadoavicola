@@ -3871,7 +3871,7 @@ window.renderPresionArterialTool = function() {
             timestamp: now.getTime()
         };
         historial.unshift(registro); // Los más nuevos primero
-        if (historial.length > 20) historial.pop(); // Máximo 20 registros
+        if (historial.length > 5) historial.pop(); // Máximo 5 registros
         guardarHistorial(historial);
         renderizarHistorial();
     }
@@ -4162,7 +4162,7 @@ window.renderPresionArterialTool = function() {
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E5E7EB; padding-bottom: 12px;">
                     <span style="font-size: 22px;">📋</span>
                     <h3 style="margin: 0; color: #1F2937;">Historial clínico</h3>
-                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 20 registros</span>
+                    <span style="margin-left: auto; font-size: 12px; color: #9CA3AF;">Máx. 5 registros</span>
                 </div>
                 <div id="historialPresionContainer">
                     <!-- Aquí se renderiza el historial dinámicamente -->
