@@ -1,138 +1,85 @@
 {
-    "name": "MI SEGUNDA APP NOMBRE 01",
-    "short_name": "MI SEGUNDA APP",
-    "description": "Descripcion de la aplicacion aqui",
-    "start_url": "/1/",
+    "name": "MI WEB SEGUNDA RE 01",
+    "short_name": "MIMWSRHUNDS MBRE CORTO",
+    "description": "DescripSEHUNDSde la aplicacion aqui",
+    "start_url": "/",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-    "theme_color": "#10B981",
+    "theme_color": "#8B4513",
     "background_color": "#f8f9fa",
     "orientation": "portrait-primary",
-    "scope": "/1/",
+    "scope": "/",
     "lang": "es-MX",
     "dir": "ltr",
     "categories": ["sports", "entertainment", "productivity"],
-    "id": "mi-app-1",
-    "version": "2.0.0",
-    
-    "edge_side_panel": {
+    "id": "mi-app-main2",
+    "version": "2.1.0",
+     "edge_side_panel": {
         "preferred_width": 400
     },
-    
-    "url_handlers": [
+     "url_handlers": [
         {
             "origin": "https://sub-legadoavicola.pages.dev",
-            "url": "/1/torneos/*"
+            "url": "/torneos/*"
         },
         {
             "origin": "https://sub-legadoavicola.pages.dev",
-            "url": "/1/cotejo/*"
+            "url": "/cotejo/*"
         }
     ],
-    
     "icons": [
-        {
-            "src": "/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
+        {"src": "/miniatura.jpg", "sizes": "48x48", "type": "image/png", "purpose": "any"},
+               {"src": "/miniatura.jpg", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
     ],
 
     "shortcuts": [
         {
-            "name": "Bienestar",
-            "short_name": "Bienestar",
-            "description": "Abrir bienestar",
-            "url": "/1/?section=bienestar",
-            "icons": [{"src": "https://placehold.co/96x96/10B981/white?text=⚡", "sizes": "96x96", "type": "image/png"}]
+            "name": "⚡ Bienestar", 
+            "short_name": "Bienestar", 
+            "description": "abrir menu", 
+            "url": "/?tsection=bienestar", 
+            "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=⚡", "sizes": "96x96", "type": "image/png"}]
         },
         {
-            "name": "Informacion",
-            "short_name": "Informacion",
-            "description": "Ver informacion",
-            "url": "/1/?section=informacion",
-            "icons": [{"src": "https://placehold.co/96x96/10B981/white?text=🏆", "sizes": "96x96", "type": "image/png"}]
+            "name": "🏆 Informacion", 
+            "short_name": "Informacion", 
+            "description": "Ver menu", 
+            "url": "/?section=INFORMACION", 
+            "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=🏆", "sizes": "96x96", "type": "image/png"}]
         },
         {
-            "name": "Buscador",
-            "short_name": "Buscador",
-            "description": "Ver buscador",
-            "url": "/1/?section=buscador",
-            "icons": [{"src": "https://placehold.co/96x96/10B981/white?text=📥", "sizes": "96x96", "type": "image/png"}]
+            "name": "📥 Buscador", 
+            "short_name": "Buscador", 
+            "description": "Ver buscador", 
+            "url": "/?section=buscador", 
+            "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=📥", "sizes": "96x96", "type": "image/png"}]
         }
     ],
 
     "screenshots": [
-        {
-            "src": "https://placehold.co/1280x720/10B981/white?text=BIENESTAR",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Pantalla de Bienestar"
-        },
-        {
-            "src": "https://placehold.co/1280x720/10B981/white?text=INFORMACION",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Pantalla de Informacion"
-        },
-        {
-            "src": "https://placehold.co/720x1280/10B981/white?text=BUSCADOR",
-            "sizes": "720x1280",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Pantalla de Buscador"
-        }
+        {"src": "https://placehold.co/1280x720/8B4513/white?text=BIENESTAR", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Tabla de Cotejo"},
+        {"src": "https://placehold.co/1280x720/8B4513/white?text=INFORAMCION", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "Tabla de Posiciones"},
+        {"src": "https://placehold.co/720x1280/8B4513/white?text=BUSCADOR", "sizes": "720x1280", "type": "image/png", "form_factor": "narrow", "label": "Calificación de peleas"}
     ],
+
     
     "handle_links": "preferred",
     
     "share_target": {
-        "action": "/1/",
+        "action": "/",
         "method": "GET",
         "enctype": "application/x-www-form-urlencoded",
         "params": {"title": "title", "text": "text", "url": "url"}
     },
     
-    "serviceworker": {
-        "src": "/1/sw.js",
-        "scope": "/1/",
-        "type": "classic",
-        "update_via_cache": "all"
-    },
-    
+    "serviceworker": {"src": "/sw.js", "scope": "/", "type": "classic", "update_via_cache": "all"},
     "offline_enabled": true,
-    "cache": {
-        "strategy": "cache-first",
-        "max_age": 2592000,
-        "max_entries": 100
-    },
+    "cache": {"strategy": "cache-first", "max_age": 2592000, "max_entries": 100},
+    "prefetch": {"urls": ["/", "/offline.html"], "strategy": "eager"},
     
-    "prefetch": {
-        "urls": ["/1/", "/offline.html"],
-        "strategy": "eager"
-    },
-    
-    "splash_screen": {
-        "background_color": "#10B981",
-        "image": "https://placehold.co/512x512/10B981/white?text=APP1",
-        "image_purpose": "any"
-    },
+    "splash_screen": {"background_color": "#8B4513", "image": "https://placehold.co/512x512/8B4513/white?text=MIAPP", "image_purpose": "any"},
     
     "analytics": {"enabled": false},
-    "features": {
-        "cross_window": true,
-        "fullscreen": true,
-        "picture_in_picture": false,
-        "wake_lock": false
-    },
+    "features": {"cross_window": true, "fullscreen": true, "picture_in_picture": false, "wake_lock": false},
     "capture_links": "existing-client-event"
 }
