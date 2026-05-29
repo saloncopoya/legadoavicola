@@ -37,21 +37,21 @@
             "name": "⚡ Bienestar", 
             "short_name": "Bienestar", 
             "description": "abrir menu", 
-            "url": "/?tab=bienestar", 
+            "url": "/?tsection=bienestar", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=⚡", "sizes": "96x96", "type": "image/png"}]
         },
         {
             "name": "🏆 Informacion", 
             "short_name": "Informacion", 
             "description": "Ver menu", 
-            "url": "/?tab=informacion", 
+            "url": "/?section=INFORMACION", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=🏆", "sizes": "96x96", "type": "image/png"}]
         },
         {
             "name": "📥 Buscador", 
             "short_name": "Buscador", 
             "description": "Ver buscador", 
-            "url": "/?tab=buscador", 
+            "url": "/?section=buscador", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=📥", "sizes": "96x96", "type": "image/png"}]
         }
     ],
