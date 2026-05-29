@@ -3,8 +3,8 @@
 // SCOPE: /1/
 // ==============================================
 
-const CACHE_NAME = 'app1-offline-v0.0.817';
-const DYNAMIC_CACHE = 'app1-dynamic-v0.0.817';
+const CACHE_NAME = 'app1-offline-v0.0.847';
+const DYNAMIC_CACHE = 'app1-dynamic-v0.0.317';
 
 // URLs específicas para la carpeta /1/
 const urlsToCache = [
