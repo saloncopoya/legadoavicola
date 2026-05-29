@@ -788,13 +788,15 @@ async function getDataOfflineFirst(store, id = null) {
 // Registrar Service Worker con el nuevo sistema
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw-full-offline.js').then(function(registration) {
-        }).catch(function(error) {
-            console.log('❌ Error al registrar Service Worker:', error);
-        });
+        navigator.serviceWorker.register('/1/sw.js', { scope: '/1/' })
+            .then(function(registration) {
+                console.log('✅ SW /1/ registrado correctamente:', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('❌ Error al registrar Service Worker:', error);
+            });
     });
 }
-
 // Cargar datos offline al iniciar la app
 setTimeout(async () => {
     if (navigator.onLine && AppState.firebase.database) {
