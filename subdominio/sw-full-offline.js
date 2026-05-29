@@ -5,7 +5,9 @@ const DYNAMIC_CACHE = 'legado-dynamic-v0.0.817';
 const urlsToCache = [
     '/',
     '/index.html',
+    '/1/index.html',
     '/manifest.json',
+    '/1/manifest.json',
     '/offline.html',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js',
