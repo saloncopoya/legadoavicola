@@ -5716,12 +5716,10 @@ window.renderRceptTool = function() {
 
 </script>          
 
-
-    
-<!-- PANTALLA 3: SHARE (COMPARTIR) - CON OFFLINE -->
+<!-- PANTALLA 3: BUSCADOR (SHARE) - MODIFICADO -->
 <script>
 window.renderShareScreen = async function() {
-  // ==============================================
+    // ==============================================
     // OCULTAR BARRA SI ENTRAMOS CON tool EN URL
     // ==============================================
     const ocultarTool = new URLSearchParams(window.location.search).get('tool');
@@ -5733,48 +5731,58 @@ window.renderShareScreen = async function() {
     }
     
     // ==============================================
-    // TODOS LOS TEXTOS SON CONSTANTES
+    // TEXTOS DEL BUSCADOR SEGÚN SOLICITUD
     // ==============================================
     const TEXTOS = {
-        btn_valores_normales: 'VALORES NORMALES',
-        btn_medicamentos: 'MEDICAMENTOS',
-        btn_conocimientos: 'CONOCIMIENTOS',
-        herramienta_glasgow: 'Escala de Glasgow',
-       
-        herramienta_antibioticos: 'Antibióticos',
-      
-        herramienta_rcep: 'RCP Actualizado',
-    
-        desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
-       
-        apertura_ocular: 'Apertura Ocular',
-        respuesta_verbal: 'Respuesta Verbal',
-        respuesta_motora: 'Respuesta Motora',
-        estado_fisico: 'Estado Físico General',
-        estado_mental: 'Estado Mental',
-        actividad: 'Actividad',
-        movilidad: 'Movilidad',
-        incontinencia: 'Incontinencia',
-        percepcion_sensorial: 'Percepción Sensorial',
-        humedad: 'Exposición a Humedad',
-        nutricion: 'Nutrición',
-        friccion: 'Fricción y Corte'
+        btn_personal_salud: 'PERSONAL DE SALUD',
+        btn_solicitar_procedimientos: 'SOLICITAR PROCEDIMIENTOS CLINICOS',
+        btn_comprar_terrenos: 'COMPRAR TERRENOS',
+        btn_renta_casas: 'RENTA DE CASAS',
+        btn_renta_salones: 'RENTA DE SALONES Y ALBERCAS',
+        
+        // Sub-herramientas para PERSONAL DE SALUD
+        herramienta_presion: 'Presión Arterial',
+        herramienta_glucosa: 'Glucosa (Diabetes)',
+        herramienta_colesterol: 'Colesterol Total',
+        herramienta_trigliceridos: 'Triglicéridos',
+        herramienta_imc: 'IMC (Índice de Masa Corporal)',
+        
+        // Sub-herramientas para SOLICITAR PROCEDIMIENTOS
+        herramienta_tramites: 'Trámites y Formatos',
+        herramienta_formatos: 'Formatos Médicos',
+        herramienta_solicitudes: 'Solicitudes en Línea',
+        
+        // Sub-herramientas para COMPRAR TERRENOS
+        herramienta_buscar_terrenos: 'Buscar Terrenos',
+        herramienta_catalogo_terrenos: 'Catálogo de Terrenos',
+        herramienta_contactar_terrenos: 'Contactar Vendedor',
+        
+        // Sub-herramientas para RENTA DE CASAS
+        herramienta_buscar_casas: 'Buscar Casas',
+        herramienta_departamentos: 'Departamentos',
+        herramienta_contactar_casas: 'Contactar Arrendador',
+        
+        // Sub-herramientas para RENTA DE SALONES Y ALBERCAS
+        herramienta_salones: 'Salones para Eventos',
+        herramienta_albercas: 'Albercas',
+        herramienta_cotizar: 'Cotizar'
     };
     
     // ==============================================
-    // TODOS LOS ICONOS SVG SON CONSTANTES
+    // ICONOS SVG DEL BUSCADOR
     // ==============================================
     const ICONOS_SVG = {
-        icono_valores_normales: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-        icono_medicamentos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>',
-        icono_conocimientos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
-      
-        icono_glasgow: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
-       
-        icono_antibioticos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>',
-       
-        icono_rcep: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>',
-      
+        icono_personal_salud: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/><path d="M12 16v-4M12 8h.01"/></svg>',
+        icono_solicitar: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+        icono_terrenos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="8" y1="21" x2="8" y2="15"/><line x1="16" y1="21" x2="16" y2="15"/><line x1="2" y1="9" x2="22" y2="9"/></svg>',
+        icono_casas: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>',
+        icono_salones: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M16.5 7.5L19 5"/><path d="M7.5 16.5L5 19"/></svg>',
+        
+        icono_presion: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-5 3 9 2-6 2 3 2-2 2 3 2-1"/><rect x="2" y="4" width="20" height="14" rx="2"/></svg>',
+        icono_glucosa: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 9v3l2 2"/></svg>',
+        icono_colesterol: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M8 8L4 12L8 16"/><path d="M16 8L20 12L16 16"/></svg>',
+        icono_trigliceridos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21L21 3"/><path d="M21 21L3 3"/><circle cx="12" cy="12" r="2"/></svg>',
+        icono_imc: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16"/><path d="M8 8h3v3H8z"/><path d="M13 8h3v3h-3z"/><path d="M8 13h3v3H8z"/><path d="M13 13h3v3h-3z"/></svg>',
         icono_default: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>'
     };
     
@@ -5785,7 +5793,7 @@ window.renderShareScreen = async function() {
     let herramientaActual = urlParams.get('tool');
     let subHerramientaActual = urlParams.get('subtool');
     
-    const herramientasValidas = ['valores-normales', 'medicamentos', 'conocimientos'];
+    const herramientasValidas = ['personal-salud', 'solicitar-procedimientos', 'comprar-terrenos', 'renta-casas', 'renta-salones'];
     if (!herramientasValidas.includes(herramientaActual)) {
         herramientaActual = null;
     }
@@ -5811,31 +5819,25 @@ window.renderShareScreen = async function() {
         renderApp();
     };
 
-
     window.cambiarSubHerramienta = function(subtool, event) {
-    if (event && event.preventDefault) event.preventDefault();
-    
-    // Guardar la posición del scroll
-    const scrollContainer = document.querySelector('.pestanas-scroll-container');
-    const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
-    
-    // Actualizar URL
-    const nuevaUrl = new URL(window.location);
-    nuevaUrl.searchParams.set('subtool', subtool);
-    window.history.pushState({}, '', nuevaUrl);
-    
-    // Recargar la pantalla para que renderApp muestre la herramienta correcta
-    renderApp();
-    
-    // Restaurar scroll después de renderizar
-    setTimeout(() => {
-        const newScrollContainer = document.querySelector('.pestanas-scroll-container');
-        if (newScrollContainer) {
-            newScrollContainer.scrollLeft = scrollPosition;
-        }
-    }, 100);
-};
-
+        if (event && event.preventDefault) event.preventDefault();
+        
+        const scrollContainer = document.querySelector('.pestanas-scroll-container');
+        const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+        
+        const nuevaUrl = new URL(window.location);
+        nuevaUrl.searchParams.set('subtool', subtool);
+        window.history.pushState({}, '', nuevaUrl);
+        
+        renderApp();
+        
+        setTimeout(() => {
+            const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+            if (newScrollContainer) {
+                newScrollContainer.scrollLeft = scrollPosition;
+            }
+        }, 100);
+    };
     
     window.volverAlMenuPrincipal = function() { 
         const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
@@ -5851,105 +5853,155 @@ window.renderShareScreen = async function() {
     };
     
     // ==============================================
-    // CONTENIDO DE CADA SUB-HERRAMIENTA
-    // ==============================================
-    const contenidos = {
-        glasgow: {
-            titulo: TEXTOS.herramienta_glasgow,
-            descripcion: TEXTOS.desc_glasgow,
-            secciones: [
-                { nombre: TEXTOS.apertura_ocular, valores: ['Espontánea (4)', 'A la voz (3)', 'Al dolor (2)', 'Ninguna (1)'] },
-                { nombre: TEXTOS.respuesta_verbal, valores: ['Orientado (5)', 'Confuso (4)', 'Palabras inapropiadas (3)', 'Sonidos incomprensibles (2)', 'Ninguna (1)'] },
-                { nombre: TEXTOS.respuesta_motora, valores: ['Obedece órdenes (6)', 'Localiza dolor (5)', 'Retirada al dolor (4)', 'Flexión anormal (3)', 'Extensión anormal (2)', 'Ninguna (1)'] }
-            ]
-        },
-        
-        antibioticos: { titulo: 'Antibióticos', descripcion: 'Clasificación, mecanismos de acción, indicaciones', secciones: [] },
-       
-        rcep: { titulo: 'RCP Actualizado', descripcion: 'Guías 2020-2025, compresiones, desfibrilación', secciones: [] },
-     
-        vacia: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
-    };
-    
-    // ==============================================
     // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
     // ==============================================
     const herramientasConfig = {
-        'valores-normales': {
-            titulo: TEXTOS.btn_valores_normales,
-            descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
+        'personal-salud': {
+            titulo: TEXTOS.btn_personal_salud,
+            descripcion: 'Herramientas clínicas para profesionales de la salud',
             color: '#0D9488',
-            icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['glasgow'],
+            icono: ICONOS_SVG.icono_personal_salud,
+            subherramientas: ['presion-arterial', 'glucosa', 'colesterol', 'trigliceridos', 'imc'],
             nombres: {
-                glasgow: TEXTOS.herramienta_glasgow
+                'presion-arterial': TEXTOS.herramienta_presion,
+                'glucosa': TEXTOS.herramienta_glucosa,
+                'colesterol': TEXTOS.herramienta_colesterol,
+                'trigliceridos': TEXTOS.herramienta_trigliceridos,
+                'imc': TEXTOS.herramienta_imc
             },
             iconos: {
-                glasgow: ICONOS_SVG.icono_glasgow
+                'presion-arterial': ICONOS_SVG.icono_presion,
+                'glucosa': ICONOS_SVG.icono_glucosa,
+                'colesterol': ICONOS_SVG.icono_colesterol,
+                'trigliceridos': ICONOS_SVG.icono_trigliceridos,
+                'imc': ICONOS_SVG.icono_imc
             }
         },
-        'medicamentos': {
-            titulo: TEXTOS.btn_medicamentos,
-            descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
+        'solicitar-procedimientos': {
+            titulo: TEXTOS.btn_solicitar_procedimientos,
+            descripcion: 'Gestión de trámites, formatos y solicitudes clínicas',
             color: '#3B82F6',
-            icono: ICONOS_SVG.icono_medicamentos,
-            subherramientas: ['antibioticos'],
+            icono: ICONOS_SVG.icono_solicitar,
+            subherramientas: ['tramites', 'formatos', 'solicitudes'],
             nombres: {
-                antibioticos: TEXTOS.herramienta_antibioticos
+                tramites: TEXTOS.herramienta_tramites,
+                formatos: TEXTOS.herramienta_formatos,
+                solicitudes: TEXTOS.herramienta_solicitudes
             },
             iconos: {
-                antibioticos: ICONOS_SVG.icono_antibioticos
+                tramites: ICONOS_SVG.icono_default,
+                formatos: ICONOS_SVG.icono_default,
+                solicitudes: ICONOS_SVG.icono_default
             }
         },
-        'conocimientos': {
-            titulo: TEXTOS.btn_conocimientos,
-            descripcion: 'Guías, protocolos, actualizaciones, RCP',
+        'comprar-terrenos': {
+            titulo: TEXTOS.btn_comprar_terrenos,
+            descripcion: 'Compra de terrenos y lotes en las mejores ubicaciones',
             color: '#F59E0B',
-            icono: ICONOS_SVG.icono_conocimientos,
-            subherramientas: ['rcep'],
+            icono: ICONOS_SVG.icono_terrenos,
+            subherramientas: ['buscar-terrenos', 'catalogo-terrenos', 'contactar-terrenos'],
             nombres: {
-                rcep: TEXTOS.herramienta_rcep
+                'buscar-terrenos': TEXTOS.herramienta_buscar_terrenos,
+                'catalogo-terrenos': TEXTOS.herramienta_catalogo_terrenos,
+                'contactar-terrenos': TEXTOS.herramienta_contactar_terrenos
             },
             iconos: {
-                rcep: ICONOS_SVG.icono_rcep
+                'buscar-terrenos': ICONOS_SVG.icono_default,
+                'catalogo-terrenos': ICONOS_SVG.icono_default,
+                'contactar-terrenos': ICONOS_SVG.icono_default
+            }
+        },
+        'renta-casas': {
+            titulo: TEXTOS.btn_renta_casas,
+            descripcion: 'Renta de casas, departamentos y propiedades residenciales',
+            color: '#8B5CF6',
+            icono: ICONOS_SVG.icono_casas,
+            subherramientas: ['buscar-casas', 'departamentos', 'contactar-casas'],
+            nombres: {
+                'buscar-casas': TEXTOS.herramienta_buscar_casas,
+                departamentos: TEXTOS.herramienta_departamentos,
+                'contactar-casas': TEXTOS.herramienta_contactar_casas
+            },
+            iconos: {
+                'buscar-casas': ICONOS_SVG.icono_default,
+                departamentos: ICONOS_SVG.icono_default,
+                'contactar-casas': ICONOS_SVG.icono_default
+            }
+        },
+        'renta-salones': {
+            titulo: TEXTOS.btn_renta_salones,
+            descripcion: 'Renta de salones para eventos y albercas para reuniones',
+            color: '#EC4899',
+            icono: ICONOS_SVG.icono_salones,
+            subherramientas: ['salones', 'albercas', 'cotizar'],
+            nombres: {
+                salones: TEXTOS.herramienta_salones,
+                albercas: TEXTOS.herramienta_albercas,
+                cotizar: TEXTOS.herramienta_cotizar
+            },
+            iconos: {
+                salones: ICONOS_SVG.icono_default,
+                albercas: ICONOS_SVG.icono_default,
+                cotizar: ICONOS_SVG.icono_default
             }
         }
     };
     
     // ==============================================
-    // VISTA PRINCIPAL (BOTONES ORIGINALES)
+    // VISTA PRINCIPAL DEL BUSCADOR (5 BOTONES)
     // ==============================================
     if (!herramientaActual) {
         return `
             <div style="min-height: 100vh; background: #F9FAFB;">
                 <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
-                        <path d="M12 16v-4M12 8h.01"/>
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
-                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
+                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BUSCADOR</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 14px;">ENCUENTRA LO QUE NECESITES</p>
                 </div>
                 <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
+                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Explora todas las categorías</p>
                 </div>
                 <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
-                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
+                    <!-- Botón 1: PERSONAL DE SALUD -->
+                    <button onclick="window.cambiarHerramienta('personal-salud', 'presion-arterial')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_valores_normales}</div>
-                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Constantes vitales, laboratorio, parámetros</p></div>
+                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_personal_salud}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_personal_salud}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Salud, bienestar y cuidados</p></div>
                         </div>
                     </button>
-                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
+                    
+                    <!-- Botón 2: SOLICITAR PROCEDIMIENTOS CLINICOS -->
+                    <button onclick="window.cambiarHerramienta('solicitar-procedimientos', 'tramites')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_medicamentos}</div>
-                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Dosis, indicaciones, contraindicaciones</p></div>
+                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_solicitar}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_solicitar_procedimientos}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Trámites, formatos y solicitudes</p></div>
                         </div>
                     </button>
-                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
+                    
+                    <!-- Botón 3: COMPRAR TERRENOS -->
+                    <button onclick="window.cambiarHerramienta('comprar-terrenos', 'buscar-terrenos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'">
                         <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_conocimientos}</div>
-                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Guías, protocolos, actualizaciones</p></div>
+                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_terrenos}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_comprar_terrenos}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Terrenos y lotes en venta</p></div>
+                        </div>
+                    </button>
+                    
+                    <!-- Botón 4: RENTA DE CASAS -->
+                    <button onclick="window.cambiarHerramienta('renta-casas', 'buscar-casas')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #8B5CF6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_casas}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_renta_casas}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Casas y departamentos en renta</p></div>
+                        </div>
+                    </button>
+                    
+                    <!-- Botón 5: RENTA DE SALONES Y ALBERCAS -->
+                    <button onclick="window.cambiarHerramienta('renta-salones', 'salones')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #EC4899; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_salones}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_renta_salones}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Salones para eventos y albercas</p></div>
                         </div>
                     </button>
                 </div>
@@ -5965,7 +6017,6 @@ window.renderShareScreen = async function() {
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
     }
-    const contenidoActual = contenidos[subHerramientaMostrar] || contenidos.vacia;
     
     const generarPestanas = () => {
         return `
@@ -5980,51 +6031,33 @@ window.renderShareScreen = async function() {
         `;
     };
     
-    // FUNCIÓN QUE LLAMA A LAS HERRAMIENTAS SEPARADAS
+    // Contenido dinámico para las herramientas
     const generarContenidoPrincipal = () => {
-        if (herramientaActual === 'valores-normales') {
-            if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
-               }
-        if (herramientaActual === 'medicamentos') {
-            if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
-                  }
-        if (herramientaActual === 'conocimientos') {
-            if (subHerramientaMostrar === 'rcep') return window.renderRceptTool();
-                  }
-        // Fallback: contenido original
-        if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
-            return `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
-                    <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
-                    <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
-                    <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
-                    </div>
-                </div>
-            `;
+        if (herramientaActual === 'personal-salud') {
+            if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool ? window.renderPresionArterialTool() : '<div>Herramienta no disponible</div>';
+            if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool ? window.renderGlucosaTool() : '<div>Herramienta no disponible</div>';
+            if (subHerramientaMostrar === 'colesterol') return window.renderColesterolTool ? window.renderColesterolTool() : '<div>Herramienta no disponible</div>';
+            if (subHerramientaMostrar === 'trigliceridos') return window.renderTrigliceridosTool ? window.renderTrigliceridosTool() : '<div>Herramienta no disponible</div>';
+            if (subHerramientaMostrar === 'imc') return window.renderIMCTool ? window.renderIMCTool() : '<div>Herramienta no disponible</div>';
         }
+        
+        // Placeholder para las demás herramientas
         return `
-            <div style="padding: 4px 0 20px 0;">
-                <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
-                    <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+                <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${configActual.nombres[subHerramientaMostrar] || 'Próximamente'}</h3>
+                <p style="color: #6B7280; margin-top: 8px;">${configActual.descripcion}</p>
+                <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente disponible</p>
                 </div>
-                ${contenidoActual.secciones.map(seccion => `
-                    <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
-                        </div>
-                    </div>
-                `).join('')}
-                <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                    <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
-                </div>
+                <button onclick="window.volverAlMenuPrincipal()" style="margin-top: 30px; background: ${configActual.color}; color: white; border: none; padding: 12px 30px; border-radius: 40px; font-weight: 600; cursor: pointer;">
+                    ← Volver al BUSCADOR
+                </button>
             </div>
         `;
     };
@@ -6032,10 +6065,10 @@ window.renderShareScreen = async function() {
     return `
         <div style="min-height: 100vh; background: #F9FAFB;">
             <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                      <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px); border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
-    <svg width="clamp(18px, 4vw, 22px)" height="clamp(18px, 4vw, 22px)" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    <span style="color: white; font-size: clamp(9px, 3vw, 23px); font-weight: 500;">SALIR</span>
-</button>
+                <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px); border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
+                    <svg width="clamp(18px, 4vw, 22px)" height="clamp(18px, 4vw, 22px)" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    <span style="color: white; font-size: clamp(9px, 3vw, 23px); font-weight: 500;">SALIR</span>
+                </button>
                 <div style="flex: 1;">
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">${configActual.icono}</span>
@@ -6050,92 +6083,8 @@ window.renderShareScreen = async function() {
         </div>
     `;
 };
-
-
-
-    // ==============================================
-// FUNCIONES SEPARADAS - VALORES NORMALES
-// ==============================================
-
-window.renderGlasgowTool = function() {
-    return `
-        <div style="padding: 4px 0 20px 0;">
-            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.</p>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Apertura Ocular</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Espontánea (4)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">A la voz (3)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Al dolor (2)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
-                </div>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Verbal</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Orientado (5)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Confuso (4)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Palabras inapropiadas (3)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sonidos incomprensibles (2)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
-                </div>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Motora</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Obedece órdenes (6)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Localiza dolor (5)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Retirada al dolor (4)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Flexión anormal (3)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Extensión anormal (2)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
-                </div>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
-            </div>
-        </div>
-    `;
-};
-
-
-
-// ==============================================
-// FUNCIONES SEPARADAS - MEDICAMENTOS
-// ==============================================
-
-window.renderAntibioticosTool = function() {
-    return `
-        <div style="padding: 4px 0 20px 0;">
-            <div style="background: #3B82F610; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3B82F6;">
-                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Clasificación, mecanismos de acción, indicaciones, espectro antibacteriano.</p>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                <button onclick="AppState.addNotification('Contenido de Antibióticos próximamente', 'info')" style="background: #3B82F6; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
-            </div>
-        </div>
-    `;
-};
-
-// ==============================================
-// FUNCIONES SEPARADAS - CONOCIMIENTOS
-// ==============================================
-
-window.renderRceptTool = function() {
-    return `
-        <div style="padding: 4px 0 20px 0;">
-            <div style="background: #F59E0B10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #F59E0B;">
-                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Guías actualizadas de RCP (2020-2025). Compresiones de alta calidad, desfibrilación temprana, trabajo en equipo.</p>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                <button onclick="AppState.addNotification('Contenido de RCP próximamente', 'info')" style="background: #F59E0B; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
-            </div>
-        </div>
-    `;
-};
 </script>
+
 
 <!-- PANTALLA 4: PUBLICACIONES -->
 <script>
