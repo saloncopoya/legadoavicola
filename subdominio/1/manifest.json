@@ -1,6 +1,6 @@
 {
-    "name": "MI WEB SEGUNDA RE 01",
-    "short_name": "MIMWSRHUNDS MBRE CORTO",
+    "name": "AGENTE INMOBILIARIO DEL BIENESTAR",
+    "short_name": "INMOBILIARIA DEL BIENESTAR",
     "description": "DescripSEHUNDSde la aplicacion aqui",
     "start_url": "/",
     "display": "standalone",
@@ -34,10 +34,10 @@
 
     "shortcuts": [
         {
-            "name": "⚡ Bienestar", 
+            "name": "TERRENO", 
             "short_name": "Bienestar", 
             "description": "abrir menu", 
-            "url": "/?tsection=bienestar", 
+            "url": "/?section=BIENESTAR", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=⚡", "sizes": "96x96", "type": "image/png"}]
         },
         {
