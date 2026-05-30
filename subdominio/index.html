@@ -3652,29 +3652,26 @@ window.renderVentasScreen = async function() {
     // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
     // ==============================================
     const herramientasConfig = {
-        'valores-normales': {
+      'valores-normales': {
     titulo: TEXTOS.btn_valores_normales,
     descripcion: 'Cuidados de enfermeria a domicilio, guardias en hospitales',
     color: '#0D9488',
     icono: ICONOS_SVG.icono_valores_normales,
-    subherramientas: ['glasgow', 'presion-arterial', 'glucosa', 'colesterol', 'trigliceridos', 'imc'],
+    subherramientas: ['presion-arterial', 'glucosa', 'colesterol', 'trigliceridos', 'imc'],  // ← ELIMINADO 'glasgow'
     nombres: {
-        glasgow: TEXTOS.herramienta_glasgow,
-        'presion-arterial': 'Presión Arterial AHA 2026',
-        'glucosa': '🩸 Glucosa (Diabetes) ADA 2024',
-        'colesterol': '🫀 Colesterol Total (NCEP-ATP III)',
-        'trigliceridos': '⚡ Triglicéridos (NCEP-ATP III)',
+        'presion-arterial': 'Presión Arterial',
+        'glucosa': '🩸 Glucosa (Diabetes)',
+        'colesterol': '🫀 Colesterol Total',
+        'trigliceridos': '⚡ Triglicéridos',
         'imc': '🧍 IMC (Índice de Masa Corporal)'
     },
-    iconos: {
-        glasgow: ICONOS_SVG.icono_glasgow,
-        'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
-        'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`,
-        // NUEVOS ICONOS PARA LAS 3 HERRAMIENTAS (Agrégalos aquí)
-        'colesterol': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L15 8H9L12 2Z M12 22L9 16H15L12 22Z M4 12L10 9V15L4 12Z M20 12L14 9V15L20 12Z"/><circle cx="12" cy="12" r="2"/></svg>`,
-        'trigliceridos': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 4 L19 20 M19 4 L5 20" stroke-linecap="round"/><path d="M16 6 L21 5 L20 10" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 18 L3 19 L4 14" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2"/></svg>`,
-        'imc': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="15"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="15" y2="12"/></svg>`
-    }
+   iconos: {
+    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-5 3 9 2-6 2 3 2-2 2 3 2-1" stroke-linecap="round"/><path d="M3 19h18" stroke-linecap="round"/><rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" fill="none"/><circle cx="12" cy="11" r="1" fill="currentColor"/></svg>`,
+    'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v3M12 19v3M4 12H2M22 12h-2M6.5 6.5L4 4M17.5 17.5L20 20M6.5 17.5L4 20M17.5 6.5L20 4" stroke-linecap="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/><path d="M12 9v3l2 2" stroke-linecap="round"/><path d="M9 12h6" stroke-linecap="round"/></svg>`,
+    'colesterol': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L14 7H10L12 2Z" fill="currentColor" fill-opacity="0.2"/><circle cx="12" cy="12" r="4" stroke="currentColor" fill="none"/><path d="M8 8L4 12L8 16" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 8L20 12L16 16" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18L10 21H14L12 18Z" fill="currentColor" fill-opacity="0.2"/><path d="M12 8V4" stroke-linecap="round"/><path d="M12 20V16" stroke-linecap="round"/></svg>`,
+    'trigliceridos': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21L21 3" stroke-linecap="round"/><path d="M21 21L3 3" stroke-linecap="round"/><path d="M7 7L5 9L7 11" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 13L19 15L17 17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" fill="none"/><path d="M12 10V7" stroke-linecap="round"/><path d="M12 14V17" stroke-linecap="round"/></svg>`,
+    'imc': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" stroke="currentColor" fill="none"/><path d="M8 8h3v3H8z" fill="currentColor" fill-opacity="0.3"/><path d="M13 8h3v3h-3z" fill="currentColor" fill-opacity="0.3"/><path d="M8 13h3v3H8z" fill="currentColor" fill-opacity="0.3"/><path d="M13 13h3v3h-3z" fill="currentColor" fill-opacity="0.3"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2" stroke-linecap="round"/></svg>`
+}
 },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
@@ -3770,15 +3767,13 @@ window.renderVentasScreen = async function() {
     
     // FUNCIÓN QUE LLAMA A LAS HERRAMIENTAS SEPARADAS
     const generarContenidoPrincipal = () => {
-        if (herramientaActual === 'valores-normales') {
-    if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
-    if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
-    if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
-    // NUEVAS HERRAMIENTAS: Colesterol, Triglicéridos e IMC
-    if (subHerramientaMostrar === 'colesterol') return window.renderColesterolTool();
-    if (subHerramientaMostrar === 'trigliceridos') return window.renderTrigliceridosTool();
-    if (subHerramientaMostrar === 'imc') return window.renderIMCTool();
-}
+    if (herramientaActual === 'valores-normales') {
+        if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
+        if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
+        if (subHerramientaMostrar === 'colesterol') return window.renderColesterolTool();
+        if (subHerramientaMostrar === 'trigliceridos') return window.renderTrigliceridosTool();
+        if (subHerramientaMostrar === 'imc') return window.renderIMCTool();
+    }
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
                   }
@@ -5681,52 +5676,7 @@ console.log("📊 REGISTROS:", historial);
     `;
 };
 
-    // ==============================================
-// FUNCIONES SEPARADAS - VALORES NORMALES 1
-// ==============================================
 
-window.renderGlasgowTool = function() {
-    return `
-        <div style="padding: 4px 0 20px 0;">
-            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.</p>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Apertura Ocular</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Espontánea (4)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">A la voz (3)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Al dolor (2)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
-                </div>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Verbal</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Orientado (5)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Confuso (4)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Palabras inapropiadas (3)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sonidos incomprensibles (2)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
-                </div>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Motora</h4>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Obedece órdenes (6)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Localiza dolor (5)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Retirada al dolor (4)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Flexión anormal (3)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Extensión anormal (2)</span>
-                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
-                </div>
-            </div>
-            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
-                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
-            </div>
-        </div>
-    `;
-};
 
 
 
