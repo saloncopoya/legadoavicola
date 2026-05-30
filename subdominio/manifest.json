@@ -1,7 +1,7 @@
 {
-    "name": "MI WEB NOMBRE 01",
-    "short_name": "MIMWEB NOMBRE CORTO",
-    "description": "Descripcion de la aplicacion aqui",
+    "name": "MI ENFERMERO DEL BIENESTAR",
+    "short_name": "ENFERMERO DEL BIENESTAR",
+    "description": "Aplicacion",
     "start_url": "/",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
@@ -34,10 +34,10 @@
 
     "shortcuts": [
         {
-            "name": "⚡ Bienestar", 
+            "name": "ANALIZAR VALORES NORMALES", 
             "short_name": "Bienestar", 
             "description": "abrir menu", 
-            "url": "/?tsection=bienestar", 
+            "url": "/?section=BIENESTAR&tool=valores-normales&subtool=glasgow", 
             "icons": [{"src": "https://placehold.co/96x96/8B4513/white?text=⚡", "sizes": "96x96", "type": "image/png"}]
         },
         {
