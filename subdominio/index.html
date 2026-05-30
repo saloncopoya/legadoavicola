@@ -4133,12 +4133,19 @@ window.renderIMCTool = function() {
         <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
             <p style="color: #4B5563;"><strong>📊 Índice de Masa Corporal (IMC) - OMS 2026</strong><br>Evaluación del estado nutricional con clasificación detallada y cálculo de peso ideal.</p>
         </div>
-        <div style="display:flex; gap:16px; margin-bottom:20px;">
-            <div style="flex:1;"><label>Peso (kg)</label>
-            <input type="number" id="imcPeso" placeholder="Ej: 70" step="0.1" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;"></div>
-            <div style="flex:1;"><label>Altura (m)</label>
-            <input type="number" id="imcAltura" placeholder="Ej: 1.70" step="0.01" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;"></div>
-        </div>
+<div style="display:flex; gap:16px; margin-bottom:20px; width:100%;">
+    <div style="flex:1; min-width:0;">
+        <label style="font-size: 20px; font-weight: bold;">Peso (kg)</label>
+        <input type="number" id="imcPeso" placeholder="Ej: 70" step="0.1" 
+               style="width:100%; padding:18px; border-radius:16px; border:2px solid #E5E7EB; font-size:24px; text-align:center; font-weight:bold; box-sizing:border-box;">
+    </div>
+    <div style="flex:1; min-width:0;">
+        <label style="font-size: 20px; font-weight: bold;">Altura (m)</label>
+        <input type="number" id="imcAltura" placeholder="Ej: 1.70" step="0.01" 
+               style="width:100%; padding:18px; border-radius:16px; border:2px solid #E5E7EB; font-size:24px; text-align:center; font-weight:bold; box-sizing:border-box;">
+    </div>
+</div>
+
         <button id="calcularIMCBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; cursor:pointer;">🔍 CALCULAR IMC</button>
         <div id="resultadoIMC" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
             <div id="resultadoIMCColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
