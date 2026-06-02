@@ -1645,10 +1645,10 @@ if (!AppState.ui.isLoading && navigator.onLine) {
     }
     
   return `
-<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(75px, 14.5vw, 65px); background: var(--bg-dark-gradient); display: flex; align-items: center; justify-content: space-evenly; padding: clamp(4px, 2vw, 12px) clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
+<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(50px, 14vw, 65px); background: var(--bg-dark-gradient); display: flex; align-items: center; justify-content: space-evenly; padding: clamp(4px, 2vw, 12px) clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(255,215,0,0.3);">
     ${botones.map(btn => `
         <button onclick="${btn.accion}" id="${btn.idBtn || ''}" style="background: ${currentScreen === btn.id ? 'var(--color-secondary-gradient)' : 'transparent'}; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 40px; min-width: 0; flex: 1; max-width: 90px;">
-<span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(35px, 6.5vw, 32px); height: clamp(35px, 6.5vw, 32px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
+<span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'var(--color-secondary)'};">${btn.icono}</span>
             <span style="font-size: clamp(6px, 2vw, 15px); font-weight: 700; color: ${currentScreen === btn.id ? 'var(--bg-dark)' : 'rgba(255,215,0,0.8)'};">${btn.texto}</span>
         </button>
     `).join('')}
@@ -1677,11 +1677,10 @@ if (userProfile.isJudge === true) topMenuItems.push({ id: SCREENS.JUEZ, icon: TE
     const initials = getInitials(userProfile.displayName || currentUser.displayName || 'U');
     
     return `
-<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(75px, 14.5vw, 65px); background: var(--bg-white); box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(4px, 2vw, 12px); z-index: 1000; border-top: 2px solid rgba(128, 128, 128, 0.3); border-bottom: 1px solid rgba(139,69,19,0.2); box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+<nav style="position: fixed; bottom: 0; left: 0; right: 0; height: clamp(55px, 14vw, 65px); background: var(--bg-white); box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; padding: 0 clamp(4px, 2vw, 12px); z-index: 1000; border-bottom: 1px solid rgba(139,69,19,0.2);">
 <div style="display: flex; gap: clamp(0px, 1vw, 20px); align-items: center; justify-content: flex-start; flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;">        ${topMenuItems.map(item => `
            <button onclick="navigateTo('${item.id}')" style="background: transparent; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'}; font-size: clamp(9px, 3vw, 11px); font-weight: ${AppState.ui.currentScreen === item.id ? '700' : '500'}; padding: 4px 8px; border-radius: 8px; min-width: 40px; flex: 0 0 auto; white-space: nowrap;">
-<div style="display: inline-flex; align-items: center; justify-content: center; width: clamp(40px, 7vw, 32px); height: clamp(40px, 7vw, 32px); background: ${AppState.ui.currentScreen === item.id ? 'rgba(139,69,19,0.15)' : 'transparent'}; border-radius: 50%; transition: all 0.2s ease;"><span style="color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'};">${item.icon}</span></div>
-
+<span style="display: inline-flex; align-items: center; justify-content: center; width: clamp(24px, 6vw, 32px); height: clamp(24px, 6vw, 32px); color: ${AppState.ui.currentScreen === item.id ? 'var(--color-primary)' : '#666'};">${item.icon}</span>
     <span style="font-size: clamp(6px, 2vw, 13px);">${item.label}</span>
 </button>
         `).join('')}
@@ -2821,6 +2820,7 @@ AppState.setScreen(SCREENS.PUBLIC);
 
             
             
+            let pantallaADestino = SCREENS.PUBLIC;
 const shareIdActual = new URLSearchParams(window.location.search).get('share');
 const toolParam = urlParams.get('tool');
 const subtoolParam = urlParams.get('subtool');
@@ -2901,7 +2901,7 @@ else if (pantallaPendiente) {
     pantallaADestino = pantallaPendiente;
 }
 
-
+AppState.setScreen(pantallaADestino);
             AppState.setLoading(false);
             hideLoadingScreen();
             // Migrar token pendiente si existe
@@ -3421,12 +3421,6 @@ window.formatTime = formatTime;
 // MANEJAR BOTÓN "ATRÁS" DEL CELULAR
 // ==============================================
 window.addEventListener('popstate', function() {
-
-    //  Si está OFFLINE NO RETROCEDER
-    if (!navigator.onLine) {
-        return;
-    }
-    
     // ✅ LEER LA NUEVA URL Y ACTUALIZAR AppState
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
@@ -3516,7 +3510,7 @@ window.renderVentasScreen = async function() {
         btn_valores_normales: 'VALORES NORMALES',
         btn_medicamentos: 'MEDICAMENTOS',
         btn_conocimientos: 'CONOCIMIENTOS',
-        herramienta_glasgow: 'ESCALA DE GLASGOWS',
+        herramienta_glasgow: 'Escala de Glasgow',
        
         herramienta_antibioticos: 'Antibióticos',
       
@@ -3652,30 +3646,29 @@ window.renderVentasScreen = async function() {
     // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
     // ==============================================
     const herramientasConfig = {
-      'valores-normales': {
-    titulo: TEXTOS.btn_valores_normales,
-    descripcion: 'Cuidados de enfermeria a domicilio, guardias en hospitales',
-    color: '#0D9488',
-    icono: ICONOS_SVG.icono_valores_normales,
-    subherramientas: ['presion-arterial', 'glucosa', 'colesterol', 'trigliceridos', 'imc'],  // ← ELIMINADO 'glasgow'
-    nombres: {
-        'presion-arterial': 'Presión Arterial',
-        'glucosa': '🩸 Glucosa (Diabetes)',
-        'colesterol': '🫀 Colesterol Total',
-        'trigliceridos': '⚡ Triglicéridos',
-        'imc': '🧍 IMC (Índice de Masa Corporal)'
-    },
-   iconos: {
-    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-5 3 9 2-6 2 3 2-2 2 3 2-1" stroke-linecap="round"/><path d="M3 19h18" stroke-linecap="round"/><rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" fill="none"/><circle cx="12" cy="11" r="1" fill="currentColor"/></svg>`,
-    'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v3M12 19v3M4 12H2M22 12h-2M6.5 6.5L4 4M17.5 17.5L20 20M6.5 17.5L4 20M17.5 6.5L20 4" stroke-linecap="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/><path d="M12 9v3l2 2" stroke-linecap="round"/><path d="M9 12h6" stroke-linecap="round"/></svg>`,
-    'colesterol': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L14 7H10L12 2Z" fill="currentColor" fill-opacity="0.2"/><circle cx="12" cy="12" r="4" stroke="currentColor" fill="none"/><path d="M8 8L4 12L8 16" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 8L20 12L16 16" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18L10 21H14L12 18Z" fill="currentColor" fill-opacity="0.2"/><path d="M12 8V4" stroke-linecap="round"/><path d="M12 20V16" stroke-linecap="round"/></svg>`,
-    'trigliceridos': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21L21 3" stroke-linecap="round"/><path d="M21 21L3 3" stroke-linecap="round"/><path d="M7 7L5 9L7 11" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 13L19 15L17 17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" fill="none"/><path d="M12 10V7" stroke-linecap="round"/><path d="M12 14V17" stroke-linecap="round"/></svg>`,
-    'imc': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" stroke="currentColor" fill="none"/><path d="M8 8h3v3H8z" fill="currentColor" fill-opacity="0.3"/><path d="M13 8h3v3h-3z" fill="currentColor" fill-opacity="0.3"/><path d="M8 13h3v3H8z" fill="currentColor" fill-opacity="0.3"/><path d="M13 13h3v3h-3z" fill="currentColor" fill-opacity="0.3"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2" stroke-linecap="round"/></svg>`
-}
-},
+        'valores-normales': {
+            titulo: TEXTOS.btn_valores_normales,
+            descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
+            color: '#0D9488',
+            icono: ICONOS_SVG.icono_valores_normales,
+            subherramientas: ['glasgow', 'presion-arterial', 'glucosa'],
+            nombres: {
+                glasgow: TEXTOS.herramienta_glasgow,
+                    'presion-arterial': 'Presión Arterial AHA 2026',
+                'glucosa': '🩸 Glucosa (Diabetes) ADA 2024'
+
+            },
+            iconos: {
+                glasgow: ICONOS_SVG.icono_glasgow,
+                    'presion-arterial': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>`,
+                'glucosa': `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>`
+
+        
+            }
+        },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
-            descripcion: 'cuiracion de heridas, dialisis',
+            descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
             color: '#3B82F6',
             icono: ICONOS_SVG.icono_medicamentos,
             subherramientas: ['antibioticos'],
@@ -3688,7 +3681,7 @@ window.renderVentasScreen = async function() {
         },
         'conocimientos': {
             titulo: TEXTOS.btn_conocimientos,
-            descripcion: 'renta de propiedades ',
+            descripcion: 'Guías, protocolos, actualizaciones, RCP',
             color: '#F59E0B',
             icono: ICONOS_SVG.icono_conocimientos,
             subherramientas: ['rcep'],
@@ -3716,7 +3709,7 @@ window.renderVentasScreen = async function() {
                     <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
                 </div>
                 <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínica</p>
+                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
                 </div>
                 <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
                     <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
@@ -3767,13 +3760,11 @@ window.renderVentasScreen = async function() {
     
     // FUNCIÓN QUE LLAMA A LAS HERRAMIENTAS SEPARADAS
     const generarContenidoPrincipal = () => {
-    if (herramientaActual === 'valores-normales') {
-        if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
-        if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
-        if (subHerramientaMostrar === 'colesterol') return window.renderColesterolTool();
-        if (subHerramientaMostrar === 'trigliceridos') return window.renderTrigliceridosTool();
-        if (subHerramientaMostrar === 'imc') return window.renderIMCTool();
-    }
+        if (herramientaActual === 'valores-normales') {
+            if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
+            if (subHerramientaMostrar === 'presion-arterial') return window.renderPresionArterialTool();
+            if (subHerramientaMostrar === 'glucosa') return window.renderGlucosaTool();
+               }
         if (herramientaActual === 'medicamentos') {
             if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
                   }
@@ -3839,566 +3830,6 @@ window.renderVentasScreen = async function() {
         </div>
     `;
 };
-
-
-
-
-
-
-
-
-
-
-    // ==============================================
-// HERRAMIENTA DE COLESTEROL TOTAL (NCEP-ATP III)
-// ==============================================
-window.renderColesterolTool = function() {
-    const HISTORIAL_KEY = 'colesterol_historial';
-    const TIPO_GUARDADO_KEY = 'colesterol_tipo_seleccionado';
-
-    function guardarTipoSeleccionado(tipo) {
-        if (tipo && tipo !== "") localStorage.setItem(TIPO_GUARDADO_KEY, tipo);
-    }
-    function cargarTipoSeleccionado() { return localStorage.getItem(TIPO_GUARDADO_KEY) || ""; }
-    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
-    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-
-    function agregarRegistro(valor, tipo, categoria, nombreCat) {
-        const h = cargarHistorial();
-        const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, tipo, categoria, nombreCat, timestamp: now.getTime() });
-        if (h.length > 25) h.pop();
-        guardarHistorial(h);
-        renderizarHistorial();
-    }
-    window.eliminarRegistroColesterol = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
-
-    function renderizarHistorial() {
-        const cont = document.getElementById('historialColesterolContainer');
-        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
-        if (!cont) return;
-        const historial = cargarHistorial();
-        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
-        if(secHist) secHist.style.display = 'block';
-
-        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th style="padding:12px 8px; text-align:left;">Fecha/Hora</th><th style="padding:12px 8px; text-align:left;">Colesterol (mg/dL)</th><th style="padding:12px 8px; text-align:left;">Resultado</th><th style="padding:12px 8px; text-align:center;">Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:10px 8px;">${reg.fecha}<br><small style="color:#6B7280;">${reg.hora}</small></td><td style="padding:10px 8px; font-weight:600;">${reg.valor} mg/dL</td><td style="padding:10px 8px;"><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">${reg.nombreCat}</span></td><td style="padding:10px 8px; text-align:center;"><button onclick="eliminarRegistroColesterol(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-
-    function clasificarColesterol(valor) {
-        if (valor < 200) return { categoria: 'verde', nombreCat: 'ÓPTIMO (Deseable)' };
-        if (valor >= 200 && valor <= 239) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
-        return { categoria: 'rojo', nombreCat: 'ALTO (Riesgo)' };
-    }
-    function getMensaje(valor, categoria) {
-        if (categoria === 'verde') return `<strong>✅ COLESTEROL ÓPTIMO</strong><br>Su nivel es deseable. Mantenga una dieta saludable y ejercicio regular.`;
-        if (categoria === 'amarillo') return `<strong>⚠️ COLESTEROL LÍMITE ALTO</strong><br>Revise su alimentación (reduzca grasas saturadas) y aumente actividad física. Consulte a su médico.`;
-        return `<strong>🔴 COLESTEROL ALTO</strong><br>Riesgo cardiovascular aumentado. Requiere cambios en el estilo de vida y probable tratamiento farmacológico. Consulte a su médico.`;
-    }
-
-    setTimeout(() => {
-        const btn = document.getElementById("calcularColesterolBtn");
-        if (btn && !btn.hasListener) {
-            btn.hasListener = true;
-            btn.onclick = function() {
-                const valor = parseInt(document.getElementById("colesterolValor")?.value);
-                const resDiv = document.getElementById("resultadoColesterol"), colorDiv = document.getElementById("resultadoColesterolColor"), recDiv = document.getElementById("resultadoColesterolRecomendacion");
-                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
-                if (valor < 50 || valor > 500) { AppState.addNotification("⚠️ Rango clínico: 50-500 mg/dL", "warning"); return; }
-                document.getElementById("colesterolValor").value = '';
-                const { categoria, nombreCat } = clasificarColesterol(valor);
-                const colorHex = { verde: '#10B981', amarillo: '#FBBF24', rojo: '#EF4444' }[categoria];
-                const mensaje = getMensaje(valor, categoria);
-                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colorHex; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                recDiv.innerHTML = mensaje; resDiv.style.display = "block";
-                agregarRegistro(valor, "General", categoria, nombreCat);
-                resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
-            };
-        }
-        renderizarHistorial();
-        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
-        if(secHist && cargarHistorial().length === 0) secHist.style.display = 'none';
-    }, 100);
-
-    return `<div style="padding: 4px 0 20px 0;">
-        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluación del colesterol total según guías NCEP-ATP III. Valores deseables: &lt;200 mg/dL.</p>
-        </div>
-        <div style="margin-bottom: 24px;">
-            <input type="number" id="colesterolValor" placeholder="Ej: 180" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center; font-weight:700; background:#F8FAFC;">
-        </div>
-        <button id="calcularColesterolBtn" style="background: #2563EB; color: white; padding: 16px; border-radius: 60px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer;">🔍 CALCULAR COLESTEROL TOTAL</button>
-        <div id="resultadoColesterol" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-            <div id="resultadoColesterolColor" style="border-radius: 16px; padding: 24px; text-align: center; font-weight: bold;"></div>
-            <div id="resultadoColesterolRecomendacion" style="margin-top: 20px; font-size: 14px; line-height: 1.6;"></div>
-            <div style="margin-top: 20px; font-size: 11px; background: #F3F4F6; padding: 12px; border-radius: 12px; text-align: center;">⚠️ Guía clínica. No reemplaza evaluación médica.</div>
-        </div>
-        <div id="seccionHistorialColesterolCompleta" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
-            <h3 style="margin:0 0 16px 0;">📋 Historial clínico</h3>
-            <div id="historialColesterolContainer">Sin registros</div>
-        </div>
-    </div>`;
-};
-
-// ==============================================
-// HERRAMIENTA DE TRIGLICÉRIDOS (NCEP-ATP III)
-// ==============================================
-window.renderTrigliceridosTool = function() {
-    const HISTORIAL_KEY = 'trigliceridos_historial';
-    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
-    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-    function agregarRegistro(valor, categoria, nombreCat) {
-        const h = cargarHistorial();
-        const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, categoria, nombreCat, timestamp: now.getTime() });
-        if (h.length > 25) h.pop();
-        guardarHistorial(h);
-        renderizarHistorial();
-    }
-    window.eliminarRegistroTrigliceridos = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
-    function renderizarHistorial() {
-        const cont = document.getElementById('historialTrigliceridosContainer');
-        const secHist = document.getElementById('seccionHistorialTrigliceridosCompleta');
-        if (!cont) return;
-        const historial = cargarHistorial();
-        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
-        if(secHist) secHist.style.display = 'block';
-        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>Triglicéridos (mg/dL)</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.valor}</td><td><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroTrigliceridos(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-    function clasificar(valor) {
-        if (valor < 150) return { categoria: 'verde', nombreCat: 'NORMAL' };
-        if (valor >= 150 && valor <= 199) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
-        if (valor >= 200 && valor <= 499) return { categoria: 'naranja', nombreCat: 'ALTO' };
-        return { categoria: 'rojo', nombreCat: 'MUY ALTO' };
-    }
-    setTimeout(() => {
-        const btn = document.getElementById("calcularTrigliceridosBtn");
-        if (btn && !btn.hasListener) {
-            btn.hasListener = true;
-            btn.onclick = function() {
-                const valor = parseInt(document.getElementById("trigliceridosValor")?.value);
-                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
-                if (valor < 20 || valor > 1000) { AppState.addNotification("⚠️ Rango clínico: 20-1000 mg/dL", "warning"); return; }
-                document.getElementById("trigliceridosValor").value = '';
-                const { categoria, nombreCat } = clasificar(valor);
-                const colorDiv = document.getElementById("resultadoTrigliceridosColor"), recDiv = document.getElementById("resultadoTrigliceridosRecomendacion"), resDiv = document.getElementById("resultadoTrigliceridos");
-                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' };
-                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                let msg = (categoria === 'verde') ? 'Óptimo. Sigue así.' : (categoria === 'amarillo' ? 'Límite alto. Mejora hábitos.' : (categoria === 'naranja' ? 'Alto. Riesgo cardiovascular.' : 'Muy alto. Consulta al médico URGENTE.'));
-                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Referencia NCEP-ATP III: Normal &lt;150 mg/dL.</small>`;
-                resDiv.style.display = "block";
-                agregarRegistro(valor, categoria, nombreCat);
-                resDiv.scrollIntoView({ behavior: "smooth" });
-            };
-        }
-        renderizarHistorial();
-        if(document.getElementById('seccionHistorialTrigliceridosCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialTrigliceridosCompleta').style.display = 'none';
-    }, 100);
-    return `<div style="padding: 4px 0 20px 0;">
-        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563;">Evaluación de triglicéridos según guías NCEP-ATP III. Valores normales: &lt;150 mg/dL.</p>
-        </div>
-        <input type="number" id="trigliceridosValor" placeholder="Ej: 120" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center;">
-        <button id="calcularTrigliceridosBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; margin-top:16px; cursor:pointer;">🔍 CALCULAR TRIGLICÉRIDOS</button>
-        <div id="resultadoTrigliceridos" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
-            <div id="resultadoTrigliceridosColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
-            <div id="resultadoTrigliceridosRecomendacion" style="margin-top:20px; font-size:14px;"></div>
-        </div>
-        <div id="seccionHistorialTrigliceridosCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialTrigliceridosContainer">Sin registros</div></div>
-    </div>`;
-};
-
-
-
-
-    // ==============================================
-// HERRAMIENTA DE IMC (OMS 2026)
-// Con interpretación de riesgo y rangos específicos
-// ==============================================
-window.renderIMCTool = function() {
-    const HISTORIAL_KEY = 'imc_historial_v2';
-    
-    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
-    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-    
-    function agregarRegistro(imc, peso, altura, categoria, nombreCat, riesgo) {
-        const h = cargarHistorial();
-        const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), imc, peso, altura, categoria, nombreCat, riesgo });
-        if (h.length > 25) h.pop();
-        guardarHistorial(h);
-        renderizarHistorial();
-    }
-    
-    window.eliminarRegistroIMC = function(id) { 
-        let h = cargarHistorial(); 
-        h = h.filter(r => r.id !== id); 
-        guardarHistorial(h); 
-        renderizarHistorial(); 
-        AppState.addNotification('✅ Registro eliminado', 'success'); 
-    };
-    
-    function clasificarIMC(imc) {
-        // Clasificación OMS 2026
-        if (imc < 16.0) return { categoria: 'rojoBrillante', nombreCat: 'DELGADEZ SEVERA', riesgo: 'Muy alto riesgo de complicaciones' };
-        if (imc >= 16.0 && imc < 17.0) return { categoria: 'rojo', nombreCat: 'DELGADEZ MODERADA', riesgo: 'Alto riesgo' };
-        if (imc >= 17.0 && imc < 18.5) return { categoria: 'naranja', nombreCat: 'DELGADEZ ACEPTABLE', riesgo: 'Riesgo moderado' };
-        if (imc >= 18.5 && imc < 25.0) return { categoria: 'verde', nombreCat: 'NORMOPESO', riesgo: 'Riesgo bajo (saludable)' };
-        if (imc >= 25.0 && imc < 27.0) return { categoria: 'amarillo', nombreCat: 'SOBREPESO GRADO I', riesgo: 'Riesgo leve aumentado' };
-        if (imc >= 27.0 && imc < 30.0) return { categoria: 'amarillo', nombreCat: 'SOBREPESO GRADO II', riesgo: 'Riesgo moderado' };
-        if (imc >= 30.0 && imc < 35.0) return { categoria: 'naranja', nombreCat: 'OBESIDAD TIPO I', riesgo: 'Alto riesgo cardiovascular' };
-        if (imc >= 35.0 && imc < 40.0) return { categoria: 'rojo', nombreCat: 'OBESIDAD TIPO II', riesgo: 'Muy alto riesgo' };
-        return { categoria: 'rojoBrillante', nombreCat: 'OBESIDAD TIPO III (MÓRBIDA)', riesgo: 'Riesgo extremadamente alto' };
-    }
-    
-    function getMensajeProfesional(imc, peso, altura, categoria, nombreCat, riesgo) {
-        const pesoIdealMin = (18.5 * altura * altura).toFixed(1);
-        const pesoIdealMax = (24.9 * altura * altura).toFixed(1);
-        
-        return `
-            <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <div style="font-size: 32px; font-weight: 800; text-align: center;">${imc} <span style="font-size: 16px;">kg/m²</span></div>
-                <div style="text-align: center; margin-top: 8px;"><strong>Clasificación:</strong> ${nombreCat}</div>
-                <div style="text-align: center; margin-top: 4px;">Peso: ${peso} kg | Altura: ${altura} m</div>
-            </div>
-            <div style="background: ${categoria === 'verde' ? '#D1FAE5' : categoria === 'amarillo' ? '#FEF3C7' : '#FEE2E2'}; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-                <strong>⚠️ Riesgo asociado: ${riesgo}</strong>
-            </div>
-            <div style="padding: 12px;">
-                ${categoria === 'verde' ? '<strong>✅ PESO SALUDABLE</strong><br>Mantenga sus hábitos actuales. Realice actividad física regular (150 min/semana) y alimentación balanceada.' : 
-                  categoria.includes('DELGADEZ') ? '<strong>⚠️ BAJO PESO</strong><br>Consulte a un nutricionista. Aumente ingesta calórica con alimentos nutritivos. Evalúe causas subyacentes.' :
-                  categoria.includes('SOBREPESO') ? '<strong>⚠️ SOBREPESO</strong><br>Riesgo cardiovascular aumentado. Modifique hábitos: reduzca 500 kcal/día, aumente actividad física a 300 min/semana.' :
-                  '<strong>🔴 OBESIDAD</strong><br>Alto riesgo de enfermedades cardiovasculares, diabetes tipo 2 y complicaciones metabólicas. Requiere intervención médica multidisciplinaria.'}
-            </div>
-            <div style="font-size: 12px; color: #6B7280; padding: 8px; background: #F3F4F6; border-radius: 8px; margin-top: 12px;">
-                📌 <strong>Referencia OMS 2026:</strong> Rango saludable 18.5 - 24.9 kg/m²<br>
-                🎯 Su peso ideal para su altura: ${pesoIdealMin} - ${pesoIdealMax} kg
-            </div>
-        `;
-    }
-    
-    function renderizarHistorial() {
-        const cont = document.getElementById('historialIMCContainer');
-        const secHist = document.getElementById('seccionHistorialIMCCompleta');
-        if (!cont) return;
-        const historial = cargarHistorial();
-        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
-        if(secHist) secHist.style.display = 'block';
-        
-        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>IMC</th><th>Peso/Altura</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.imc} kg/m²</td><td>${reg.peso}kg / ${reg.altura}m</td><td><span style="background:${getColor(reg.categoria)}; color:white; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroIMC(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-    
-    setTimeout(() => {
-        const btn = document.getElementById("calcularIMCBtn");
-        if (btn && !btn.hasListener) {
-            btn.hasListener = true;
-            btn.onclick = function() {
-                const peso = parseFloat(document.getElementById("imcPeso")?.value);
-                const altura = parseFloat(document.getElementById("imcAltura")?.value);
-                if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) { 
-                    AppState.addNotification("❌ Ingrese peso y altura válidos", "error"); 
-                    return; 
-                }
-                if (peso < 20 || peso > 300) { AppState.addNotification("⚠️ Rango de peso: 20-300 kg", "warning"); return; }
-                if (altura < 0.5 || altura > 2.5) { AppState.addNotification("⚠️ Rango de altura: 0.5-2.5 m", "warning"); return; }
-                
-                const imc = peso / (altura * altura);
-                const { categoria, nombreCat, riesgo } = clasificarIMC(imc);
-                const resDiv = document.getElementById("resultadoIMC"), colorDiv = document.getElementById("resultadoIMCColor"), recDiv = document.getElementById("resultadoIMCRecomendacion");
-                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' };
-                
-                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${imc.toFixed(1)}</div><div>kg/m²</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colores[categoria];
-                colorDiv.style.color = "white";
-                recDiv.innerHTML = getMensajeProfesional(imc.toFixed(1), peso, altura, categoria, nombreCat, riesgo);
-                resDiv.style.display = "block";
-                
-                agregarRegistro(imc.toFixed(1), peso, altura, categoria, nombreCat, riesgo);
-                resDiv.scrollIntoView({ behavior: "smooth" });
-            };
-        }
-        renderizarHistorial();
-    }, 100);
-    
-    return `<div style="padding: 4px 0 20px 0;">
-        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563;"><strong>📊 Índice de Masa Corporal (IMC) - OMS 2026</strong><br>Evaluación del estado nutricional con clasificación detallada y cálculo de peso ideal.</p>
-        </div>
-<div style="display:flex; gap:16px; margin-bottom:20px; width:100%;">
-    <div style="flex:1; min-width:0;">
-        <label style="font-size: 20px; font-weight: bold;">Peso (kg)</label>
-        <input type="number" id="imcPeso" placeholder="Ej: 70" step="0.1" 
-               style="width:100%; padding:18px; border-radius:16px; border:2px solid #E5E7EB; font-size:24px; text-align:center; font-weight:bold; box-sizing:border-box;">
-    </div>
-    <div style="flex:1; min-width:0;">
-        <label style="font-size: 20px; font-weight: bold;">Altura (m)</label>
-        <input type="number" id="imcAltura" placeholder="Ej: 1.70" step="0.01" 
-               style="width:100%; padding:18px; border-radius:16px; border:2px solid #E5E7EB; font-size:24px; text-align:center; font-weight:bold; box-sizing:border-box;">
-    </div>
-</div>
-
-        <button id="calcularIMCBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; cursor:pointer;">🔍 CALCULAR IMC</button>
-        <div id="resultadoIMC" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
-            <div id="resultadoIMCColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
-            <div id="resultadoIMCRecomendacion" style="margin-top:16px;"></div>
-        </div>
-        <div id="seccionHistorialIMCCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;">
-            <h3>📋 Historial de IMC</h3>
-            <div id="historialIMCContainer">Sin registros</div>
-        </div>
-    </div>`;
-};
-
-
-
-    
-
-// ==============================================
-// HERRAMIENTA DE COLESTEROL TOTAL (NCEP-ATP III)
-// ==============================================
-window.renderColesterolTool = function() {
-    const HISTORIAL_KEY = 'colesterol_historial';
-    const TIPO_GUARDADO_KEY = 'colesterol_tipo_seleccionado';
-
-    function guardarTipoSeleccionado(tipo) {
-        if (tipo && tipo !== "") localStorage.setItem(TIPO_GUARDADO_KEY, tipo);
-    }
-    function cargarTipoSeleccionado() { return localStorage.getItem(TIPO_GUARDADO_KEY) || ""; }
-    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
-    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-
-    function agregarRegistro(valor, tipo, categoria, nombreCat) {
-        const h = cargarHistorial();
-        const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, tipo, categoria, nombreCat, timestamp: now.getTime() });
-        if (h.length > 25) h.pop();
-        guardarHistorial(h);
-        renderizarHistorial();
-    }
-    window.eliminarRegistroColesterol = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
-
-    function renderizarHistorial() {
-        const cont = document.getElementById('historialColesterolContainer');
-        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
-        if (!cont) return;
-        const historial = cargarHistorial();
-        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
-        if(secHist) secHist.style.display = 'block';
-
-        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th style="padding:12px 8px; text-align:left;">Fecha/Hora</th><th style="padding:12px 8px; text-align:left;">Colesterol (mg/dL)</th><th style="padding:12px 8px; text-align:left;">Resultado</th><th style="padding:12px 8px; text-align:center;">Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:10px 8px;">${reg.fecha}<br><small style="color:#6B7280;">${reg.hora}</small></td><td style="padding:10px 8px; font-weight:600;">${reg.valor} mg/dL</td><td style="padding:10px 8px;"><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">${reg.nombreCat}</span></td><td style="padding:10px 8px; text-align:center;"><button onclick="eliminarRegistroColesterol(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-
-    function clasificarColesterol(valor) {
-        if (valor < 200) return { categoria: 'verde', nombreCat: 'ÓPTIMO (Deseable)' };
-        if (valor >= 200 && valor <= 239) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
-        return { categoria: 'rojo', nombreCat: 'ALTO (Riesgo)' };
-    }
-    function getMensaje(valor, categoria) {
-        if (categoria === 'verde') return `<strong>✅ COLESTEROL ÓPTIMO</strong><br>Su nivel es deseable. Mantenga una dieta saludable y ejercicio regular.`;
-        if (categoria === 'amarillo') return `<strong>⚠️ COLESTEROL LÍMITE ALTO</strong><br>Revise su alimentación (reduzca grasas saturadas) y aumente actividad física. Consulte a su médico.`;
-        return `<strong>🔴 COLESTEROL ALTO</strong><br>Riesgo cardiovascular aumentado. Requiere cambios en el estilo de vida y probable tratamiento farmacológico. Consulte a su médico.`;
-    }
-
-    setTimeout(() => {
-        const btn = document.getElementById("calcularColesterolBtn");
-        if (btn && !btn.hasListener) {
-            btn.hasListener = true;
-            btn.onclick = function() {
-                const valor = parseInt(document.getElementById("colesterolValor")?.value);
-                const resDiv = document.getElementById("resultadoColesterol"), colorDiv = document.getElementById("resultadoColesterolColor"), recDiv = document.getElementById("resultadoColesterolRecomendacion");
-                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
-                if (valor < 50 || valor > 500) { AppState.addNotification("⚠️ Rango clínico: 50-500 mg/dL", "warning"); return; }
-                document.getElementById("colesterolValor").value = '';
-                const { categoria, nombreCat } = clasificarColesterol(valor);
-                const colorHex = { verde: '#10B981', amarillo: '#FBBF24', rojo: '#EF4444' }[categoria];
-                const mensaje = getMensaje(valor, categoria);
-                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colorHex; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                recDiv.innerHTML = mensaje; resDiv.style.display = "block";
-                agregarRegistro(valor, "General", categoria, nombreCat);
-                resDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
-            };
-        }
-        renderizarHistorial();
-        const secHist = document.getElementById('seccionHistorialColesterolCompleta');
-        if(secHist && cargarHistorial().length === 0) secHist.style.display = 'none';
-    }, 100);
-
-    return `<div style="padding: 4px 0 20px 0;">
-        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluación del colesterol total según guías NCEP-ATP III. Valores deseables: &lt;200 mg/dL.</p>
-        </div>
-        <div style="margin-bottom: 24px;">
-            <input type="number" id="colesterolValor" placeholder="Ej: 180" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center; font-weight:700; background:#F8FAFC;">
-        </div>
-        <button id="calcularColesterolBtn" style="background: #2563EB; color: white; padding: 16px; border-radius: 60px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer;">🔍 CALCULAR COLESTEROL TOTAL</button>
-        <div id="resultadoColesterol" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-            <div id="resultadoColesterolColor" style="border-radius: 16px; padding: 24px; text-align: center; font-weight: bold;"></div>
-            <div id="resultadoColesterolRecomendacion" style="margin-top: 20px; font-size: 14px; line-height: 1.6;"></div>
-            <div style="margin-top: 20px; font-size: 11px; background: #F3F4F6; padding: 12px; border-radius: 12px; text-align: center;">⚠️ Guía clínica. No reemplaza evaluación médica.</div>
-        </div>
-        <div id="seccionHistorialColesterolCompleta" style="background: white; border-radius: 20px; padding: 20px; margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
-            <h3 style="margin:0 0 16px 0;">📋 Historial clínico</h3>
-            <div id="historialColesterolContainer">Sin registros</div>
-        </div>
-    </div>`;
-};
-
-// ==============================================
-// HERRAMIENTA DE TRIGLICÉRIDOS (NCEP-ATP III)
-// ==============================================
-window.renderTrigliceridosTool = function() {
-    const HISTORIAL_KEY = 'trigliceridos_historial';
-    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
-    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-    function agregarRegistro(valor, categoria, nombreCat) {
-        const h = cargarHistorial();
-        const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), valor, categoria, nombreCat, timestamp: now.getTime() });
-        if (h.length > 25) h.pop();
-        guardarHistorial(h);
-        renderizarHistorial();
-    }
-    window.eliminarRegistroTrigliceridos = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
-    function renderizarHistorial() {
-        const cont = document.getElementById('historialTrigliceridosContainer');
-        const secHist = document.getElementById('seccionHistorialTrigliceridosCompleta');
-        if (!cont) return;
-        const historial = cargarHistorial();
-        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
-        if(secHist) secHist.style.display = 'block';
-        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>Triglicéridos (mg/dL)</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.valor}</td><td><span style="background:${getColor(reg.categoria)}; color:${reg.categoria === 'amarillo' ? '#1F2937' : 'white'}; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroTrigliceridos(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-    function clasificar(valor) {
-        if (valor < 150) return { categoria: 'verde', nombreCat: 'NORMAL' };
-        if (valor >= 150 && valor <= 199) return { categoria: 'amarillo', nombreCat: 'LÍMITE ALTO' };
-        if (valor >= 200 && valor <= 499) return { categoria: 'naranja', nombreCat: 'ALTO' };
-        return { categoria: 'rojo', nombreCat: 'MUY ALTO' };
-    }
-    setTimeout(() => {
-        const btn = document.getElementById("calcularTrigliceridosBtn");
-        if (btn && !btn.hasListener) {
-            btn.hasListener = true;
-            btn.onclick = function() {
-                const valor = parseInt(document.getElementById("trigliceridosValor")?.value);
-                if (isNaN(valor)) { AppState.addNotification("❌ Ingrese un valor válido", "error"); return; }
-                if (valor < 20 || valor > 1000) { AppState.addNotification("⚠️ Rango clínico: 20-1000 mg/dL", "warning"); return; }
-                document.getElementById("trigliceridosValor").value = '';
-                const { categoria, nombreCat } = clasificar(valor);
-                const colorDiv = document.getElementById("resultadoTrigliceridosColor"), recDiv = document.getElementById("resultadoTrigliceridosRecomendacion"), resDiv = document.getElementById("resultadoTrigliceridos");
-                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444' };
-                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${valor}</div><div>mg/dL</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                let msg = (categoria === 'verde') ? 'Óptimo. Sigue así.' : (categoria === 'amarillo' ? 'Límite alto. Mejora hábitos.' : (categoria === 'naranja' ? 'Alto. Riesgo cardiovascular.' : 'Muy alto. Consulta al médico URGENTE.'));
-                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Referencia NCEP-ATP III: Normal &lt;150 mg/dL.</small>`;
-                resDiv.style.display = "block";
-                agregarRegistro(valor, categoria, nombreCat);
-                resDiv.scrollIntoView({ behavior: "smooth" });
-            };
-        }
-        renderizarHistorial();
-        if(document.getElementById('seccionHistorialTrigliceridosCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialTrigliceridosCompleta').style.display = 'none';
-    }, 100);
-    return `<div style="padding: 4px 0 20px 0;">
-        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563;">Evaluación de triglicéridos según guías NCEP-ATP III. Valores normales: &lt;150 mg/dL.</p>
-        </div>
-        <input type="number" id="trigliceridosValor" placeholder="Ej: 120" style="width:100%; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:35px; text-align:center;">
-        <button id="calcularTrigliceridosBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; margin-top:16px; cursor:pointer;">🔍 CALCULAR TRIGLICÉRIDOS</button>
-        <div id="resultadoTrigliceridos" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
-            <div id="resultadoTrigliceridosColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
-            <div id="resultadoTrigliceridosRecomendacion" style="margin-top:20px; font-size:14px;"></div>
-        </div>
-        <div id="seccionHistorialTrigliceridosCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialTrigliceridosContainer">Sin registros</div></div>
-    </div>`;
-};
-
-// ==============================================
-// HERRAMIENTA DE IMC (ÍNDICE DE MASA CORPORAL)
-// ==============================================
-window.renderIMCTool = function() {
-    const HISTORIAL_KEY = 'imc_historial';
-    function cargarHistorial() { const g = localStorage.getItem(HISTORIAL_KEY); return g ? JSON.parse(g) : []; }
-    function guardarHistorial(h) { localStorage.setItem(HISTORIAL_KEY, JSON.stringify(h)); }
-    function agregarRegistro(imc, peso, altura, categoria, nombreCat) {
-        const h = cargarHistorial();
-        const now = new Date();
-        h.unshift({ id: Date.now(), fecha: now.toLocaleDateString('es-MX'), hora: now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }), imc, peso, altura, categoria, nombreCat });
-        if (h.length > 25) h.pop();
-        guardarHistorial(h);
-        renderizarHistorial();
-    }
-    window.eliminarRegistroIMC = function(id) { let h = cargarHistorial(); h = h.filter(r => r.id !== id); guardarHistorial(h); renderizarHistorial(); AppState.addNotification('✅ Registro eliminado', 'success'); };
-    function renderizarHistorial() {
-        const cont = document.getElementById('historialIMCContainer');
-        const secHist = document.getElementById('seccionHistorialIMCCompleta');
-        if (!cont) return;
-        const historial = cargarHistorial();
-        if (historial.length === 0) { if(secHist) secHist.style.display = 'none'; return; }
-        if(secHist) secHist.style.display = 'block';
-        const getColor = (cat) => ({ verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' }[cat] || '#6B7280');
-        cont.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;"><thead><tr style="background:#F3F4F6;"><th>Fecha/Hora</th><th>IMC (kg/m²)</th><th>Peso/Altura</th><th>Resultado</th><th>Eliminar</th></tr></thead><tbody>${historial.map(reg => `<tr><td style="padding:10px 8px;">${reg.fecha}<br><small>${reg.hora}</small></td><td style="font-weight:600;">${reg.imc}</td><td>${reg.peso}kg / ${reg.altura}m</td><td><span style="background:${getColor(reg.categoria)}; color:white; padding:4px 10px; border-radius:20px;">${reg.nombreCat}</span></td><td><button onclick="eliminarRegistroIMC(${reg.id})" style="background:#EF4444; color:white; border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button></td></tr>`).join('')}</tbody></table></div>`;
-    }
-    function clasificarIMC(imc) {
-        if (imc < 18.5) return { categoria: 'amarillo', nombreCat: 'BAJO PESO' };
-        if (imc >= 18.5 && imc <= 24.9) return { categoria: 'verde', nombreCat: 'NORMAL' };
-        if (imc >= 25 && imc <= 29.9) return { categoria: 'naranja', nombreCat: 'SOBREPESO' };
-        if (imc >= 30 && imc <= 34.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD I' };
-        if (imc >= 35 && imc <= 39.9) return { categoria: 'rojo', nombreCat: 'OBESIDAD II' };
-        return { categoria: 'rojoBrillante', nombreCat: 'OBESIDAD III (MÓRBIDA)' };
-    }
-    setTimeout(() => {
-        const btn = document.getElementById("calcularIMCBtn");
-        if (btn && !btn.hasListener) {
-            btn.hasListener = true;
-            btn.onclick = function() {
-                const peso = parseFloat(document.getElementById("imcPeso")?.value);
-                const altura = parseFloat(document.getElementById("imcAltura")?.value);
-                if (isNaN(peso) || isNaN(altura) || peso <= 0 || altura <= 0) { AppState.addNotification("❌ Ingrese peso y altura válidos", "error"); return; }
-                const imc = peso / (altura * altura);
-                const { categoria, nombreCat } = clasificarIMC(imc);
-                const resDiv = document.getElementById("resultadoIMC"), colorDiv = document.getElementById("resultadoIMCColor"), recDiv = document.getElementById("resultadoIMCRecomendacion");
-                const colores = { verde: '#10B981', amarillo: '#FBBF24', naranja: '#F97316', rojo: '#EF4444', rojoBrillante: '#B91C1C' };
-                colorDiv.innerHTML = `<div style="font-size:36px; font-weight:800;">${imc.toFixed(1)}</div><div>kg/m²</div><div style="margin-top:8px; background:rgba(0,0,0,0.1); display:inline-block; padding:4px 16px; border-radius:40px;">${nombreCat}</div>`;
-                colorDiv.style.backgroundColor = colores[categoria]; colorDiv.style.color = categoria === "amarillo" ? "#1F2937" : "white";
-                let msg = (categoria === 'verde') ? 'Peso saludable. Mantén hábitos.' : (categoria === 'amarillo' ? 'Bajo peso. Aumenta ingesta calórica.' : (categoria === 'naranja' ? 'Sobrepeso. Dieta y ejercicio.' : (categoria === 'rojo' ? 'Obesidad. Consulta a un nutriólogo.' : 'Obesidad mórbida. Requiere evaluación médica URGENTE.')));
-                recDiv.innerHTML = `<strong>${msg}</strong><br><br><small>Rango normal IMC: 18.5 - 24.9 kg/m² (OMS).</small>`;
-                resDiv.style.display = "block";
-                document.getElementById("imcPeso").value = '';
-                document.getElementById("imcAltura").value = '';
-                agregarRegistro(imc.toFixed(1), peso, altura, categoria, nombreCat);
-                resDiv.scrollIntoView({ behavior: "smooth" });
-            };
-        }
-        renderizarHistorial();
-        if(document.getElementById('seccionHistorialIMCCompleta') && cargarHistorial().length === 0) document.getElementById('seccionHistorialIMCCompleta').style.display = 'none';
-    }, 100);
-    return `<div style="padding: 4px 0 20px 0;">
-        <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
-            <p style="color: #4B5563;">Cálculo del Índice de Masa Corporal (IMC) según OMS. Clasificación del estado nutricional.</p>
-        </div>
-        <div style="display:flex; gap:16px; margin-bottom:20px;">
-            <input type="number" id="imcPeso" placeholder="Peso (kg)" step="0.1" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
-            <input type="number" id="imcAltura" placeholder="Altura (m)" step="0.01" style="flex:1; padding:15px; border-radius:16px; border:2px solid #E5E7EB; font-size:18px;">
-        </div>
-        <button id="calcularIMCBtn" style="background:#2563EB; color:white; padding:16px; border-radius:60px; font-weight:800; width:100%; cursor:pointer;">🔍 CALCULAR IMC</button>
-        <div id="resultadoIMC" style="background:white; border-radius:20px; padding:20px; margin-top:24px; display:none;">
-            <div id="resultadoIMCColor" style="border-radius:16px; padding:24px; text-align:center;"></div>
-            <div id="resultadoIMCRecomendacion" style="margin-top:20px; font-size:14px;"></div>
-        </div>
-        <div id="seccionHistorialIMCCompleta" style="background:white; border-radius:20px; padding:20px; margin-top:24px;"><h3>📋 Historial</h3><div id="historialIMCContainer">Sin registros</div></div>
-    </div>`;
-};
-
-
-    
-    
 
 // ==============================================
 // HERRAMIENTA DE GLUCOSA (DIABETES) - PROFESIONAL
@@ -5676,7 +5107,52 @@ console.log("📊 REGISTROS:", historial);
     `;
 };
 
+    // ==============================================
+// FUNCIONES SEPARADAS - VALORES NORMALES 1
+// ==============================================
 
+window.renderGlasgowTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Apertura Ocular</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Espontánea (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">A la voz (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Al dolor (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Verbal</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Orientado (5)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Confuso (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Palabras inapropiadas (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sonidos incomprensibles (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Motora</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Obedece órdenes (6)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Localiza dolor (5)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Retirada al dolor (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Flexión anormal (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Extensión anormal (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
+};
 
 
 
@@ -5717,11 +5193,11 @@ window.renderRceptTool = function() {
 </script>          
 
 
-
-<!-- PANTALLA 3: BUSCADOR (SHARE) - SOLO TEXTOS MODIFICADOS, TODO IGUAL -->
+    
+<!-- PANTALLA 3: SHARE (COMPARTIR) - CON OFFLINE -->
 <script>
 window.renderShareScreen = async function() {
-    // ==============================================
+  // ==============================================
     // OCULTAR BARRA SI ENTRAMOS CON tool EN URL
     // ==============================================
     const ocultarTool = new URLSearchParams(window.location.search).get('tool');
@@ -5733,16 +5209,20 @@ window.renderShareScreen = async function() {
     }
     
     // ==============================================
-    // TODOS LOS TEXTOS SON CONSTANTES (ACTUALIZADOS)
+    // TODOS LOS TEXTOS SON CONSTANTES
     // ==============================================
     const TEXTOS = {
-        btn_valores_normales: 'PERSONAL DE SALUD',
-        btn_medicamentos: 'SOLICITAR PROCEDIMIENTOS CLINICOS',
-        btn_conocimientos: 'COMPRAR PROPIEDADES (TERRENOS Y CASAS)',
-        herramienta_glasgow: 'ESCALA DE GLASGOWS',
+        btn_valores_normales: 'VALORES NORMALES',
+        btn_medicamentos: 'MEDICAMENTOS',
+        btn_conocimientos: 'CONOCIMIENTOS',
+        herramienta_glasgow: 'Escala de Glasgow',
+       
         herramienta_antibioticos: 'Antibióticos',
+      
         herramienta_rcep: 'RCP Actualizado',
-        desc_glasgow: 'Evaluar el nivel de conciencia...',
+    
+        desc_glasgow: 'Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.',
+       
         apertura_ocular: 'Apertura Ocular',
         respuesta_verbal: 'Respuesta Verbal',
         respuesta_motora: 'Respuesta Motora',
@@ -5758,15 +5238,19 @@ window.renderShareScreen = async function() {
     };
     
     // ==============================================
-    // TODOS LOS ICONOS SVG SON CONSTANTES (NUEVOS ICONOS)
+    // TODOS LOS ICONOS SVG SON CONSTANTES
     // ==============================================
     const ICONOS_SVG = {
-        icono_valores_normales: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>',
-        icono_medicamentos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
-        icono_conocimientos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+        icono_valores_normales: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        icono_medicamentos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>',
+        icono_conocimientos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+      
         icono_glasgow: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
+       
         icono_antibioticos: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="8" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="16"/><line x1="8" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="16" y2="12"/></svg>',
+       
         icono_rcep: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>',
+      
         icono_default: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>'
     };
     
@@ -5783,7 +5267,7 @@ window.renderShareScreen = async function() {
     }
     
     // ==============================================
-    // FUNCIONES DE NAVEGACIÓN (ORIGINALES SIN CAMBIOS)
+    // FUNCIONES DE NAVEGACIÓN
     // ==============================================
     window.cambiarHerramienta = function(herramienta, subtool) {
         const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
@@ -5803,19 +5287,31 @@ window.renderShareScreen = async function() {
         renderApp();
     };
 
+
     window.cambiarSubHerramienta = function(subtool, event) {
-        if (event && event.preventDefault) event.preventDefault();
-        const scrollContainer = document.querySelector('.pestanas-scroll-container');
-        const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
-        const nuevaUrl = new URL(window.location);
-        nuevaUrl.searchParams.set('subtool', subtool);
-        window.history.pushState({}, '', nuevaUrl);
-        renderApp();
-        setTimeout(() => {
-            const newScrollContainer = document.querySelector('.pestanas-scroll-container');
-            if (newScrollContainer) newScrollContainer.scrollLeft = scrollPosition;
-        }, 100);
-    };
+    if (event && event.preventDefault) event.preventDefault();
+    
+    // Guardar la posición del scroll
+    const scrollContainer = document.querySelector('.pestanas-scroll-container');
+    const scrollPosition = scrollContainer ? scrollContainer.scrollLeft : 0;
+    
+    // Actualizar URL
+    const nuevaUrl = new URL(window.location);
+    nuevaUrl.searchParams.set('subtool', subtool);
+    window.history.pushState({}, '', nuevaUrl);
+    
+    // Recargar la pantalla para que renderApp muestre la herramienta correcta
+    renderApp();
+    
+    // Restaurar scroll después de renderizar
+    setTimeout(() => {
+        const newScrollContainer = document.querySelector('.pestanas-scroll-container');
+        if (newScrollContainer) {
+            newScrollContainer.scrollLeft = scrollPosition;
+        }
+    }, 100);
+};
+
     
     window.volverAlMenuPrincipal = function() { 
         const bottomBar = document.querySelector('nav[style*="position: fixed"][style*="bottom: 0"]');
@@ -5831,384 +5327,105 @@ window.renderShareScreen = async function() {
     };
     
     // ==============================================
-    // CONTENIDO DE CADA SUB-HERRAMIENTA (ORIGINAL)
+    // CONTENIDO DE CADA SUB-HERRAMIENTA
     // ==============================================
     const contenidos = {
-        glasgow: { titulo: TEXTOS.herramienta_glasgow, descripcion: TEXTOS.desc_glasgow, secciones: [] },
+        glasgow: {
+            titulo: TEXTOS.herramienta_glasgow,
+            descripcion: TEXTOS.desc_glasgow,
+            secciones: [
+                { nombre: TEXTOS.apertura_ocular, valores: ['Espontánea (4)', 'A la voz (3)', 'Al dolor (2)', 'Ninguna (1)'] },
+                { nombre: TEXTOS.respuesta_verbal, valores: ['Orientado (5)', 'Confuso (4)', 'Palabras inapropiadas (3)', 'Sonidos incomprensibles (2)', 'Ninguna (1)'] },
+                { nombre: TEXTOS.respuesta_motora, valores: ['Obedece órdenes (6)', 'Localiza dolor (5)', 'Retirada al dolor (4)', 'Flexión anormal (3)', 'Extensión anormal (2)', 'Ninguna (1)'] }
+            ]
+        },
+        
         antibioticos: { titulo: 'Antibióticos', descripcion: 'Clasificación, mecanismos de acción, indicaciones', secciones: [] },
+       
         rcep: { titulo: 'RCP Actualizado', descripcion: 'Guías 2020-2025, compresiones, desfibrilación', secciones: [] },
+     
         vacia: { titulo: 'Próximamente', descripcion: 'Contenido en desarrollo', secciones: [] }
     };
     
     // ==============================================
-    // NUEVAS FUNCIONES PARA LAS PANTALLAS SOLICITADAS
-    // ==============================================
-    
-    // --- SIMULACIÓN DE BASE DE DATOS LOCAL ---
-    let solicitudesDB = JSON.parse(localStorage.getItem('solicitudes_sistema')) || [];
-    let personalDB = [
-        { id: 1, nombre: 'María González', tipo: 'Enfermera', edad: 34, especialidad: 'Cuidados generales', disponible: true, descripcion: 'Experta en atención domiciliaria y curación de heridas.' },
-        { id: 2, nombre: 'Carlos Ruiz', tipo: 'Enfermero', edad: 28, especialidad: 'Terapia intensiva', disponible: true, descripcion: 'Manejo de equipos médicos y cuidados críticos.' },
-        { id: 3, nombre: 'Laura Fernández', tipo: 'Fisioterapeuta', edad: 41, especialidad: 'Rehabilitación Neurológica', disponible: false, descripcion: 'Especialista en terapia física y movilidad asistida.' },
-        { id: 4, nombre: 'Gerardo Méndez', tipo: 'Gerontólogo', edad: 55, especialidad: 'Geriatría', disponible: true, descripcion: 'Atención integral al adulto mayor y enfermedades crónicas.' },
-        { id: 5, nombre: 'Sofía Ramírez', tipo: 'Cuidador', edad: 29, especialidad: 'Cuidado paliativo', disponible: true, descripcion: 'Apoyo emocional y asistencia en actividades diarias.' }
-    ];
-    
-    let procedimientosDB = [
-        { id: 1, titulo: 'Ultrasonido de alta resolución', tipo: 'Diagnóstico', imagen: 'https://via.placeholder.com/400x200?text=Ultrasonido', video: null, descripcion: 'Estudio no invasivo para órganos abdominales.' },
-        { id: 2, titulo: 'Laboratorio clínico completo', tipo: 'Análisis', imagen: 'https://via.placeholder.com/400x200?text=Laboratorio', video: null, descripcion: 'Biometría hemática, química sanguínea y más.' },
-        { id: 3, titulo: 'Consulta de especialidad', tipo: 'Consulta', imagen: 'https://via.placeholder.com/400x200?text=Consulta', video: 'https://www.youtube.com/embed/dQw4w9WgXcQ', descripcion: 'Evaluación con médicos certificados en diversas ramas.' }
-    ];
-    
-    let propiedadesDB = [
-        { id: 1, titulo: 'Casa en el Centro', tipo: 'Casa', colonia: 'Centro', precio: 2500000, medidas: '120 m²', habitaciones: 3, baños: 2, imagen: 'https://via.placeholder.com/300x200?text=Casa+Centro' },
-        { id: 2, titulo: 'Terreno en Terán', tipo: 'Terreno', colonia: 'Terán', precio: 850000, medidas: '500 m²', imagen: 'https://via.placeholder.com/300x200?text=Terreno+Teran' },
-        { id: 3, titulo: 'Casa residencial Las Palmas', tipo: 'Casa', colonia: 'Las Palmas', precio: 4200000, medidas: '250 m²', habitaciones: 4, baños: 3, imagen: 'https://via.placeholder.com/300x200?text=Casa+Las+Palmas' },
-        { id: 4, titulo: 'Terreno en El Cerrito', tipo: 'Terreno', colonia: 'El Cerrito', precio: 620000, medidas: '300 m²', imagen: 'https://via.placeholder.com/300x200?text=Terreno+Cerrito' },
-        { id: 5, titulo: 'Casa económica 20 de Noviembre', tipo: 'Casa', colonia: '20 de Noviembre', precio: 1800000, medidas: '90 m²', habitaciones: 2, baños: 1, imagen: 'https://via.placeholder.com/300x200?text=Casa+20Nov' }
-    ];
-    
-    // Función para guardar solicitud en "Fierbase" (LocalStorage)
-    window.guardarSolicitud = function(tipo, personalTipo, ubicacion) {
-        const nuevaSolicitud = {
-            id: Date.now(),
-            tipo: tipo, // 'personal', 'procedimiento'
-            personalTipo: personalTipo,
-            ubicacion: ubicacion,
-            estado: 'pendiente',
-            fecha: new Date().toISOString(),
-            usuario: 'no_logueado'
-        };
-        solicitudesDB.push(nuevaSolicitud);
-        localStorage.setItem('solicitudes_sistema', JSON.stringify(solicitudesDB));
-        alert('¡Solicitud enviada al sistema exitosamente!');
-        console.log('Solicitud guardada:', nuevaSolicitud);
-        return true;
-    };
-    
-    // Componente de mapa con geolocalización
-    function renderMapaYCaptura(tipoSolicitud, onUbicacionCapturada) {
-        let ubicacionTemp = '';
-        
-        setTimeout(() => {
-            const btnActivarGps = document.getElementById('activarGpsBtn');
-            if (btnActivarGps) {
-                btnActivarGps.onclick = () => {
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition((position) => {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            ubicacionTemp = `${lat}, ${lng}`;
-                            document.getElementById('ubicacionTexto').innerHTML = `📍 Ubicación activada: Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
-                            document.getElementById('ubicacionTexto').style.color = '#10B981';
-                            document.getElementById('confirmarUbicacionBtn').style.display = 'block';
-                            
-                            // Mostrar mapa estático (simulado)
-                            const mapaDiv = document.getElementById('mapaStatico');
-                            if (mapaDiv) {
-                                mapaDiv.innerHTML = `<iframe width="100%" height="200" frameborder="0" style="border:0; border-radius:16px;" src="https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.01},${lat-0.01},${lng+0.01},${lat+0.01}&layer=mapnik&marker=${lat},${lng}"></iframe>`;
-                            }
-                        }, (error) => {
-                            alert('Error al obtener ubicación: ' + error.message);
-                        });
-                    } else {
-                        alert('Geolocalización no soportada');
-                    }
-                };
-            }
-            
-            const btnConfirmar = document.getElementById('confirmarUbicacionBtn');
-            if (btnConfirmar) {
-                btnConfirmar.onclick = () => {
-                    if (ubicacionTemp) {
-                        onUbicacionCapturada(ubicacionTemp);
-                    } else {
-                        alert('Primero active el GPS para capturar su ubicación');
-                    }
-                };
-            }
-        }, 100);
-        
-        return `
-            <div style="margin-top: 20px; background: #F3F4F6; border-radius: 16px; padding: 16px;">
-                <h4 style="margin:0 0 12px 0;">📍 Marcar ubicación exacta</h4>
-                <button id="activarGpsBtn" style="background: #2563EB; color:white; padding: 12px; border-radius: 30px; width:100%; border:none; cursor:pointer; font-weight:bold;">🎯 ACTIVAR GPS Y OBTENER UBICACIÓN</button>
-                <div id="ubicacionTexto" style="margin-top: 12px; font-size:13px; color:#6B7280; text-align:center;">Presiona el botón para activar tu ubicación.</div>
-                <div id="mapaStatico" style="margin-top: 16px; min-height: 200px; background:#E5E7EB; border-radius:16px; overflow:hidden;"></div>
-                <button id="confirmarUbicacionBtn" style="margin-top: 16px; background: #10B981; color:white; padding: 12px; border-radius: 30px; width:100%; border:none; cursor:pointer; font-weight:bold; display:none;">✅ CONFIRMAR UBICACIÓN Y ENVIAR SOLICITUD</button>
-            </div>
-        `;
-    }
-    
-    // Renderizado de la pantalla "Personal de Salud"
-    function renderPersonalSalud() {
-        let selectedTipo = '';
-        let ubicacionFinal = '';
-        
-        const handleEnvio = (ubicacion) => {
-            if (!selectedTipo) {
-                alert('Por favor seleccione qué tipo de personal necesita (Enfermera, Fisioterapeuta, etc.)');
-                return false;
-            }
-            if (!ubicacion) {
-                alert('Por favor active el GPS y confirme su ubicación');
-                return false;
-            }
-            const exito = window.guardarSolicitud('personal', selectedTipo, ubicacion);
-            if (exito) {
-                alert(`Solicitud enviada: ${selectedTipo} en ubicación ${ubicacion}`);
-                // Limpiar para nueva solicitud
-                selectedTipo = '';
-                ubicacionFinal = '';
-                document.getElementById('ubicacionTexto').innerHTML = 'Presiona el botón para activar tu ubicación.';
-                document.getElementById('confirmarUbicacionBtn').style.display = 'none';
-                document.getElementById('mapaStatico').innerHTML = '';
-                return true;
-            }
-            return false;
-        };
-        
-        setTimeout(() => {
-            const radios = document.querySelectorAll('input[name="tipoPersonal"]');
-            radios.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    selectedTipo = e.target.value;
-                });
-            });
-            window.capturarUbicacionPersonal = (ubic) => {
-                if (handleEnvio(ubic)) {
-                    // Si se envió correctamente, reiniciamos estado visual
-                }
-            };
-        }, 100);
-        
-        // Lista de personal disponible
-        const listaPersonalHTML = personalDB.filter(p => p.disponible).map(p => `
-            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #0D9488;">
-                <div style="display: flex; justify-content: space-between;">
-                    <strong style="font-size: 16px;">${p.nombre}</strong>
-                    <span style="background: #10B98120; color: #0D9488; padding: 4px 8px; border-radius: 20px; font-size:12px;">Disponible</span>
-                </div>
-                <div style="font-size: 13px; color:#4B5563;">${p.tipo} • ${p.edad} años</div>
-                <div style="font-size: 13px; margin-top: 6px;">🎓 ${p.especialidad}</div>
-                <div style="font-size: 12px; color:#6B7280; margin-top: 8px;">📋 ${p.descripcion}</div>
-            </div>
-        `).join('');
-        
-        return `
-            <div style="padding: 16px;">
-                <div style="background: linear-gradient(135deg, #0D9488, #0F766E); border-radius: 20px; padding: 20px; color: white; margin-bottom: 24px;">
-                    <h3 style="margin:0 0 8px 0;">👩‍⚕️ Solicitar Personal de Salud</h3>
-                    <p style="margin:0; opacity:0.9;">Selecciona el tipo de profesional que necesitas, activa tu ubicación y envía la solicitud al sistema.</p>
-                </div>
-                
-                <div style="margin-bottom: 24px;">
-                    <h4>Selecciona el personal que necesitas:</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
-                        <label style="display: flex; align-items: center; gap: 8px; background:#F3F4F6; padding: 8px 16px; border-radius: 40px;"><input type="radio" name="tipoPersonal" value="Enfermera/o"> 🩺 Enfermera/o</label>
-                        <label style="display: flex; align-items: center; gap: 8px; background:#F3F4F6; padding: 8px 16px; border-radius: 40px;"><input type="radio" name="tipoPersonal" value="Fisioterapeuta"> 🦵 Fisioterapeuta</label>
-                        <label style="display: flex; align-items: center; gap: 8px; background:#F3F4F6; padding: 8px 16px; border-radius: 40px;"><input type="radio" name="tipoPersonal" value="Gerontólogo"> 👴 Gerontólogo</label>
-                        <label style="display: flex; align-items: center; gap: 8px; background:#F3F4F6; padding: 8px 16px; border-radius: 40px;"><input type="radio" name="tipoPersonal" value="Cuidador"> 🤝 Cuidador</label>
-                    </div>
-                </div>
-                
-                ${renderMapaYCaptura('personal', (ubic) => {
-                    if (selectedTipo) {
-                        window.guardarSolicitud('personal', selectedTipo, ubic);
-                        alert(`✅ Solicitud enviada: ${selectedTipo} en ubicación ${ubic}`);
-                    } else {
-                        alert('Primero selecciona qué tipo de personal necesitas');
-                    }
-                })}
-                
-                <div style="margin-top: 32px;">
-                    <h4>📋 Personal Disponible en tu zona</h4>
-                    ${listaPersonalHTML || '<p>No hay personal disponible en este momento.</p>'}
-                </div>
-            </div>
-        `;
-    }
-    
-    // Renderizado de la pantalla "Procedimientos Clínicos"
-    function renderProcedimientos() {
-        const publicacionesHTML = procedimientosDB.map(p => `
-            <div style="background: white; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                ${p.imagen ? `<img src="${p.imagen}" style="width:100%; height: 180px; object-fit: cover;">` : ''}
-                <div style="padding: 16px;">
-                    <h3 style="margin:0 0 8px 0;">${p.titulo}</h3>
-                    <span style="background: #E0F2FE; color:#0369A1; padding:4px 12px; border-radius:20px; font-size:12px;">${p.tipo}</span>
-                    <p style="margin-top: 12px; color:#4B5563;">${p.descripcion}</p>
-                    ${p.video ? `<div style="margin-top:12px;"><iframe width="100%" height="180" src="${p.video}" frameborder="0" allowfullscreen></iframe></div>` : ''}
-                    <button style="margin-top: 16px; background: #0D9488; color:white; border:none; padding: 10px 20px; border-radius:30px; cursor:pointer;" onclick="alert('Solicitud de procedimiento enviada (demo)')">Solicitar este procedimiento</button>
-                </div>
-            </div>
-        `).join('');
-        
-        return `
-            <div style="padding: 16px;">
-                <div style="background: linear-gradient(135deg, #2563EB, #1E40AF); border-radius: 20px; padding: 20px; color: white; margin-bottom: 24px;">
-                    <h3 style="margin:0 0 8px 0;">🔬 Solicitar Procedimientos Clínicos</h3>
-                    <p style="margin:0; opacity:0.9;">Explora los procedimientos médicos disponibles, mira fotos, videos y solicita el que necesitas.</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <input type="text" placeholder="🔍 Buscar procedimiento..." style="width:100%; padding: 14px; border-radius: 40px; border: 1px solid #E5E7EB; font-size:16px;">
-                </div>
-                
-                <h4>📸 Procedimientos destacados</h4>
-                <div id="listaPublicaciones">
-                    ${publicacionesHTML}
-                </div>
-            </div>
-        `;
-    }
-    
-    // Renderizado de la pantalla "Propiedades"
-    function renderPropiedades() {
-        let filtroColonia = '';
-        let filtroTipo = '';
-        let filtroPrecioMax = Infinity;
-        
-        function aplicarFiltros() {
-            let propiedadesFiltradas = propiedadesDB.filter(p => {
-                if (filtroColonia && p.colonia !== filtroColonia) return false;
-                if (filtroTipo && p.tipo !== filtroTipo) return false;
-                if (filtroPrecioMax !== Infinity && p.precio > filtroPrecioMax) return false;
-                return true;
-            });
-            
-            const container = document.getElementById('propiedadesContainer');
-            if (container) {
-                container.innerHTML = propiedadesFiltradas.map(p => `
-                    <div style="background: white; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                        <img src="${p.imagen}" style="width:100%; height: 160px; object-fit: cover;">
-                        <div style="padding: 16px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <h3 style="margin:0;">${p.titulo}</h3>
-                                <span style="background: #0D948820; padding:4px 12px; border-radius:20px; font-size:12px;">${p.tipo}</span>
-                            </div>
-                            <div style="color:#6B7280; margin-top: 6px;">📍 ${p.colonia}</div>
-                            <div style="font-weight:800; color:#0D9488; margin-top: 8px;">$${p.precio.toLocaleString()}</div>
-                            <div style="font-size:13px;">📏 ${p.medidas}</div>
-                            ${p.habitaciones ? `<div>🛏️ ${p.habitaciones} hab | 🚿 ${p.baños} baños</div>` : ''}
-                            <button style="margin-top: 12px; background: #0D9488; color:white; border:none; padding: 8px 16px; border-radius:30px; cursor:pointer;" onclick="alert('Contactar para comprar (demo)')">Contactar para comprar</button>
-                        </div>
-                    </div>
-                `).join('');
-                if (propiedadesFiltradas.length === 0) container.innerHTML = '<p style="text-align:center; color:#9CA3AF;">No hay propiedades con esos filtros.</p>';
-            }
-        }
-        
-        setTimeout(() => {
-            const coloniaSelect = document.getElementById('filtroColonia');
-            const tipoSelect = document.getElementById('filtroTipo');
-            const precioInput = document.getElementById('filtroPrecio');
-            
-            if (coloniaSelect) coloniaSelect.onchange = (e) => { filtroColonia = e.target.value; aplicarFiltros(); };
-            if (tipoSelect) tipoSelect.onchange = (e) => { filtroTipo = e.target.value; aplicarFiltros(); };
-            if (precioInput) precioInput.oninput = (e) => { filtroPrecioMax = parseInt(e.target.value) || Infinity; aplicarFiltros(); };
-            
-            aplicarFiltros();
-        }, 100);
-        
-        const coloniasUnicas = [...new Set(propiedadesDB.map(p => p.colonia))];
-        const tiposUnicos = [...new Set(propiedadesDB.map(p => p.tipo))];
-        
-        return `
-            <div style="padding: 16px;">
-                <div style="background: linear-gradient(135deg, #F59E0B, #B45309); border-radius: 20px; padding: 20px; color: white; margin-bottom: 24px;">
-                    <h3 style="margin:0 0 8px 0;">🏡 Compra Terrenos y Casas</h3>
-                    <p style="margin:0; opacity:0.9;">Encuentra la propiedad ideal en Tuxtla Gutiérrez usando nuestros filtros avanzados.</p>
-                </div>
-                
-                <div style="background: #F9FAFB; border-radius: 20px; padding: 16px; margin-bottom: 24px;">
-                    <h4 style="margin:0 0 12px 0;">🔍 Filtros de búsqueda</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                        <select id="filtroColonia" style="flex:1; padding: 10px; border-radius: 40px; border:1px solid #E5E7EB;">
-                            <option value="">Todas las colonias</option>
-                            ${coloniasUnicas.map(c => `<option value="${c}">${c}</option>`).join('')}
-                        </select>
-                        <select id="filtroTipo" style="flex:1; padding: 10px; border-radius: 40px; border:1px solid #E5E7EB;">
-                            <option value="">Todo tipo</option>
-                            ${tiposUnicos.map(t => `<option value="${t}">${t}</option>`).join('')}
-                        </select>
-                        <input type="number" id="filtroPrecio" placeholder="Precio máximo" style="flex:1; padding: 10px; border-radius: 40px; border:1px solid #E5E7EB;">
-                    </div>
-                </div>
-                
-                <div id="propiedadesContainer" style="margin-top: 20px;">
-                    Cargando propiedades...
-                </div>
-            </div>
-        `;
-    }
-    
-    // ==============================================
-    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL (ACTUALIZADA)
+    // CONFIGURACIÓN DE CADA HERRAMIENTA PRINCIPAL
     // ==============================================
     const herramientasConfig = {
         'valores-normales': {
             titulo: TEXTOS.btn_valores_normales,
-            descripcion: 'Solicita enfermeras, fisioterapeutas, gerontólogos o cuidadores a domicilio',
+            descripcion: 'Constantes vitales, laboratorio, parámetros clínicos',
             color: '#0D9488',
             icono: ICONOS_SVG.icono_valores_normales,
-            subherramientas: ['personal_salud'],
-            nombres: { 'personal_salud': '👥 Personal de Salud' },
-            iconos: { 'personal_salud': ICONOS_SVG.icono_valores_normales }
+            subherramientas: ['glasgow'],
+            nombres: {
+                glasgow: TEXTOS.herramienta_glasgow
+            },
+            iconos: {
+                glasgow: ICONOS_SVG.icono_glasgow
+            }
         },
         'medicamentos': {
             titulo: TEXTOS.btn_medicamentos,
-            descripcion: 'Encuentra procedimientos clínicos, ultrasonidos, laboratorios y más',
+            descripcion: 'Dosis, indicaciones, contraindicaciones, interacciones',
             color: '#3B82F6',
             icono: ICONOS_SVG.icono_medicamentos,
-            subherramientas: ['procedimientos_clinicos'],
-            nombres: { 'procedimientos_clinicos': '🔬 Procedimientos Clínicos' },
-            iconos: { 'procedimientos_clinicos': ICONOS_SVG.icono_medicamentos }
+            subherramientas: ['antibioticos'],
+            nombres: {
+                antibioticos: TEXTOS.herramienta_antibioticos
+            },
+            iconos: {
+                antibioticos: ICONOS_SVG.icono_antibioticos
+            }
         },
         'conocimientos': {
             titulo: TEXTOS.btn_conocimientos,
-            descripcion: 'Terrenos y casas en venta en Tuxtla Gutiérrez',
+            descripcion: 'Guías, protocolos, actualizaciones, RCP',
             color: '#F59E0B',
             icono: ICONOS_SVG.icono_conocimientos,
-            subherramientas: ['propiedades'],
-            nombres: { 'propiedades': '🏡 Propiedades' },
-            iconos: { 'propiedades': ICONOS_SVG.icono_conocimientos }
+            subherramientas: ['rcep'],
+            nombres: {
+                rcep: TEXTOS.herramienta_rcep
+            },
+            iconos: {
+                rcep: ICONOS_SVG.icono_rcep
+            }
         }
     };
     
     // ==============================================
-    // VISTA PRINCIPAL (BOTONES ACTUALIZADOS)
+    // VISTA PRINCIPAL (BOTONES ORIGINALES)
     // ==============================================
     if (!herramientaActual) {
         return `
-            <div style="min-height: 100vh; background: linear-gradient(145deg, #EFF6FF 0%, #F8FAFC 100%);">
-                <div style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 50px 24px; text-align: center;">
+            <div style="min-height: 100vh; background: #F9FAFB;">
+                <div style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); padding: 50px 24px; text-align: center;">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" style="margin-bottom: 16px;">
-                        <path d="M12 2v4M12 18v4M4 12H2M22 12h-2M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83M16.24 16.24l2.83 2.83M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                        <path d="M12 16v-4M12 8h.01"/>
                     </svg>
-                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 800;">BUSCADOR</h1>
-                    <p style="color: #94A3B8; margin-top: 8px;">Encuentra lo que necesitas</p>
+                    <h1 style="color: white; font-size: 32px; margin: 0; font-weight: 700;">BIENESTAR</h1>
                 </div>
-                <div style="position: sticky; top: 0; z-index: 100; background: #1E293B; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">ENCUENTRA LO QUE NECESITAS</p>
+                <div style="position: sticky; top: 0; z-index: 100; background: #0D9488; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <p style="color: white; margin: 0; font-size: 14px; font-weight: 500;">Herramientas clínicas para profesionales</p>
                 </div>
-                <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 20px;">
-                    <button onclick="window.cambiarHerramienta('valores-normales', 'personal_salud')" style="background: white; border: none; border-radius: 24px; padding: 24px; text-align: left; box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 20px;">
-                            <div style="background: #0D9488; width: 64px; height: 64px; border-radius: 32px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_valores_normales}</div>
-                            <div><h3 style="margin: 0; color: #0F172A; font-size: 20px;">${TEXTOS.btn_valores_normales}</h3><p style="margin: 6px 0 0; color: #64748B; font-size: 14px;">Enfermeras, Fisioterapeutas, Gerontólogos, Cuidadores</p></div>
+                <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 16px;">
+                    <button onclick="window.cambiarHerramienta('valores-normales', 'glasgow')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #0D9488; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_valores_normales}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_valores_normales}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Constantes vitales, laboratorio, parámetros</p></div>
                         </div>
                     </button>
-                    <button onclick="window.cambiarHerramienta('medicamentos', 'procedimientos_clinicos')" style="background: white; border: none; border-radius: 24px; padding: 24px; text-align: left; box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 20px;">
-                            <div style="background: #3B82F6; width: 64px; height: 64px; border-radius: 32px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_medicamentos}</div>
-                            <div><h3 style="margin: 0; color: #0F172A; font-size: 20px;">${TEXTOS.btn_medicamentos}</h3><p style="margin: 6px 0 0; color: #64748B; font-size: 14px;">Ultrasonidos, laboratorios, consultas médicas</p></div>
+                    <button onclick="window.cambiarHerramienta('medicamentos', 'antibioticos')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #3B82F6; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_medicamentos}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_medicamentos}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Dosis, indicaciones, contraindicaciones</p></div>
                         </div>
                     </button>
-                    <button onclick="window.cambiarHerramienta('conocimientos', 'propiedades')" style="background: white; border: none; border-radius: 24px; padding: 24px; text-align: left; box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15); cursor: pointer; width: 100%; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 20px;">
-                            <div style="background: #F59E0B; width: 64px; height: 64px; border-radius: 32px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_conocimientos}</div>
-                            <div><h3 style="margin: 0; color: #0F172A; font-size: 20px;">${TEXTOS.btn_conocimientos}</h3><p style="margin: 6px 0 0; color: #64748B; font-size: 14px;">Terrenos y casas en Tuxtla Gutiérrez</p></div>
+                    <button onclick="window.cambiarHerramienta('conocimientos', 'rcep')" style="background: white; border: none; border-radius: 20px; padding: 24px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="background: #F59E0B; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center;">${ICONOS_SVG.icono_conocimientos}</div>
+                            <div><h3 style="margin: 0; color: #1F2937; font-size: 18px;">${TEXTOS.btn_conocimientos}</h3><p style="margin: 4px 0 0; color: #6B7280; font-size: 13px;">Guías, protocolos, actualizaciones</p></div>
                         </div>
                     </button>
                 </div>
@@ -6217,112 +5434,184 @@ window.renderShareScreen = async function() {
     }
     
     // ==============================================
-    // VISTA DE HERRAMIENTA SELECCIONADA (RENDERIZADO CONDICIONAL)
+    // VISTA DE HERRAMIENTA SELECCIONADA
     // ==============================================
     const configActual = herramientasConfig[herramientaActual];
     let subHerramientaMostrar = subHerramientaActual;
     if (!configActual.subherramientas.includes(subHerramientaMostrar)) {
         subHerramientaMostrar = configActual.subherramientas[0];
     }
+    const contenidoActual = contenidos[subHerramientaMostrar] || contenidos.vacia;
     
     const generarPestanas = () => {
         return `
-            <div class="pestanas-scroll-container" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px;">
+            <div class="pestanas-scroll-container" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: thin;">
                 ${configActual.subherramientas.map(sub => `
-                    <button class="subtool-btn" data-subtool="${sub}" onclick="window.cambiarSubHerramienta('${sub}', event)" style="display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 80px; padding: 10px 8px; background: ${subHerramientaMostrar === sub ? configActual.color : 'white'}; border: 1px solid ${subHerramientaMostrar === sub ? configActual.color : '#E5E7EB'}; border-radius: 20px; cursor: pointer; transition: all 0.2s; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">
+                    <button class="subtool-btn" data-subtool="${sub}" onclick="window.cambiarSubHerramienta('${sub}', event)" style="display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 70px; padding: 10px 8px; background: ${subHerramientaMostrar === sub ? configActual.color : 'white'}; border: 1px solid ${subHerramientaMostrar === sub ? configActual.color : '#E5E7EB'}; border-radius: 16px; cursor: pointer; transition: all 0.2s; color: ${subHerramientaMostrar === sub ? 'white' : configActual.color};">
                         <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">${configActual.iconos[sub] || ICONOS_SVG.icono_default}</span>
-                        <span style="font-size: 12px; font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center;">${configActual.nombres[sub]}</span>
+                        <span class="subtool-text" style="font-size: clamp(10px, 3vw, 12px); font-weight: ${subHerramientaMostrar === sub ? '700' : '500'}; text-align: center; max-width: 70px; line-height: 1.3;">${configActual.nombres[sub]}</span>
                     </button>
                 `).join('')}
             </div>
         `;
     };
     
+    // FUNCIÓN QUE LLAMA A LAS HERRAMIENTAS SEPARADAS
     const generarContenidoPrincipal = () => {
         if (herramientaActual === 'valores-normales') {
-            if (subHerramientaMostrar === 'personal_salud') return renderPersonalSalud();
-        }
+            if (subHerramientaMostrar === 'glasgow') return window.renderGlasgowTool();
+               }
         if (herramientaActual === 'medicamentos') {
-            if (subHerramientaMostrar === 'procedimientos_clinicos') return renderProcedimientos();
-        }
+            if (subHerramientaMostrar === 'antibioticos') return window.renderAntibioticosTool();
+                  }
         if (herramientaActual === 'conocimientos') {
-            if (subHerramientaMostrar === 'propiedades') return renderPropiedades();
+            if (subHerramientaMostrar === 'rcep') return window.renderRceptTool();
+                  }
+        // Fallback: contenido original
+        if (!contenidoActual.secciones || contenidoActual.secciones.length === 0) {
+            return `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
+                    <h3 style="color: #374151; margin-top: 20px; font-size: 20px;">${contenidoActual.titulo}</h3>
+                    <p style="color: #6B7280; margin-top: 8px;">${contenidoActual.descripcion}</p>
+                    <div style="background: #F3F4F6; border-radius: 16px; padding: 40px; margin-top: 30px;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${configActual.color}" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <p style="color: #9CA3AF; font-size: 14px; margin-top: 16px;">Contenido en desarrollo<br>Próximamente</p>
+                    </div>
+                </div>
+            `;
         }
-        return `<div style="padding:20px; text-align:center;">Contenido no disponible</div>`;
+        return `
+            <div style="padding: 4px 0 20px 0;">
+                <div style="background: ${configActual.color}10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid ${configActual.color};">
+                    <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">${contenidoActual.descripcion}</p>
+                </div>
+                ${contenidoActual.secciones.map(seccion => `
+                    <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h4 style="color: ${configActual.color}; margin: 0 0 12px 0; font-size: 16px;">${seccion.nombre}</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${seccion.valores.map(valor => `<span style="background: #F3F4F6; padding: 8px 14px; border-radius: 25px; font-size: 13px; color: #374151;">${valor}</span>`).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                    <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: ${configActual.color}; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+                </div>
+            </div>
+        `;
     };
     
     return `
-        <div style="min-height: 100vh; background: #F8FAFC;">
+        <div style="min-height: 100vh; background: #F9FAFB;">
             <div style="position: sticky; top: 0; z-index: 100; background: ${configActual.color}; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px); border-radius: 30px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <svg width="clamp(18px, 4vw, 22px)" height="clamp(18px, 4vw, 22px)" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-                    <span style="color: white; font-size: 14px; font-weight: 500;">SALIR</span>
-                </button>
+                      <button onclick="window.volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.2); border: none; padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px); border-radius: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
+    <svg width="clamp(18px, 4vw, 22px)" height="clamp(18px, 4vw, 22px)" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <span style="color: white; font-size: clamp(9px, 3vw, 23px); font-weight: 500;">SALIR</span>
+</button>
                 <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;">${configActual.icono}</span>
-                        <h2 style="color: white; margin: 0; font-size: 18px; font-weight: 700;">${configActual.titulo}</h2>
+                        <h2 style="color: white; margin: 0; font-size: 18px; font-weight: 600;">${configActual.titulo}</h2>
                     </div>
                 </div>
             </div>
-            <div style="background: white; padding: 12px 16px; border-bottom: 1px solid #E2E8F0;">
+            <div style="position: relative; background: white; padding: 12px 16px; border-bottom: 1px solid #E5E7EB;">
                 ${generarPestanas()}
             </div>
-            <div id="subtool-main-content">${generarContenidoPrincipal()}</div>
+            <div id="subtool-main-content" style="padding: 16px;">${generarContenidoPrincipal()}</div>
         </div>
     `;
 };
 
-// ===========================================================================
-// TODAS TUS FUNCIONES ORIGINALES (PRESIÓN, GLUCOSA, IMC, COLESTEROL, ETC) SE MANTIENEN ÍNTEGRAS
-// ===========================================================================
 
-window.renderColesterolTool = function() {
-    // ... (código original intacto)
-    return `<div>Función Colesterol intacta</div>`;
+
+    // ==============================================
+// FUNCIONES SEPARADAS - VALORES NORMALES
+// ==============================================
+
+window.renderGlasgowTool = function() {
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #0D948810; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #0D9488;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Evaluar el nivel de conciencia en pacientes con lesión cerebral. Valora tres parámetros: apertura ocular, respuesta verbal y respuesta motora.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Apertura Ocular</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Espontánea (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">A la voz (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Al dolor (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Verbal</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Orientado (5)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Confuso (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Palabras inapropiadas (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Sonidos incomprensibles (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h4 style="color: #0D9488; margin: 0 0 12px 0; font-size: 16px;">Respuesta Motora</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Obedece órdenes (6)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Localiza dolor (5)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Retirada al dolor (4)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Flexión anormal (3)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Extensión anormal (2)</span>
+                    <span style="background:#F3F4F6; padding:8px 14px; border-radius:25px;">Ninguna (1)</span>
+                </div>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Función en desarrollo', 'info')" style="background: #0D9488; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Calcular puntuación</button>
+            </div>
+        </div>
+    `;
 };
-window.renderTrigliceridosTool = function() {
-    // ... (código original intacto)
-    return `<div>Función Triglicéridos intacta</div>`;
-};
-window.renderIMCTool = function() {
-    // ... (código original intacto)
-    return `<div>Función IMC intacta</div>`;
-};
-window.renderGlucosaTool = function() {
-    // ... (código original intacto)
-    return `<div>Función Glucosa intacta</div>`;
-};
-window.renderPresionArterialTool = function() {
-    // ... (código original intacto)
-    return `<div>Función Presión Arterial intacta</div>`;
-};
+
+
+
+// ==============================================
+// FUNCIONES SEPARADAS - MEDICAMENTOS
+// ==============================================
+
 window.renderAntibioticosTool = function() {
-    // ... (código original intacto)
-    return `<div>Función Antibióticos intacta</div>`;
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #3B82F610; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3B82F6;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Clasificación, mecanismos de acción, indicaciones, espectro antibacteriano.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de Antibióticos próximamente', 'info')" style="background: #3B82F6; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
 };
+
+// ==============================================
+// FUNCIONES SEPARADAS - CONOCIMIENTOS
+// ==============================================
+
 window.renderRceptTool = function() {
-    // ... (código original intacto)
-    return `<div>Función RCP intacta</div>`;
+    return `
+        <div style="padding: 4px 0 20px 0;">
+            <div style="background: #F59E0B10; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #F59E0B;">
+                <p style="color: #4B5563; font-size: 14px; line-height: 1.6;">Guías actualizadas de RCP (2020-2025). Compresiones de alta calidad, desfibrilación temprana, trabajo en equipo.</p>
+            </div>
+            <div style="background: white; border-radius: 16px; padding: 20px; margin-top: 20px; text-align: center;">
+                <button onclick="AppState.addNotification('Contenido de RCP próximamente', 'info')" style="background: #F59E0B; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;">Ver más</button>
+            </div>
+        </div>
+    `;
 };
-// FIN DE LAS FUNCIONES ORIGINALES
-// ===========================================================================
-
-// Nota: Para que la aplicación funcione correctamente sin errores, estas funciones deben tener su implementación completa.
-// Como el código original era muy extenso, aquí se colocan stubs funcionales para evitar errores.
-// En tu implementación final, reemplaza estos stubs con el contenido original que tienes en tu sistema.
 </script>
-
-
-
-
-
-
-
-
-    
-    
-    
 
 <!-- PANTALLA 4: PUBLICACIONES -->
 <script>
@@ -6546,7 +5835,7 @@ window.renderAdminScreen = async function() {
         
         <div style="border-top:1px solid rgba(255,215,0,0.2); padding-top:20px;">
             <div style="font-size:12px; color:var(--text-gray, #CCCCCC); font-weight:500;">⚡ "SLOGAN AQUI"</div>
-            <div style="font-size:10px; margin-top:10px; color:#999999;">© 2026 MI APP | Versión 1.0</div>
+            <div style="font-size:10px; margin-top:10px; color:#999999;">© 2026 MI APP | Versión 2.0</div>
         </div>
     </div>
 </footer>
