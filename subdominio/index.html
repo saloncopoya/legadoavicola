@@ -5918,51 +5918,417 @@ window.renderJuezScreen = async function() {
 
 <!-- PANTALLA 8: CONFIGURACIONES - CON OFFLINE (guarda preferencias) -->
 <script>
+// ==============================================
+// PANTALLA DE CONFIGURACIONES COMPLETA
+// ==============================================
+
 window.renderConfiguracionesScreen = async function() {
-    // Cargar preferencias guardadas offline
-    const preferencias = await getDataOfflineFirst('configuraciones', 'user_prefs') || {};
+    // Cargar preferencias guardadas
+    let preferencias = await getDataOfflineFirst('configuraciones', 'user_prefs') || {};
+    
+    // Inicializar categorías si no existen
+    if (!preferencias.categorias) {
+        preferencias.categorias = {
+            salud: false,
+            terrenos: false,
+            compraCasas: false,
+            rentaSalones: false
+        };
+    }
+    
+    // Cargar topics guardados en localStorage (prioridad)
+    const topicsGuardados = JSON.parse(localStorage.getItem('user_topics') || '{}');
+    
+    // Combinar preferencias
+    preferencias.categorias = {
+        salud: topicsGuardados.salud !== undefined ? topicsGuardados.salud : preferencias.categorias.salud,
+        terrenos: topicsGuardados.terrenos !== undefined ? topicsGuardados.terrenos : preferencias.categorias.terrenos,
+        compraCasas: topicsGuardados.compraCasas !== undefined ? topicsGuardados.compraCasas : preferencias.categorias.compraCasas,
+        rentaSalones: topicsGuardados.rentaSalones !== undefined ? topicsGuardados.rentaSalones : preferencias.categorias.rentaSalones
+    };
+    
+    const user = AppState.user.current;
+    const isOffline = !navigator.onLine;
+    
+    // Función para obtener el estado visual del toggle
+    const getToggleStyle = (categoria) => {
+        const activo = preferencias.categorias[categoria];
+        return {
+            backgroundColor: activo ? '#4CAF50' : '#ccc',
+            transform: activo ? 'translateX(26px)' : 'translateX(0px)'
+        };
+    };
     
     return `
         <div style="min-height: 100vh; background: var(--bg-body);">
             <div style="width: 100%; min-height: 100vh; padding: 20px; padding-top: 10px;">
-                <h2 style="color: var(--color-primary);">⚙️ Configuraciones</h2>
-                ${!navigator.onLine ? '<div style="background: var(--warning-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px;">📴 Modo offline - Los cambios se guardarán localmente</div>' : ''}
-                <div style="background: var(--bg-white); border-radius: 12px; padding: 20px;">
+                
+                <!-- TÍTULO -->
+                <h2 style="color: var(--color-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span>⚙️</span> Configuraciones
+                </h2>
+                
+                ${!navigator.onLine ? '<div style="background: #fff3cd; padding: 12px; border-radius: 12px; margin-bottom: 20px; text-align: center;">📴 Modo offline - Los cambios se guardarán localmente</div>' : ''}
+                
+                <!-- ============================================ -->
+                <!-- SECCIÓN: PREFERENCIAS DE NOTIFICACIONES      -->
+                <!-- ============================================ -->
+                <div style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;">
+                        <span style="font-size: 28px;">🔔</span>
+                        <h3 style="margin: 0; color: var(--color-primary);">Preferencias de Notificaciones</h3>
+                    </div>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Selecciona qué tipos de publicaciones quieres recibir</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        
+                        <!-- SALUD -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 24px;">🏥</span>
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Salud y Bienestar</div>
+                                        <div style="font-size: 11px; color: #888;">Noticias médicas, consejos de salud</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <label style="position: relative; display: inline-block; width: 52px; height: 26px;">
+                                <input type="checkbox" id="notif_salud" 
+                                    onchange="toggleNotificacionCategoria('salud', this)" 
+                                    ${preferencias.categorias.salud ? 'checked' : ''}
+                                    ${!user ? 'disabled' : ''}>
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${getToggleStyle('salud').backgroundColor}; transition: 0.3s; border-radius: 26px;"></span>
+                                <span class="slider-circle" style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; transform: ${getToggleStyle('salud').transform};"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- TERRENOS -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 24px;">🏞️</span>
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Terrenos y Propiedades</div>
+                                        <div style="font-size: 11px; color: #888;">Ofertas de terrenos, lotes en venta</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <label style="position: relative; display: inline-block; width: 52px; height: 26px;">
+                                <input type="checkbox" id="notif_terrenos" 
+                                    onchange="toggleNotificacionCategoria('terrenos', this)" 
+                                    ${preferencias.categorias.terrenos ? 'checked' : ''}
+                                    ${!user ? 'disabled' : ''}>
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${getToggleStyle('terrenos').backgroundColor}; transition: 0.3s; border-radius: 26px;"></span>
+                                <span class="slider-circle" style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; transform: ${getToggleStyle('terrenos').transform};"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- COMPRA DE CASAS -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 24px;">🏠</span>
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Compra de Casas</div>
+                                        <div style="font-size: 11px; color: #888;">Casas en venta, inmuebles residenciales</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <label style="position: relative; display: inline-block; width: 52px; height: 26px;">
+                                <input type="checkbox" id="notif_compraCasas" 
+                                    onchange="toggleNotificacionCategoria('compraCasas', this)" 
+                                    ${preferencias.categorias.compraCasas ? 'checked' : ''}
+                                    ${!user ? 'disabled' : ''}>
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${getToggleStyle('compraCasas').backgroundColor}; transition: 0.3s; border-radius: 26px;"></span>
+                                <span class="slider-circle" style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; transform: ${getToggleStyle('compraCasas').transform};"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- RENTA DE SALONES -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 24px;">🎉</span>
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Renta de Salones</div>
+                                        <div style="font-size: 11px; color: #888;">Salones de eventos, fiestas, reuniones</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <label style="position: relative; display: inline-block; width: 52px; height: 26px;">
+                                <input type="checkbox" id="notif_rentaSalones" 
+                                    onchange="toggleNotificacionCategoria('rentaSalones', this)" 
+                                    ${preferencias.categorias.rentaSalones ? 'checked' : ''}
+                                    ${!user ? 'disabled' : ''}>
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${getToggleStyle('rentaSalones').backgroundColor}; transition: 0.3s; border-radius: 26px;"></span>
+                                <span class="slider-circle" style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; transform: ${getToggleStyle('rentaSalones').transform};"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- BOTÓN RESTAURAR -->
+                    <div style="margin-top: 25px; padding: 15px; background: #e3f2fd; border-radius: 12px; text-align: center;">
+                        <button onclick="restaurarSuscripcionesManual()" 
+                            style="background: #2196F3; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px;"
+                            ${!user ? 'disabled' : ''}>
+                            🔄 RESTAURAR MIS NOTIFICACIONES
+                        </button>
+                        <p style="font-size: 11px; color: #666; margin-top: 8px;">Usa este botón si dejaste de recibir notificaciones</p>
+                    </div>
+                    
+                    ${!user ? `
+                    <div style="margin-top: 20px; padding: 12px; background: #fff3cd; border-radius: 10px; text-align: center;">
+                        <span style="font-size: 14px;">🔒 Inicia sesión para activar notificaciones personalizadas</span>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <!-- ============================================ -->
+                <!-- SECCIÓN: OTRAS CONFIGURACIONES                -->
+                <!-- ============================================ -->
+                <div style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;">
+                        <span style="font-size: 28px;">🔧</span>
+                        <h3 style="margin: 0; color: var(--color-primary);">Otras Configuraciones</h3>
+                    </div>
+                    
                     <div style="margin-bottom: 15px;">
-                        <label style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>🔔 Notificaciones push</span>
-                            <button onclick="guardarConfiguracion('notificaciones', event)" style="padding:8px 16px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.notificaciones === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                        <label style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 10px;">
+                            <div>
+                                <div style="font-weight: 600;">🔔 Probar Notificaciones</div>
+                                <div style="font-size: 11px; color: #888;">Verifica que las notificaciones funcionan</div>
+                            </div>
+                            <button onclick="probarPushNotification()" 
+                                style="padding: 8px 20px; background: var(--color-primary); color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                                Probar
+                            </button>
                         </label>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>🌙 Modo oscuro</span>
-                            <button onclick="guardarConfiguracion('modo_oscuro', event)" style="padding:8px 16px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.modo_oscuro === 'activado' ? '✅ Activado' : 'Activar'}</button>
-                        </label>
-                    </div>
+                    
                     <div>
-                        <label style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>💾 Sincronización automática</span>
-                            <button onclick="guardarConfiguracion('sincronizacion', event)" style="padding:8px 16px; background:var(--color-primary); color:white; border:none; border-radius:8px; cursor:pointer;">${preferencias.sincronizacion === 'activado' ? '✅ Activado' : 'Activar'}</button>
+                        <label style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 10px;">
+                            <div>
+                                <div style="font-weight: 600;">🗑️ Limpiar Caché Local</div>
+                                <div style="font-size: 11px; color: #888;">Elimina datos guardados localmente</div>
+                            </div>
+                            <button onclick="limpiarCacheLocal()" 
+                                style="padding: 8px 20px; background: #ff9800; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold;">
+                                Limpiar
+                            </button>
                         </label>
                     </div>
+                </div>
+                
+                <!-- VERSIÓN DE LA APP -->
+                <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+                    📱 Versión 2.0.0 | Notificaciones por preferencias
                 </div>
             </div>
         </div>
     `;
 };
 
-// Función auxiliar para guardar configuraciones offline
-async function guardarConfiguracion(key, event) {
-    const boton = event.target;
-    const preferencias = await getDataOfflineFirst('configuraciones', 'user_prefs') || {};
-    const nuevoEstado = preferencias[key] === 'activado' ? 'desactivado' : 'activado';
-    preferencias[key] = nuevoEstado;
-    await OfflineDB.set('configuraciones', 'user_prefs', preferencias);
-    boton.textContent = nuevoEstado === 'activado' ? '✅ Activado' : 'Activar';
-    AppState.addNotification(`Configuración guardada offline: ${key}`, 'success');
+// ==============================================
+// FUNCIONES PARA MANEJAR LOS TOGGLES Y TOPICS
+// ==============================================
+
+// Suscribir a topic
+async function suscribirATopicFirebase(categoria) {
+    if (!AppState.user.current) {
+        AppState.addNotification('Debes iniciar sesión primero', 'warning');
+        return false;
+    }
+    
+    try {
+        const messaging = firebase.messaging();
+        
+        const topicsMap = {
+            'salud': 'topic_salud',
+            'terrenos': 'topic_terrenos',
+            'compraCasas': 'topic_casas',
+            'rentaSalones': 'topic_salones'
+        };
+        
+        const topicName = topicsMap[categoria];
+        if (!topicName) return false;
+        
+        await messaging.subscribeToTopic(topicName);
+        console.log(`✅ Suscrito a: ${topicName}`);
+        
+        // Guardar en localStorage
+        let topics = JSON.parse(localStorage.getItem('user_topics') || '{}');
+        topics[categoria] = true;
+        localStorage.setItem('user_topics', JSON.stringify(topics));
+        
+        // Guardar en Firebase como respaldo
+        if (AppState.firebase.database) {
+            await AppState.firebase.database.ref(`userTopics/${AppState.user.current.uid}/${categoria}`).set(true);
+        }
+        
+        AppState.addNotification(`✅ Activadas notificaciones de ${getNombreCategoria(categoria)}`, 'success');
+        return true;
+    } catch (error) {
+        console.error('Error al suscribir:', error);
+        AppState.addNotification(`❌ Error: ${error.message}`, 'error');
+        return false;
+    }
 }
 
+// Desuscribir de topic
+async function desuscribirDeTopicFirebase(categoria) {
+    if (!AppState.user.current) return false;
+    
+    try {
+        const messaging = firebase.messaging();
+        
+        const topicsMap = {
+            'salud': 'topic_salud',
+            'terrenos': 'topic_terrenos',
+            'compraCasas': 'topic_casas',
+            'rentaSalones': 'topic_salones'
+        };
+        
+        const topicName = topicsMap[categoria];
+        if (!topicName) return false;
+        
+        await messaging.unsubscribeFromTopic(topicName);
+        console.log(`❌ Desuscrito de: ${topicName}`);
+        
+        // Actualizar localStorage
+        let topics = JSON.parse(localStorage.getItem('user_topics') || '{}');
+        topics[categoria] = false;
+        localStorage.setItem('user_topics', JSON.stringify(topics));
+        
+        // Eliminar de Firebase
+        if (AppState.firebase.database) {
+            await AppState.firebase.database.ref(`userTopics/${AppState.user.current.uid}/${categoria}`).remove();
+        }
+        
+        AppState.addNotification(`❌ Desactivadas notificaciones de ${getNombreCategoria(categoria)}`, 'info');
+        return true;
+    } catch (error) {
+        console.error('Error al desuscribir:', error);
+        AppState.addNotification(`❌ Error: ${error.message}`, 'error');
+        return false;
+    }
+}
+
+// Obtener nombre legible
+function getNombreCategoria(categoria) {
+    const nombres = {
+        'salud': 'Salud y Bienestar',
+        'terrenos': 'Terrenos',
+        'compraCasas': 'Compra de Casas',
+        'rentaSalones': 'Renta de Salones'
+    };
+    return nombres[categoria] || categoria;
+}
+
+// Manejar toggle
+window.toggleNotificacionCategoria = async function(categoria, checkboxElement) {
+    const isChecked = checkboxElement.checked;
+    
+    // Actualizar estilo visual del toggle
+    const slider = checkboxElement.nextElementSibling;
+    const circle = slider?.nextElementSibling;
+    
+    if (isChecked) {
+        if (slider) slider.style.backgroundColor = '#4CAF50';
+        if (circle) circle.style.transform = 'translateX(26px)';
+        await suscribirATopicFirebase(categoria);
+    } else {
+        if (slider) slider.style.backgroundColor = '#ccc';
+        if (circle) circle.style.transform = 'translateX(0px)';
+        await desuscribirDeTopicFirebase(categoria);
+    }
+};
+
+// RESTAURAR SUSCRIPCIONES (BOTÓN)
+window.restaurarSuscripcionesManual = async function() {
+    if (!AppState.user.current) {
+        AppState.addNotification('🔒 Debes iniciar sesión primero', 'warning');
+        return;
+    }
+    
+    AppState.addNotification('🔄 Restaurando tus preferencias...', 'info');
+    
+    const topicsGuardados = localStorage.getItem('user_topics');
+    
+    if (!topicsGuardados) {
+        AppState.addNotification('ℹ️ No hay preferencias guardadas. Activa algunas notificaciones primero.', 'info');
+        return;
+    }
+    
+    const topics = JSON.parse(topicsGuardados);
+    const messaging = firebase.messaging();
+    
+    const topicsMap = {
+        'salud': 'topic_salud',
+        'terrenos': 'topic_terrenos',
+        'compraCasas': 'topic_casas',
+        'rentaSalones': 'topic_salones'
+    };
+    
+    let activadas = 0;
+    
+    for (const [categoria, activo] of Object.entries(topics)) {
+        if (activo === true) {
+            const topicName = topicsMap[categoria];
+            if (topicName) {
+                try {
+                    await messaging.subscribeToTopic(topicName);
+                    console.log(`✅ Restaurada: ${topicName}`);
+                    activadas++;
+                } catch (error) {
+                    console.error(`Error con ${categoria}:`, error);
+                }
+            }
+        }
+    }
+    
+    if (activadas > 0) {
+        AppState.addNotification(`✅ Restauradas ${activadas} preferencias de notificaciones`, 'success');
+        
+        // Actualizar visualmente los toggles
+        for (const [categoria, activo] of Object.entries(topics)) {
+            const toggle = document.getElementById(`notif_${categoria}`);
+            if (toggle && activo === true) {
+                toggle.checked = true;
+                const slider = toggle.nextElementSibling;
+                const circle = slider?.nextElementSibling;
+                if (slider) slider.style.backgroundColor = '#4CAF50';
+                if (circle) circle.style.transform = 'translateX(26px)';
+            }
+        }
+    } else {
+        AppState.addNotification('ℹ️ No hay preferencias activas para restaurar', 'info');
+    }
+};
+
+// Limpiar caché local
+window.limpiarCacheLocal = async function() {
+    if (confirm('¿Eliminar todos los datos guardados localmente? Esto no afecta tu cuenta.')) {
+        try {
+            // Limpiar localStorage de preferencias
+            localStorage.removeItem('user_topics');
+            localStorage.removeItem('offline_user');
+            
+            // Limpiar IndexedDB
+            await OfflineDB.clear('configuraciones');
+            await OfflineDB.clear('users');
+            
+            AppState.addNotification('✅ Caché local limpiada correctamente', 'success');
+            
+            // Recargar la página después de 1 segundo
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } catch (error) {
+            AppState.addNotification('❌ Error al limpiar caché', 'error');
+        }
+    }
+};
 </script>
 
 <!-- PANTALLA 9: ADMIN - SIN OFFLINE (requiere internet para admin) -->
