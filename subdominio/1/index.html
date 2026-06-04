@@ -788,7 +788,7 @@ async function getDataOfflineFirst(store, id = null) {
 // Registrar Service Worker con el nuevo sistema
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw-full-offline.js').then(function(registration) {
+        navigator.serviceWorker.register('sw-full-offline.js').then(function(registration) {
         }).catch(function(error) {
             console.log('❌ Error al registrar Service Worker:', error);
         });
