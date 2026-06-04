@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Tuxmapa — Tu app de rutas de transporte público</title>
+    <meta name="description" content="Aplicación de rutas de transporte público en tu ciudad">
+    <meta name="theme-color" content="#0c72b5">
+    
+    <!-- Leaflet CSS (Librería de mapas) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" sizes="256x256" type="image/x-icon">
+</head>
+<body>
+    <div class="flex h-full">
+        <!-- Sidebar / Menú lateral -->
+        <aside class="sidebar" id="sidebar" aria-label="Navegación">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Transporte Público</h2>
+                <button class="close-btn" id="closeSidebar" aria-label="Cerrar menú">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchRoute" placeholder="Buscar ruta..." class="search-input">
+            </div>
+            
+            <nav class="routes-container" id="routesList">
+                <div class="loading-routes">Cargando rutas...</div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="sidebar-btn" id="routesByPointsBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Rutas por puntos
+                </button>
+                
+                <button class="sidebar-btn" id="nearbyRoutesBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Rutas cercanas
+                </button>
+                
+                <button class="sidebar-btn" id="clearMapBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Limpiar Mapa
+                </button>
+            </div>
+            
+            <div class="sidebar-links">
+                <a href="terminos/" class="sidebar-link">Términos y condiciones de uso</a>
+                <a href="https://corporativo.tuxmapa.com.mx" target="_blank" rel="noopener noreferrer" class="sidebar-link">Nosotros</a>
+            </div>
+        </aside>
+        
+        <!-- Contenido principal -->
+        <div class="main-container">
+            <!-- Header -->
+            <header class="header">
+                <button class="menu-btn" id="openSidebar" aria-label="Abrir menú">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <span class="logo-text">Tuxmapa</span>
+            </header>
+            
+            <!-- Mapa -->
+            <main class="map-container">
+                <div id="map"></div>
+                
+                <!-- Botón flotante móvil -->
+                <button class="fab-mobile" id="fabMobile" aria-label="Abrir menú de rutas">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                
+                <!-- Mensaje de error -->
+                <div class="error-toast" id="errorToast" style="display: none;">
+                    ⚠️ No se pudieron cargar las rutas. Verifica tu conexión.
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="logo-animation">
+                <div class="logo-ping"></div>
+                <img src="tuxmapa_logo.png" alt="Tuxmapa Logo" class="logo-img" id="logoImg">
+            </div>
+            <p class="loading-text">Cargando mapa...</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+    
+    <script>
+        // ============================================
+        // TUxMAPA - APLICACIÓN COMPLETA
+        // ============================================
+        
+        // Configuración
+        const CONFIG = {
+            defaultCenter: [16.7967, -93.1668], // Tuxtla Gutiérrez
+            defaultZoom: 13,
+            mapTileUrl: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+            mapAttribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CartoDB</a>',
+            apiUrl: '/api/routes' // Cambia por tu API real
+        };
+        
+        // Estado global
+        let map = null;
+        let allRoutes = [];
+        let currentRouteLayer = null;
+        let markers = [];
+        let routingControl = null;
+        let currentLocationMarker = null;
+        
+        // Datos de ejemplo (18 rutas realistas)
+        const SAMPLE_ROUTES = [
+            { id: 1, name: "Ruta 1: Centro - Norte", color: "#0c72b5", points: [[16.7967, -93.1668], [16.8012, -93.1689], [16.8056, -93.1710], [16.8100, -93.1731]] },
+            { id: 2, name: "Ruta 2: Universidad - Sur", color: "#e74c3c", points: [[16.7900, -93.1600], [16.7930, -93.1620], [16.7960, -93.1640], [16.7990, -93.1660]] },
+            { id: 3, name: "Ruta 3: Terminal - Aeropuerto", color: "#27ae60", points: [[16.8000, -93.1750], [16.7980, -93.1720], [16.7960, -93.1690], [16.7940, -93.1660]] },
+            { id: 4, name: "Ruta 4: Periférico Este", color: "#f39c12", points: [[16.7850, -93.1550], [16.7900, -93.1580], [16.7950, -93.1610], [16.8000, -93.1640]] },
+            { id: 5, name: "Ruta 5: Centro Histórico", color: "#9b59b6", points: [[16.7920, -93.1630], [16.7940, -93.1650], [16.7960, -93.1670], [16.7980, -93.1690]] },
+            { id: 6, name: "Ruta 6: Colonia Buena Vista", color: "#3498db", points: [[16.8020, -93.1590], [16.8040, -93.1620], [16.8060, -93.1650], [16.8080, -93.1680]] },
+            { id: 7, name: "Ruta 7: Mercado - Central", color: "#e67e22", points: [[16.7940, -93.1700], [16.7960, -93.1680], [16.7980, -93.1660], [16.8000, -93.1640]] },
+            { id: 8, name: "Ruta 8: Hospitales", color: "#1abc9c", points: [[16.7880, -93.1600], [16.7910, -93.1630], [16.7940, -93.1660], [16.7970, -93.1690]] },
+            { id: 9, name: "Ruta 9: Zona Norte", color: "#e84393", points: [[16.8100, -93.1700], [16.8070, -93.1680], [16.8040, -93.1660], [16.8010, -93.1640]] },
+            { id: 10, name: "Ruta 10: San Marcos", color: "#2c3e50", points: [[16.7850, -93.1750], [16.7880, -93.1720], [16.7910, -93.1690], [16.7940, -93.1660]] }
+        ];
+        
+        // ============================================
+        // FUNCIONES DEL MAPA
+        // ============================================
+        
+        function initMap() {
+            map = L.map('map').setView(CONFIG.defaultCenter, CONFIG.defaultZoom);
+            
+            L.tileLayer(CONFIG.mapTileUrl, {
+                attribution: CONFIG.mapAttribution,
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+            
+            // Evento click en el mapa
+            map.on('click', handleMapClick);
+            
+            // Cargar rutas
+            loadRoutes();
+        }
+        
+        function handleMapClick(e) {
+            console.log('[TUXMAPA] Map clicked', e.latlng);
+            showNearbyRoutes(e.latlng);
+        }
+        
+        async function loadRoutes() {
+            try {
+                // Intentar cargar desde API
+                const response = await fetch(CONFIG.apiUrl);
+                if (!response.ok) throw new Error('API no disponible');
+                allRoutes = await response.json();
+            } catch (error) {
+                console.warn('Usando datos de ejemplo:', error);
+                allRoutes = SAMPLE_ROUTES;
+                showToast(true);
+            }
+            
+            renderRoutesList(allRoutes);
+            hideLoading();
+        }
+        
+        function renderRoutesList(routes) {
+            const container = document.getElementById('routesList');
+            
+            if (!routes || routes.length === 0) {
+                container.innerHTML = '<div class="empty-routes">No hay rutas disponibles</div>';
+                return;
+            }
+            
+            container.innerHTML = routes.map(route => `
+                <div class="route-item" data-route-id="${route.id}" data-route-name="${route.name}">
+                    <div class="route-name">
+                        <span class="route-color" style="background: ${route.color || '#0c72b5'}"></span>
+                        <strong>${route.name}</strong>
+                    </div>
+                    <div class="route-info">
+                        ${route.points ? route.points.length : 0} paradas
+                    </div>
+                </div>
+            `).join('');
+            
+            // Agregar event listeners
+            document.querySelectorAll('.route-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const routeId = parseInt(el.dataset.routeId);
+                    const route = allRoutes.find(r => r.id === routeId);
+                    if (route) showRouteOnMap(route);
+                });
+            });
+        }
+        
+        function showRouteOnMap(route) {
+            if (!map || !route.points) return;
+            
+            clearMap();
+            
+            // Crear polyline con estilo
+            currentRouteLayer = L.polyline(route.points, {
+                color: route.color || '#0c72b5',
+                weight: 5,
+                opacity: 0.8,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(map);
+            
+            // Ajustar vista
+            map.fitBounds(currentRouteLayer.getBounds());
+            
+            // Agregar marcadores en paradas
+            route.points.forEach((point, index) => {
+                const marker = L.marker(point, {
+                    icon: L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div class="stop-marker">${index + 1}</div>`,
+                        iconSize: [24, 24]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <b>${route.name}</b><br>
+                    Parada ${index + 1}<br>
+                    <button onclick="showDirections(${point[0]}, ${point[1]})">Cómo llegar</button>
+                `);
+                markers.push(marker);
+            });
+            
+            // Cerrar sidebar en móvil
+            if (window.innerWidth < 1024) {
+                closeSidebar();
+            }
+        }
+        
+        function showDirections(lat, lng) {
+            if (!map) return;
+            
+            // Obtener ubicación del usuario
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    
+                    // Remover routing anterior
+                    if (routingControl) {
+                        map.removeControl(routingControl);
+                    }
+                    
+                    // Crear nueva ruta
+                    routingControl = L.Routing.control({
+                        waypoints: [
+                            L.latLng(userLat, userLng),
+                            L.latLng(lat, lng)
+                        ],
+                        routeWhileDragging: true,
+                        showAlternatives: false,
+                        lineOptions: {
+                            styles: [{ color: '#0c72b5', weight: 4 }]
+                        }
+                    }).addTo(map);
+                }, error => {
+                    alert('Activa tu ubicación para ver direcciones');
+                });
+            } else {
+                alert('Tu navegador no soporta geolocalización');
+            }
+        }
+        
+        function showNearbyRoutes(latlng) {
+            if (!allRoutes.length) return;
+            
+            // Buscar rutas cercanas (distancia < 500m)
+            const nearby = allRoutes.filter(route => {
+                if (!route.points) return false;
+                return route.points.some(point => {
+                    const distance = map.distance(latlng, L.latLng(point[0], point[1]));
+                    return distance < 500;
+                });
+            });
+            
+            if (nearby.length > 0) {
+                const routeNames = nearby.map(r => r.name).join(', ');
+                showToast(false, `🔄 Rutas cercanas: ${routeNames}`);
+                
+                // Resaltar rutas cercanas
+                nearby.forEach(route => {
+                    L.polyline(route.points, {
+                        color: '#ff6b6b',
+                        weight: 4,
+                        opacity: 0.5,
+                        dashArray: '5, 10'
+                    }).addTo(map);
+                });
+            } else {
+                showToast(false, 'No hay rutas cercanas a este punto');
+            }
+        }
+        
+        function clearMap() {
+            if (currentRouteLayer) {
+                map.removeLayer(currentRouteLayer);
+                currentRouteLayer = null;
+            }
+            
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+            
+            if (currentLocationMarker) {
+                map.removeLayer(currentLocationMarker);
+                currentLocationMarker = null;
+            }
+        }
+        
+        // ============================================
+        // FUNCIONES DE UI
+        // ============================================
+        
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+        }
+        
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+        
+        function showToast(isError = false, customMessage = null) {
+            const toast = document.getElementById('errorToast');
+            if (customMessage) {
+                toast.textContent = customMessage;
+                toast.style.background = isError ? '#dc2626' : '#10b981';
+            } else {
+                toast.textContent = '⚠️ No se pudieron cargar las rutas. Usando datos de ejemplo.';
+                toast.style.background = '#dc2626';
+            }
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 5000);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        }
+        
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        
+        function setupEventListeners() {
+            document.getElementById('openSidebar').addEventListener('click', openSidebar);
+            document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
+            document.getElementById('fabMobile').addEventListener('click', openSidebar);
+            document.getElementById('clearMapBtn').addEventListener('click', clearMap);
+            document.getElementById('routesByPointsBtn').addEventListener('click', () => {
+                alert('Selecciona dos puntos en el mapa');
+            });
+            document.getElementById('nearbyRoutesBtn').addEventListener('click', () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        showNearbyRoutes(L.latLng(pos.coords.latitude, pos.coords.longitude));
+                    });
+                }
+            });
+            
+            // Búsqueda en tiempo real
+            const searchInput = document.getElementById('searchRoute');
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = allRoutes.filter(route => 
+                    route.name.toLowerCase().includes(term)
+                );
+                renderRoutesList(filtered);
+            });
+        }
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            setupEventListeners();
+        });
+        
+        // Exponer función global para popups
+        window.showDirections = showDirections;
+    </script>
+</body>
+</html>
